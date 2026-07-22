@@ -1,0 +1,11 @@
+  /* BANDA */
+  .band{background:var(--onix);color:var(--hueso)}
+  .band .wrap{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:50px var(--wrap-pad);flex-wrap:wrap}
+  .band h2{font-size:clamp(23px,3vw,32px);font-weight:600;letter-spacing:-.5px;max-width:18ch}
+  .band p{color:var(--gris-claro);font-weight:300;margin-top:10px;max-width:46ch;font-size:15px}
+  .band{position:relative}
+  .band-x{position:absolute;top:10px;right:14px;background:none;border:0;color:var(--gris-claro);font-size:15px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:.15s}
+  .band-x:hover{color:var(--hueso);background:rgba(245,243,238,.08)}
+  .band .btn-fill{background:var(--cobre);border-color:var(--cobre);color:var(--onix)}
+  .band .btn-fill:hover{background:var(--cobre-l);border-color:var(--cobre-l)}
+

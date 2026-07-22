@@ -1,0 +1,26 @@
+
+  :root{
+    --onix:#17191D; --grafito:#2A2D33; --bronce:#9A7F4E; --cobre-d:#7E6234;
+    --gris:#6E727A; --hueso:#F5F3EE; --blanco:#FFFFFF;
+    --linea:rgba(23,25,29,.09); --linea-b:rgba(154,127,78,.28);
+    --ff-d:'Chakra Petch',sans-serif; --ff-b:'Titillium Web',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--ff-b);background:var(--hueso);color:var(--onix);min-height:100vh;display:grid;place-items:center;padding:24px}
+  .card{max-width:520px;text-align:center}
+  .mono{font-family:var(--ff-d);font-weight:700;font-size:64px;letter-spacing:-2px;margin-bottom:6px}
+  .mono .s{color:var(--bronce)} .mono .b{color:var(--grafito)}
+  .code{font-family:var(--ff-d);font-weight:700;font-size:clamp(64px,14vw,110px);line-height:1;color:var(--onix);letter-spacing:-4px}
+  .code em{font-style:normal;color:var(--cobre-d)}
+  .ticks{height:14px;margin:18px auto 22px;max-width:320px;background-image:
+    repeating-linear-gradient(90deg,var(--linea-b) 0 1px,transparent 1px 12px),
+    repeating-linear-gradient(90deg,var(--bronce) 0 1px,transparent 1px 60px);
+    background-size:100% 7px,100% 14px;background-position:0 100%,0 100%;background-repeat:repeat-x;opacity:.85}
+  h1{font-family:var(--ff-d);font-size:22px;font-weight:600;margin-bottom:10px}
+  p{color:var(--gris);font-size:15px;margin-bottom:26px}
+  .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  a.btn{font-family:var(--ff-b);font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;text-decoration:none;transition:.2s}
+  .fill{background:var(--onix);color:var(--hueso);border:1px solid var(--onix)}
+  .fill:hover{background:var(--grafito)}
+  .ghost{border:1px solid var(--bronce);color:var(--cobre-d)}
+  .ghost:hover{background:var(--bronce);color:#fff}

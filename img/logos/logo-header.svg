@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Nota: usa la fuente "Chakra Petch"; instálala o incrústala si lo usas fuera de la web -->
+<svg class="logo-h logo-svg" viewBox="0 0 880 240" role="img" aria-label="Sinergia Biomédica">
+  <text x="40" y="208" font-weight="700" font-size="212" textLength="252" lengthAdjust="spacingAndGlyphs"><tspan fill="#9A7F4E">S</tspan><tspan fill="#2A2D33">B</tspan></text>
+  <text x="342" y="158" font-weight="700" font-size="100" fill="#17191D" textLength="498" lengthAdjust="spacingAndGlyphs">SINERGIA</text>
+  <text x="342" y="212" font-weight="600" font-size="52" fill="#2A2D33" textLength="498" lengthAdjust="spacingAndGlyphs">BIOMÉDICA</text>
+  <rect x="342" y="228" width="498" height="3" fill="#9A7F4E"/>
+</svg>

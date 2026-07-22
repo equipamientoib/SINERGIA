@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sinergia Biomédica — Metrología y alquiler de equipos biomédicos en Lima</title>
+<meta name="description" content="Alquiler de analizadores y simuladores biomédicos con personal técnico y certificado de calibración vigente. Metrología, suministro hospitalario y talleres prácticos. Lima y provincias, Perú.">
+<meta name="theme-color" content="#17191D">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_PE">
+<meta property="og:title" content="Sinergia Biomédica — Metrología y alquiler de equipos biomédicos">
+<meta property="og:description" content="Analizadores y simuladores premium, siempre con personal técnico y certificado de calibración vigente. Lima y provincias.">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="img/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="img/icons/favicon-16.png">
+<link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="preload" as="image" href="img/tienda/esa620.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/01-base.css">
+<link rel="stylesheet" href="css/02-header.css">
+<link rel="stylesheet" href="css/03-home.css">
+<link rel="stylesheet" href="css/04-paginas.css">
+<link rel="stylesheet" href="css/05-catalogo.css">
+<link rel="stylesheet" href="css/06-talleres.css">
+<link rel="stylesheet" href="css/07-detalle.css">
+<link rel="stylesheet" href="css/08-banda.css">
+<link rel="stylesheet" href="css/09-contacto.css">
+<link rel="stylesheet" href="css/10-modal.css">
+<link rel="stylesheet" href="css/11-personaliza.css">
+<link rel="stylesheet" href="css/12-extras.css">
+<link rel="stylesheet" href="css/13-clientes.css">
+<link rel="stylesheet" href="css/14-footer.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Sinergia Biomédica",
+  "legalName": "Servicios Integrales Sinergia S.A.C.",
+  "taxID": "20615862682",
+  "description": "Metrología y calibración, alquiler de equipos biomédicos con personal técnico, suministro hospitalario y talleres prácticos.",
+  "email": "ventas@sinergiabiomedica.pe",
+  "address": {"@type": "PostalAddress", "addressLocality": "Pueblo Libre", "addressRegion": "Lima", "addressCountry": "PE"},
+  "areaServed": "Lima y provincias, Perú",
+  "knowsAbout": ["Metrología biomédica", "IEC 62353", "IEC 60601-1", "Calibración de equipos médicos"]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<noscript><div style="padding:14px 24px;background:#F0ECE2;color:#17191D;font-family:sans-serif;font-size:14px">Esta página necesita JavaScript para mostrar el catálogo y calcular las tarifas.</div></noscript>
+
+<!-- HEADER y FOOTER: universales, se generan desde js/00-config.js + js/01-componentes.js -->
+<div id="app-header"></div>
+
+<main id="main">
+<!-- ===== INICIO ===== -->
+<div class="page" id="page-home">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Metrología · Alquiler · Talleres</div>
+      <h1>Instrumentos de calibración que <em>distinguen su servicio</em>.</h1>
+      <p class="lead">Alquiler de analizadores y simuladores biomédicos de marca premium en Lima y provincias. Cada equipo llega con personal técnico especializado y certificado de calibración vigente.</p>
+      <div class="hero-props">
+        <span>Certificados de calibración vigentes</span>
+        <span>Lima y provincias</span>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-fill btn-lg" onclick="go('#/catalogo')">Ver catálogo de alquiler</a>
+        <a class="btn btn-lg" onclick="go('#/contacto')">Solicitar cotización</a>
+      </div>
+    </div>
+    <div class="hero-stage">
+      <img src="img/tienda/esa620.jpg" alt="Analizador de seguridad eléctrica Fluke ESA620" onclick="go('#/equipo/esa620')">
+      <div class="cap"><span>Fluke ESA620 · seguridad eléctrica</span><span><b>IEC 62353</b></span></div>
+    </div>
+  </div>
+  <div class="wrap"><div class="ticks" aria-hidden="true"></div></div>
+
+  <div class="marcas">
+    <div class="wrap"><span class="lab">Trabajamos con</span>
+      <div class="names"><span>FLUKE</span><span>RIGEL</span><span>CONTEC</span><span>AUTOOL</span><span>TASI</span></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="shead">
+        <div><div class="k">Catálogo de alquiler</div><h2>Equipos más solicitados</h2></div>
+        <a class="btn btn-fill" onclick="go('#/catalogo')">Ver todo el catálogo →</a>
+      </div>
+      <div class="grid" id="eqHome"></div>
+      <div class="cat-chips">
+        <span>Ir directo a</span>
+        <button class="chip" onclick="go('#/catalogo/ansim')">Analizadores y simuladores</button>
+        <button class="chip" onclick="go('#/catalogo/med')">Instrumentos de medición</button>
+        <button class="chip" onclick="go('#/catalogo/elec')">Medidores eléctricos</button>
+        <button class="chip" onclick="go('#/catalogo/paquetes')">Paquetes completos</button>
+        <button class="chip" onclick="go('#/catalogo/custom')">Arma tu paquete</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="shead">
+        <div><div class="k">Qué hacemos</div><h2>Tres servicios, un mismo estándar</h2></div>
+        <p>Resolvemos la calibración, el alquiler y el equipamiento sin que coordines con varios proveedores.</p>
+      </div>
+      <div class="svc">
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div><h3>Metrología y calibración</h3><p>Seguridad eléctrica y desempeño bajo IEC 62353, IEC 60601-1 y AAMI ES1, con instrumentos trazables.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/></svg></div><h3>Suministro hospitalario</h3><p>Equipos e instrumentos biomédicos para obras y proyectos, desde la cotización hasta la entrega.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 1 8l11 5 9-4.1V15"/><path d="M5 10.5V15c0 1.7 3.1 3 7 3s7-1.3 7-3v-4.5"/></svg></div><h3>Talleres prácticos</h3><p>Capacitación en metrología biomédica con práctica sobre equipos reales que también alquilamos.</p></div>
+      </div>
+      <div style="margin-top:24px"><a class="btn" onclick="go('#/servicios')">Conoce cómo trabajamos →</a></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="shead">
+        <div><div class="k">Nuestros clientes</div><h2>Proyectos recientes</h2></div>
+        <p>Servicios reales, con un panel de seguimiento en línea para cada cliente.</p>
+      </div>
+      <div class="pr-grid" id="prHome"></div>
+      <div style="margin-top:24px"><a class="btn" onclick="go('#/clientes')">Ver todos los proyectos →</a></div>
+    </div>
+  </section>
+
+  <div class="band"><button class="band-x" onclick="this.closest('.band').style.display='none'" aria-label="Cerrar aviso">✕</button><div class="wrap">
+    <div><h2>¿Listo para tu próxima calibración?</h2><p>Cuéntanos qué equipo necesitas y las fechas. Te respondemos con la cotización y la disponibilidad.</p></div>
+    <a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a>
+  </div></div>
+</div>
+
+<!-- ===== NOSOTROS ===== -->
+<div class="page" id="page-nosotros">
+  <div class="wrap pagehead"><div class="k">Quiénes somos</div>
+    <h1>Especialistas en metrología biomédica</h1>
+    <p>Una empresa peruana enfocada en la precisión de los equipos que cuidan a las personas.</p>
+  </div>
+  <section style="padding-top:40px">
+    <div class="wrap cols">
+      <div>
+        <p class="lead-txt">Sinergia Biomédica es la línea de metrología, alquiler y equipamiento de Servicios Integrales Sinergia S.A.C., con sede en Pueblo Libre, Lima.</p>
+        <p class="body-txt">Combinamos experiencia práctica en el mantenimiento de equipos biomédicos —monitores, bombas de infusión, desfibriladores, equipos de electrocirugía— con un portafolio de instrumentos de calibración de marca premium. Acompañamos a clínicas, hospitales, laboratorios e ingenieros biomédicos para que cada medición sea confiable y trazable, respaldada siempre por personal técnico especializado.</p>
+      </div>
+      <div class="facts">
+        <div class="row"><span class="l">Razón social</span><span class="v">Servicios Integrales Sinergia S.A.C.</span></div>
+        <div class="row"><span class="l">RUC</span><span class="v">20615862682</span></div>
+        <div class="row"><span class="l">Sede</span><span class="v">Pueblo Libre, Lima<small>Perú</small></span></div>
+        <div class="row"><span class="l">Cobertura</span><span class="v">Lima y provincias</span></div>
+      </div>
+    </div>
+  </section>
+  <div class="band"><button class="band-x" onclick="this.closest('.band').style.display='none'" aria-label="Cerrar aviso">✕</button><div class="wrap">
+    <div><h2>Trabajemos juntos</h2><p>Solicita una cotización o consulta por el equipo que necesitas.</p></div>
+    <a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Contáctanos</a>
+  </div></div>
+</div>
+
+<!-- ===== SERVICIOS ===== -->
+<div class="page" id="page-servicios">
+  <div class="wrap pagehead"><div class="k">Servicios</div>
+    <h1>Qué hacemos y cómo trabajamos</h1>
+    <p>Tres líneas de servicio con un mismo estándar de precisión y respaldo técnico.</p>
+  </div>
+  <section style="padding-top:44px">
+    <div class="wrap">
+      <div class="svc">
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div><div class="tagn">SERVICIO 01</div><h3>Metrología y calibración</h3><p>Verificamos la seguridad eléctrica y el desempeño de tus equipos médicos según IEC 62353, IEC 60601-1 y AAMI ES1, con instrumentos trazables.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="tagn">SERVICIO 02</div><h3>Alquiler con técnico</h3><p>Ponemos analizadores y simuladores premium a tu disposición por días, siempre con personal técnico que opera el equipo y respalda las mediciones.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/></svg></div><div class="tagn">SERVICIO 03</div><h3>Suministro hospitalario</h3><p>Abastecemos equipos e instrumentos biomédicos para obras y proyectos de equipamiento, desde la cotización hasta la entrega.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 1 8l11 5 9-4.1V15"/><path d="M5 10.5V15c0 1.7 3.1 3 7 3s7-1.3 7-3v-4.5"/></svg></div><div class="tagn">SERVICIO 04</div><h3>Talleres prácticos</h3><p>Formamos a tu equipo en metrología y seguridad eléctrica biomédica con sesiones prácticas sobre instrumentos reales Fluke y Rigel.</p></div>
+      </div>
+    </div>
+  </section>
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="shead"><div><div class="k">Cómo trabajamos</div><h2>Del catálogo a tu servicio en tres pasos</h2></div><p>Sin pagos en línea: tú eliges y solicitas, nosotros confirmamos y coordinamos.</p></div>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h3>Eliges el equipo</h3><p>Revisas el catálogo y seleccionas el instrumento que tu servicio necesita.</p></div>
+        <div class="step"><div class="num">2</div><h3>Solicitas tus fechas</h3><p>Indicas el rango de días; calculamos el estimado con IGV al instante y envías la solicitud.</p></div>
+        <div class="step"><div class="num">3</div><h3>Confirmamos y coordinamos</h3><p>Validamos disponibilidad y coordinamos la entrega del equipo junto al técnico que lo acompaña.</p></div>
+      </div>
+      <div style="margin-top:26px"><a class="btn btn-fill" onclick="go('#/catalogo')">Ver catálogo de equipos →</a></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== CATÁLOGO ===== -->
+<div class="page" id="page-catalogo">
+  <div class="wrap pagehead"><div class="k">Catálogo de alquiler</div>
+    <h1>Equipos disponibles por días</h1>
+    <p>Toca un equipo para ver su ficha y tarifas. Alquila por equipo o por paquete, y los paquetes vienen en dos niveles: Calibración y Mantenimiento.</p>
+  </div>
+  <section style="padding-top:34px">
+    <div class="wrap">
+            <div class="seg">
+        <button class="on" id="segEq" onclick="setView('eq')">Equipos individuales</button>
+        <button id="segPk" onclick="setView('pk')">Paquetes</button>
+        <button id="segCustom" onclick="setView('custom')">Arma tu paquete</button>
+      </div>
+      <button class="filtros-btn" onclick="toggleFiltros()">Filtros ▾</button>
+      <div class="catalog-layout" id="catLayout">
+        <aside class="filters-side" id="filtersSide"></aside>
+        <div class="catalog-main">
+          <div id="viewEq">
+            <div class="subseg" id="subEq">
+              <button class="on" data-g="all" onclick="setGrupo('all')">Todos</button>
+              <button data-g="ansim" onclick="setGrupo('ansim')">Analizadores y simuladores</button>
+              <button data-g="med" onclick="setGrupo('med')">Instrumentos de medición</button>
+              <button data-g="elec" onclick="setGrupo('elec')">Medidores eléctricos</button>
+              <button data-g="apoyo" onclick="setGrupo('apoyo')">Herramientas de apoyo</button>
+            </div>
+            <div class="result-count" id="countEq"></div>
+            <div class="grid" id="grid"></div>
+          </div>
+          <div id="viewPk" style="display:none">
+            <div class="subseg" id="subPk">
+              <button class="on" data-niv="all" onclick="setNivel('all')">Todos</button>
+              <button data-niv="Calibración" onclick="setNivel('Calibración')">Calibración</button>
+              <button data-niv="Mantenimiento" onclick="setNivel('Mantenimiento')">Mantenimiento</button>
+            </div>
+            <div class="result-count" id="countPk"></div>
+            <div class="pkgs" id="pkgs"></div>
+            <div class="custom-cta"><span>¿No está la combinación que buscas?</span><button class="btn btn-fill" onclick="setView('custom')">Arma tu paquete a medida →</button></div>
+          </div>
+          <div id="viewCustom" style="display:none">
+            <div class="custom-intro">Elige los instrumentos que necesitas y arma tu propio paquete. El precio se calcula solo, con descuento por combinar, y el técnico va incluido (se cobra aparte, mínimo medio día).</div>
+            <div class="custom-layout">
+              <div class="custom-list" id="customList"></div>
+              <aside class="custom-summary" id="customSummary"></aside>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nota"><div class="tag">POLÍTICA FIJA</div><p>Ningún equipo se alquila sin personal técnico de Sinergia Biomédica. El acompañamiento garantiza el uso correcto del instrumento y la validez de las mediciones.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== NUESTROS CLIENTES ===== -->
+<div class="page" id="page-clientes">
+  <div class="wrap pagehead"><div class="k">Nuestros clientes</div>
+    <h1>Proyectos que respaldan nuestro trabajo</h1>
+    <p>Una muestra de los servicios realizados con clínicas, hospitales e ingenieros biomédicos. Cada proyecto incluye un panel de seguimiento privado: el cliente entra con su clave y ve el avance en tiempo real.</p>
+  </div>
+  <section style="padding-top:34px">
+    <div class="wrap">
+      <div class="result-count" id="countPr"></div>
+      <div class="pr-grid" id="prGrid"></div>
+      <div class="nota"><div class="tag">SEGUIMIENTO PRIVADO</div><p>El avance de cada proyecto es confidencial: solo el cliente accede con la clave que le entregamos al iniciar el servicio. ¿Eres cliente y no tienes tu clave? Escríbenos.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== DETALLE EQUIPO (dinámico) ===== -->
+<div class="page" id="page-equipo">
+  <div class="wrap" id="equipoBody"></div>
+</div>
+
+<!-- ===== TALLERES ===== -->
+<div class="page" id="page-talleres">
+  <div class="wrap pagehead"><div class="k">Talleres prácticos</div>
+    <h1>Capacitación en metrología biomédica</h1>
+    <p>Sesiones prácticas sobre instrumentos reales —los mismos que alquilamos— para que tu equipo domine la verificación y calibración de equipos médicos. Presencial en Lima o in-house en tu institución.</p>
+  </div>
+  <section style="padding-top:40px">
+    <div class="wrap">
+      <div class="work">
+        <div class="wcard">
+          <div class="wmeta"><span>NIVEL INTERMEDIO</span><span>8 HORAS</span></div>
+          <h3>Seguridad eléctrica en equipos médicos</h3>
+          <div class="wmod">Presencial Lima · in-house · IEC 62353</div>
+          <p>Aprende a ejecutar e interpretar pruebas de seguridad eléctrica con práctica directa sobre el analizador Fluke ESA620.</p>
+          <ul class="temas"><li>Corrientes de fuga y resistencia de tierra</li><li>Resistencia de aislamiento</li><li>Protocolo IEC 62353 / 60601-1</li><li>Interpretación de resultados</li></ul>
+          <a class="btn" onclick="go('#/contacto')">Solicitar información</a>
+        </div>
+        <div class="wcard">
+          <div class="wmeta"><span>NIVEL BÁSICO-INT.</span><span>6 HORAS</span></div>
+          <h3>Verificación de monitores y pulsioxímetros</h3>
+          <div class="wmod">Presencial Lima · in-house</div>
+          <p>Práctica con el Rigel SP-SiM y el CONTEC MS400 para verificar pulsioxímetros y monitores multiparamétricos.</p>
+          <ul class="temas"><li>Simulación de SpO2 y signos vitales</li><li>Verificación de ECG y respiración</li><li>Criterios de aceptación</li><li>Registro y trazabilidad</li></ul>
+          <a class="btn" onclick="go('#/contacto')">Solicitar información</a>
+        </div>
+        <div class="wcard">
+          <div class="wmeta"><span>NIVEL BÁSICO</span><span>4 HORAS</span></div>
+          <h3>Fundamentos de metrología biomédica</h3>
+          <div class="wmod">Presencial Lima · in-house</div>
+          <p>Bases conceptuales para entender la metrología aplicada a equipos médicos y su marco normativo.</p>
+          <ul class="temas"><li>Calibración vs. verificación</li><li>Trazabilidad e incertidumbre</li><li>Normas IEC y AAMI</li><li>Buenas prácticas en sitio</li></ul>
+          <a class="btn" onclick="go('#/contacto')">Solicitar información</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="band"><button class="band-x" onclick="this.closest('.band').style.display='none'" aria-label="Cerrar aviso">✕</button><div class="wrap">
+    <div><h2>¿Quieres capacitar a tu equipo?</h2><p>Armamos el taller a la medida de tu institución, presencial o in-house.</p></div>
+    <a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar información</a>
+  </div></div>
+</div>
+
+<!-- ===== CONTACTO ===== -->
+<div class="page" id="page-contacto">
+  <div class="wrap pagehead"><div class="k">Contacto</div>
+    <h1>Solicita tu cotización</h1>
+    <p>Cuéntanos qué equipo necesitas y las fechas. Te respondemos con disponibilidad y precio.</p>
+  </div>
+  <section style="padding-top:34px">
+    <div class="wrap contact-grid">
+      <div class="cform">
+        <div class="field"><label>Nombre / institución</label><input type="text" placeholder="Clínica, hospital o nombre"></div>
+        <div class="field row2"><div><label>Correo</label><input type="email" placeholder="correo@ejemplo.com"></div><div><label>Teléfono</label><input type="tel" placeholder="+51 9XX XXX XXX"></div></div>
+        <div class="field"><label>Equipo de interés</label><select id="cEq"></select></div>
+        <div class="field"><label>Mensaje</label><textarea rows="4" placeholder="Fechas, ubicación, detalles del servicio…"></textarea></div>
+        <button class="btn btn-fill" onclick="alert('Prototipo: este formulario se conectará a tu correo vía Formspree.')">Enviar solicitud</button>
+      </div>
+      <div class="facts">
+        <div class="row"><span class="l">Correo</span><span class="v">ventas@sinergiabiomedica.pe</span></div>
+        <div class="row"><span class="l">Web</span><span class="v">sinergiabiomedica.pe</span></div>
+        <div class="row"><span class="l">Teléfono</span><span class="v">+51 9XX XXX XXX</span></div>
+        <div class="row"><span class="l">Sede</span><span class="v">Pueblo Libre, Lima<small>Perú</small></span></div>
+        <div class="row"><span class="l">RUC</span><span class="v">20615862682</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<div id="app-footer"></div>
+
+<button class="toTop" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver al inicio">↑</button>
+
+<!-- WHATSAPP FLOTANTE (se activa poniendo tu número en CONFIG.WHATSAPP) -->
+<a class="wafab" id="waFab" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.6.8 5 2.3 7L4 29l7.3-2.2c1.9 1 4 1.6 6.2 1.6h.1c6.6 0 12-5.3 12-11.9 0-3.2-1.3-6.2-3.5-8.4A12 12 0 0 0 16 3zm7 16.9c-.3.8-1.7 1.6-2.4 1.7-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.8-3.6-1.5-5.9-5.1-6.1-5.4-.2-.2-1.4-1.9-1.4-3.7s.9-2.6 1.3-3c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6l1.1 2.7c.1.2.2.5 0 .7l-.4.7-.6.6c-.2.2-.4.4-.2.8.2.3 1 1.6 2.1 2.6 1.5 1.3 2.7 1.7 3 1.9.4.2.6.1.8-.1l1.2-1.4c.3-.3.5-.2.8-.1l2.6 1.2c.4.2.6.3.7.5.1.1.1.8-.2 1.6z"/></svg>
+</a>
+
+<!-- MODAL RESERVA -->
+<div class="ov" id="ov">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitulo">
+    <div class="mhead">
+      <button class="x" onclick="cerrar()" aria-label="Cerrar">✕</button>
+      <div class="k">Solicitar reserva</div>
+      <h3 id="mTitulo">Equipo</h3>
+      <div class="mm" id="mMarca">Marca</div>
+      <div class="modseg" id="modSeg">
+        <button data-m="equipo" onclick="setMod('equipo')">Por equipo</button>
+        <button class="on" data-m="hora" onclick="setMod('hora')">Por hora</button>
+        <button data-m="dia" onclick="setMod('dia')">Por día</button>
+        <button data-m="semana" onclick="setMod('semana')">Por semana</button>
+        <button data-m="mes" onclick="setMod('mes')">Por mes</button>
+      </div>
+    </div>
+    <div class="mbody">
+    <div class="modcond" id="modCond"></div>
+    <div id="inDia"><div class="field row2"><div><label>Desde</label><input type="date" id="d1" oninput="calc()" onchange="calc()"></div><div><label>Hasta</label><input type="date" id="d2" oninput="calc()" onchange="calc()"></div></div></div>
+    <div id="inQty" style="display:none"><div class="field"><label id="qtyLabel">Cantidad</label><input type="number" min="1" step="1" id="nQty" value="1" oninput="calc()" onchange="calc()"></div></div>
+    <div class="calc">
+      <div class="calc-h">Alquiler del equipo</div>
+      <div><span id="cUnitLbl">Precio por día</span><span id="cDia">—</span></div>
+      <div><span id="cQtyLbl">Días</span><span id="cDias">—</span></div>
+      <div><span>Subtotal (sin IGV)</span><span id="cSub">—</span></div>
+      <div><span>IGV 18% (incluido)</span><span id="cIgv">—</span></div>
+      <div class="tot"><span>Total alquiler</span><span id="cTot">—</span></div>
+    </div>
+    <div class="calc tecbox">
+      <div class="calc-h">Personal técnico · instrumentista <span class="apart">(se cobra aparte)</span></div>
+      <div class="apart" style="margin:-3px 0 9px;display:block">Mínimo: medio día · S/ 60</div>
+      <div><span id="cTecUnitLbl">Por día</span><span id="cTecUnit">—</span></div>
+      <div><span id="cTecQtyLbl">Días</span><span id="cTecQty">—</span></div>
+      <div class="tot"><span>Total instrumentista</span><span id="cTec">—</span></div>
+    </div>
+    <div class="grand"><span>Total general (IGV incluido)</span><span id="cGrand">—</span></div>
+    <div class="field"><label>Nombre / institución</label><input type="text" placeholder="Clínica, hospital o nombre"></div>
+    <div class="field row2"><div><label>Correo</label><input type="email" placeholder="correo@ejemplo.com"></div><div><label>Teléfono</label><input type="tel" placeholder="+51 9XX XXX XXX"></div></div>
+    <button class="btn btn-fill" onclick="enviar()">Enviar solicitud de reserva</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/00-config.js"></script>
+<script src="js/01-componentes.js"></script>
+<script src="js/02-datos.js"></script>
+<script src="js/03-catalogo.js"></script>
+<script src="js/04-personaliza.js"></script>
+<script src="js/05-detalle.js"></script>
+<script src="js/06-clientes.js"></script>
+<script src="js/07-router.js"></script>
+<script src="js/08-ui.js"></script>
+<script src="js/09-menu.js"></script>
+<script src="js/10-modal.js"></script>
+</body>
+</html>

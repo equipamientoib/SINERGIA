@@ -1,0 +1,15 @@
+  /* FOOTER */
+  footer{background:var(--onix);color:var(--hueso);padding:54px 0 34px}
+  .footer-logo text{font-family:var(--ff-d)}
+  .fgrid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+  footer p{font-size:13.5px;color:var(--gris-claro);font-weight:300;margin-top:14px;line-height:1.7}
+  footer .tt{font-family:var(--ff-d);font-size:12px;letter-spacing:2px;color:var(--cobre);text-transform:uppercase}
+  footer .fnav{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  footer .fnav a{color:var(--gris-claro);font-size:14px;cursor:pointer}
+  footer .fnav a:hover{color:var(--cobre-l)}
+  .wa-row{display:flex;align-items:center;gap:6px;margin-top:16px;flex-wrap:wrap}
+  .wa{display:inline-flex;align-items:center;gap:8px;color:var(--ok-l);font-weight:600;font-size:14px;cursor:pointer}
+  .wa:hover{color:#8ee6c4}
+  .wa2{color:var(--gris-claro);font-weight:600;font-size:14px;cursor:pointer}
+  .wa2:hover{color:var(--cobre-l)}
+  footer .ruc{font-size:12px;color:#5a5e66;margin-top:24px;font-family:var(--ff-d);letter-spacing:1px;padding-top:22px;border-top:1px solid rgba(245,243,238,.08)}

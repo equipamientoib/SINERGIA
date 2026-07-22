@@ -1,0 +1,12 @@
+  /* CONTACTO PAGE */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;padding-top:10px}
+  @media(max-width:880px){.contact-grid{grid-template-columns:1fr;gap:28px}}
+  .cform{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);padding:28px}
+
+  /* FORM (modal + contacto) */
+  .field{margin-bottom:14px}
+  .field label{display:block;font-family:var(--ff-d);font-size:12px;letter-spacing:.5px;color:var(--grafito);margin-bottom:6px}
+  .field input,.field textarea,.field select{width:100%;background:var(--crema);border:1px solid var(--linea);border-radius:var(--r-sm);padding:11px 13px;color:var(--onix);font-family:var(--ff-b);font-size:14px}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--bronce);background:var(--blanco)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+

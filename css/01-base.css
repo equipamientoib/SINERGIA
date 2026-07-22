@@ -1,0 +1,25 @@
+
+  :root{
+    --onix:#17191D; --grafito:#2A2D33; --grafito-2:#3A3F47;
+    --bronce:#9A7F4E; --cobre:#B5945A; --cobre-d:#7E6234; --cobre-l:#D8C49A;
+    --gris:#6E727A; --gris-claro:#9aa0a8;
+    --hueso:#F5F3EE; --blanco:#FFFFFF; --crema:#FBFAF6; --crema-2:#F0ECE2;
+    --linea:rgba(23,25,29,.09); --linea-b:rgba(154,127,78,.28);
+    --ok:#2E8B6B; --ok-l:#67d3ad;
+    /* Tokens de diseño (edítalos aquí y cambian en toda la página) */
+    --ff-d:'Chakra Petch',sans-serif;              /* tipografía display */
+    --ff-b:'Titillium Web',system-ui,sans-serif;   /* tipografía de cuerpo */
+    --r-sm:8px; --r-md:12px; --r-lg:16px;          /* radios de borde */
+    --sh-card:0 12px 32px rgba(23,25,29,.06);      /* sombra de tarjeta */
+    --sh-pop:0 18px 40px rgba(23,25,29,.09);       /* sombra elevada */
+    --wrap-pad:clamp(16px,4vw,24px);               /* margen lateral fluido */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--ff-b);background:var(--hueso);color:var(--onix);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
+  h1,h2,h3,.ff{font-family:var(--ff-d)}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 var(--wrap-pad)}
+  .logo-svg text{font-family:var(--ff-d)}
+
