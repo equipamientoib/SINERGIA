@@ -34,6 +34,6 @@ const CONFIG = {
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
      - URL de Apps Script    -> Google Sheets EN VIVO (Opción A)                    */
-  DATA_URL: "https://script.google.com/macros/s/AKfycbyCC42QwfzqLYKo0J9ahH_m1upJ0uMIhd2hF2R7YOdNhtceXmhzRVYlydhkdjk-Xh_1Rg/exec",,
+  DATA_URL: "https://script.google.com/macros/s/AKfycbyCC42QwfzqLYKo0J9ahH_m1upJ0uMIhd2hF2R7YOdNhtceXmhzRVYlydhkdjk-Xh_1Rg/exec",
   WHATSAPP: SITE.whatsapp,
 };
