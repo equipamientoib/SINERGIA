@@ -152,8 +152,10 @@ function renderProyecto(id){
         </div>
         <div class="dnote" style="margin-top:16px">¿Consultas sobre el avance? <a onclick="go('#/contacto')" style="color:var(--cobre-d);font-weight:600;cursor:pointer">&nbsp;Contáctanos</a>.</div>
       </div>
-    </div>`;
+    </div>
+    <div id="prDet"></div>`;
   setTimeout(()=>{const b=document.getElementById('prBar');if(b)b.style.width=p.avance+'%';},80);
+  cargarDetalle(id);
 }
 async function tryUnlock(id){
   const inp=document.getElementById('prKey'), err=document.getElementById('lockErr');
@@ -161,8 +163,133 @@ async function tryUnlock(id){
   if(!v){if(err)err.classList.add('show');return;}
   const h=await sha256(v);
   const p=PROYECTOS.find(x=>x.id===id);
-  if(p&&h===p.clave_hash){PR_OPEN.add(id);renderProyecto(id);}
+  if(p&&h===p.clave_hash){PR_OPEN.add(id);PR_KEY[id]=h;renderProyecto(id);}
   else{if(err)err.classList.add('show');if(inp){inp.value='';inp.focus();}}
 }
+
+/* ---- DETALLE PRIVADO POR EQUIPO (se pide al servidor con la clave) ---- */
+const PR_KEY={};              // hash de la clave por proyecto (solo en memoria)
+const PR_DET={};              // detalle ya descargado, para no volver a pedirlo
+let DET_AREA='', DET_Q='', DET_SOLO=true;
+
+async function cargarDetalle(id){
+  const cont=document.getElementById('prDet'); if(!cont)return;
+  const p=PROYECTOS.find(x=>x.id===id);
+  const url=(typeof CONFIG!=='undefined'&&CONFIG.DATA_URL)||'';
+  if(!p||!p.detalle||url.indexOf('http')!==0){cont.innerHTML='';return;}
+  if(PR_DET[id]){pintarDetalle(id);return;}
+  cont.innerHTML='<div class="dash-card det-card"><div class="dh">Equipos del contrato</div><p class="dnote">Cargando el detalle…</p></div>';
+  try{
+    const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)+'&clave='+encodeURIComponent(PR_KEY[id]||'');
+    const r=await fetch(q,{cache:'no-store'});
+    const d=await r.json();
+    if(!d||!d.ok)throw new Error((d&&d.motivo)||'sin acceso');
+    PR_DET[id]=d; DET_AREA=''; DET_Q=''; pintarDetalle(id);
+  }catch(e){
+    cont.innerHTML='<div class="dash-card det-card"><div class="dh">Equipos del contrato</div>'+
+      '<p class="dnote">No se pudo cargar el detalle ('+e.message+'). Puedes reintentar más tarde o escribirnos.</p></div>';
+  }
+}
+
+function detFiltrados(id){
+  const d=PR_DET[id]; if(!d)return [];
+  const q=DET_Q.toLowerCase();
+  return d.equipos.filter(e=>{
+    if(DET_SOLO&&!e.alcance)return false;
+    if(DET_AREA&&e.area!==DET_AREA)return false;
+    if(!q)return true;
+    return (e.nom+' '+e.marca+' '+e.modelo+' '+e.serie+' '+e.cod).toLowerCase().includes(q);
+  });
+}
+
+function pintarDetalle(id){
+  const cont=document.getElementById('prDet'), d=PR_DET[id]; if(!cont||!d)return;
+  const areas=[...new Set(d.equipos.map(e=>e.area))].filter(Boolean).sort();
+  const t=d.totales;
+  cont.innerHTML=`
+    <div class="dash-card det-card">
+      <div class="dh">Equipos del contrato</div>
+      <div class="det-tot">
+        <div><b>${t.en_alcance}</b><span>equipos en alcance</span></div>
+        <div><b>${t.intervenciones}</b><span>intervenciones</span></div>
+        <div><b>${t.ejecutadas}</b><span>ejecutadas</span></div>
+        <div><b>${t.intervenciones-t.ejecutadas}</b><span>pendientes</span></div>
+      </div>
+      <div class="det-filtros">
+        <select onchange="DET_AREA=this.value;pintarLista('${id}')">
+          <option value="">Todas las áreas</option>
+          ${areas.map(a=>`<option${a===DET_AREA?' selected':''}>${a}</option>`).join('')}
+        </select>
+        <input type="search" placeholder="Buscar equipo, marca o serie" value="${DET_Q}"
+               oninput="DET_Q=this.value;pintarLista('${id}')">
+        <label class="det-chk"><input type="checkbox"${DET_SOLO?' checked':''}
+               onchange="DET_SOLO=this.checked;pintarLista('${id}')"> Solo en alcance</label>
+      </div>
+      <div id="detLista"></div>
+    </div>`;
+  pintarLista(id);
+}
+
+function pintarLista(id){
+  const cont=document.getElementById('detLista'); if(!cont)return;
+  const lista=detFiltrados(id);
+  if(!lista.length){cont.innerHTML='<p class="dnote">No hay equipos que coincidan con el filtro.</p>';return;}
+  cont.innerHTML='<div class="det-n">'+lista.length+' equipos</div>'+lista.map(e=>{
+    const hechas=e.intervenciones.filter(i=>i.hecho).length, tot=e.intervenciones.length;
+    const est=tot&&hechas>=tot?'ok':(hechas?'medio':'pend');
+    return `
+    <div class="eqrow${e.alcance?'':' fuera'}">
+      <button class="eqhead" onclick="this.parentNode.classList.toggle('open')">
+        <span class="eqcod">${e.cod}</span>
+        <span class="eqnom">${e.nom}<em>${[e.marca,e.modelo].filter(x=>x&&x!=='S/M').join(' ')}</em></span>
+        <span class="eqarea">${e.area}</span>
+        <span class="eqpill ${est}">${tot?hechas+'/'+tot:'sin servicio'}</span>
+      </button>
+      <div class="eqbody">
+        <div class="eqdatos">
+          <span><i>Serie</i>${e.serie||'—'}</span>
+          <span><i>Cód. MINSA</i>${e.minsa||'—'}</span>
+          <span><i>Servicios/año</i>${e.servicios}</span>
+          <span><i>Ítem</i>${e.item||'—'}</span>
+        </div>
+        ${tot?e.intervenciones.sort((a,b)=>a.n-b.n).map(i=>`
+          <div class="intv${i.hecho?' hecho':''}">
+            <div class="itxt">
+              <b>${i.tipo==='MC'?'Correctivo':'Preventivo'} ${i.n}</b>
+              <span>${i.informe||''}</span>
+              ${i.fecha?`<span class="ifec">Ejecutado ${i.fecha}</span>`:(i.programada?`<span class="ifec">Programado ${i.programada}</span>`:'<span class="ifec">Sin programar</span>')}
+              ${i.estado?`<span class="iest ${i.estado.toUpperCase().indexOf('INOPER')===0?'bad':'good'}">${i.estado}</span>`:''}
+            </div>
+            ${i.pdf?`<button class="ibtn" onclick="verInforme('${i.pdf}','${(i.informe||'Informe').replace(/'/g,'')}')">Ver informe</button>`:'<span class="ibtn off">Sin informe</span>'}
+          </div>`).join(''):'<p class="dnote">Este equipo no tiene intervenciones programadas en el contrato.</p>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* Visor de informes: abre el PDF de Drive dentro de la web */
+function verInforme(url,titulo){
+  cerrarInforme();
+  const ov=document.createElement('div');
+  ov.className='pdfov'; ov.id='pdfOv';
+  ov.innerHTML=`
+    <div class="pdfbox" role="dialog" aria-modal="true" aria-label="${titulo}">
+      <div class="pdfhead">
+        <span>${titulo}</span>
+        <a href="${url.replace('/preview','/view')}" target="_blank" rel="noopener">Abrir en Drive</a>
+        <button onclick="cerrarInforme()" aria-label="Cerrar">✕</button>
+      </div>
+      <iframe src="${url}" loading="lazy" allow="autoplay"></iframe>
+    </div>`;
+  ov.addEventListener('click',ev=>{if(ev.target===ov)cerrarInforme();});
+  document.body.appendChild(ov);
+  document.body.classList.add('lock');
+}
+function cerrarInforme(){
+  const o=document.getElementById('pdfOv'); if(o)o.remove();
+  document.body.classList.remove('lock');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarInforme();});
+
 pintarProyectos();
 
