@@ -1,7 +1,7 @@
 /* ---- ROUTER ---- */
 const PAGES={'':'page-home','#/':'page-home','#/nosotros':'page-nosotros','#/servicios':'page-servicios','#/talleres':'page-talleres','#/catalogo':'page-catalogo','#/clientes':'page-clientes','#/contacto':'page-contacto'};
 function go(hash){location.hash=hash;closeMenu();}
-function route(){
+function route(sinMover){
   const h=location.hash||'#/';
   let pageId, navKey;
   if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
@@ -17,9 +17,9 @@ function route(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  window.scrollTo(0,0);
+  if(!sinMover) window.scrollTo(0,0);   // al sincronizar datos no se mueve la vista
 }
-window.addEventListener('hashchange',route);
+window.addEventListener('hashchange',function(){ route(); });   // al navegar SÍ sube al inicio
 route();
 
 /* ===== SINCRONIZACIÓN DE DATOS =====
@@ -38,14 +38,28 @@ route();
 
    Además se guarda la última respuesta buena en sessionStorage: dentro
    de la misma sesión, las siguientes cargas ya no esperan.            */
-let DATOS_LISTOS = false;      // true cuando llegaron los datos en vivo
+/* DATOS_LISTOS se declara en 00-config.js, que carga primero. */
 const CACHE_KEY = 'sb-datos';
+
+let HUELLA='';   // firma de los datos ya pintados, para no repintar de balde
 
 function aplicarDatos(d, enVivo){
   if(!d) return false;
+  const huella=JSON.stringify([d.equipos&&d.equipos.length, d.paquetes&&d.paquetes.length,
+    enVivo?(d.proyectos||[]).map(p=>p.id+p.avance).join('|'):'',
+    (d.equipos||[]).map(e=>e.id+(e.dia||'')+(e.photo||'')).join('|')]);
+  if(huella===HUELLA){                      // nada cambió: no se toca la pantalla
+    if(enVivo) DATOS_LISTOS=true;
+    return true;
+  }
+  HUELLA=huella;
   if(Array.isArray(d.equipos)  && d.equipos.length)  EQUIPOS  = d.equipos;
   if(Array.isArray(d.paquetes) && d.paquetes.length) PAQUETES = d.paquetes;
-  if(Array.isArray(d.proyectos))                     PROYECTOS = d.proyectos;
+  /* Los proyectos SOLO se toman de una fuente confiable (Apps Script en vivo
+     o la caché de esta sesión, que vino de él). El archivo del repositorio
+     puede traer proyectos de ejemplo desactualizados: si se pintaran,
+     el cliente vería otros proyectos un instante antes que los suyos.   */
+  if(enVivo && Array.isArray(d.proyectos))           PROYECTOS = d.proyectos;
   if(d.modelo){
     const m=d.modelo;
     if(m.instrumentista_dia!=null) TEC_DIA=m.instrumentista_dia;
@@ -55,7 +69,7 @@ function aplicarDatos(d, enVivo){
   }
   if(enVivo) DATOS_LISTOS = true;
   try{ buildFacetsEq(); pintar(); pintarPaquetes(); pintarProyectos(); pintarDestacados(); }catch(e){}
-  route();
+  route(true);          // sin mover la vista: el usuario puede estar leyendo
   return true;
 }
 
@@ -69,12 +83,12 @@ async function loadData(){
   // ── 1. lo que ya tenemos a mano: sesión anterior o archivo del repositorio ──
   try{
     const guardado = sessionStorage.getItem(CACHE_KEY);
-    if(guardado) aplicarDatos(JSON.parse(guardado), false);
+    if(guardado) aplicarDatos(JSON.parse(guardado), true);   // la caché vino del Apps Script
     else if(CONFIG.CACHE_URL) aplicarDatos(await traer(CONFIG.CACHE_URL), false);
   }catch(e){ /* si no hay caché, se sigue con los datos integrados */ }
 
   // ── 2. datos en vivo ──
-  if(!CONFIG.DATA_URL) { DATOS_LISTOS = true; route(); return; }
+  if(!CONFIG.DATA_URL) { DATOS_LISTOS = true; route(true); return; }
   try{
     const d = await traer(CONFIG.DATA_URL);
     aplicarDatos(d, true);
@@ -82,7 +96,7 @@ async function loadData(){
     console.info('Sinergia: datos sincronizados desde '+CONFIG.DATA_URL);
   }catch(e){
     DATOS_LISTOS = true;   // hubo respuesta (fallida): dejar de esperar
-    route();
+    route(true);
     console.warn('Sinergia: usando datos locales (no se cargó '+CONFIG.DATA_URL+'): '+e.message);
   }
 }

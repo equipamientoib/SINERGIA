@@ -2,20 +2,9 @@
 /* Datos de ejemplo: reemplázalos desde la hoja "Proyectos" (Excel / Google Sheets).
    La clave de acceso NUNCA viaja en texto plano: aquí solo va su hash SHA-256.
    Clave de demostración para los tres proyectos: demo123                       */
-let PROYECTOS=[
-  {id:"clinica-monitores", cliente:"Clínica privada · San Isidro", titulo:"Calibración de monitores multiparamétricos", servicio:"Metrología · Pack Monitores", fecha:"Junio 2026", foto:"img/proyectos/clinica-monitores.jpg", estado:"En curso", avance:65,
-   desc:"Verificación de seguridad eléctrica y desempeño de 24 monitores de paciente en dos sedes, con certificado trazable por equipo.",
-   hitos:[{t:"Levantamiento y cronograma",d:true},{t:"Seguridad eléctrica (IEC 62353)",d:true},{t:"Verificación de SpO2 y NIBP",d:false},{t:"Entrega de certificados",d:false}],
-   clave_hash:"d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"},
-  {id:"hospital-desfibriladores", cliente:"Hospital regional · Lima Norte", titulo:"Verificación de desfibriladores en emergencia", servicio:"Metrología · Pack Desfibriladores", fecha:"Mayo 2026", foto:"img/proyectos/hospital-desfibriladores.jpg", estado:"En curso", avance:40,
-   desc:"Medición de energía entregada, tiempo de carga y sincronización de 12 desfibriladores del área de emergencia y UCI.",
-   hitos:[{t:"Inventario y plan de trabajo",d:true},{t:"Pruebas de energía (50 Ω)",d:true},{t:"Cardioversión sincronizada",d:false},{t:"Informe y certificados",d:false}],
-   clave_hash:"d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"},
-  {id:"taller-inhouse", cliente:"Ingeniería clínica · in-house", titulo:"Taller de seguridad eléctrica IEC 62353", servicio:"Taller práctico · 8 horas", fecha:"Abril 2026", foto:"img/proyectos/taller-inhouse.jpg", estado:"Completado", avance:100,
-   desc:"Capacitación práctica al equipo de ingeniería clínica con el analizador Fluke ESA620: corrientes de fuga, aislamiento y protocolo de pruebas.",
-   hitos:[{t:"Diagnóstico de necesidades",d:true},{t:"Sesión teórica y normativa",d:true},{t:"Práctica sobre equipos reales",d:true},{t:"Evaluación y constancias",d:true}],
-   clave_hash:"d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"}
-];
+let PROYECTOS=[];   /* Los proyectos reales llegan del Apps Script.
+   Antes había tres de ejemplo aquí y se veían un instante antes que los
+   del cliente; por eso la lista arranca vacía y se muestra un marcador. */
 const PR_OPEN=new Set(); // proyectos desbloqueados en esta sesión (solo en memoria)
 const PR_KEY={};              // hash de la clave por proyecto (solo en memoria)
 const PR_DET={};              // detalle ya descargado, para no volver a pedirlo
@@ -135,10 +124,27 @@ function cardProyecto(p){
     </div></div>`;
 }
 function pintarProyectos(){
-  const g=document.getElementById('prGrid'), hm=document.getElementById('prHome'), c=document.getElementById('countPr');
-  if(g)g.innerHTML=PROYECTOS.map(cardProyecto).join('')||'<p style="color:var(--gris);grid-column:1/-1">Aún no hay proyectos publicados.</p>';
+  const g=document.getElementById('prGrid'), hm=document.getElementById('prHome'),
+        c=document.getElementById('countPr');
+
+  /* Mientras no lleguen los proyectos del sistema se muestran marcadores.
+     Así el cliente nunca alcanza a ver los proyectos de ejemplo.        */
+  if(typeof DATOS_LISTOS!=='undefined' && !DATOS_LISTOS){
+    const hueso=n=>Array.from({length:n},()=>`
+      <article class="pr pr-hueso">
+        <div class="ph-img"></div>
+        <div class="ph-txt"><span class="ln w35"></span><span class="ln w85"></span>
+          <span class="ln w60"></span></div>
+      </article>`).join('');
+    if(g)g.innerHTML=hueso(3);
+    if(hm)hm.innerHTML=hueso(3);
+    if(c)c.textContent='';
+    return;
+  }
+  if(g)g.innerHTML=PROYECTOS.map(cardProyecto).join('')||
+    '<p style="color:var(--gris);grid-column:1/-1">Aún no hay proyectos publicados.</p>';
   if(hm)hm.innerHTML=PROYECTOS.slice(0,3).map(cardProyecto).join('');
-  if(c)c.textContent=PROYECTOS.length+(PROYECTOS.length===1?' proyecto':' proyectos');
+  if(c)c.textContent=PROYECTOS.length+' proyecto'+(PROYECTOS.length===1?'':'s');
 }
 
 /* SHA-256: usa la API nativa (https/localhost) o el respaldo puro JS (file://) */

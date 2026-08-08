@@ -1,3 +1,8 @@
+/* Bandera compartida: en true cuando ya llegaron los datos en vivo del
+   Apps Script. Se declara aquí porque 00-config.js es el primer archivo
+   que carga y otros la consultan (06-clientes.js, 07-router.js).        */
+let DATOS_LISTOS = false;
+
 /* =====================================================================
    00-config.js — EDITA AQUÍ los datos de tu empresa y ajustes del sitio
    Todo lo que está en este archivo se refleja automáticamente en el
