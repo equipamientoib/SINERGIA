@@ -204,7 +204,28 @@ async function sha256(s){
 function renderProyecto(id){
   const p=PROYECTOS.find(x=>x.id===id);
   const body=document.getElementById('equipoBody');
-  if(!p){body.innerHTML='<div class="pagehead"><h1>Proyecto no encontrado</h1></div>';return;}
+  if(!p){
+    /* Los proyectos llegan del Apps Script y tardan unos segundos.
+       Mientras tanto se muestra un estado de carga, no un error.   */
+    if(!DATOS_LISTOS && performance.now()<30000){
+      body.innerHTML=`
+        <div class="cargando-proy">
+          <div class="cp-barra"><i></i></div>
+          <p>Cargando el proyecto…</p>
+          <span>Estamos trayendo la información desde el sistema de mantenimiento.</span>
+        </div>`;
+      clearTimeout(REINTENTO);
+      REINTENTO=setTimeout(()=>{ if(location.hash.indexOf(id)>=0) renderProyecto(id); },400);
+      return;
+    }
+    body.innerHTML=`
+      <div class="pagehead"><h1>Proyecto no encontrado</h1>
+        <p class="dnote">No pudimos cargar este proyecto. Revisa el enlace o vuelve a
+          <a onclick="go('#/clientes')" style="color:var(--cobre-d);cursor:pointer">Nuestros clientes</a>.</p>
+      </div>`;
+    return;
+  }
+  clearTimeout(REINTENTO);
   if(!PR_OPEN.has(id)){
     body.innerHTML=`
       <div class="crumb"><a onclick="go('#/clientes')">Nuestros clientes</a> &nbsp;/&nbsp; ${p.titulo}</div>
@@ -374,7 +395,7 @@ function setDetTab(id,t){
 async function cargarDetalle(id){
   const cont=document.getElementById('prDet'); if(!cont)return;
   const p=PROYECTOS.find(x=>x.id===id);
-  const url=(typeof CONFIG!=='undefined'&&CONFIG.DATA_URL)||'';
+  const url=(typeof CONFIG!=='undefined'&&(CONFIG.PANEL_URL||CONFIG.DATA_URL))||'';
   if(!p||!p.detalle||url.indexOf('http')!==0){cont.innerHTML='';return;}
   if(PR_DET[id]){pintarPanel(id);return;}
   try{
@@ -910,7 +931,7 @@ function menuCol(ev,id,campo){
   montarMenu(m,ev);
 }
 
-let MENU_CAMPO='', MENU_OPS=[], VAL_FOCO='';
+let MENU_CAMPO='', MENU_OPS=[], VAL_FOCO='', REINTENTO=0;
 function marcarCol(ix,on){
   const v=MENU_OPS[ix].v, s=SEL[MENU_CAMPO];
   on?s.add(v):s.delete(v);
