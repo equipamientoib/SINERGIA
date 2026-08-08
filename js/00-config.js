@@ -14,8 +14,8 @@ const SITE = {
   // Contacto (se muestra en el footer)
   email: "ventas@sinergiabiomedica.pe",
   web: "sinergiabiomedica.pe",
-  telefono: "+51 9XX XXX XXX",
-  whatsapp: "51987654321",   // número con código de país; activa el botón flotante y el enlace del footer
+  telefono: "+51 956 614 346",
+  whatsapp: "51956614346",   // número con código de país; activa el botón flotante y el enlace del footer
 
   // Navegación (header, menú móvil y footer se generan de esta lista)
   nav: [
