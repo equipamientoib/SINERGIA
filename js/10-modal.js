@@ -71,4 +71,6 @@ function calc(){
   document.getElementById('cTec').textContent='S/ '+tecTot.toFixed(2);
   document.getElementById('cGrand').textContent='S/ '+grand.toFixed(2);
 }
-function enviar(){alert('Prototipo: aquí la solicitud se enviaría a tu correo (Formspree) y/o se guardaría como reserva.\n\nEquipo: '+actual.nom);cerrar();}
+/* El envío real de la solicitud vive en js/11-solicitudes.js (función
+   enviar). Antes aquí había una versión de prueba que solo mostraba un
+   aviso diciendo "Prototipo" y no enviaba nada.                       */

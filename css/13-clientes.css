@@ -1258,3 +1258,12 @@
   .ln.w35{width:35%;height:8px} .ln.w60{width:60%} .ln.w85{width:85%;height:13px}
   @keyframes lnGo{0%{background-position:100% 50%}100%{background-position:0 50%}}
   @media (prefers-reduced-motion:reduce){ .ln{animation:none} }
+
+  /* — Aviso flotante (sustituye a alert) — */
+  .aviso-panel{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:9000;
+    max-width:min(92vw,420px);padding:13px 18px;border-radius:var(--r-sm);
+    background:var(--onix);color:var(--hueso);font-size:14px;line-height:1.5;
+    box-shadow:0 10px 32px rgba(23,25,29,.28);opacity:0;pointer-events:none;
+    transition:opacity .22s ease,transform .22s ease}
+  .aviso-panel.show{opacity:1;transform:translate(-50%,0)}
+  @media (prefers-reduced-motion:reduce){ .aviso-panel{transition:none} }

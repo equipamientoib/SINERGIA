@@ -1,13 +1,16 @@
 /* ---- PERSONALIZA TU PAQUETE ---- */
 const CUSTOM={sel:new Set(),kit:false};
 function buildCustom(){
+  /* Con CONFIG.MOSTRAR_PRECIOS en false no debe verse ningún precio.
+     Antes esta lista los mostraba igual, saltándose el interruptor.  */
+  const pz = txt => VER_PRECIOS ? `<span class="cp">${txt}</span>` : '';
   const groups=[['ansim','Analizadores y simuladores'],['med','Instrumentos de medición'],['elec','Medidores eléctricos']];
   let html=groups.map(([g,label])=>{
     const items=EQUIPOS.filter(e=>e.g===g&&!e.apoyo);
     if(!items.length)return '';
-    return `<div class="cgroup"><div class="cgh">${label}</div>`+items.map(e=>`<label class="citem"><input type="checkbox" value="${e.id}" ${CUSTOM.sel.has(e.id)?'checked':''} onchange="toggleCustom('${e.id}',this.checked)"><span class="cn">${e.nom}</span><span class="cp">S/ ${e.dia}/día</span></label>`).join('')+`</div>`;
+    return `<div class="cgroup"><div class="cgh">${label}</div>`+items.map(e=>`<label class="citem"><input type="checkbox" value="${e.id}" ${CUSTOM.sel.has(e.id)?'checked':''} onchange="toggleCustom('${e.id}',this.checked)"><span class="cn">${e.nom}</span>${pz('S/ '+e.dia+'/día')}</label>`).join('')+`</div>`;
   }).join('');
-  html+=`<div class="cgroup"><div class="cgh">Extra</div><label class="citem"><input type="checkbox" ${CUSTOM.kit?'checked':''} onchange="toggleKit(this.checked)"><span class="cn">Kit de herramientas de apoyo (set 46 pzs + destornillador eléctrico)</span><span class="cp">+ S/ ${KIT_DIA}/día</span></label></div>`;
+  html+=`<div class="cgroup"><div class="cgh">Extra</div><label class="citem"><input type="checkbox" ${CUSTOM.kit?'checked':''} onchange="toggleKit(this.checked)"><span class="cn">Kit de herramientas de apoyo (set 46 pzs + destornillador eléctrico)</span>${pz('+ S/ '+KIT_DIA+'/día')}</label></div>`;
   document.getElementById('customList').innerHTML=html;
   renderCustomSummary();
 }
@@ -44,7 +47,21 @@ function reservarCustom(){
   openModal(nom,'Paquete personalizado · IGV incluido',{equipo:precioEquipo(c.dia),hora:precioHora(c.dia),dia:c.dia,semana:c.dia*4,mes:c.dia*12},eqConds(),techRates(8),true,'dia');
 }
 
-/* selector en contacto */
-const cEq=document.getElementById('cEq');
-cEq.innerHTML='<option>— Selecciona —</option>'+EQUIPOS.map(e=>`<option>${e.nom}</option>`).join('');
+/* Selector de equipos del formulario de contacto.
+   ANTES: se llenaba una sola vez, al cargar el archivo, con los datos de
+   respaldo — y nunca se actualizaba. Si la hoja tenía un equipo nuevo,
+   el cliente no podía elegirlo. Ahora lo repinta el router cada vez que
+   llegan datos buenos, conservando lo que el usuario ya había elegido. */
+function pintarSelectContacto(){
+  const sel=document.getElementById('cEq'); if(!sel)return;
+  const previo=sel.value;
+  sel.innerHTML='<option value="">— Selecciona —</option>'+
+    EQUIPOS.map(e=>`<option value="${e.nom}">${e.nom}</option>`).join('')+
+    '<option value="Otro / no está en la lista">Otro / no está en la lista</option>';
+  if(previo){
+    const op=[...sel.options].find(o=>o.value===previo);
+    if(op) sel.value=previo;
+  }
+}
+pintarSelectContacto();
 

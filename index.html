@@ -16,9 +16,51 @@
 <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" as="image" href="img/tienda/esa620.jpg">
+<!-- El catálogo empieza a descargarse AQUÍ, en el primer milisegundo,
+     en paralelo con el CSS y el JS. Antes no arrancaba hasta que los
+     doce scripts se habían descargado y ejecutado. -->
+<script>
+  window.__catalogo = (function(){
+    try{
+      var c = new AbortController();
+      setTimeout(function(){ c.abort(); }, 5000);
+      return fetch('data/catalogo.json', {signal: c.signal})
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .catch(function(){ return null; });
+    }catch(e){ return null; }
+  })();
+</script>
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Estilos base en línea: la página ya tiene color, tipografía y
+     estructura antes de que llegue ningún archivo externo. -->
+<style>
+  :root{--onix:#17191D;--grafito:#2A2D33;--bronce:#9A7F4E;--cobre-d:#7E6234;
+    --gris:#6E727A;--hueso:#F5F3EE;--blanco:#FFFFFF;--crema:#FBFAF6;
+    --linea:rgba(23,25,29,.09);--ff-d:'Chakra Petch',system-ui,sans-serif;
+    --ff-b:'Titillium Web',system-ui,sans-serif;--wrap-pad:clamp(16px,4vw,24px)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--ff-b);background:var(--hueso);color:var(--onix);
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 var(--wrap-pad)}
+  header{position:sticky;top:0;z-index:60;background:rgba(245,243,238,.94);
+    border-bottom:1px solid var(--linea)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:70px;gap:16px}
+  .page{display:none}.page.active{display:block}
+</style>
+
+<!-- Las fuentes ya no bloquean el pintado: la página aparece con la
+     tipografía del sistema y cambia sola al llegar las definitivas. -->
+<link rel="preload" as="style"
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Titillium+Web:wght@300;400;600;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Titillium+Web:wght@300;400;600;700&display=swap"></noscript>
 <link rel="stylesheet" href="css/01-base.css">
 <link rel="stylesheet" href="css/02-header.css">
 <link rel="stylesheet" href="css/03-home.css">
@@ -31,7 +73,6 @@
 <link rel="stylesheet" href="css/10-modal.css">
 <link rel="stylesheet" href="css/11-personaliza.css">
 <link rel="stylesheet" href="css/12-extras.css">
-<link rel="stylesheet" href="css/13-clientes.css">
 <link rel="stylesheet" href="css/14-footer.css">
 <script type="application/ld+json">
 {
@@ -42,11 +83,27 @@
   "taxID": "20615862682",
   "description": "Alquiler de herramientas de metrología y calibración, suministro hospitalario y talleres prácticos.",
   "email": "logistica@sinergiabiomedica.pe",
+  "telephone": "+51 908 704 131",
   "address": {"@type": "PostalAddress", "addressLocality": "Pueblo Libre", "addressRegion": "Lima", "addressCountry": "PE"},
   "areaServed": "Lima y provincias, Perú",
   "knowsAbout": ["Metrología biomédica", "IEC 62353", "IEC 60601-1", "Calibración de equipos médicos"]
 }
 </script>
+
+<!-- defer: se descargan en paralelo con el HTML y se ejecutan
+     en orden cuando la página ya está leída. -->
+<script defer src="js/00-config.js"></script>
+<script defer src="js/01-componentes.js"></script>
+<script defer src="js/02-datos.js"></script>
+<script defer src="js/03-catalogo.js"></script>
+<script defer src="js/04-personaliza.js"></script>
+<script defer src="js/05-detalle.js"></script>
+<script defer src="js/06-portal.js"></script>
+<script defer src="js/07-router.js"></script>
+<script defer src="js/08-ui.js"></script>
+<script defer src="js/09-menu.js"></script>
+<script defer src="js/10-modal.js"></script>
+<script defer src="js/11-solicitudes.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -313,18 +370,23 @@
   <section style="padding-top:34px">
     <div class="wrap contact-grid">
       <div class="cform">
-        <div class="field"><label>Nombre / institución</label><input type="text" placeholder="Clínica, hospital o nombre"></div>
-        <div class="field row2"><div><label>Correo</label><input type="email" placeholder="correo@ejemplo.com"></div><div><label>Teléfono</label><input type="tel" placeholder="+51 9XX XXX XXX"></div></div>
-        <div class="field"><label>Equipo de interés</label><select id="cEq"></select></div>
-        <div class="field"><label>Mensaje</label><textarea rows="4" placeholder="Fechas, ubicación, detalles del servicio…"></textarea></div>
-        <button class="btn btn-fill" onclick="alert('Prototipo: este formulario se conectará a tu correo vía Formspree.')">Enviar solicitud</button>
+        <div class="field"><label for="cNom">Nombre / institución</label><input id="cNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></div>
+        <div class="field row2"><div><label for="cMail">Correo</label><input id="cMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></div><div><label for="cTel">Teléfono</label><input id="cTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></div></div>
+        <div class="field"><label for="cEq">Equipo de interés</label><select id="cEq"><option>Cargando catálogo…</option></select></div>
+        <div class="field"><label for="cMsg">Mensaje</label><textarea id="cMsg" rows="4" placeholder="Fechas, ubicación, detalles del servicio…"></textarea></div>
+        <div class="form-msg" id="cAviso" role="status" aria-live="polite"></div>
+        <div class="form-btns">
+          <button class="btn btn-fill" onclick="enviarContacto('whatsapp')">Enviar por WhatsApp</button>
+          <button class="btn" onclick="enviarContacto('correo')">Enviar por correo</button>
+        </div>
+        <div class="form-nota">Se abre tu WhatsApp o tu correo con la solicitud ya redactada. Respondemos en horario de oficina.</div>
       </div>
       <div class="facts">
-        <div class="row"><span class="l">Correo</span><span class="v">logistica@sinergiabiomedica.pe</span></div>
-        <div class="row"><span class="l">Web</span><span class="v">sinergiabiomedica.pe</span></div>
-        <div class="row"><span class="l">Teléfono</span><span class="v">+51 9XX XXX XXX</span></div>
+        <div class="row"><span class="l">Correo</span><span class="v" id="factMail">—</span></div>
+        <div class="row"><span class="l">Web</span><span class="v" id="factWeb">—</span></div>
+        <div class="row"><span class="l">Teléfono</span><span class="v" id="factTel">—</span></div>
         <div class="row"><span class="l">Sede</span><span class="v">Pueblo Libre, Lima<small>Perú</small></span></div>
-        <div class="row"><span class="l">RUC</span><span class="v">20615862682</span></div>
+        <div class="row"><span class="l">RUC</span><span class="v" id="factRuc">—</span></div>
       </div>
     </div>
   </section>
@@ -395,23 +457,16 @@
       <div class="tot"><span>Total instrumentista</span><span id="cTec">—</span></div>
     </div>
     <div class="grand"><span>Total general (IGV incluido)</span><span id="cGrand">—</span></div>
-    <div class="field"><label>Nombre / institución</label><input type="text" placeholder="Clínica, hospital o nombre"></div>
-    <div class="field row2"><div><label>Correo</label><input type="email" placeholder="correo@ejemplo.com"></div><div><label>Teléfono</label><input type="tel" placeholder="+51 9XX XXX XXX"></div></div>
-    <button class="btn btn-fill" onclick="enviar()">Enviar solicitud de reserva</button>
+    <div class="field"><label for="mNom">Nombre / institución</label><input id="mNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></div>
+    <div class="field row2"><div><label for="mMail">Correo</label><input id="mMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></div><div><label for="mTel">Teléfono</label><input id="mTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></div></div>
+    <div class="form-msg" id="mAviso" role="status" aria-live="polite"></div>
+    <div class="form-btns">
+      <button class="btn btn-fill" onclick="enviar('whatsapp')">Enviar por WhatsApp</button>
+      <button class="btn" onclick="enviar('correo')">Enviar por correo</button>
+    </div>
     </div>
   </div>
 </div>
 
-<script src="js/00-config.js"></script>
-<script src="js/01-componentes.js"></script>
-<script src="js/02-datos.js"></script>
-<script src="js/03-catalogo.js"></script>
-<script src="js/04-personaliza.js"></script>
-<script src="js/05-detalle.js"></script>
-<script src="js/06-clientes.js"></script>
-<script src="js/07-router.js"></script>
-<script src="js/08-ui.js"></script>
-<script src="js/09-menu.js"></script>
-<script src="js/10-modal.js"></script>
 </body>
 </html>

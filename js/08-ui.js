@@ -2,7 +2,7 @@
 // Sombra del header al hacer scroll
 const _hdr=document.querySelector('header');
 addEventListener('scroll',()=>{
-  _hdr.classList.toggle('scrolled',scrollY>8);
+  if(_hdr) _hdr.classList.toggle('scrolled',scrollY>8);
   const t=document.getElementById('toTop'); if(t)t.classList.toggle('show',scrollY>420);
 },{passive:true});
 // Revelado suave de secciones estáticas

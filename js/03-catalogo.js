@@ -1,7 +1,13 @@
 /* ---- CATÁLOGO ---- */
 const grid=document.getElementById('grid');
 const GRUPOS={ansim:"Analizadores y simuladores",med:"Instrumentos de medición",elec:"Medidores eléctricos",apoyo:"Herramientas de apoyo"};
-const eqBrand=e=>e.specs.Marca||'—', eqOrigen=e=>e.specs.Origen||'—', uniq=a=>[...new Set(a)];
+/* Lecturas a prueba de filas incompletas. Si un equipo de la hoja llega
+   sin columna Marca u Origen, antes esto lanzaba un error que tumbaba el
+   repintado COMPLETO del catálogo, en silencio, y la web se quedaba con
+   los datos anteriores.                                                */
+const eqBrand=e=>(e&&e.specs&&e.specs.Marca)||'—',
+      eqOrigen=e=>(e&&e.specs&&e.specs.Origen)||'—',
+      uniq=a=>[...new Set(a)];
 const F={grupo:new Set(),marca:new Set(),tipo:new Set(),origen:new Set()};
 const FP={app:new Set()};
 let curNivel='all', curGrupo='all';
@@ -11,7 +17,37 @@ function facetSection(title,key,opts,labelFn){
     opts.map(o=>`<label><input type="checkbox" value="${o}" onchange="toggleF('${key}',this.value,this.checked)"> ${labelFn?labelFn(o):o}</label>`).join('')+
     `</div></details>`;
 }
+/* ── Marcadores mientras carga el catálogo ─────────────────────────────
+   Mientras CATALOGO_LISTO sea false se pintan tarjetas fantasma. Evita
+   que el cliente alcance a ver los datos de respaldo de 02-datos.js y
+   luego un salto cuando llegan los buenos.                            */
+function huesoEq(n){
+  return Array.from({length:n},()=>`
+    <div class="eq eq-hueso">
+      <div class="hu-img"></div>
+      <div class="body">
+        <span class="ln w35"></span><span class="ln w85"></span>
+        <span class="ln w60"></span><span class="ln w85"></span>
+      </div>
+    </div>`).join('');
+}
+function huesoPk(n){
+  return Array.from({length:n},()=>`
+    <div class="pkg pkg-hueso">
+      <span class="ln w35"></span><span class="ln w85"></span>
+      <span class="ln w60"></span><span class="ln w85"></span>
+      <span class="ln w60"></span>
+    </div>`).join('');
+}
+function huesoFacetas(){
+  return `<div class="facet-hueso">
+    <span class="ln w60"></span><span class="ln w85"></span><span class="ln w85"></span>
+    <span class="ln w60"></span><span class="ln w85"></span><span class="ln w85"></span>
+  </div>`;
+}
+
 function buildFacetsEq(){
+  if(!CATALOGO_LISTO){ document.getElementById('filtersSide').innerHTML=huesoFacetas(); return; }
   document.getElementById('filtersSide').innerHTML=
     facetSection('Marca','marca',uniq(EQUIPOS.map(eqBrand)).sort())+
     facetSection('Tipo','tipo',uniq(EQUIPOS.map(e=>e.cat)).sort())+
@@ -19,6 +55,7 @@ function buildFacetsEq(){
     `<div class="filters-clear"><button onclick="clearF()">Limpiar filtros</button></div>`;
 }
 function buildFacetsPk(){
+  if(!CATALOGO_LISTO){ document.getElementById('filtersSide').innerHTML=huesoFacetas(); return; }
   document.getElementById('filtersSide').innerHTML=
     `<details class="facet" open><summary>Aplicación</summary><div class="opts">`+
     uniq(PAQUETES.map(p=>p.app)).map(a=>`<label><input type="checkbox" value="${a}" onchange="toggleFP(this.value,this.checked)"> ${a}</label>`).join('')+
@@ -59,6 +96,11 @@ function cardEq(e){
       </div></div>`;
 }
 function pintar(){
+  if(!CATALOGO_LISTO){
+    grid.innerHTML=huesoEq(6);
+    document.getElementById('countEq').textContent='';
+    return;
+  }
   const list=EQUIPOS.filter(matchEq);
   grid.innerHTML=list.map(cardEq).join('')||'<p style="color:var(--gris);grid-column:1/-1">No hay equipos con esos filtros.</p>';
   document.getElementById('countEq').textContent=list.length+(list.length===1?' equipo':' equipos');
@@ -67,6 +109,11 @@ function pintar(){
 /* PAQUETES */
 function pintarPaquetes(){
   const cont=document.getElementById('pkgs');
+  if(!CATALOGO_LISTO){
+    cont.innerHTML=huesoPk(4);
+    document.getElementById('countPk').textContent='';
+    return;
+  }
   const list=PAQUETES.filter(p=>(curNivel==='all'||p.nivel===curNivel)&&(!FP.app.size||FP.app.has(p.app)));
   cont.innerHTML=list.map(p=>{
     const items=p.items.map(id=>byId(id));
@@ -95,8 +142,11 @@ function setGrupo(g){curGrupo=g;document.querySelectorAll('#subEq button').forEa
 const DESTACADOS=["esa620","sp-sim","defib"];
 function pintarDestacados(){
   const g=document.getElementById('eqHome');if(!g)return;
+  if(!CATALOGO_LISTO){ g.innerHTML=huesoEq(3); return; }
   g.innerHTML=DESTACADOS.map(id=>byId(id)).filter(Boolean).map(cardEq).join('');
 }
+/* Primer pintado: solo marcadores. Los datos reales los pinta
+   aplicarDatos() en js/07-router.js cuando llega la primera fuente buena. */
 buildFacetsEq();pintar();pintarPaquetes();pintarDestacados();
 function setView(v){
   const eq=v==='eq', pk=v==='pk', cu=v==='custom';

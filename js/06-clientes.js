@@ -1,13 +1,40 @@
 /* ---- NUESTROS CLIENTES / PROYECTOS ---- */
-/* Datos de ejemplo: reemplázalos desde la hoja "Proyectos" (Excel / Google Sheets).
-   La clave de acceso NUNCA viaja en texto plano: aquí solo va su hash SHA-256.
-   Clave de demostración para los tres proyectos: demo123                       */
-let PROYECTOS=[];   /* Los proyectos reales llegan del Apps Script.
-   Antes había tres de ejemplo aquí y se veían un instante antes que los
-   del cliente; por eso la lista arranca vacía y se muestra un marcador. */
+/* ESTE ARCHIVO SE CARGA APARTE, no desde index.html.
+   Lo pide js/06-portal.js cuando hace falta: pesa unos 70 KB y solo lo
+   necesita quien entra al portal de clientes. La clave de acceso NUNCA
+   viaja en texto plano: solo se compara su hash SHA-256.
+
+   PROYECTOS se declara en js/06-portal.js (que carga siempre), porque el
+   router lo rellena aunque este archivo todavía no haya llegado.      */
+
+/* Seguro por si una subida quedó incompleta y falta js/06-portal.js:
+   se crea PROYECTOS aquí para que el portal siga funcionando en vez de
+   romperse entero.                                                    */
+if(typeof PROYECTOS==='undefined'){ window.PROYECTOS=[]; }
+
 const PR_OPEN=new Set(); // proyectos desbloqueados en esta sesión (solo en memoria)
 const PR_KEY={};              // hash de la clave por proyecto (solo en memoria)
+/* Aviso discreto dentro del panel. Sustituye a alert(), que bloquea el
+   navegador y se ve poco profesional en un panel de cliente.          */
+let AVISO_T=0;
+function avisoPanel(texto){
+  let el=document.getElementById('avisoPanel');
+  if(!el){
+    el=document.createElement('div');
+    el.id='avisoPanel'; el.className='aviso-panel'; el.setAttribute('role','status');
+    document.body.appendChild(el);
+  }
+  el.textContent=texto;
+  el.classList.add('show');
+  clearTimeout(AVISO_T);
+  AVISO_T=setTimeout(()=>el.classList.remove('show'),3600);
+}
+
 const PR_DET={};              // detalle ya descargado, para no volver a pedirlo
+/* Tope de reintentos al abrir un proyecto antes de que lleguen los datos.
+   25 × 400 ms = 10 s. Pasado eso se muestra "no encontrado" en vez de
+   seguir repintando la pantalla indefinidamente.                        */
+let PR_INTENTOS=0; const PR_MAX_INTENTOS=25;
 let DET_TAB='eq';            // pestaña activa: res | val | eq
 let DET_Q='', DET_SOLO=true, DET_ORDEN='';
 let TAB_AREAS=[], TAB_ESTADOS=[];
@@ -212,8 +239,14 @@ function renderProyecto(id){
   const body=document.getElementById('equipoBody');
   if(!p){
     /* Los proyectos llegan del Apps Script y tardan unos segundos.
-       Mientras tanto se muestra un estado de carga, no un error.   */
-    if(!DATOS_LISTOS && performance.now()<30000){
+       Mientras tanto se muestra un estado de carga, no un error.
+
+       ANTES: se reintentaba cada 400 ms durante 30 s sin límite de
+       intentos. Si Google no respondía nunca (la petición se quedaba
+       colgada), esto repintaba la pantalla ~75 veces. Ahora se cuentan
+       los intentos y se corta solo.                                   */
+    if(!DATOS_LISTOS && PR_INTENTOS < PR_MAX_INTENTOS){
+      PR_INTENTOS++;
       body.innerHTML=`
         <div class="cargando-proy">
           <div class="cp-barra"><i></i></div>
@@ -224,6 +257,7 @@ function renderProyecto(id){
       REINTENTO=setTimeout(()=>{ if(location.hash.indexOf(id)>=0) renderProyecto(id); },400);
       return;
     }
+    PR_INTENTOS=0;
     body.innerHTML=`
       <div class="pagehead"><h1>Proyecto no encontrado</h1>
         <p class="dnote">No pudimos cargar este proyecto. Revisa el enlace o vuelve a
@@ -231,6 +265,7 @@ function renderProyecto(id){
       </div>`;
     return;
   }
+  PR_INTENTOS=0;
   clearTimeout(REINTENTO);
   if(!PR_OPEN.has(id)){
     body.innerHTML=`
@@ -245,6 +280,11 @@ function renderProyecto(id){
         <div class="locknote">La clave se entrega al iniciar el servicio. Si eres cliente y no la tienes, <a onclick="go('#/contacto')" style="color:var(--cobre-d);font-weight:600;cursor:pointer">escríbenos</a>.</div>
       </div>`;
     const k=document.getElementById('prKey'); if(k)k.focus();
+    /* El cliente va a tardar unos segundos en escribir su clave. Se
+       aprovechan para despertar el Apps Script: cuando pulse el botón,
+       el servidor ya está levantado y responde de inmediato en vez de
+       arrancar en frío.                                              */
+    despertarSistema();
     return;
   }
   const r=p.resumen||{};
@@ -398,22 +438,111 @@ function setDetTab(id,t){
   if(!PR_DET[id]) cargarDetalle(id);
 }
 
-async function cargarDetalle(id){
+/* ═════════════════════════════════════════════════════════════════════
+   CARGA DEL DETALLE DEL PROYECTO
+   ---------------------------------------------------------------------
+   Es la parte de la que se quejaban los clientes. Tres mecanismos:
+
+   1. DESPERTADOR. Apps Script se apaga cuando nadie lo usa y arrancar en
+      frío cuesta segundos. En cuanto el cliente llega a la pantalla de
+      la clave se le manda una petición mínima (?ping=1). Mientras
+      escribe, Google levanta el script; al pulsar el botón ya responde.
+
+   2. CACHÉ DE SESIÓN. El detalle se guarda en el navegador. Recargar la
+      página, salir y volver, o cambiar de pestaña dentro del panel ya no
+      vuelve a pedir nada: es instantáneo.
+
+   3. AVISO CON ETAPAS. Si toca esperar, se dice qué está pasando y
+      cuánto lleva. Una pantalla que informa no parece rota.
+   ═════════════════════════════════════════════════════════════════════ */
+
+const DET_CACHE_MIN = 10;          // minutos que vale la copia del navegador
+let PING_HECHO = false;
+
+/* 1. Despertador — se lanza al mostrar la pantalla de la clave. */
+function despertarSistema(){
+  if(PING_HECHO) return;
+  PING_HECHO = true;
+  const url=(typeof CONFIG!=='undefined'&&(CONFIG.PANEL_URL||CONFIG.DATA_URL))||'';
+  if(url.indexOf('http')!==0) return;
+  try{
+    fetch(url+(url.indexOf('?')>=0?'&':'?')+'ping=1', {cache:'no-store'}).catch(()=>{});
+  }catch(e){}
+}
+
+/* 2. Caché de sesión */
+function detCacheLeer(id){
+  try{
+    const raw=sessionStorage.getItem('sb-det-'+id);
+    if(!raw) return null;
+    const o=JSON.parse(raw);
+    if(!o || !o.t || (Date.now()-o.t)/60000 > DET_CACHE_MIN) return null;
+    return o.d;
+  }catch(e){ return null; }
+}
+function detCacheGuardar(id,d){
+  try{ sessionStorage.setItem('sb-det-'+id, JSON.stringify({t:Date.now(), d:d})); }catch(e){}
+}
+
+/* 3. Aviso con etapas */
+const DET_ETAPAS=[
+  [0,    'Conectando con el sistema de mantenimiento…'],
+  [2500, 'Leyendo la hoja del contrato…'],
+  [6000, 'Preparando el listado de equipos e informes…'],
+  [11000,'Está tardando más de lo normal. Seguimos intentándolo…']
+];
+let DET_RELOJ=0, DET_T0=0;
+
+function detCargando(cont,id){
+  DET_T0=Date.now();
+  const pinta=()=>{
+    const ms=Date.now()-DET_T0;
+    let txt=DET_ETAPAS[0][1];
+    for(const [t,m] of DET_ETAPAS) if(ms>=t) txt=m;
+    const seg=Math.floor(ms/1000);
+    cont.innerHTML=`<div class="dash-card det-card"><div class="cargando-proy">
+      <div class="cp-barra"><i></i></div>
+      <p>${txt}</p>
+      <span>${seg} s · los datos vienen del sistema de Sinergia Biomédica</span>
+    </div></div>`;
+  };
+  pinta();
+  clearInterval(DET_RELOJ);
+  DET_RELOJ=setInterval(pinta,1000);
+}
+function detCargandoFin(){ clearInterval(DET_RELOJ); DET_RELOJ=0; }
+
+async function cargarDetalle(id, reintento){
   const cont=document.getElementById('prDet'); if(!cont)return;
   const p=PROYECTOS.find(x=>x.id===id);
   const url=(typeof CONFIG!=='undefined'&&(CONFIG.PANEL_URL||CONFIG.DATA_URL))||'';
   if(!p||!p.detalle||url.indexOf('http')!==0){cont.innerHTML='';return;}
   if(PR_DET[id]){pintarPanel(id);return;}
+
+  /* Copia guardada en el navegador: aparece al instante, sin pedir nada. */
+  const guardado=detCacheLeer(id);
+  if(guardado){ PR_DET[id]=guardado; selLimpia(); DET_Q=''; pintarPanel(id); return; }
+
+  detCargando(cont,id);
+  const intento=reintento||0;
   try{
     const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)+'&clave='+encodeURIComponent(PR_KEY[id]||'');
-    const r=await fetch(q,{cache:'no-store'});
-    const d=await r.json();
+    const d=await traer(q, 25000);
     if(!d||!d.ok)throw new Error((d&&d.motivo)||'sin acceso');
-    PR_DET[id]=d; selLimpia(); DET_Q=''; pintarPanel(id);
+    detCargandoFin();
+    PR_DET[id]=d; detCacheGuardar(id,d); selLimpia(); DET_Q=''; pintarPanel(id);
   }catch(e){
+    /* Un fallo puntual (red del cliente, arranque en frío) no debe
+       terminar en pantalla de error: se reintenta dos veces solo. */
+    if(intento<2 && location.hash.indexOf(id)>=0){
+      setTimeout(()=>cargarDetalle(id,intento+1), 1200*(intento+1));
+      return;
+    }
+    detCargandoFin();
     cont.innerHTML='<div class="dash-card det-card">'+tabsDet(id,0)+
-      '<p class="dnote" style="padding:14px 0">No se pudo cargar el detalle ('+e.message+'). '+
-      'Puedes reintentar más tarde o escribirnos.</p></div>';
+      '<p class="dnote" style="padding:14px 0">No pudimos cargar el detalle ('+e.message+'). '+
+      'Suele ser un problema momentáneo de conexión.</p>'+
+      '<button class="btn btn-fill" onclick="cargarDetalle(\''+id+'\')">Reintentar</button></div>';
   }
 }
 
@@ -529,7 +658,7 @@ function enviarFalla(ev,id){
     +`Reporta: ${v('quien')}${v('cargo')?' · '+v('cargo'):''}\n`
     +`Fecha: ${fecha} ${hora}`;
   const S=(typeof SITE!=='undefined')?SITE:{};
-  const wa=`https://wa.me/${String(S.whatsapp||'51956614346').replace(/\D/g,'')}?text=${encodeURIComponent(texto)}`;
+  const wa=`https://wa.me/${String(S.whatsapp||'').replace(/\D/g,'')}?text=${encodeURIComponent(texto)}`;
 
   document.getElementById('ffOK').innerHTML=`
     <div class="ff-ok">
@@ -601,7 +730,7 @@ function reporteRapido(id,k,fmt){
   else if(k==='pend') SEL.avance.add('PENDIENTE');
   if(!detFiltrados(id).length){
     restaurarFiltros(guardado,id);
-    alert('No hay equipos que cumplan ese criterio con los datos actuales.');
+    avisoPanel('No hay equipos que cumplan ese criterio con los datos actuales.');
     return;
   }
   if(fmt==='pdf') imprimirReporte(id); else exportarExcel(id);
@@ -968,7 +1097,7 @@ function cerrarMenuCol(){ const m=document.getElementById('colMenu'); if(m)m.rem
 /* Enlace de WhatsApp con el contexto del contrato ya escrito */
 function waLink(p){
   const S=(typeof SITE!=='undefined')?SITE:{};
-  const num=String(S.whatsapp||'51956614346').replace(/\D/g,'');
+  const num=String(S.whatsapp||'').replace(/\D/g,'');
   const texto=`Hola, soy de ${p.cliente||'la clínica'}. `
     +`Tengo una consulta sobre el avance del contrato ${(p.servicio||'').replace(/^Contrato\s*/i,'')}.`;
   return `https://wa.me/${num}?text=${encodeURIComponent(texto)}`;
@@ -1000,8 +1129,8 @@ function membrete(id){
       </svg>
       <div class="mb-contacto">
         <span>${S.direccion||'Av. Simón Bolívar 2150 · Pueblo Libre, Lima'}</span>
-        <span>T. 956 614 346</span>
-        <span>logistica@sinergiabiomedica.pe</span>
+        <span>T. ${S.telefono||''}</span>
+        <span>${S.email||''}</span>
         <b>${S.web||'www.sinergiabiomedica.pe'}</b>
       </div>
     </div>
@@ -1121,7 +1250,7 @@ function exportarExcel(id){
     <tr><td colspan="5" class="t1">SINERGIA BIOMÉDICA</td>
         <td colspan="6" class="tr">Av. Simón Bolívar 2150 · Pueblo Libre, Lima</td></tr>
     <tr><td colspan="5" class="t2">Servicios Integrales Sinergia S.A.C. · RUC 20615862682</td>
-        <td colspan="6" class="tr">T. 956 614 346 · logistica@sinergiabiomedica.pe</td></tr>
+        <td colspan="6" class="tr">T. ${S.telefono||''} · ${S.email||''}</td></tr>
     <tr><td colspan="5" class="t2">Herramientas de metrología que distinguen su servicio</td>
         <td colspan="6" class="web">www.sinergiabiomedica.pe</td></tr>
     <tr><td colspan="${N}" class="rule"></td></tr>

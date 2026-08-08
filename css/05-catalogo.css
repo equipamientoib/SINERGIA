@@ -84,3 +84,13 @@
   .pkg .save{font-family:var(--ff-d);font-weight:600;font-size:11px;color:var(--ok);background:rgba(46,139,107,.12);border:1px solid rgba(46,139,107,.26);padding:5px 9px;border-radius:6px;margin-top:6px;display:inline-block}
   .pkg .pbtns{display:flex;gap:8px;width:100%;margin-top:14px}
   .pkg .pbtns .btn{flex:1;text-align:center;padding:10px}
+
+  /* ── Marcadores mientras carga el catálogo ──────────────────────────
+     Se muestran hasta que llega data/catalogo.json o la hoja en vivo.
+     Las clases .ln (líneas animadas) viven en css/13-clientes.css.     */
+  .eq-hueso, .pkg-hueso{pointer-events:none;transform:none!important;box-shadow:none!important}
+  .eq-hueso:hover, .pkg-hueso:hover{border-color:var(--linea)}
+  .eq-hueso .hu-img{height:206px;background:var(--crema);border-bottom:1px solid var(--linea)}
+  .eq-hueso .body{padding:20px;display:flex;flex-direction:column;gap:11px}
+  .pkg-hueso{gap:13px}
+  .facet-hueso{display:flex;flex-direction:column;gap:13px;padding:4px 2px}

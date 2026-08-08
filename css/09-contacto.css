@@ -10,3 +10,12 @@
   .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--bronce);background:var(--blanco)}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
+
+  /* — Avisos y botones de los formularios — */
+  .form-msg{display:none;font-size:13.5px;line-height:1.5;padding:10px 13px;border-radius:var(--r-sm);margin:4px 0 12px}
+  .form-msg.show{display:block}
+  .form-msg.err{background:rgba(197,74,58,.10);color:#9E3A2C;border:1px solid rgba(197,74,58,.26)}
+  .form-msg.ok{background:rgba(46,139,107,.10);color:var(--ok);border:1px solid rgba(46,139,107,.26)}
+  .form-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .form-btns .btn{flex:1;min-width:170px;text-align:center;justify-content:center}
+  .form-nota{font-size:12.5px;color:var(--gris);margin-top:11px;line-height:1.55}

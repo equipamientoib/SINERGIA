@@ -5,7 +5,8 @@ function renderEquipo(id){
   if(!e){body.innerHTML='<div class="pagehead"><h1>Equipo no encontrado</h1></div>';return;}
   const items=galleryItems(e);
   const idx=EQUIPOS.indexOf(e);
-  const specRows=Object.entries(e.specs).map(([k,v])=>`<div class="row"><span class="l">${k}</span><span class="v">${v}</span></div>`).join('');
+  /* Un equipo nuevo de la hoja puede venir sin ficha: no debe romper la página. */
+  const specRows=Object.entries(e.specs||{}).map(([k,v])=>`<div class="row"><span class="l">${k}</span><span class="v">${v}</span></div>`).join('');
   const isA=e.apoyo;
   const priceHTML=isA
     ?`<div class="pricebox"><span class="pp" style="font-size:19px">Complementaria</span><span class="pu">· incluida en paquetes de Mantenimiento</span></div>`
@@ -43,7 +44,7 @@ function renderEquipo(id){
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
         <div class="dnote">${isA?'Complementaria. Se entrega dentro de los paquetes de Mantenimiento.':'Se entrega con su certificado de calibración vigente.'}</div>
-        ${calHTML}${tarifasHTML}<div class="spec"><div class="sh">Ficha técnica</div>${specRows}</div>
+        ${calHTML}${tarifasHTML}${specRows?`<div class="spec"><div class="sh">Ficha técnica</div>${specRows}</div>`:''}
       </div>
     </div>`;
   window._galItems=items;
