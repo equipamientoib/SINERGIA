@@ -40,7 +40,9 @@ function cardEq(e){
   const badge=e.apoyo?`<span class="badge" style="background:rgba(154,127,78,.13);color:var(--cobre-d);border-color:var(--linea-b)">COMPLEMENTARIA</span>`:`<span class="badge">DISPONIBLE</span>`;
   const foot=e.apoyo
     ?`<div class="foot"><div class="price" style="font-size:14px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Complementaria<small style="font-weight:400">incluida en Mantenimiento</small></div><button class="btn" onclick="go('#/equipo/${e.id}')">Ver detalle</button></div>`
-    :`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${precioHora(e.dia)}<span>/hora · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`;
+    :(VER_PRECIOS
+      ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${precioHora(e.dia)}<span>/hora · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`
+      :`<div class="foot"><div class="price" style="font-size:15px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Consultar tarifa<small style="font-weight:400">te respondemos con precio y disponibilidad</small></div><button class="btn" onclick="go('#/contacto')">Cotizar</button></div>`);
   return `<div class="eq">
       <div class="img${e.photo?' has-photo':''}" onclick="go('#/equipo/${e.id}')">
         ${e.photo?'':'<span class="grid-bg"></span>'}
@@ -51,6 +53,7 @@ function cardEq(e){
         <div class="cat">${e.cat}</div>
         <h3 onclick="go('#/equipo/${e.id}')">${e.nom}</h3>
         <div class="marca">${e.marca}</div>
+      ${e.cal_fin?`<div class="calchip" style="margin-top:7px;display:inline-block;font-family:var(--ff-d);font-size:10px;letter-spacing:.6px;padding:3px 8px;border-radius:5px;background:rgba(46,139,107,.10);color:var(--ok);border:1px solid rgba(46,139,107,.25)">CALIBRACIÓN VIGENTE HASTA ${e.cal_fin}</div>`:''}
         <div class="desc">${e.desc}</div>
         ${foot}
       </div></div>`;
@@ -69,16 +72,19 @@ function pintarPaquetes(){
     const items=p.items.map(id=>byId(id));
     const kitLine=p.kit.length?`<li style="opacity:.7">+ Kit de intervención: ${p.kit.map(k=>APOYO[k]).join(', ')}</li>`:'';
     const badge=p.nivel==='Calibración'?`<span class="ptag">CALIBRACIÓN</span>`:`<span class="ptag" style="background:var(--onix)">MANTENIMIENTO</span>`;
+    const pkFoto=(p.fotos&&p.fotos.length)?p.fotos[0]:(p.foto||'');
+    const pkImg=pkFoto?`<div class="pkimg" onclick="go('#/paquete/${p.id}')" style="height:172px;margin:0 0 16px;overflow:hidden;border-radius:12px;border:1px solid var(--linea);cursor:pointer;background:var(--blanco)"><img src="${pkFoto}" alt="${p.nom}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:'';
     return `<div class="pkg">
       ${badge}
+      ${pkImg}
       <h3 onclick="go('#/paquete/${p.id}')">${p.nom}</h3>
       <div class="pdesc">${p.desc}</div>
       <ul class="inc">${items.map(e=>`<li>${e.nom}</li>`).join('')}${kitLine}</ul>
-      <div class="pfoot">
+      ${VER_PRECIOS?`<div class="pfoot">
         <div class="pprice">S/ ${p.dia}<span>/día · IGV incluido</span></div>
         <div class="pmod">Otras modalidades: por equipo S/ ${p.pe} · por hora S/ ${p.ph} · semana S/ ${fmt(p.psem)} · mes S/ ${fmt(p.pmes)}</div>
-      </div>
-      <div class="pbtns"><button class="btn btn-fill" onclick="abrirPaq('${p.id}')">Reservar paquete</button><a class="btn" onclick="go('#/paquete/${p.id}')">Ver detalle</a></div>
+      </div>`:`<div class="pfoot"><div class="pprice" style="font-size:17px;color:var(--gris)">Consultar tarifa<span style="display:block">te respondemos con precio y disponibilidad</span></div></div>`}
+      <div class="pbtns">${VER_PRECIOS?`<button class="btn btn-fill" onclick="abrirPaq('${p.id}')">Reservar paquete</button>`:`<button class="btn btn-fill" onclick="go('#/contacto')">Solicitar cotización</button>`}<a class="btn" onclick="go('#/paquete/${p.id}')">Ver detalle</a></div>
     </div>`;
   }).join('')||'<p style="color:var(--gris);grid-column:1/-1">No hay paquetes con esos filtros.</p>';
   document.getElementById('countPk').textContent=list.length+(list.length===1?' paquete':' paquetes');

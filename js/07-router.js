@@ -40,6 +40,7 @@ async function loadData(){
     if(Array.isArray(d.proyectos)) PROYECTOS=d.proyectos;
     if(d.modelo){
       const m=d.modelo;
+      if(m.mostrar_precios!=null) VER_PRECIOS=(String(m.mostrar_precios).toLowerCase()!=='no'&&m.mostrar_precios!==false);
       if(m.instrumentista_dia!=null) TEC_DIA=m.instrumentista_dia;
       if(m.instrumentista_min!=null) TEC_MIN=m.instrumentista_min;
       if(m.kit_dia!=null) KIT_DIA=m.kit_dia;

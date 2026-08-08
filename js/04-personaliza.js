@@ -26,12 +26,16 @@ function renderCustomSummary(){
   document.getElementById('customSummary').innerHTML=
     `<div class="csh">Tu paquete</div>`+
     (n?`<ul class="csel">${items.map(x=>`<li>${x}</li>`).join('')}${CUSTOM.kit?'<li>Kit de herramientas de apoyo</li>':''}</ul>`:`<div class="cempty">Aún no eliges instrumentos. Marca los que necesites a la izquierda.</div>`)+
-    (n?`<div class="crow"><span>Suma instrumentos</span><span>S/ ${fmt(c.sum)}/día</span></div>`:'')+
-    (c.disc?`<div class="crow disc"><span>Descuento por combinar (${Math.round(c.disc*100)}%)</span><span>− S/ ${fmt(Math.round(c.sum*c.disc))}</span></div>`:'')+
-    (CUSTOM.kit?`<div class="crow"><span>Kit de apoyo</span><span>+ S/ ${fmt(KIT_DIA)}</span></div>`:'')+
-    `<div class="ctot"><span>Total por día</span><span>S/ ${fmt(c.dia)}</span></div>`+
-    `<button class="btn btn-fill" ${n<1?'disabled':''} onclick="reservarCustom()">Reservar mi paquete</button>`+
-    `<div class="cnote">Precio con IGV incluido. El instrumentista se cobra aparte (mínimo medio día). Al reservar eliges por día, semana, mes, etc.</div>`;
+    (n&&VER_PRECIOS?`<div class="crow"><span>Suma instrumentos</span><span>S/ ${fmt(c.sum)}/día</span></div>`:'')+
+    (c.disc&&VER_PRECIOS?`<div class="crow disc"><span>Descuento por combinar (${Math.round(c.disc*100)}%)</span><span>− S/ ${fmt(Math.round(c.sum*c.disc))}</span></div>`:'')+
+    (CUSTOM.kit&&VER_PRECIOS?`<div class="crow"><span>Kit de apoyo</span><span>+ S/ ${fmt(KIT_DIA)}</span></div>`:'')+
+    (VER_PRECIOS
+      ?`<div class="ctot"><span>Total por día</span><span>S/ ${fmt(c.dia)}</span></div>`
+      +`<button class="btn btn-fill" ${n<1?'disabled':''} onclick="reservarCustom()">Reservar mi paquete</button>`
+      +`<div class="cnote">Precio con IGV incluido. Al reservar eliges por día, semana, mes, etc.</div>`
+      :`<div class="ctot"><span>Total por día</span><span style="font-size:16px;color:var(--gris)">Consultar</span></div>`
+      +`<button class="btn btn-fill" ${n<1?'disabled':''} onclick="go('#/contacto')">Solicitar cotización</button>`
+      +`<div class="cnote">Arma tu combinación y envíanosla: te respondemos con la tarifa y la disponibilidad.</div>`);
 }
 function reservarCustom(){
   const c=customCalc(); if(c.dia<=0)return;

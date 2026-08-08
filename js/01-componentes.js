@@ -22,7 +22,9 @@ const LOGO_FOOTER = `<svg class="footer-logo logo-svg" width="250" viewBox="0 0 
 </svg>`;
 
 function navLinks(indent){
-  return SITE.nav.map(n=>`${indent}<a data-route="${n.r}" onclick="go('${n.r}')">${n.t}</a>`).join('\n');
+  /* El header muestra solo las entradas principales; el pie las muestra todas. */
+  const menu=SITE.nav.filter(n=>!n.pie);
+  return menu.map(n=>`${indent}<a data-route="${n.r}" onclick="go('${n.r}')">${n.t}</a>`).join('\n');
 }
 
 function renderHeader(){

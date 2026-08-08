@@ -5,6 +5,7 @@ const MODLBL={equipo:['Precio por equipo','Equipos','Cantidad de equipos a atend
 function pkgConds(p){return {equipo:'Pagas por cada equipo atendido. Ideal para 1–2 equipos.',hora:`Por hora de servicio. En 1 h se atienden ~${p.eqh} equipos.`,dia:`Jornada de 7 h efectivas (8 h − 1 h de almuerzo). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
 function eqConds(){return {equipo:'Pagas por cada equipo que atiendas con el instrumento.',hora:'Por hora de uso del instrumento.',dia:'Jornada de 7 h efectivas (8 h − 1 h de almuerzo).',semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
 function openModal(nom,marca,prices,conds,tec,igvInc,mod0){
+  if(!VER_PRECIOS){ go('#/contacto'); return; }   // precios ocultos: se cotiza por contacto
   actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia'};
   document.getElementById('mTitulo').textContent=nom;
   document.getElementById('mMarca').textContent=marca;

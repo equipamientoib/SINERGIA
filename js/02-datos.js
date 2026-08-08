@@ -61,6 +61,9 @@ let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
 const byId=id=>EQUIPOS.find(e=>e.id===id);
 /* Divisores de modalidad para equipos individuales (única fuente de la verdad) */
 const DIV_EQUIPO=8, DIV_HORA=6;
+/* Interruptor general de precios (js/00-config.js -> CONFIG.MOSTRAR_PRECIOS).
+   La hoja de Google puede sobrescribirlo con modelo.mostrar_precios. */
+let VER_PRECIOS = (typeof CONFIG!=='undefined' && CONFIG.MOSTRAR_PRECIOS!==undefined) ? !!CONFIG.MOSTRAR_PRECIOS : true;
 const precioEquipo=d=>Math.round(d/DIV_EQUIPO), precioHora=d=>Math.round(d/DIV_HORA);
 const sumItems=p=>p.items.reduce((s,id)=>s+byId(id).dia,0);
 const fmt=n=>Number(n).toLocaleString('es-PE');
@@ -87,7 +90,7 @@ function galleryItems(e){
   const items=[];
   const fotos=(e.fotos&&e.fotos.length)?e.fotos:(e.photo?[e.photo]:[]);
   fotos.forEach(u=>items.push(`<img src="${u}" alt="${e.nom}">`));
-  items.push(device(e));
+  if(!items.length) items.push(device(e));   // el ícono solo cuando no hay foto
   return items;
 }
 

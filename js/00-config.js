@@ -12,25 +12,36 @@ const SITE = {
   direccion: "Pueblo Libre, Lima — Perú",
 
   // Contacto (se muestra en el footer)
-  email: "ventas@sinergiabiomedica.pe",
+  email: "logistica@sinergiabiomedica.pe",
   web: "sinergiabiomedica.pe",
   telefono: "+51 956 614 346",
   whatsapp: "51956614346",   // número con código de país; activa el botón flotante y el enlace del footer
 
   // Navegación (header, menú móvil y footer se generan de esta lista)
+  /* nav: el header muestra estas entradas. Las marcadas con pie:true salen
+     solo en el pie de página, para no recargar el menú de arriba. */
   nav: [
     { t: "Inicio",        r: "#/" },
-    { t: "Quiénes somos", r: "#/nosotros" },
     { t: "Servicios",     r: "#/servicios" },
-    { t: "Talleres",      r: "#/talleres" },
     { t: "Catálogo",      r: "#/catalogo" },
+    { t: "Talleres",      r: "#/talleres" },
     { t: "Clientes",      r: "#/clientes" },
     { t: "Contacto",      r: "#/contacto" },
+    { t: "Quiénes somos", r: "#/nosotros",  pie: true },
   ],
   portal: { t: "Portal distribuidores", r: "#/contacto" },
 };
 
 const CONFIG = {
+  /* ┌──────────────────────────────────────────────────────────────────┐
+     │ MOSTRAR_PRECIOS                                                  │
+     │   true  -> la web muestra tarifas y el botón «Reservar».         │
+     │   false -> oculta TODOS los precios; los botones pasan a         │
+     │            «Solicitar cotización» y llevan a Contacto.           │
+     │ Cambia solo esta palabra cuando termines de definir tus costos.  │
+     └──────────────────────────────────────────────────────────────────┘ */
+  MOSTRAR_PRECIOS: false,
+
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
      - URL de Apps Script    -> Google Sheets EN VIVO (Opción A)                    */
