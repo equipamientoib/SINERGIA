@@ -266,27 +266,6 @@ function paneCargando(){
 }
 
 
-/* Dial de avance: escala de instrumento con marcas cada 10% */
-function dialAvance(pct){
-  const R=52, C=Math.PI*R, len=C*Math.max(0,Math.min(100,pct))/100;
-  const ticks=[];
-  for(let i=0;i<=10;i++){
-    const ang=Math.PI*(1-i/10), x1=64+Math.cos(ang)*62, y1=68-Math.sin(ang)*62;
-    const l=i%5===0?9:5;
-    const x2=64+Math.cos(ang)*(62-l), y2=68-Math.sin(ang)*(62-l);
-    ticks.push(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"
-      stroke="${i%5===0?'rgba(255,255,255,.45)':'rgba(255,255,255,.2)'}" stroke-width="${i%5===0?1.4:1}"/>`);
-  }
-  return `<svg class="dial" viewBox="0 0 128 84" role="img" aria-label="Avance ${pct}%">
-    ${ticks.join('')}
-    <path d="M12 68 A52 52 0 0 1 116 68" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="7" stroke-linecap="butt"/>
-    <path d="M12 68 A52 52 0 0 1 116 68" fill="none" stroke="url(#gdial)" stroke-width="7" stroke-linecap="butt"
-      stroke-dasharray="${len.toFixed(1)} ${C.toFixed(1)}" class="dial-arco"/>
-    <defs><linearGradient id="gdial" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#8A6A38"/><stop offset="1" stop-color="#C9A96A"/></linearGradient></defs>
-    <text x="64" y="62" text-anchor="middle" class="dial-num">${pct}<tspan class="dial-pc">%</tspan></text>
-  </svg>`;
-}
 
 function metricas(d,lista){
   let equipos=0,inter=0,ejec=0,inop=0,eqListos=0,eqIniciados=0,venc=0,prox=0,vencAlta=0,alta=0;
@@ -353,6 +332,7 @@ function tableroAreas(id,d){
 }
 
 function paneValorizaciones(id,d){
+  PROY_ACT=id;
   const vals=d.valorizaciones||[];
   if(!vals.length) return '<p class="dnote" style="padding:14px 0">Aún no hay valorizaciones registradas.</p>';
   const lista=vals.filter(v=>{
@@ -385,12 +365,6 @@ function paneValorizaciones(id,d){
       :'<p class="dnote" style="padding:14px 0">No hay valorizaciones con ese estado.</p>'}`;
 }
 
-/* Deja el panel a la vista al cambiar de pestaña */
-function verPanel(destino){
-  const c=document.querySelector(destino||'#prDet .det-card'); if(!c)return;
-  const y=c.getBoundingClientRect().top+window.pageYOffset-90;
-  window.scrollTo({top:y<0?0:y,behavior:'smooth'});
-}
 
 function setDetTab(id,t){
   DET_TAB=t; pintarPanel(id);
@@ -696,14 +670,18 @@ function valBloque(v){
         <b>firmados</b>, que se publican al presentarse la valorización.</div>`:''}
       ${v.obs?`<p class="dnote">${v.obs}</p>`:''}
       ${items.length?`<div class="vlista">
-        <div class="vcab"><span>Código</span><span>Equipo</span><span>Ejecutado</span><span>Estado</span><span>Informe</span></div>
+        <div class="vcab"><span>Código</span><span>Equipo</span><span>Ejecutado</span><span>Estado</span><span>Informe</span><span></span></div>
         ${items.map(i=>`
-        <div class="vitem" data-buscar="${[i.cod,i.equipo,i.area,i.informe].join(' ').toLowerCase()}">
+        <div class="vitem abre" data-buscar="${[i.cod,i.equipo,i.area,i.informe].join(' ').toLowerCase()}"
+             role="button" tabindex="0" title="Ver ficha del equipo"
+             onclick="abrirEquipo(PROY_ACT,'${i.cod}','${v.n}')"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirEquipo(PROY_ACT,'${i.cod}','${v.n}')}">
           <span class="vi-cod">${i.cod}</span>
           <span class="vi-eq">${i.equipo}<em>${i.area} · ${i.tipo==='MC'?'Correctivo':'Preventivo'}</em></span>
           <span class="vi-fec">${i.fecha||'—'}</span>
           ${i.estado?`<span class="iest ${i.estado.toUpperCase().indexOf('INOPER')===0?'bad':'good'}">${i.estado}</span>`:'<span></span>'}
-          ${botonesInforme(i)}
+          <span class="vi-btn" onclick="event.stopPropagation()">${botonesInforme(i)}</span>
+          <span class="ec-ir" aria-hidden="true">›</span>
         </div>`).join('')}
         <p class="vi-nada hvacio" style="display:none">Ningún informe coincide con la búsqueda.</p>
       </div>`:'<p class="hvacio">Aún no hay informes emitidos en este periodo.</p>'}
@@ -932,7 +910,7 @@ function menuCol(ev,id,campo){
   montarMenu(m,ev);
 }
 
-let MENU_CAMPO='', MENU_OPS=[];
+let MENU_CAMPO='', MENU_OPS=[], VAL_FOCO='';
 function marcarCol(ix,on){
   const v=MENU_OPS[ix].v, s=SEL[MENU_CAMPO];
   on?s.add(v):s.delete(v);
@@ -956,7 +934,6 @@ function montarMenu(m,ev){
   setTimeout(()=>document.addEventListener('click',cerrarMenuCol,{once:true}),0);
 }
 
-function aplicarCol(v){ if(MENU_SET)MENU_SET(v); cerrarMenuCol(); pintarPanel(MENU_ID); }
 function cerrarMenuCol(){ const m=document.getElementById('colMenu'); if(m)m.remove(); }
 
 /* Descarga la vista actual (con sus filtros) como CSV para Excel */
@@ -1251,7 +1228,8 @@ function pintarLista(id){
 }
 
 /* ---- Panel lateral con la ficha del equipo ---- */
-function abrirEquipo(id,cod){
+function abrirEquipo(id,cod,desdeVal){
+  VAL_FOCO=desdeVal||'';
   const d=PR_DET[id]; if(!d)return;
   const e=d.equipos.find(x=>x.cod===cod); if(!e)return;
   EQ_SEL=cod; cerrarEquipo(true);
@@ -1271,6 +1249,8 @@ function abrirEquipo(id,cod){
         <div class="ep-ruta">${e.cod}</div>
         <h3>${e.nom}</h3>
         <p class="ep-sub2">${[e.marca,e.modelo].filter(x=>x&&x!=='S/M').join(' · ')||'Sin marca registrada'}</p>
+        ${VAL_FOCO?`<p class="ep-foco">Abierto desde la valorización <b>${VAL_FOCO}</b> ·
+          se resalta lo que corresponde a ese periodo</p>`:''}
       </header>
 
       <div class="ep-body">
@@ -1328,12 +1308,14 @@ function cerrarEquipo(silencio){
 function hitoIntervencion(i){
   const cls=i.hecho?(i.estado&&i.estado.toUpperCase().indexOf('INOPER')===0?'bad':'ok'):'pend';
   const f=(i.fecha||i.programada||'').split('/');
+  const suya = VAL_FOCO && i.valorizacion===VAL_FOCO;
   return `
-    <div class="hito ${cls}">
+    <div class="hito ${cls}${suya?' foco':''}${VAL_FOCO&&!suya?' otra':''}">
       <div class="h-fecha">${f.length===3?`<b>${f[0]}</b><span>${mesCorto(f[1])} ${f[2].slice(-2)}</span>`
         :'<b>—</b><span>s/f</span>'}</div>
       <div class="h-cont">
         <div class="h-line"><b>${i.tipo==='MC'?'Correctivo':'Preventivo'} ${i.n}</b>
+          ${i.valorizacion?`<span class="h-val${suya?' on':''}">${i.valorizacion}</span>`:''}
           ${i.estado?`<span class="iest ${cls==='bad'?'bad':'good'}">${i.estado}</span>`:''}
           ${i.preliminar?'<span class="tag-prelim">preliminar</span>':''}
           ${!i.hecho?'<span class="tag-prelim">pendiente</span>':''}
