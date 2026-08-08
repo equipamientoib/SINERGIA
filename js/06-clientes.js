@@ -22,6 +22,7 @@ const PR_DET={};              // detalle ya descargado, para no volver a pedirlo
 let DET_TAB='eq';            // pestaña activa: res | val | eq
 let DET_AREA='', DET_Q='', DET_SOLO=true, DET_EST='';
 let TAB_AREAS=[], TAB_ESTADOS=[];
+let AREAS_OPEN=false;   // el bloque de áreas arranca plegado
 
 function prBadge(p){return p.estado==='Completado'?'<span class="st fin">COMPLETADO</span>':'<span class="st curso">EN CURSO</span>';}
 function prImg(p){
@@ -182,7 +183,7 @@ function metricas(d){
 }
 
 /* Barras por área — cada fila abre la lista filtrada */
-function tableroAreas(id,d){
+function agrupaAreas(d){
   const m={};
   d.equipos.forEach(e=>{
     if(!e.alcance)return;
@@ -192,20 +193,28 @@ function tableroAreas(id,d){
     e.intervenciones.forEach(i=>{m[a].inter++;
       if(i.hecho){m[a].ejec++; if((i.estado||'').toUpperCase().indexOf('INOPER')===0)m[a].inop++;}});
   });
-  const filas=Object.keys(m).map(a=>({a,...m[a],pct:m[a].inter?Math.round(m[a].ejec*100/m[a].inter):0}))
-                            .sort((x,y)=>y.pct-x.pct||y.inter-x.inter);
-  TAB_AREAS=filas;
-  return `<div class="tab-areas">${filas.map((f,ix)=>`
-      <button type="button" class="ta-row${DET_AREA===f.a?' act':''}"
-              onclick="irAEquipos('${id}',{area:TAB_AREAS[${ix}].a})">
-        <span class="ta-nom">${f.a}${f.inop?`<i class="ta-alerta" title="${f.inop} inoperativo(s)">${f.inop}</i>`:''}</span>
-        <span class="ta-eq">${f.eq} equipo${f.eq===1?'':'s'}</span>
-        <span class="ta-bar"><i style="width:${f.pct}%"></i></span>
-        <span class="ta-num">${f.ejec}/${f.inter}</span>
-        <span class="ta-pct">${f.pct}%</span>
-      </button>`).join('')}</div>`;
+  return Object.keys(m).map(a=>({a,...m[a],pct:m[a].inter?Math.round(m[a].ejec*100/m[a].inter):0}))
+                       .sort((x,y)=>y.pct-x.pct||y.inter-x.inter);
 }
 
+/* Resumen que se lee sin abrir el bloque */
+function resumenAreas(d){
+  const m=agrupaAreas(d), con=m.filter(a=>a.ejec>0).length;
+  return `${m.length} áreas · ${con} con avance`;
+}
+
+/* Rejilla compacta: cada tarjeta filtra la lista de equipos */
+function tableroAreas(id,d){
+  const filas=agrupaAreas(d);
+  TAB_AREAS=filas;
+  return `<div class="areas-grid">${filas.map((f,ix)=>`
+      <button type="button" class="ac${DET_AREA===f.a?' act':''}${f.pct?'':' cero'}"
+              onclick="irAEquipos('${id}',{area:TAB_AREAS[${ix}].a})" title="${f.a}">
+        <span class="ac-top"><b>${f.a}</b>${f.inop?`<i class="ta-alerta">${f.inop}</i>`:''}</span>
+        <span class="ac-bar"><i style="width:${f.pct}%"></i></span>
+        <span class="ac-pie">${f.eq} eq · ${f.ejec}/${f.inter}<em>${f.pct}%</em></span>
+      </button>`).join('')}</div>`;
+}
 
 function paneValorizaciones(id,d){
   const vals=d.valorizaciones||[];
@@ -385,8 +394,8 @@ function paneEquipos(id,p,d){
       <span class="ab-pct">${p.avance}%</span>
     </div>
 
-    <details class="bloque" open>
-      <summary><span>Avance por área</span><i>toca un área para filtrar la lista</i></summary>
+    <details class="bloque areas"${AREAS_OPEN?' open':''} ontoggle="AREAS_OPEN=this.open">
+      <summary><span>Avance por área</span><i>${resumenAreas(d)}</i></summary>
       ${tableroAreas(id,d)}
     </details>
 
