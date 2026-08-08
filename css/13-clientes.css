@@ -648,8 +648,7 @@
   }
   .ec-amb i{font-style:normal;color:var(--linea-b);font-size:11px}
 
-/* (retirado: el tablero oscuro con dial se descartó por decisión de diseño) */
-/* ═══ estilos inactivos ═══ */
+/* ═══ estilos del tablero descartado (sin uso) ═══ */
   .tablero{display:grid;grid-template-columns:auto 1fr;gap:0;margin:16px 0 14px;
     border-radius:5px;overflow:hidden;background:linear-gradient(160deg,#22252B,var(--onix));
     border:1px solid #2C3037}
@@ -867,18 +866,7 @@
   .lg-nota{margin-left:auto;font-style:italic;opacity:.85}
 
   /* — Impresión: sale solo la tabla, con encabezado del contrato — */
-  @media print{
-    body{background:#fff}
-    .crumb,.det-tabs,.avance-band,.kpis,.bloque,.det-filtros,.filtro-act,.lh-acc,
-    .pie-serv,.eqov,.pdfov,header,footer,.wa,.up,.prev-nota{display:none!important}
-    .det-card{box-shadow:none;border:none;padding:0}
-    .pr-head{padding:0 0 12px}
-    .eqcard{break-inside:avoid;padding:6px 0}
-    .eqcard .ec-ir{display:none}
-    .eqlista{border-top:1px solid #000}
-    .eqcab{border-bottom:1px solid #000}
-    a[href]:after{content:""}
-  }
+  
 
   /* — Columna Próximo mantenimiento — */
   .eqcard,.eqcab{grid-template-columns:128px 92px minmax(150px,1fr) 100px 74px 104px 46px 14px}
@@ -925,195 +913,38 @@
 
   /* — Membrete: solo visible al imprimir — */
   .membrete{display:none}
-  @media print{
-    .membrete{display:block;margin-bottom:14px}
-    .mb-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;
-      padding-bottom:10px;border-bottom:2px solid #9A7F4E}
-    .mb-marca{display:flex;gap:12px;align-items:flex-start}
-    .mb-marca b{display:block;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:700;
-      letter-spacing:.1em}
-    .mb-marca span{display:block;font-size:8.5px;color:#4a4d54;line-height:1.5}
-    .mb-doc{text-align:right}
-    .mb-doc b{display:block;font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.04em}
-    .mb-doc span{display:block;font-size:8.5px;color:#4a4d54;margin-top:2px}
-    .mb-datos{display:flex;flex-wrap:wrap;gap:0;margin:10px 0 0;border:1px solid #d9d5cc}
-    .mb-datos>div{flex:1 1 25%;padding:6px 10px;border-right:1px solid #d9d5cc}
-    .mb-datos>div:last-child{border-right:none}
-    .mb-datos dt{font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:#6E727A;margin:0}
-    .mb-datos dd{margin:2px 0 0;font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:600}
-
-    /* tabla impresa */
-    .pr-head,.lista-head,.det-n,.leyenda{display:none!important}
-    .eqcab{font-size:7.5px;padding:4px 0;border-bottom:1.2px solid #17191D}
-    .eqcard{font-size:9px;padding:4px 0;border-bottom:.5px solid #d9d5cc}
-    .ec-nom{font-size:9.5px} .ec-nom em{font-size:7.5px}
-    .ec-cod,.ec-serv{font-size:8px}
-    .eqpill:before,.ec-crit:before{width:5px;height:5px}
-    @page{margin:14mm 12mm}
-  }
+  
 
 
 /* ═══ Impresión — reglas finales (mayor prioridad) ═══ */
-@media print{
-  header.membrete{display:block!important}
-  /* la tabla conserva sus columnas en papel */
-  .eqcab,.eqcard{display:grid!important;align-items:center!important;
-    grid-template-columns:74px 68px minmax(150px,1fr) 46px 62px 42px 66px 34px!important;
-    gap:6px!important;padding:3.5px 0!important}
-  .eqcab .th:nth-child(5),.eqcab span:nth-child(5){display:block!important}
-  .ec-amb,.ec-val{display:block!important}
-  .ec-ir{display:none!important}
-  .eqcab>span:last-child{display:none!important}
-  .ec-val{display:flex!important;justify-content:flex-end}
-  .ec-nom{font-size:8.5px!important;line-height:1.25!important}
-  .ec-nom em{font-size:7px!important}
-  .ec-serv,.ec-cod{font-size:7.5px!important}
-  .ec-crit{font-size:7.5px!important;gap:3px!important}
-  .ec-amb{font-size:7.5px!important}
-  .ec-prox b{font-size:8px!important} .ec-prox i{font-size:6.5px!important}
-  .ec-val i{font-size:7px!important;padding:1px 3px!important}
-  .eqpill{font-size:8px!important}
-  .eqcard.g1{border-top:1px solid #17191D!important;margin-top:3px!important;padding-top:5px!important}
-}
+
 
 /* ═══ Impresión — anular el diseño móvil (el papel es angosto) ═══ */
-@media print{
-  .ec-serv,.ec-cod{grid-column:auto!important;align-self:center!important;padding-top:0!important}
-  .eqcab .th{display:inline-flex!important}
-  .eqcab .th:nth-child(4),.eqcab .th:nth-child(5),
-  .eqcab .th:nth-child(6),.eqcab .th:nth-child(7){display:inline-flex!important}
-  .eqcab .th:nth-child(4),.eqcab .th:nth-child(5){justify-content:flex-start!important;text-align:left!important}
-  .ec-crit,.ec-amb{justify-content:flex-start!important;text-align:left!important}
-  .eqcab{padding-bottom:4px!important}
-  .eqcard{page-break-inside:avoid}
-}
-
-@media print{
-  .eqcab,.eqcard{grid-template-columns:70px 64px minmax(190px,1.6fr) 44px 56px 38px 62px 30px!important}
-  .eqcab .th{font-size:6.5px!important;letter-spacing:.05em!important;white-space:normal!important;
-    line-height:1.2!important;gap:2px!important}
-  .eqcab .th i{display:none!important}
-  .ec-nom{white-space:normal!important}
-}
 
 
 /* ═══ Membrete impreso — mismo formato que los documentos Word ═══ */
   .membrete,.pie-impreso{display:none}
-  @media print{
-    .membrete{display:block!important;margin:0 0 12px}
-    .mb-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
-      padding-bottom:6px;border-bottom:2px solid #9A7F4E}
-    .mb-logo{width:230px;height:auto;display:block;flex:none}
-    .mb-contacto{text-align:right;font-size:8.5px;line-height:1.55;color:#3f4248}
-    .mb-contacto span,.mb-contacto b{display:block}
-    .mb-contacto b{color:#9A7F4E;font-weight:700}
-    .mb-doc{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:12px 0 8px}
-    .mb-doc h2{font-family:'Chakra Petch',sans-serif;font-size:12.5px;font-weight:700;
-      letter-spacing:.06em;text-transform:uppercase;margin:0;color:#17191D}
-    .mb-doc span{font-size:8.5px;color:#6E727A}
-    .mb-datos{display:flex;flex-wrap:wrap;margin:0 0 4px;border:1px solid #d9d5cc}
-    .mb-datos>div{flex:1 1 25%;padding:5px 9px;border-right:1px solid #d9d5cc}
-    .mb-datos>div:last-child{border-right:none}
-    .mb-datos dt{font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#6E727A;margin:0}
-    .mb-datos dd{margin:2px 0 0;font-family:'Chakra Petch',sans-serif;font-size:9.5px;font-weight:600}
-
-    /* pie en todas las páginas, como en el Word */
-    .pie-impreso{display:block!important;position:fixed;bottom:0;left:0;right:0;
-      padding-top:5px;border-top:1px solid #9A7F4E;
-      font-size:7.5px;letter-spacing:.06em;color:#6E727A;text-align:center}
-    @page{margin:12mm 10mm 16mm}
-  }
+  
 
   /* — Botón de WhatsApp del pie — */
   .wa-btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none}
   .wa-btn svg{flex:none;opacity:.9}
   .wa-btn:hover{border-color:#25D366;color:#128C4A;background:rgba(37,211,102,.07)}
   .wa-btn:hover svg{opacity:1}
-  @media print{ .wa-btn{display:none!important} }
+  
 
   /* ═══ Reporte de impresión ═══ */
   #repImp{display:none}
-  @media print{
-    body.imprimiendo #equipoBody{display:none!important}
-    body.imprimiendo #repImp{display:block!important}
-    #repImp .membrete{display:block!important}
-    table.rep{width:100%;border-collapse:collapse;margin-top:8px}
-    table.rep th{background:#17191D;color:#fff;font-family:'Chakra Petch',sans-serif;font-size:7px;
-      font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:4px 5px;
-      border:.5px solid #9A7F4E;text-align:left}
-    table.rep td{font-size:7.5px;padding:3px 5px;border:.5px solid #ddd9d0;vertical-align:top}
-    table.rep td b{display:block;font-size:8px;font-weight:700;color:#17191D}
-    table.rep td em{font-style:normal;font-size:6.5px;color:#6E727A}
-    table.rep td.cod{font-family:'Chakra Petch',sans-serif;font-size:7px;letter-spacing:.03em;
-      white-space:nowrap;color:#7A6237}
-    table.rep tr.rg td{background:#F1EEE8;font-family:'Chakra Petch',sans-serif;font-size:7.5px;
-      font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#17191D;padding:4px 5px}
-    table.rep td.c-alta{color:#9E342C;font-weight:700;text-align:center}
-    table.rep td.c-media{color:#8A6A38;font-weight:600;text-align:center}
-    table.rep td.c-baja{color:#9a9a94;text-align:center}
-    table.rep td.bien{color:#2F6B3A} table.rep td.mal{color:#9E342C;font-weight:600}
-    table.rep .lk{color:#8A6A38;text-decoration:none;margin-left:3px}
-    table.rep tr{break-inside:avoid}
-    table.rep thead{display:table-header-group}     /* repite la cabecera en cada página */
-    .rep-nota{font-size:7px;color:#6E727A;margin-top:8px;line-height:1.5}
-  }
-  @media print{
-    table.rep td.mms{font-size:7px;color:#3f4248;line-height:1.35}
-    table.rep td.mms em{display:block;font-style:normal;font-size:6.5px;color:#8b8f96}
-  }
+  
+  
 
 /* ═══ Tabla del reporte impreso — formato definitivo ═══ */
-@media print{
-  table.rep{border:.5px solid #C9C4B8}
-  table.rep th{background:#17191D!important;color:#fff!important;font-size:6.8px!important;
-    padding:5px 4px!important;border:none!important;border-bottom:1.5px solid #9A7F4E!important;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact}
-  table.rep td{font-size:7.2px!important;padding:3px 4px!important;
-    border:none!important;border-bottom:.4px solid #E8E4DA!important}
-  table.rep tr.par td{background:#FBFAF7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  table.rep tr.rg td{background:#EFEBE2!important;font-size:7px!important;padding:4px!important;
-    border-bottom:.5px solid #C9C4B8!important}
-  table.rep td.eq{font-weight:700;color:#17191D}
-  table.rep td.ser{font-family:'Chakra Petch',sans-serif;font-size:6.8px!important;color:#5A5E66}
-  table.rep td.f{text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
-  table.rep td.c{text-align:center}
-  table.rep td.ojo{color:#8A6A38;font-weight:600}
-  table.rep td.cod{color:#7A6237}
-}
+
 
 /* ═══ Reporte impreso — paleta de la cotización SB ═══
    Fondo blanco (hoja membretada) · cabecera #2A2D33 · filas alternas #F4F0E6
    bordes #BFBBB0 y #9A7F4E · verde #1E6B2F · gris de apoyo #8A8578        */
-@media print{
-  html,body,body.imprimiendo{background:#FFFFFF!important}
-  #repImp{background:#FFFFFF}
 
-  table.rep{border:.5px solid #BFBBB0}
-  table.rep th{background:#2A2D33!important;color:#F5F3EE!important;
-    border-bottom:1.5px solid #9A7F4E!important}
-  table.rep td{border-bottom:.4px solid #BFBBB0!important;background:#FFFFFF}
-  table.rep tr.par td{background:#F4F0E6!important}
-  table.rep tr.rg td{background:#F2F1ED!important;color:#2A2D33!important;
-    border-top:.5px solid #9A7F4E!important;border-bottom:.5px solid #BFBBB0!important}
-  table.rep td.eq{color:#2A2D33}
-  table.rep td.ser,table.rep td.cod{color:#8A8578}
-  table.rep td.cod .lk{color:#9A7F4E;text-decoration:none}
-  table.rep td.bien{color:#1E6B2F;font-weight:600}
-  table.rep td.mal{color:#9E342C;font-weight:700}
-  table.rep td.ojo{color:#9A7F4E;font-weight:600}
-
-  /* fila de totales, en ónix como la cotización */
-  table.rep tr.tot td{background:#2A2D33!important;color:#F5F3EE!important;
-    font-family:'Chakra Petch',sans-serif;font-size:7.5px!important;font-weight:700;
-    letter-spacing:.06em;text-transform:uppercase;padding:5px 4px!important;
-    border-top:1.5px solid #9A7F4E!important;border-bottom:none!important}
-  table.rep tfoot{display:table-footer-group}
-
-  .rep-nota{color:#8A8578}
-  .mb-datos{border-color:#BFBBB0!important}
-  .mb-datos>div{border-color:#BFBBB0!important}
-  * { -webkit-print-color-adjust:exact; print-color-adjust:exact }
-}
 
 /* ═══ Pestaña Programación ═══ */
   .det-tabs button em.al{color:#9E342C}
@@ -1161,7 +992,7 @@
   .rep-pie b{color:var(--onix)}
   @media(max-width:760px){ .prog-kpis{grid-template-columns:repeat(2,1fr)}
     .pfila{grid-template-columns:44px 1fr auto 14px} .pf-est{display:none} }
-  @media print{ .prog-kpis,.pmes,.rep-grid,.rep-intro,.rep-pie{display:none!important} }
+  
 
 /* ═══ Formulario de reporte de falla ═══ */
   .fform{display:flex;flex-direction:column;gap:14px;max-width:760px;margin-top:4px}
@@ -1216,4 +1047,192 @@
     background:var(--blanco);border:1px solid var(--linea);border-radius:4px}
   .ff-aviso{font-size:11.5px;color:var(--gris);margin:12px 0 0;line-height:1.55}
   .val-docs{display:inline-flex;gap:7px;margin-left:10px}
-  @media print{ .fform,.ff-ok,.val-docs{display:none!important} }
+  
+
+  /* — En valorizaciones, cada fila abre la ficha del equipo — */
+  .vitem.abre{cursor:pointer;grid-template-columns:auto 1fr auto auto auto 14px}
+  .vcab{grid-template-columns:auto 1fr auto auto auto 14px}
+  .vitem.abre:hover{background:var(--crema);border-color:var(--linea-b)}
+  .vitem.abre:focus-visible{outline:2px solid var(--bronce);outline-offset:2px}
+  .vitem .ec-ir{opacity:.4;transition:.14s;text-align:right}
+  .vitem.abre:hover .ec-ir{opacity:1;transform:translateX(2px)}
+  .vitem.sel{background:var(--crema);box-shadow:inset 2px 0 0 var(--bronce)}
+  @media(max-width:720px){
+    .vitem.abre{grid-template-columns:1fr auto 14px}
+    .vi-cod,.vi-eq{grid-column:1/-1}
+  }
+
+  /* — Al abrir desde una valorización, se distingue lo del periodo — */
+  .ep-foco{margin:8px 0 0;font-size:11px;color:rgba(255,255,255,.6);line-height:1.5}
+  .ep-foco b{color:var(--cobre);font-family:var(--ff-d);letter-spacing:.04em}
+  .h-val{font-family:var(--ff-d);font-size:9.5px;font-weight:700;letter-spacing:.05em;
+    color:var(--gris);background:rgba(23,25,29,.06);border-radius:3px;padding:2px 6px;
+    font-variant-numeric:tabular-nums}
+  .h-val.on{color:#fff;background:var(--bronce)}
+  .hito.foco{border-left-width:3px;box-shadow:0 0 0 1px rgba(154,127,78,.35)}
+  .hito.otra{opacity:.55}
+  .hito.otra:hover{opacity:1}
+
+/* ═══════════════════════════════════════════════════════════
+   IMPRESIÓN — todas las reglas de papel, en un solo bloque
+   ═══════════════════════════════════════════════════════════ */
+@media print{
+  body{background:#fff}
+      .crumb,.det-tabs,.avance-band,.kpis,.bloque,.det-filtros,.filtro-act,.lh-acc,
+      .pie-serv,.eqov,.pdfov,header,footer,.wa,.up,.prev-nota{display:none!important}
+      .det-card{box-shadow:none;border:none;padding:0}
+      .pr-head{padding:0 0 12px}
+      .eqcard{break-inside:avoid;padding:6px 0}
+      .eqcard .ec-ir{display:none}
+      .eqlista{border-top:1px solid #000}
+      .eqcab{border-bottom:1px solid #000}
+      a[href]:after{content:""}
+  .membrete{display:block;margin-bottom:14px}
+      .mb-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;
+        padding-bottom:10px;border-bottom:2px solid #9A7F4E}
+      .mb-marca{display:flex;gap:12px;align-items:flex-start}
+      .mb-marca b{display:block;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:700;
+        letter-spacing:.1em}
+      .mb-marca span{display:block;font-size:8.5px;color:#4a4d54;line-height:1.5}
+      .mb-doc{text-align:right}
+      .mb-doc b{display:block;font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.04em}
+      .mb-doc span{display:block;font-size:8.5px;color:#4a4d54;margin-top:2px}
+      .mb-datos{display:flex;flex-wrap:wrap;gap:0;margin:10px 0 0;border:1px solid #d9d5cc}
+      .mb-datos>div{flex:1 1 25%;padding:6px 10px;border-right:1px solid #d9d5cc}
+      .mb-datos>div:last-child{border-right:none}
+      .mb-datos dt{font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:#6E727A;margin:0}
+      .mb-datos dd{margin:2px 0 0;font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:600}
+  
+      /* tabla impresa */
+      .pr-head,.lista-head,.det-n,.leyenda{display:none!important}
+      .eqcab{font-size:7.5px;padding:4px 0;border-bottom:1.2px solid #17191D}
+      .eqcard{font-size:9px;padding:4px 0;border-bottom:.5px solid #d9d5cc}
+      .ec-nom{font-size:9.5px} .ec-nom em{font-size:7.5px}
+      .ec-cod,.ec-serv{font-size:8px}
+      .eqpill:before,.ec-crit:before{width:5px;height:5px}
+      @page{margin:14mm 12mm}
+  header.membrete{display:block!important}
+    /* la tabla conserva sus columnas en papel */
+    .eqcab,.eqcard{display:grid!important;align-items:center!important;
+      grid-template-columns:74px 68px minmax(150px,1fr) 46px 62px 42px 66px 34px!important;
+      gap:6px!important;padding:3.5px 0!important}
+    .eqcab .th:nth-child(5),.eqcab span:nth-child(5){display:block!important}
+    .ec-amb,.ec-val{display:block!important}
+    .ec-ir{display:none!important}
+    .eqcab>span:last-child{display:none!important}
+    .ec-val{display:flex!important;justify-content:flex-end}
+    .ec-nom{font-size:8.5px!important;line-height:1.25!important}
+    .ec-nom em{font-size:7px!important}
+    .ec-serv,.ec-cod{font-size:7.5px!important}
+    .ec-crit{font-size:7.5px!important;gap:3px!important}
+    .ec-amb{font-size:7.5px!important}
+    .ec-prox b{font-size:8px!important} .ec-prox i{font-size:6.5px!important}
+    .ec-val i{font-size:7px!important;padding:1px 3px!important}
+    .eqpill{font-size:8px!important}
+    .eqcard.g1{border-top:1px solid #17191D!important;margin-top:3px!important;padding-top:5px!important}
+  .ec-serv,.ec-cod{grid-column:auto!important;align-self:center!important;padding-top:0!important}
+    .eqcab .th{display:inline-flex!important}
+    .eqcab .th:nth-child(4),.eqcab .th:nth-child(5),
+    .eqcab .th:nth-child(6),.eqcab .th:nth-child(7){display:inline-flex!important}
+    .eqcab .th:nth-child(4),.eqcab .th:nth-child(5){justify-content:flex-start!important;text-align:left!important}
+    .ec-crit,.ec-amb{justify-content:flex-start!important;text-align:left!important}
+    .eqcab{padding-bottom:4px!important}
+    .eqcard{page-break-inside:avoid}
+  .eqcab,.eqcard{grid-template-columns:70px 64px minmax(190px,1.6fr) 44px 56px 38px 62px 30px!important}
+    .eqcab .th{font-size:6.5px!important;letter-spacing:.05em!important;white-space:normal!important;
+      line-height:1.2!important;gap:2px!important}
+    .eqcab .th i{display:none!important}
+    .ec-nom{white-space:normal!important}
+  .membrete{display:block!important;margin:0 0 12px}
+      .mb-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
+        padding-bottom:6px;border-bottom:2px solid #9A7F4E}
+      .mb-logo{width:230px;height:auto;display:block;flex:none}
+      .mb-contacto{text-align:right;font-size:8.5px;line-height:1.55;color:#3f4248}
+      .mb-contacto span,.mb-contacto b{display:block}
+      .mb-contacto b{color:#9A7F4E;font-weight:700}
+      .mb-doc{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:12px 0 8px}
+      .mb-doc h2{font-family:'Chakra Petch',sans-serif;font-size:12.5px;font-weight:700;
+        letter-spacing:.06em;text-transform:uppercase;margin:0;color:#17191D}
+      .mb-doc span{font-size:8.5px;color:#6E727A}
+      .mb-datos{display:flex;flex-wrap:wrap;margin:0 0 4px;border:1px solid #d9d5cc}
+      .mb-datos>div{flex:1 1 25%;padding:5px 9px;border-right:1px solid #d9d5cc}
+      .mb-datos>div:last-child{border-right:none}
+      .mb-datos dt{font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#6E727A;margin:0}
+      .mb-datos dd{margin:2px 0 0;font-family:'Chakra Petch',sans-serif;font-size:9.5px;font-weight:600}
+  
+      /* pie en todas las páginas, como en el Word */
+      .pie-impreso{display:block!important;position:fixed;bottom:0;left:0;right:0;
+        padding-top:5px;border-top:1px solid #9A7F4E;
+        font-size:7.5px;letter-spacing:.06em;color:#6E727A;text-align:center}
+      @page{margin:12mm 10mm 16mm}
+  .wa-btn{display:none!important}
+  body.imprimiendo #equipoBody{display:none!important}
+      body.imprimiendo #repImp{display:block!important}
+      #repImp .membrete{display:block!important}
+      table.rep{width:100%;border-collapse:collapse;margin-top:8px}
+      table.rep th{background:#17191D;color:#fff;font-family:'Chakra Petch',sans-serif;font-size:7px;
+        font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:4px 5px;
+        border:.5px solid #9A7F4E;text-align:left}
+      table.rep td{font-size:7.5px;padding:3px 5px;border:.5px solid #ddd9d0;vertical-align:top}
+      table.rep td b{display:block;font-size:8px;font-weight:700;color:#17191D}
+      table.rep td em{font-style:normal;font-size:6.5px;color:#6E727A}
+      table.rep td.cod{font-family:'Chakra Petch',sans-serif;font-size:7px;letter-spacing:.03em;
+        white-space:nowrap;color:#7A6237}
+      table.rep tr.rg td{background:#F1EEE8;font-family:'Chakra Petch',sans-serif;font-size:7.5px;
+        font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#17191D;padding:4px 5px}
+      table.rep td.c-alta{color:#9E342C;font-weight:700;text-align:center}
+      table.rep td.c-media{color:#8A6A38;font-weight:600;text-align:center}
+      table.rep td.c-baja{color:#9a9a94;text-align:center}
+      table.rep td.bien{color:#2F6B3A} table.rep td.mal{color:#9E342C;font-weight:600}
+      table.rep .lk{color:#8A6A38;text-decoration:none;margin-left:3px}
+      table.rep tr{break-inside:avoid}
+      table.rep thead{display:table-header-group}     /* repite la cabecera en cada página */
+      .rep-nota{font-size:7px;color:#6E727A;margin-top:8px;line-height:1.5}
+  table.rep td.mms{font-size:7px;color:#3f4248;line-height:1.35}
+      table.rep td.mms em{display:block;font-style:normal;font-size:6.5px;color:#8b8f96}
+  table.rep{border:.5px solid #C9C4B8}
+    table.rep th{background:#17191D!important;color:#fff!important;font-size:6.8px!important;
+      padding:5px 4px!important;border:none!important;border-bottom:1.5px solid #9A7F4E!important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+    table.rep td{font-size:7.2px!important;padding:3px 4px!important;
+      border:none!important;border-bottom:.4px solid #E8E4DA!important}
+    table.rep tr.par td{background:#FBFAF7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    table.rep tr.rg td{background:#EFEBE2!important;font-size:7px!important;padding:4px!important;
+      border-bottom:.5px solid #C9C4B8!important}
+    table.rep td.eq{font-weight:700;color:#17191D}
+    table.rep td.ser{font-family:'Chakra Petch',sans-serif;font-size:6.8px!important;color:#5A5E66}
+    table.rep td.f{text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+    table.rep td.c{text-align:center}
+    table.rep td.ojo{color:#8A6A38;font-weight:600}
+    table.rep td.cod{color:#7A6237}
+  html,body,body.imprimiendo{background:#FFFFFF!important}
+    #repImp{background:#FFFFFF}
+  
+    table.rep{border:.5px solid #BFBBB0}
+    table.rep th{background:#2A2D33!important;color:#F5F3EE!important;
+      border-bottom:1.5px solid #9A7F4E!important}
+    table.rep td{border-bottom:.4px solid #BFBBB0!important;background:#FFFFFF}
+    table.rep tr.par td{background:#F4F0E6!important}
+    table.rep tr.rg td{background:#F2F1ED!important;color:#2A2D33!important;
+      border-top:.5px solid #9A7F4E!important;border-bottom:.5px solid #BFBBB0!important}
+    table.rep td.eq{color:#2A2D33}
+    table.rep td.ser,table.rep td.cod{color:#8A8578}
+    table.rep td.cod .lk{color:#9A7F4E;text-decoration:none}
+    table.rep td.bien{color:#1E6B2F;font-weight:600}
+    table.rep td.mal{color:#9E342C;font-weight:700}
+    table.rep td.ojo{color:#9A7F4E;font-weight:600}
+  
+    /* fila de totales, en ónix como la cotización */
+    table.rep tr.tot td{background:#2A2D33!important;color:#F5F3EE!important;
+      font-family:'Chakra Petch',sans-serif;font-size:7.5px!important;font-weight:700;
+      letter-spacing:.06em;text-transform:uppercase;padding:5px 4px!important;
+      border-top:1.5px solid #9A7F4E!important;border-bottom:none!important}
+    table.rep tfoot{display:table-footer-group}
+  
+    .rep-nota{color:#8A8578}
+    .mb-datos{border-color:#BFBBB0!important}
+    .mb-datos>div{border-color:#BFBBB0!important}
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact }
+  .prog-kpis,.pmes,.rep-grid,.rep-intro,.rep-pie{display:none!important}
+  .fform,.ff-ok,.val-docs{display:none!important}
+}
