@@ -17,6 +17,11 @@ let PROYECTOS=[
    clave_hash:"d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"}
 ];
 const PR_OPEN=new Set(); // proyectos desbloqueados en esta sesión (solo en memoria)
+const PR_KEY={};              // hash de la clave por proyecto (solo en memoria)
+const PR_DET={};              // detalle ya descargado, para no volver a pedirlo
+let DET_TAB='eq';            // pestaña activa: res | val | eq
+let DET_AREA='', DET_Q='', DET_SOLO=true, DET_EST='';
+let TAB_AREAS=[], TAB_ESTADOS=[];
 
 function prBadge(p){return p.estado==='Completado'?'<span class="st fin">COMPLETADO</span>':'<span class="st curso">EN CURSO</span>';}
 function prImg(p){
@@ -123,40 +128,118 @@ function renderProyecto(id){
     const k=document.getElementById('prKey'); if(k)k.focus();
     return;
   }
-  const done=p.hitos.filter(x=>x.d).length;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/clientes')">Nuestros clientes</a> &nbsp;/&nbsp; ${p.titulo}</div>
     <div class="dash-head" style="padding-top:18px">
       <div>
         <div class="k">${p.cliente}</div>
-        <h1 style="font-size:clamp(24px,3.2vw,36px);font-weight:700;letter-spacing:-.8px;margin-top:8px">${p.titulo}</h1>
-        <p style="color:var(--gris);font-size:14.5px;margin-top:8px;max-width:64ch">${p.desc}</p>
+        <h1 style="font-size:clamp(22px,3vw,32px);font-weight:700;letter-spacing:-.8px;margin-top:8px">${p.titulo}</h1>
+        <p style="color:var(--gris);font-size:13.5px;margin-top:6px">${p.servicio} · ${p.fecha}</p>
       </div>
       ${prBadge(p).replace('class="st','style="position:static" class="st')}
     </div>
-    <div class="dash-grid">
-      <div>
-        <div class="dash-card">
-          <div class="dh">Avance del proyecto</div>
-          <div class="prog-row"><span class="pct" id="prPct">${p.avance}%</span><span class="lbl">${done} de ${p.hitos.length} hitos completados</span></div>
-          <div class="prog"><i id="prBar"></i></div>
-          <ul class="hitos">${p.hitos.map(hi=>`<li class="${hi.d?'done':''}">${hi.t}</li>`).join('')}</ul>
-        </div>
-      </div>
-      <div>
-        <div class="dash-foto">${prImg(p)}</div>
-        <div class="spec"><div class="sh">Datos del servicio</div>
-          <div class="row"><span class="l">Servicio</span><span class="v">${p.servicio}</span></div>
-          <div class="row"><span class="l">Inicio</span><span class="v">${p.fecha}</span></div>
-          <div class="row"><span class="l">Estado</span><span class="v">${p.estado}</span></div>
-        </div>
-        <div class="dnote" style="margin-top:16px">¿Consultas sobre el avance? <a onclick="go('#/contacto')" style="color:var(--cobre-d);font-weight:600;cursor:pointer">&nbsp;Contáctanos</a>.</div>
-      </div>
-    </div>
     <div id="prDet"></div>`;
-  setTimeout(()=>{const b=document.getElementById('prBar');if(b)b.style.width=p.avance+'%';},80);
+  pintarPanel(id);
   cargarDetalle(id);
 }
+
+/* ---- Panel con pestañas: Resumen · Valorizaciones · Equipos ---- */
+function pintarPanel(id){
+  const cont=document.getElementById('prDet'); if(!cont)return;
+  const y=window.pageYOffset;                 // conservar la posición al redibujar
+  const p=PROYECTOS.find(x=>x.id===id), d=PR_DET[id];
+  const nv=d&&d.valorizaciones?d.valorizaciones.length:0;
+  let pane='';
+  if(DET_TAB==='val') pane=d?paneValorizaciones(id,d):paneCargando();
+  else                pane=d?paneEquipos(id,p,d):paneCargando();
+  cont.innerHTML=`<div class="dash-card det-card">${tabsDet(id,nv)}${pane}</div>`;
+  if(DET_TAB!=='val'){
+    setTimeout(()=>{const b=document.getElementById('prBar');if(b)b.style.width=p.avance+'%';},80);
+    pintarLista(id);
+  }
+  if(window.pageYOffset!==y) window.scrollTo(0,y);
+}
+
+function paneCargando(){
+  return '<p class="dnote" style="padding:18px 0">Cargando el detalle…</p>';
+}
+
+
+function metricas(d){
+  let equipos=0,inter=0,ejec=0,inop=0,eqListos=0,eqIniciados=0;
+  d.equipos.forEach(e=>{
+    if(!e.alcance)return;
+    equipos++;
+    let malo=false,h=0,t=0;
+    e.intervenciones.forEach(i=>{inter++;t++; if(i.hecho){ejec++;h++;
+      if((i.estado||'').toUpperCase().indexOf('INOPER')===0)malo=true;}});
+    if(t&&h>=t)eqListos++;
+    if(h)eqIniciados++;
+    if(malo)inop++;
+  });
+  return {equipos,inter,ejec,inop,eqListos,eqIniciados,pend:inter-ejec,
+          pct:inter?Math.round(ejec*100/inter):0};
+}
+
+/* Barras por área — cada fila abre la lista filtrada */
+function tableroAreas(id,d){
+  const m={};
+  d.equipos.forEach(e=>{
+    if(!e.alcance)return;
+    const a=e.area||'—';
+    m[a]=m[a]||{eq:0,inter:0,ejec:0,inop:0};
+    m[a].eq++;
+    e.intervenciones.forEach(i=>{m[a].inter++;
+      if(i.hecho){m[a].ejec++; if((i.estado||'').toUpperCase().indexOf('INOPER')===0)m[a].inop++;}});
+  });
+  const filas=Object.keys(m).map(a=>({a,...m[a],pct:m[a].inter?Math.round(m[a].ejec*100/m[a].inter):0}))
+                            .sort((x,y)=>y.pct-x.pct||y.inter-x.inter);
+  TAB_AREAS=filas;
+  return `<div class="tab-areas">${filas.map((f,ix)=>`
+      <button type="button" class="ta-row${DET_AREA===f.a?' act':''}"
+              onclick="irAEquipos('${id}',{area:TAB_AREAS[${ix}].a})">
+        <span class="ta-nom">${f.a}${f.inop?`<i class="ta-alerta" title="${f.inop} inoperativo(s)">${f.inop}</i>`:''}</span>
+        <span class="ta-eq">${f.eq} equipo${f.eq===1?'':'s'}</span>
+        <span class="ta-bar"><i style="width:${f.pct}%"></i></span>
+        <span class="ta-num">${f.ejec}/${f.inter}</span>
+        <span class="ta-pct">${f.pct}%</span>
+      </button>`).join('')}</div>`;
+}
+
+
+function paneValorizaciones(id,d){
+  const vals=d.valorizaciones||[];
+  if(!vals.length) return '<p class="dnote" style="padding:14px 0">Aún no hay valorizaciones registradas.</p>';
+  return `<div class="det-n">${vals.length} valorizaci${vals.length===1?'ón':'ones'} · se listan solo los informes ya emitidos</div>
+    ${vals.map(v=>valBloque(v)).join('')}`;
+}
+
+
+
+function setDetTab(id,t){
+  DET_TAB=t; pintarPanel(id);
+  if(!PR_DET[id]) cargarDetalle(id);
+}
+
+async function cargarDetalle(id){
+  const cont=document.getElementById('prDet'); if(!cont)return;
+  const p=PROYECTOS.find(x=>x.id===id);
+  const url=(typeof CONFIG!=='undefined'&&CONFIG.DATA_URL)||'';
+  if(!p||!p.detalle||url.indexOf('http')!==0){cont.innerHTML='';return;}
+  if(PR_DET[id]){pintarPanel(id);return;}
+  try{
+    const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)+'&clave='+encodeURIComponent(PR_KEY[id]||'');
+    const r=await fetch(q,{cache:'no-store'});
+    const d=await r.json();
+    if(!d||!d.ok)throw new Error((d&&d.motivo)||'sin acceso');
+    PR_DET[id]=d; DET_AREA=''; DET_Q=''; DET_EST=''; pintarPanel(id);
+  }catch(e){
+    cont.innerHTML='<div class="dash-card det-card">'+tabsDet(id,0)+
+      '<p class="dnote" style="padding:14px 0">No se pudo cargar el detalle ('+e.message+'). '+
+      'Puedes reintentar más tarde o escribirnos.</p></div>';
+  }
+}
+
 async function tryUnlock(id){
   const inp=document.getElementById('prKey'), err=document.getElementById('lockErr');
   const v=(inp&&inp.value||'').trim();
@@ -167,28 +250,89 @@ async function tryUnlock(id){
   else{if(err)err.classList.add('show');if(inp){inp.value='';inp.focus();}}
 }
 
-/* ---- DETALLE PRIVADO POR EQUIPO (se pide al servidor con la clave) ---- */
-const PR_KEY={};              // hash de la clave por proyecto (solo en memoria)
-const PR_DET={};              // detalle ya descargado, para no volver a pedirlo
-let DET_AREA='', DET_Q='', DET_SOLO=true;
+function tabsDet(id,nv){
+  return `<div class="det-tabs">
+    <button type="button" class="${DET_TAB==='eq'?'on':''}" onclick="setDetTab('${id}','eq')">Equipos y avance</button>
+    <button type="button" class="${DET_TAB==='val'?'on':''}" onclick="setDetTab('${id}','val')">Valorizaciones${nv?` <em>${nv}</em>`:''}</button>
+  </div>`;
+}
 
-async function cargarDetalle(id){
-  const cont=document.getElementById('prDet'); if(!cont)return;
-  const p=PROYECTOS.find(x=>x.id===id);
-  const url=(typeof CONFIG!=='undefined'&&CONFIG.DATA_URL)||'';
-  if(!p||!p.detalle||url.indexOf('http')!==0){cont.innerHTML='';return;}
-  if(PR_DET[id]){pintarDetalle(id);return;}
-  cont.innerHTML='<div class="dash-card det-card"><div class="dh">Equipos del contrato</div><p class="dnote">Cargando el detalle…</p></div>';
-  try{
-    const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)+'&clave='+encodeURIComponent(PR_KEY[id]||'');
-    const r=await fetch(q,{cache:'no-store'});
-    const d=await r.json();
-    if(!d||!d.ok)throw new Error((d&&d.motivo)||'sin acceso');
-    PR_DET[id]=d; DET_AREA=''; DET_Q=''; pintarDetalle(id);
-  }catch(e){
-    cont.innerHTML='<div class="dash-card det-card"><div class="dh">Equipos del contrato</div>'+
-      '<p class="dnote">No se pudo cargar el detalle ('+e.message+'). Puedes reintentar más tarde o escribirnos.</p></div>';
-  }
+function valEstadoClase(e){
+  const t=(e||'').toLowerCase();
+  if(t.indexOf('cerrada')>=0||t.indexOf('conformidad')>=0)return 'ok';
+  if(t.indexOf('presentada')>=0)return 'medio';
+  if(t.indexOf('sin movimiento')>=0)return 'pend';
+  return 'curso';
+}
+
+/* Fechas de la valorización + acceso al documento, solo cuando corresponde */
+function bloqueFechas(v){
+  const abierta = v.estado==='En ejecución';
+  const f=[];
+  if(v.presentacion)          f.push(`<span><i>Presentada</i>${v.presentacion}</span>`);
+  else if(v.presentacion_max) f.push(`<span><i>Se presenta hasta el</i>${v.presentacion_max}</span>`);
+  if(v.conformidad)                      f.push(`<span><i>Conformidad</i>${v.conformidad}</span>`);
+  else if(v.conformidad_max && !abierta) f.push(`<span><i>Conformidad (máx.)</i>${v.conformidad_max}</span>`);
+  if(!f.length) return '';
+  const acceso = (!abierta && v.pdf)
+    ? `<button type="button" class="ibtn" onclick="verInforme('${v.pdf}','Valorización ${v.n}')">Ver valorización</button>`
+    : (abierta ? '<span class="val-nota">Periodo en curso · aún no se presenta</span>' : '');
+  return `<div class="valfechas">${f.join('')}${acceso}</div>`;
+}
+
+/* Aviso de plazo de conformidad (Cláusula Tercera: 7 días calendario) */
+function avisoConformidad(v){
+  if(v.estado!=='Presentada'||v.dias_conformidad===null||v.dias_conformidad===undefined)return '';
+  const d=v.dias_conformidad;
+  if(d>0) return `<div class="valaviso">Pendiente de su conformidad · quedan <b>${d} día${d===1?'':'s'}</b>
+    (hasta el ${v.conformidad_max||''}).</div>`;
+  if(d===0) return `<div class="valaviso urge">Último día para dar conformidad (${v.conformidad_max||''}).</div>`;
+  return `<div class="valaviso ok">Venció el plazo de revisión el ${v.conformidad_max||''} sin observaciones:
+    conforme al contrato, se entiende otorgada la conformidad.</div>`;
+}
+
+function valBloque(v){
+  const items=(v.items||[]).slice().sort((a,b)=>(a.area||'').localeCompare(b.area||''));
+  return `
+  <div class="valrow${v.total?'':' vacia'}">
+    <button type="button" class="valhead" onclick="this.parentNode.classList.toggle('open')">
+      <span class="valn">${v.n}</span>
+      <span class="valmes">${v.mes||''}<em>${v.total} informe${v.total===1?'':'s'}</em></span>
+      <span class="eqpill ${valEstadoClase(v.estado)}">${v.estado}</span>
+    </button>
+    <div class="valbody">
+      ${bloqueFechas(v)}
+      ${avisoConformidad(v)}
+      ${items.some(i=>i.preliminar)?`<div class="valaviso prelim">
+        <b>Informes preliminares.</b> Esta valorización sigue en ejecución: los PDF que ve aquí son
+        referenciales, para control de avance, y pueden variar. Los informes oficiales son los
+        <b>firmados</b>, que se publican al presentarse la valorización.</div>`:''}
+      ${v.obs?`<p class="dnote">${v.obs}</p>`:''}
+      ${items.length?items.map(i=>`
+        <div class="intv hecho">
+          <div class="itxt">
+            <b>${i.cod}</b>
+            <span>${i.equipo}</span>
+            <span class="ifec">${i.area} · ${i.tipo==='MC'?'Correctivo':'Preventivo'} · ${i.fecha}</span>
+            ${i.estado?`<span class="iest ${i.estado.toUpperCase().indexOf('INOPER')===0?'bad':'good'}">${i.estado}</span>`:''}
+          </div>
+          ${botonesInforme(i)}
+        </div>`).join(''):'<p class="dnote">Aún no hay informes emitidos en este periodo.</p>'}
+    </div>
+  </div>`;
+}
+
+/* Informe firmado (escaneado) primero; el PDF preliminar mientras no exista */
+function botonesInforme(i){
+  const t=(i.informe||'Informe').replace(/'/g,'');
+  if(i.scan) return `<span class="ibtns">
+      <button type="button" class="ibtn" onclick="verInforme('${i.scan}','${t} (firmado)')">Ver informe firmado</button>
+      ${i.pdf?`<button type="button" class="ibtn alt" onclick="verInforme('${i.pdf}','${t}')">PDF</button>`:''}
+    </span>`;
+  if(i.pdf) return `<span class="ibtns">
+      <button type="button" class="ibtn prelim" onclick="verInforme('${i.pdf}','${t} — preliminar')">Ver PDF preliminar</button>
+    </span>`;
+  return '<span class="ibtn off">Sin informe</span>';
 }
 
 function detFiltrados(id){
@@ -197,74 +341,203 @@ function detFiltrados(id){
   return d.equipos.filter(e=>{
     if(DET_SOLO&&!e.alcance)return false;
     if(DET_AREA&&e.area!==DET_AREA)return false;
+    if(DET_EST){
+      const hechas=e.intervenciones.filter(i=>i.hecho);
+      if(DET_EST==='PENDIENTE'){ if(!e.intervenciones.some(i=>!i.hecho))return false; }
+      else if(DET_EST==='EJECUTADO'){ if(!hechas.length)return false; }
+      else if(DET_EST==='COMPLETO'){ if(!e.intervenciones.length||hechas.length<e.intervenciones.length)return false; }
+      else if(!hechas.some(i=>(i.estado||'').toUpperCase()===DET_EST))return false;
+    }
     if(!q)return true;
     return (e.nom+' '+e.marca+' '+e.modelo+' '+e.serie+' '+e.cod).toLowerCase().includes(q);
   });
 }
 
-function pintarDetalle(id){
-  const cont=document.getElementById('prDet'), d=PR_DET[id]; if(!cont||!d)return;
-  const areas=[...new Set(d.equipos.map(e=>e.area))].filter(Boolean).sort();
-  const t=d.totales;
-  cont.innerHTML=`
-    <div class="dash-card det-card">
-      <div class="dh">Equipos del contrato</div>
-      <div class="det-tot">
-        <div><b>${t.en_alcance}</b><span>equipos en alcance</span></div>
-        <div><b>${t.intervenciones}</b><span>intervenciones</span></div>
-        <div><b>${t.ejecutadas}</b><span>ejecutadas</span></div>
-        <div><b>${t.intervenciones-t.ejecutadas}</b><span>pendientes</span></div>
-      </div>
-      <div class="det-filtros">
-        <select onchange="DET_AREA=this.value;pintarLista('${id}')">
-          <option value="">Todas las áreas</option>
-          ${areas.map(a=>`<option${a===DET_AREA?' selected':''}>${a}</option>`).join('')}
-        </select>
-        <input type="search" placeholder="Buscar equipo, marca o serie" value="${DET_Q}"
-               oninput="DET_Q=this.value;pintarLista('${id}')">
-        <label class="det-chk"><input type="checkbox"${DET_SOLO?' checked':''}
-               onchange="DET_SOLO=this.checked;pintarLista('${id}')"> Solo en alcance</label>
-      </div>
-      <div id="detLista"></div>
-    </div>`;
-  pintarLista(id);
+/* Filtra la lista desde el tablero, sin salir de la vista */
+function irAEquipos(id,f){
+  DET_AREA=f.area||''; DET_EST=f.estado||''; DET_Q='';
+  if(f.solo!==undefined)DET_SOLO=f.solo;
+  DET_TAB='eq'; pintarPanel(id);
 }
+function limpiarFiltros(id){
+  DET_AREA=''; DET_EST=''; DET_Q=''; DET_SOLO=true; pintarPanel(id);
+}
+function filtrosActivos(){
+  const f=[];
+  if(DET_AREA)f.push(DET_AREA);
+  if(DET_EST)f.push(DET_EST==='PENDIENTE'?'Con intervenciones pendientes'
+    :(DET_EST==='EJECUTADO'?'Con intervenciones ejecutadas'
+    :(DET_EST==='COMPLETO'?'Servicio completo':DET_EST)));
+  if(!DET_SOLO)f.push('Incluye fuera de alcance');
+  return f;
+}
+
+function paneEquipos(id,p,d){
+  const areas=[...new Set(d.equipos.map(e=>e.area))].filter(Boolean).sort();
+  const m=metricas(d), f=filtrosActivos();
+  return `
+    <div class="avance-band">
+      <div class="ab-txt">
+        <span class="ab-lbl">Avance del contrato</span>
+        <span class="ab-det">${m.ejec} de ${m.inter} intervenciones ejecutadas</span>
+      </div>
+      <div class="ab-bar"><i id="prBar"></i></div>
+      <span class="ab-pct">${p.avance}%</span>
+    </div>
+
+    <details class="bloque" open>
+      <summary><span>Avance por área</span><i>toca un área para filtrar la lista</i></summary>
+      ${tableroAreas(id,d)}
+    </details>
+
+    <div class="kpis">
+      <button type="button" class="kpi${!f.length?' act':''}" onclick="irAEquipos('${id}',{})">
+        <b>${m.equipos}</b><span>equipos totales en el alcance</span></button>
+      <button type="button" class="kpi${DET_EST==='EJECUTADO'?' act':''}" onclick="irAEquipos('${id}',{estado:'EJECUTADO'})">
+        <b>${m.ejec}<em>/${m.inter}</em></b><span>intervenciones ejecutadas</span></button>
+      <button type="button" class="kpi${DET_EST==='COMPLETO'?' act':''}" onclick="irAEquipos('${id}',{estado:'COMPLETO'})">
+        <b>${m.eqListos}<em>/${m.equipos}</em></b><span>equipos ejecutados</span></button>
+      <button type="button" class="kpi ${m.inop?'alerta':''}${DET_EST==='INOPERATIVO'?' act':''}"
+              onclick="irAEquipos('${id}',{estado:'INOPERATIVO'})">
+        <b>${m.inop}</b><span>equipos inoperativos</span></button>
+    </div>
+
+    <div class="lista-head" id="listaEquipos">
+      <h4>Lista de equipos</h4>
+      <span class="th-nota">${d.totales.equipos} registrados · ${m.equipos} dentro del contrato</span>
+    </div>
+    <div class="det-filtros">
+      <select onchange="DET_AREA=this.value;pintarPanel('${id}')">
+        <option value="">Todas las áreas</option>
+        ${areas.map(a=>`<option${a===DET_AREA?' selected':''}>${a}</option>`).join('')}
+      </select>
+      <input type="search" placeholder="Buscar equipo, marca o serie" value="${DET_Q}"
+             oninput="DET_Q=this.value;pintarLista('${id}')">
+      <div class="chips" role="group" aria-label="Filtros rápidos">
+        ${[['','Todos'],['COMPLETO','Ejecutados'],['PENDIENTE','Pendientes'],
+           ['INOPERATIVO','Inoperativos'],['OPERATIVO','Operativos']]
+          .map(([k,t])=>`<button type="button" class="chip${DET_EST===k?' on':''}"
+             onclick="DET_EST='${k}';pintarPanel('${id}')">${t}</button>`).join('')}
+      </div>
+      <label class="det-chk"><input type="checkbox"${DET_SOLO?' checked':''}
+             onchange="DET_SOLO=this.checked;pintarPanel('${id}')"> Solo en alcance</label>
+    </div>
+    ${f.length?`<div class="filtro-act">
+      <span>Filtrando por: ${f.map(x=>`<b>${x}</b>`).join(' · ')}</span>
+      <button type="button" onclick="limpiarFiltros('${id}')">Quitar filtros</button></div>`:''}
+    <div id="detLista"></div>
+
+    <details class="bloque ficha-serv">
+      <summary><span>Datos del servicio</span></summary>
+      <div class="res-pie">
+        <div class="spec">
+          <div class="row"><span class="l">Servicio</span><span class="v">${p.servicio}</span></div>
+          <div class="row"><span class="l">Inicio</span><span class="v">${p.fecha}</span></div>
+          <div class="row"><span class="l">Estado</span><span class="v">${p.estado}</span></div>
+          <div class="row"><span class="l">Equipos</span><span class="v">${m.equipos} en alcance</span></div>
+        </div>
+        <p class="dnote">${p.desc}<br><br>¿Consultas sobre el avance?
+          <a onclick="go('#/contacto')" style="color:var(--cobre-d);font-weight:600;cursor:pointer">Contáctanos</a>.</p>
+      </div>
+    </details>`;
+}
+
+let EQ_SEL='';
 
 function pintarLista(id){
   const cont=document.getElementById('detLista'); if(!cont)return;
   const lista=detFiltrados(id);
   if(!lista.length){cont.innerHTML='<p class="dnote">No hay equipos que coincidan con el filtro.</p>';return;}
-  cont.innerHTML='<div class="det-n">'+lista.length+' equipos</div>'+lista.map(e=>{
-    const hechas=e.intervenciones.filter(i=>i.hecho).length, tot=e.intervenciones.length;
-    const est=tot&&hechas>=tot?'ok':(hechas?'medio':'pend');
-    return `
-    <div class="eqrow${e.alcance?'':' fuera'}">
-      <button class="eqhead" onclick="this.parentNode.classList.toggle('open')">
-        <span class="eqcod">${e.cod}</span>
-        <span class="eqnom">${e.nom}<em>${[e.marca,e.modelo].filter(x=>x&&x!=='S/M').join(' ')}</em></span>
-        <span class="eqarea">${e.area}</span>
+  cont.innerHTML='<div class="det-n">'+lista.length+' equipos</div>'+
+    '<div class="eqlista">'+lista.map(e=>{
+      const hechas=e.intervenciones.filter(i=>i.hecho).length, tot=e.intervenciones.length;
+      const est=tot&&hechas>=tot?'ok':(hechas?'medio':'pend');
+      return `
+      <button type="button" class="eqcard${e.alcance?'':' fuera'}${EQ_SEL===e.cod?' sel':''}"
+              onclick="abrirEquipo('${id}','${e.cod}')">
+        <span class="ec-cod">${e.cod}</span>
+        <span class="ec-nom">${e.nom}<em>${[e.marca,e.modelo].filter(x=>x&&x!=='S/M').join(' ')||'—'}</em></span>
+        <span class="ec-area">${e.area}</span>
         <span class="eqpill ${est}">${tot?hechas+'/'+tot:'sin servicio'}</span>
-      </button>
-      <div class="eqbody">
-        <div class="eqdatos">
-          <span><i>Serie</i>${e.serie||'—'}</span>
-          <span><i>Cód. MINSA</i>${e.minsa||'—'}</span>
-          <span><i>Servicios/año</i>${e.servicios}</span>
-          <span><i>Ítem</i>${e.item||'—'}</span>
+        <span class="ec-ir" aria-hidden="true">›</span>
+      </button>`;
+    }).join('')+'</div>';
+}
+
+/* ---- Panel lateral con la ficha del equipo ---- */
+function abrirEquipo(id,cod){
+  const d=PR_DET[id]; if(!d)return;
+  const e=d.equipos.find(x=>x.cod===cod); if(!e)return;
+  EQ_SEL=cod; cerrarEquipo(true);
+  const prev=e.intervenciones.filter(i=>i.tipo!=='MC').sort((a,b)=>a.n-b.n);
+  const corr=e.intervenciones.filter(i=>i.tipo==='MC').sort((a,b)=>a.n-b.n);
+  const hechas=e.intervenciones.filter(i=>i.hecho).length, tot=e.intervenciones.length;
+
+  const ov=document.createElement('div');
+  ov.className='eqov'; ov.id='eqOv';
+  ov.innerHTML=`
+    <aside class="eqpanel" role="dialog" aria-modal="true" aria-label="${e.nom}">
+      <header class="ep-head">
+        <div class="ep-ruta">${e.cod} &nbsp;·&nbsp; ${e.minsa||'—'} &nbsp;·&nbsp; ${e.area||'—'}</div>
+        <h3>${e.nom}</h3>
+        <div class="ep-chips">
+          <span class="chip-est ${e.alcance?'on':''}">${e.alcance?'En alcance':'Fuera de alcance'}</span>
+          <span class="chip-est">${tot?`${hechas} de ${tot} intervenciones`:'Sin servicio contratado'}</span>
+          ${e.servicios?`<span class="chip-est">${e.servicios} servicio${e.servicios===1?'':'s'}/año</span>`:''}
         </div>
-        ${tot?e.intervenciones.sort((a,b)=>a.n-b.n).map(i=>`
-          <div class="intv${i.hecho?' hecho':''}">
-            <div class="itxt">
-              <b>${i.tipo==='MC'?'Correctivo':'Preventivo'} ${i.n}</b>
-              <span>${i.informe||''}</span>
-              ${i.fecha?`<span class="ifec">Ejecutado ${i.fecha}</span>`:(i.programada?`<span class="ifec">Programado ${i.programada}</span>`:'<span class="ifec">Sin programar</span>')}
-              ${i.estado?`<span class="iest ${i.estado.toUpperCase().indexOf('INOPER')===0?'bad':'good'}">${i.estado}</span>`:''}
-            </div>
-            ${i.pdf?`<button class="ibtn" onclick="verInforme('${i.pdf}','${(i.informe||'Informe').replace(/'/g,'')}')">Ver informe</button>`:'<span class="ibtn off">Sin informe</span>'}
-          </div>`).join(''):'<p class="dnote">Este equipo no tiene intervenciones programadas en el contrato.</p>'}
+        <button class="ep-x" onclick="cerrarEquipo()" aria-label="Cerrar">✕</button>
+      </header>
+      <div class="ep-body">
+        <div class="ep-foto">${e.foto?`<img src="${e.foto}" alt="${e.nom}" loading="lazy">`
+          :'<span class="sinfoto">Sin fotografía del equipo</span>'}</div>
+        <div class="ep-sub">Características</div>
+        <div class="ep-datos">
+          <span><i>Marca</i>${e.marca||'—'}</span>
+          <span><i>Modelo</i>${e.modelo&&e.modelo!=='S/M'?e.modelo:'—'}</span>
+          <span><i>Serie</i>${e.serie&&e.serie!=='S/S'?e.serie:'—'}</span>
+          <span><i>Código MINSA</i>${e.minsa||'—'}</span>
+          <span><i>Área</i>${e.area||'—'}</span>
+          <span><i>Ítem cotización</i>${e.item||'—'}</span>
+        </div>
+        <div class="ep-sub">Historial de intervenciones</div>
+        <div class="ep-hist">
+          <div class="hgrupo">Preventivo${prev.length?` <em>${prev.filter(i=>i.hecho).length}/${prev.length}</em>`:''}</div>
+          ${prev.length?prev.map(i=>hitoIntervencion(i)).join('')
+            :'<p class="dnote">Sin preventivos programados en el contrato.</p>'}
+          <div class="hgrupo">Correctivo${corr.length?` <em>${corr.length}</em>`:''}</div>
+          ${corr.length?corr.map(i=>hitoIntervencion(i)).join('')
+            :'<p class="dnote">Sin correctivos registrados.</p>'}
+        </div>
       </div>
+    </aside>`;
+  ov.addEventListener('click',ev=>{if(ev.target===ov)cerrarEquipo();});
+  document.body.appendChild(ov);
+  document.body.classList.add('lock');
+  requestAnimationFrame(()=>ov.classList.add('abierto'));
+  pintarLista(id);
+}
+
+function cerrarEquipo(silencio){
+  const o=document.getElementById('eqOv'); if(o)o.remove();
+  if(!silencio){document.body.classList.remove('lock'); EQ_SEL='';}
+}
+
+/* Una intervención dentro de la línea de tiempo */
+function hitoIntervencion(i){
+  const cls=i.hecho?(i.estado&&i.estado.toUpperCase().indexOf('INOPER')===0?'bad':'ok'):'pend';
+  return `
+    <div class="hito ${cls}">
+      <div class="h-line"><b>${i.tipo==='MC'?'Correctivo':'Preventivo'} ${i.n}</b>
+        ${i.estado?`<span class="iest ${cls==='bad'?'bad':'good'}">${i.estado}</span>`:''}
+        ${i.preliminar?'<span class="tag-prelim">preliminar</span>':''}
+      </div>
+      <div class="h-meta">${i.informe||''}</div>
+      <div class="h-meta">${i.fecha?`Ejecutado el ${i.fecha}`
+        :(i.programada?`Programado para el ${i.programada}`:'Sin fecha programada')}</div>
+      ${i.falla?`<div class="h-meta">Falla reportada: ${i.falla}</div>`:''}
+      ${i.trabajo?`<div class="h-meta">Trabajo realizado: ${i.trabajo}</div>`:''}
+      <div class="h-btns">${botonesInforme(i)}</div>
     </div>`;
-  }).join('');
 }
 
 /* Visor de informes: abre el PDF de Drive dentro de la web */
@@ -287,9 +560,10 @@ function verInforme(url,titulo){
 }
 function cerrarInforme(){
   const o=document.getElementById('pdfOv'); if(o)o.remove();
-  document.body.classList.remove('lock');
+  if(!document.getElementById('eqOv')) document.body.classList.remove('lock');
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarInforme();});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;
+  if(document.getElementById('pdfOv'))cerrarInforme(); else cerrarEquipo();});
 
 pintarProyectos();
 
