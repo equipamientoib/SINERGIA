@@ -1246,3 +1246,15 @@
   .cargando-proy p{font-family:var(--ff-d);font-size:15px;font-weight:600;color:var(--onix);margin:0 0 6px}
   .cargando-proy span{font-size:12.5px;color:var(--gris)}
   @media (prefers-reduced-motion:reduce){ .cp-barra i{animation:none;width:100%} }
+
+  /* — Marcadores mientras cargan los proyectos — */
+  .pr-hueso{border:1px solid var(--linea);border-radius:var(--r-sm);overflow:hidden;
+    background:var(--blanco);pointer-events:none}
+  .ph-img{height:150px;background:var(--crema)}
+  .ph-txt{padding:16px;display:flex;flex-direction:column;gap:10px}
+  .ln{display:block;height:10px;border-radius:99px;
+    background:linear-gradient(90deg,var(--crema) 25%,#EDE9E0 37%,var(--crema) 63%);
+    background-size:400% 100%;animation:lnGo 1.3s ease-in-out infinite}
+  .ln.w35{width:35%;height:8px} .ln.w60{width:60%} .ln.w85{width:85%;height:13px}
+  @keyframes lnGo{0%{background-position:100% 50%}100%{background-position:0 50%}}
+  @media (prefers-reduced-motion:reduce){ .ln{animation:none} }
