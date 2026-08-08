@@ -6,21 +6,29 @@
    "g": "ansim",
    "scr": "ecg",
    "code": "ESA620",
+   "photo": "https://lh3.googleusercontent.com/d/1CgzYTMecptuSqUY1LAh24ZkEHV7heGC7",
+   "fotos": [
+    "https://lh3.googleusercontent.com/d/1CgzYTMecptuSqUY1LAh24ZkEHV7heGC7",
+    "https://lh3.googleusercontent.com/d/1iPDKbLYWF2Fa9smDeyRCn2j15jId9Y8o"
+   ],
    "nom": "Analizador de seguridad eléctrica",
    "marca": "Fluke ESA620 · EE.UU.",
    "tier": "Premium",
-   "ficha": "",
-   "desc": "Analizador de seguridad eléctrica biomédico que verifica el cumplimiento de las normas IEC 62353 e IEC 60601-1. Mide corrientes de fuga, resistencia de tierra y aislamiento, con selección de partes aplicadas y simulación de fallas. Ideal para validaciones post-mantenimiento y auditorías; llega con certificado de calibración vigente.",
-   "photo": "img/tienda/esa620.jpg",
-   "dia": 270.0,
+   "dia": 270,
    "sem": 1080,
    "mes": 3240,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Analizador de seguridad eléctrica biomédico que verifica el cumplimiento de las normas IEC 62353 e IEC 60601-1. Mide corrientes de fuga, resistencia de tierra y aislamiento, con selección de partes aplicadas y simulación de fallas. Ideal para validaciones post-mantenimiento y auditorías; llega con certificado de calibración vigente.",
    "specs": {
     "Marca": "Fluke",
     "Modelo": "ESA620",
     "Origen": "Estados Unidos",
-    "Normas": "IEC 62353 · 60601-1",
-    "Calibración": "Certificado vigente"
+    "Normas": "IEC 62353 · 60601-1"
    }
   },
   {
@@ -29,17 +37,27 @@
    "g": "ansim",
    "scr": "pulse",
    "code": "DEFIB",
+   "photo": "https://lh3.googleusercontent.com/d/1iBW1VsoYCNN-i4yui2-yBdSeg_zEtLEg",
+   "fotos": [
+    "https://lh3.googleusercontent.com/d/1iBW1VsoYCNN-i4yui2-yBdSeg_zEtLEg",
+    "https://lh3.googleusercontent.com/d/1eyohw3fm2SxKLjNJ01uoR-Mc0eHbfLNG"
+   ],
    "nom": "Analizador de desfibriladores",
-   "marca": "Meditech MDP-8082255 · China",
+   "marca": "Meditech DEFI-SENSE · China",
    "tier": "Estándar",
-   "ficha": "",
-   "desc": "Analizador de desfibriladores que mide la energía entregada (joules) sobre carga de 50 Ω, el tiempo de carga y la sincronización en cardioversión. Permite comprobar que el equipo descarga dentro de la tolerancia del fabricante, en modo manual y sincronizado. Incluye certificado de calibración vigente.",
-   "dia": 228.0,
+   "dia": 228,
    "sem": 912,
    "mes": 2736,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Analizador de desfibriladores que mide la energía entregada (joules) sobre carga de 50 Ω, el tiempo de carga y la sincronización en cardioversión. Permite comprobar que el equipo descarga dentro de la tolerancia del fabricante, en modo manual y sincronizado. Incluye certificado de calibración vigente.",
    "specs": {
     "Marca": "Meditech",
-    "Modelo": "MDP-8082255",
+    "Modelo": "DEFI-SENSE",
     "Origen": "China",
     "Uso": "Desfibriladores"
    }
@@ -53,11 +71,16 @@
    "nom": "Simulador ECG",
    "marca": "Contec MS400 · China",
    "tier": "Estándar",
-   "ficha": "",
-   "desc": "Simulador de paciente multiparamétrico para monitores y electrocardiógrafos. Genera ECG con ritmo normal y arritmias seleccionables, además de señales de respiración, para verificar la respuesta y exactitud del equipo sin un paciente real. Incluye certificado de calibración vigente.",
-   "dia": 195.0,
+   "dia": 195,
    "sem": 780,
    "mes": 2340,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Simulador de paciente multiparamétrico para monitores y electrocardiógrafos. Genera ECG con ritmo normal y arritmias seleccionables, además de señales de respiración, para verificar la respuesta y exactitud del equipo sin un paciente real. Incluye certificado de calibración vigente.",
    "specs": {
     "Marca": "Contec",
     "Modelo": "MS400",
@@ -71,15 +94,23 @@
    "g": "ansim",
    "scr": "ecg",
    "code": "SP-SiM",
+   "photo": "https://lh3.googleusercontent.com/d/1hD5mnnX102PZUkRJ2WNUweOtPzk3K9Jf",
+   "fotos": [
+    "https://lh3.googleusercontent.com/d/1hD5mnnX102PZUkRJ2WNUweOtPzk3K9Jf"
+   ],
    "nom": "Simulador de SpO2 para pulsioxímetros",
    "marca": "Rigel SP-SiM · Reino Unido",
    "tier": "Premium",
-   "ficha": "",
-   "desc": "Probador y simulador de SpO₂ para pulsioxímetros y módulos de oximetría. Simula distintos niveles de saturación, frecuencia de pulso e índice de perfusión, compatible con las principales marcas mediante curvas R. Verificación rápida y trazable; llega con certificado de calibración vigente.",
-   "photo": "img/tienda/sp-sim.jpg",
-   "dia": 252.0,
+   "dia": 252,
    "sem": 1008,
    "mes": 3024,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Probador y simulador de SpO₂ para pulsioxímetros y módulos de oximetría. Simula distintos niveles de saturación, frecuencia de pulso e índice de perfusión, compatible con las principales marcas mediante curvas R. Verificación rápida y trazable; llega con certificado de calibración vigente.",
    "specs": {
     "Marca": "Rigel",
     "Modelo": "SP-SiM",
@@ -93,19 +124,29 @@
    "g": "med",
    "scr": "num",
    "code": "dB",
+   "photo": "https://lh3.googleusercontent.com/d/1B9G4JWbNvuFKSclONH-71ZVuri2eGwU4",
+   "fotos": [
+    "https://lh3.googleusercontent.com/d/1B9G4JWbNvuFKSclONH-71ZVuri2eGwU4",
+    "https://lh3.googleusercontent.com/d/1IuCCUbUmktDvXUW-DKXJFsHeAjF35mho"
+   ],
    "nom": "Sonómetro",
    "marca": "Fluke 945 · EE.UU.",
    "tier": "Premium",
-   "ficha": "",
-   "desc": "Sonómetro digital para medir el nivel de presión sonora (dB) con ponderaciones A y C. Útil para verificar niveles de ruido en quirófanos, unidades dentales y salas de equipos, como apoyo al control de condiciones ambientales. Incluye certificado de calibración vigente.",
-   "dia": 108.0,
+   "dia": 108,
    "sem": 432,
    "mes": 1296,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Sonómetro digital para medir el nivel de presión sonora (dB) con ponderaciones A y C. Útil para verificar niveles de ruido en quirófanos, unidades dentales y salas de equipos, como apoyo al control de condiciones ambientales. Incluye certificado de calibración vigente.",
    "specs": {
     "Marca": "Fluke",
     "Modelo": "945",
     "Origen": "Estados Unidos",
-    "Uso": "Nivel de ruido (dB)"
+    "Mide": "Nivel sonoro dBA/dBC"
    }
   },
   {
@@ -117,11 +158,16 @@
    "nom": "Termómetro digital (tipo termocupla)",
    "marca": "Fluke 51 II · EE.UU.",
    "tier": "Premium",
-   "ficha": "",
-   "desc": "Termómetro digital de alta precisión con entrada de termocupla tipo J/K y resolución de 0,1°. Ideal para verificar la temperatura de incubadoras, baños térmicos y refrigeración de medicamentos. Robusto para campo; llega con certificado de calibración vigente.",
-   "dia": 90.0,
+   "dia": 90,
    "sem": 360,
    "mes": 1080,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Termómetro digital de alta precisión con entrada de termocupla tipo J/K y resolución de 0,1°. Ideal para verificar la temperatura de incubadoras, baños térmicos y refrigeración de medicamentos. Robusto para campo; llega con certificado de calibración vigente.",
    "specs": {
     "Marca": "Fluke",
     "Modelo": "51 II",
@@ -135,16 +181,26 @@
    "g": "med",
    "scr": "gauge",
    "code": "BAR",
+   "photo": "https://lh3.googleusercontent.com/d/1cBQBZ0w13RYfseqTG8dYOshCw5sFpkIt",
+   "fotos": [
+    "https://lh3.googleusercontent.com/d/1cBQBZ0w13RYfseqTG8dYOshCw5sFpkIt"
+   ],
    "nom": "Manómetro diferencial digital",
-   "marca": "Genérico · China",
+   "marca": "AUTOOL PT520 · China",
    "tier": "Estándar",
-   "ficha": "",
-   "desc": "Manómetro diferencial digital para pruebas de presión y verificación de presión no invasiva (NIBP) en monitores y equipos neumáticos. Mide presión positiva y diferencial con lectura clara, útil para comprobar canales, fugas y exactitud de manguitos. Incluye certificado de calibración vigente.",
-   "dia": 117.0,
+   "dia": 117,
    "sem": 468,
    "mes": 1404,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Manómetro diferencial digital para pruebas de presión y verificación de presión no invasiva (NIBP) en monitores y equipos neumáticos. Mide presión positiva y diferencial con lectura clara, útil para comprobar canales, fugas y exactitud de manguitos. Incluye certificado de calibración vigente.",
    "specs": {
-    "Marca": "Genérico",
+    "Marca": "AUTOOL",
+    "Modelo": "PT520",
     "Origen": "China",
     "Uso": "Presión / NIBP"
    }
@@ -155,19 +211,29 @@
    "g": "med",
    "scr": "num",
    "code": "LUX",
+   "photo": "https://lh3.googleusercontent.com/d/1zg5DTWSMHEyagYCGwQ9O7-a6SUuvegxq",
+   "fotos": [
+    "https://lh3.googleusercontent.com/d/1zg5DTWSMHEyagYCGwQ9O7-a6SUuvegxq",
+    "https://lh3.googleusercontent.com/d/10mS8pA2flmiltBKKwJkbS5Rz664O0K3P"
+   ],
    "nom": "Luxómetro",
    "marca": "TASI TA630B · China",
    "tier": "Estándar",
-   "ficha": "",
-   "desc": "Luxómetro digital para medir el nivel de iluminación (lux) en quirófanos y áreas clínicas. Permite verificar que las lámparas cialíticas y la iluminación general cumplan los niveles adecuados. Portátil y de lectura inmediata; llega con certificado de calibración vigente.",
-   "dia": 59.0,
+   "dia": 59,
    "sem": 236,
    "mes": 708,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Luxómetro digital para medir el nivel de iluminación (lux) en quirófanos y áreas clínicas. Permite verificar que las lámparas cialíticas y la iluminación general cumplan los niveles adecuados. Portátil y de lectura inmediata; llega con certificado de calibración vigente.",
    "specs": {
     "Marca": "TASI",
     "Modelo": "TA630B",
     "Origen": "China",
-    "Uso": "Iluminación (lux)"
+    "Mide": "Iluminancia (lux)"
    }
   },
   {
@@ -179,11 +245,16 @@
    "nom": "Tacómetro dual (contacto / óptico)",
    "marca": "TASI TA500C · China",
    "tier": "Estándar",
-   "ficha": "",
-   "desc": "Tacómetro digital de doble modo (contacto y óptico) para medir velocidad de rotación (rpm) en centrífugas y equipos rotativos. El modo óptico mide sin contacto con cinta reflectante. Ideal para verificar la velocidad real frente al valor programado. Incluye certificado de calibración vigente.",
-   "dia": 59.0,
+   "dia": 59,
    "sem": 236,
    "mes": 708,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Tacómetro digital de doble modo (contacto y óptico) para medir velocidad de rotación (rpm) en centrífugas y equipos rotativos. El modo óptico mide sin contacto con cinta reflectante. Ideal para verificar la velocidad real frente al valor programado. Incluye certificado de calibración vigente.",
    "specs": {
     "Marca": "TASI",
     "Modelo": "TA500C",
@@ -200,11 +271,16 @@
    "nom": "Multímetro digital",
    "marca": "Sanwa CD771 · Japón",
    "tier": "Premium",
-   "ficha": "",
-   "desc": "Multímetro digital profesional para medir tensión (CA/CC), corriente, resistencia, continuidad, frecuencia y capacitancia. Herramienta base para el diagnóstico eléctrico y electrónico durante el mantenimiento de equipos médicos. Robusto y confiable; llega con certificado de calibración vigente.",
-   "dia": 65.0,
+   "dia": 65,
    "sem": 260,
    "mes": 780,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Multímetro digital profesional para medir tensión (CA/CC), corriente, resistencia, continuidad, frecuencia y capacitancia. Herramienta base para el diagnóstico eléctrico y electrónico durante el mantenimiento de equipos médicos. Robusto y confiable; llega con certificado de calibración vigente.",
    "specs": {
     "Marca": "Sanwa",
     "Modelo": "CD771",
@@ -221,9 +297,14 @@
    "nom": "Set de herramientas 46 pzs",
    "marca": "Kit técnico · China",
    "tier": "Estándar",
-   "ficha": "",
-   "desc": "Juego de 46 piezas para mantenimiento e intervención técnica en sitio. Complementaria: se incluye en los paquetes de Mantenimiento.",
    "apoyo": true,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Juego de 46 piezas para mantenimiento e intervención técnica en sitio. Complementaria: se incluye en los paquetes de Mantenimiento.",
    "specs": {
     "Marca": "Kit técnico",
     "Origen": "China",
@@ -240,14 +321,49 @@
    "nom": "Destornillador eléctrico inalámbrico",
    "marca": "Genérico · China",
    "tier": "Estándar",
-   "ficha": "",
-   "desc": "Destornillador eléctrico inalámbrico con puntas para intervención en sitio. Complementaria: se incluye en los paquetes de Mantenimiento.",
    "apoyo": true,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Destornillador eléctrico inalámbrico con puntas para intervención en sitio. Complementaria: se incluye en los paquetes de Mantenimiento.",
    "specs": {
     "Marca": "Genérico",
     "Origen": "China",
     "Tipo": "Inalámbrico",
     "Accesorios": "Juego de puntas"
+   }
+  },
+  {
+   "id": "phantom-flujo",
+   "cat": "Phantom de flujo",
+   "g": "ansim",
+   "scr": "pulse",
+   "code": "FLOW",
+   "photo": "https://lh3.googleusercontent.com/d/1tx7UIbvxin8hqGDQFuCWPWyQcDRebhZ5",
+   "fotos": [
+    "https://lh3.googleusercontent.com/d/1tx7UIbvxin8hqGDQFuCWPWyQcDRebhZ5"
+   ],
+   "nom": "Phantom de flujo sanguíneo para punción ecoguiada",
+   "marca": "Genérico · China",
+   "tier": "Estándar",
+   "dia": 50,
+   "sem": 200,
+   "mes": 600,
+   "ficha": "",
+   "ficha_dl": "",
+   "cal_ini": "",
+   "cal_fin": "",
+   "cal_pdf": "",
+   "cal_dl": "",
+   "desc": "Phantom de tejido blando con bomba de circulación que simula flujo sanguíneo. Permite practicar accesos vasculares guiados por ecografía y verificar la respuesta Doppler de ecógrafos. Se usa también en los talleres prácticos de Sinergia Biomédica.",
+   "specs": {
+    "Marca": "Genérico",
+    "Origen": "China",
+    "Uso": "Punción ecoguiada · Doppler",
+    "Incluye": "Almohadilla + bomba de circulación"
    }
   }
  ],
@@ -264,13 +380,13 @@
     "manometro"
    ],
    "kit": [],
-   "pe": 108.0,
-   "ph": 146.0,
-   "dia": 624.0,
+   "pe": 108,
+   "ph": 146,
+   "dia": 624,
    "psem": 2496,
    "pmes": 7488,
    "eqh": 1.5,
-   "eqd": 10.0,
+   "eqd": 10,
    "desc": "Instrumentos para calibrar y certificar monitores: seguridad eléctrica + SpO2 + ECG/multiparámetro + presión (NIBP)."
   },
   {
@@ -289,13 +405,13 @@
     "destornillador-elec",
     "set-46"
    ],
-   "pe": 124.0,
-   "ph": 168.0,
-   "dia": 718.0,
+   "pe": 124,
+   "ph": 168,
+   "dia": 718,
    "psem": 2872,
    "pmes": 8616,
    "eqh": 1.5,
-   "eqd": 10.0,
+   "eqd": 10,
    "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."
   },
   {
@@ -308,13 +424,13 @@
     "defib"
    ],
    "kit": [],
-   "pe": 120.0,
-   "ph": 162.0,
-   "dia": 693.0,
+   "pe": 120,
+   "ph": 162,
+   "dia": 693,
    "psem": 2772,
    "pmes": 8316,
    "eqh": 1.5,
-   "eqd": 10.0,
+   "eqd": 10,
    "desc": "Seguridad eléctrica + energía entregada (joules) y sincronía."
   },
   {
@@ -331,13 +447,13 @@
     "destornillador-elec",
     "set-46"
    ],
-   "pe": 138.0,
-   "ph": 186.0,
-   "dia": 797.0,
+   "pe": 138,
+   "ph": 186,
+   "dia": 797,
    "psem": 3188,
    "pmes": 9564,
    "eqh": 1.5,
-   "eqd": 10.0,
+   "eqd": 10,
    "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."
   },
   {
@@ -350,13 +466,13 @@
     "tacometro"
    ],
    "kit": [],
-   "pe": 75.0,
-   "ph": 135.0,
-   "dia": 578.0,
+   "pe": 100,
+   "ph": 135,
+   "dia": 578,
    "psem": 2312,
    "pmes": 6936,
-   "eqh": 2.0,
-   "eqd": 14.0,
+   "eqh": 2,
+   "eqd": 14,
    "desc": "Seguridad eléctrica + verificación de rpm."
   },
   {
@@ -373,13 +489,13 @@
     "destornillador-elec",
     "set-46"
    ],
-   "pe": 86.0,
-   "ph": 155.0,
-   "dia": 665.0,
+   "pe": 115,
+   "ph": 155,
+   "dia": 665,
    "psem": 2660,
    "pmes": 7980,
-   "eqh": 2.0,
-   "eqd": 14.0,
+   "eqh": 2,
+   "eqd": 14,
    "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."
   },
   {
@@ -392,13 +508,13 @@
     "luxometro"
    ],
    "kit": [],
-   "pe": 90.0,
-   "ph": 162.0,
-   "dia": 693.0,
+   "pe": 120,
+   "ph": 162,
+   "dia": 693,
    "psem": 2772,
    "pmes": 8316,
-   "eqh": 2.0,
-   "eqd": 14.0,
+   "eqh": 2,
+   "eqd": 14,
    "desc": "Seguridad eléctrica + nivel de iluminación (lux)."
   },
   {
@@ -415,13 +531,13 @@
     "destornillador-elec",
     "set-46"
    ],
-   "pe": 103.0,
-   "ph": 186.0,
-   "dia": 797.0,
+   "pe": 138,
+   "ph": 186,
+   "dia": 797,
    "psem": 3188,
    "pmes": 9564,
-   "eqh": 2.0,
-   "eqd": 14.0,
+   "eqh": 2,
+   "eqd": 14,
    "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."
   },
   {
@@ -435,13 +551,13 @@
     "manometro"
    ],
    "kit": [],
-   "pe": 90.0,
-   "ph": 122.0,
-   "dia": 520.0,
+   "pe": 90,
+   "ph": 121,
+   "dia": 520,
    "psem": 2080,
    "pmes": 6240,
    "eqh": 1.5,
-   "eqd": 10.0,
+   "eqd": 10,
    "desc": "Seguridad eléctrica + ruido (sonómetro) + presión (manómetro)."
   },
   {
@@ -459,108 +575,17 @@
     "destornillador-elec",
     "set-46"
    ],
-   "pe": 103.0,
-   "ph": 140.0,
-   "dia": 598.0,
+   "pe": 103,
+   "ph": 140,
+   "dia": 598,
    "psem": 2392,
    "pmes": 7176,
    "eqh": 1.5,
-   "eqd": 10.0,
+   "eqd": 10,
    "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."
   }
  ],
- "proyectos": [
-  {
-   "id": "clinica-monitores",
-   "cliente": "Clínica privada · San Isidro",
-   "titulo": "Calibración de monitores multiparamétricos",
-   "servicio": "Metrología · Pack Monitores",
-   "fecha": "Junio 2026",
-   "foto": "img/proyectos/clinica-monitores.jpg",
-   "estado": "En curso",
-   "avance": 65,
-   "desc": "Verificación de seguridad eléctrica y desempeño de 24 monitores de paciente en dos sedes, con certificado trazable por equipo.",
-   "hitos": [
-    {
-     "t": "Levantamiento y cronograma",
-     "d": true
-    },
-    {
-     "t": "Seguridad eléctrica (IEC 62353)",
-     "d": true
-    },
-    {
-     "t": "Verificación de SpO2 y NIBP",
-     "d": false
-    },
-    {
-     "t": "Entrega de certificados",
-     "d": false
-    }
-   ],
-   "clave_hash": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"
-  },
-  {
-   "id": "hospital-desfibriladores",
-   "cliente": "Hospital regional · Lima Norte",
-   "titulo": "Verificación de desfibriladores en emergencia",
-   "servicio": "Metrología · Pack Desfibriladores",
-   "fecha": "Mayo 2026",
-   "foto": "img/proyectos/hospital-desfibriladores.jpg",
-   "estado": "En curso",
-   "avance": 40,
-   "desc": "Medición de energía entregada, tiempo de carga y sincronización de 12 desfibriladores del área de emergencia y UCI.",
-   "hitos": [
-    {
-     "t": "Inventario y plan de trabajo",
-     "d": true
-    },
-    {
-     "t": "Pruebas de energía (50 Ω)",
-     "d": true
-    },
-    {
-     "t": "Cardioversión sincronizada",
-     "d": false
-    },
-    {
-     "t": "Informe y certificados",
-     "d": false
-    }
-   ],
-   "clave_hash": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"
-  },
-  {
-   "id": "taller-inhouse",
-   "cliente": "Ingeniería clínica · in-house",
-   "titulo": "Taller de seguridad eléctrica IEC 62353",
-   "servicio": "Taller práctico · 8 horas",
-   "fecha": "Abril 2026",
-   "foto": "img/proyectos/taller-inhouse.jpg",
-   "estado": "Completado",
-   "avance": 100,
-   "desc": "Capacitación práctica al equipo de ingeniería clínica con el analizador Fluke ESA620: corrientes de fuga, aislamiento y protocolo de pruebas.",
-   "hitos": [
-    {
-     "t": "Diagnóstico de necesidades",
-     "d": true
-    },
-    {
-     "t": "Sesión teórica y normativa",
-     "d": true
-    },
-    {
-     "t": "Práctica sobre equipos reales",
-     "d": true
-    },
-    {
-     "t": "Evaluación y constancias",
-     "d": true
-    }
-   ],
-   "clave_hash": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"
-  }
- ],
+ "proyectos": [],
  "modelo": {
   "igv": 0.18,
   "alquiler_pct": 0.3,
@@ -577,5 +602,6 @@
    "3": 0.12,
    "4": 0.15
   }
- }
+ },
+ "nota": "Copia local del catálogo, para que la web aparezca al instante. Los proyectos NO se guardan aquí: llegan del Apps Script."
 }
