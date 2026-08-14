@@ -311,6 +311,7 @@ function renderProyecto(id){
 /* ---- Panel con pestañas: Resumen · Valorizaciones · Equipos ---- */
 function pintarPanel(id){
   const cont=document.getElementById('prDet'); if(!cont)return;
+  PROY_ACT=id;                                // el sello de frescura lo consulta
   const y=window.pageYOffset;                 // conservar la posición al redibujar
   const p=PROYECTOS.find(x=>x.id===id), d=PR_DET[id];
   const nv=d&&d.valorizaciones?d.valorizaciones.length:0;
@@ -521,7 +522,8 @@ async function cargarDetalle(id, reintento){
 
   /* Copia guardada en el navegador: aparece al instante, sin pedir nada. */
   const guardado=detCacheLeer(id);
-  if(guardado){ PR_DET[id]=guardado; selLimpia(); DET_Q=''; pintarPanel(id); return; }
+  if(guardado){ PR_DET[id]=guardado; PR_SELLO[id]=selloDe(guardado);
+                selLimpia(); DET_Q=''; pintarPanel(id); return; }
 
   detCargando(cont,id);
   const intento=reintento||0;
@@ -530,7 +532,8 @@ async function cargarDetalle(id, reintento){
     const d=await traer(q, 25000);
     if(!d||!d.ok)throw new Error((d&&d.motivo)||'sin acceso');
     detCargandoFin();
-    PR_DET[id]=d; detCacheGuardar(id,d); selLimpia(); DET_Q=''; pintarPanel(id);
+    PR_DET[id]=d; detCacheGuardar(id,d); PR_SELLO[id]=selloDe(d);
+    selLimpia(); DET_Q=''; pintarPanel(id);
   }catch(e){
     /* Un fallo puntual (red del cliente, arranque en frío) no debe
        terminar en pantalla de error: se reintenta dos veces solo. */
@@ -562,7 +565,78 @@ function tabsDet(id,nv,nvenc){
     <button type="button" class="${DET_TAB==='val'?'on':''}" onclick="setDetTab('${id}','val')">Valorizaciones${nv?` <em>${nv}</em>`:''}</button>
     <button type="button" class="${DET_TAB==='rep'?'on':''}" onclick="setDetTab('${id}','rep')">Reportes</button>
     <button type="button" class="${DET_TAB==='falla'?'on':''}" onclick="setDetTab('${id}','falla')">Reportar falla</button>
+    <div class="det-actu">
+      <span id="detSello">${selloTxt(id)}</span>
+      <button type="button" class="det-refresh" id="btnActu" onclick="actualizarDetalle('${id}')"
+              title="Traer los datos más recientes de la hoja" aria-label="Actualizar datos">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/>
+        </svg>
+      </button>
+    </div>
   </div>`;
+}
+
+/* ════════ FRESCURA DE LOS DATOS Y BOTÓN DE ACTUALIZAR ════════
+   El servidor guarda su respuesta en caché para que el panel abra rápido.
+   El precio es que los datos pueden tener unos minutos. Para que eso no
+   sea un misterio, el panel dice desde cuándo son y deja pedirlos de
+   nuevo a mano: el botón manda ?refrescar=1, que salta la caché.
+
+   El sello sale del campo `generado` que pone el Apps Script, no de la
+   hora en que el navegador recibió la respuesta: si vino de la caché,
+   lo honesto es mostrar cuándo se leyó la hoja de verdad.           */
+const PR_SELLO = {};          // cuándo se leyó la hoja, por proyecto
+let ACTU_EN_CURSO = false;
+
+function selloDe(d){
+  const t = d && d.generado ? Date.parse(d.generado) : NaN;
+  return isNaN(t) ? Date.now() : t;
+}
+
+function selloTxt(id){
+  const t = PR_SELLO[id];
+  if(!t) return '';
+  const m = Math.round((Date.now()-t)/60000);
+  if(m < 1)  return 'Datos de hace un momento';
+  if(m === 1) return 'Datos de hace 1 minuto';
+  if(m < 60) return 'Datos de hace '+m+' minutos';
+  const h = Math.round(m/60);
+  return 'Datos de hace '+h+(h===1?' hora':' horas');
+}
+
+/* El sello envejece solo, sin repintar el panel: se toca únicamente ese
+   texto, así no se pierde el scroll ni los filtros abiertos. */
+setInterval(()=>{
+  const s = document.getElementById('detSello');
+  if(s && PROY_ACT) s.textContent = selloTxt(PROY_ACT);
+}, 30000);
+
+async function actualizarDetalle(id){
+  if(ACTU_EN_CURSO) return;
+  const url=(typeof CONFIG!=='undefined'&&(CONFIG.PANEL_URL||CONFIG.DATA_URL))||'';
+  if(url.indexOf('http')!==0) return;
+
+  ACTU_EN_CURSO = true;
+  const b=document.getElementById('btnActu');
+  if(b){ b.classList.add('girando'); b.disabled=true; }
+
+  try{
+    const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)
+           +'&clave='+encodeURIComponent(PR_KEY[id]||'')+'&refrescar=1';
+    const d=await traer(q, 25000);
+    if(!d||!d.ok) throw new Error((d&&d.motivo)||'sin acceso');
+    PR_DET[id]=d; detCacheGuardar(id,d); PR_SELLO[id]=selloDe(d);
+    pintarPanel(id);                      // conserva pestaña, filtros y scroll
+    avisoPanel('Datos actualizados');
+  }catch(e){
+    avisoPanel('No se pudo actualizar ahora. Vuelve a intentar en un momento.');
+  }finally{
+    ACTU_EN_CURSO = false;
+    const b2=document.getElementById('btnActu');
+    if(b2){ b2.classList.remove('girando'); b2.disabled=false; }
+  }
 }
 
 /* Reporte de una valorización, con el mismo formato del metrado */
