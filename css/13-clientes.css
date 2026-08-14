@@ -1267,3 +1267,18 @@
     transition:opacity .22s ease,transform .22s ease}
   .aviso-panel.show{opacity:1;transform:translate(-50%,0)}
   @media (prefers-reduced-motion:reduce){ .aviso-panel{transition:none} }
+
+  /* — Frescura de los datos + botón de actualizar (barra de pestañas) — */
+  .det-actu{margin-left:auto;display:flex;align-items:center;gap:8px;padding-bottom:6px}
+  .det-actu #detSello{font-family:var(--ff-d);font-size:11.5px;color:var(--gris);
+    letter-spacing:.02em;white-space:nowrap}
+  .det-refresh{display:inline-flex;align-items:center;justify-content:center;
+    width:28px;height:28px;padding:0;border:1px solid var(--linea);border-radius:99px;
+    background:var(--blanco);color:var(--gris);cursor:pointer;transition:.18s}
+  .det-refresh:hover{color:var(--onix);border-color:var(--bronce)}
+  .det-refresh[disabled]{cursor:default;opacity:.55}
+  .det-refresh.girando svg{animation:actuGiro .9s linear infinite}
+  @keyframes actuGiro{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){ .det-refresh.girando svg{animation:none} }
+  /* En móvil el sello estorba: queda solo el botón. */
+  @media(max-width:720px){ .det-actu #detSello{display:none} }
