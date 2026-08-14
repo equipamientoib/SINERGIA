@@ -1,35 +1,45 @@
 /**
- * Sinergia Biomédica — Apps Script
+ * Sinergia Biomédica — Apps Script  ·  versión UNIFICADA
  *
- * DOS RESPUESTAS DISTINTAS SEGÚN QUIÉN PREGUNTE:
+ * Junta las DOS ramas que se habían separado:
+ *   · La que está publicada hoy  -> tiene galería de fotos, calibración
+ *     y valorizaciones, pero lee las hojas enteras en CADA petición.
+ *   · La que quedó en el repositorio (google-apps-script/Codigo.gs)
+ *     -> tiene caché y lecturas memorizadas, pero le faltan esas tres
+ *     funciones nuevas.
  *
- *  A) Sin parámetros  ->  datos PÚBLICOS
- *     Catálogo, paquetes y, de cada proyecto, solo agregados
- *     (% de avance, avance por área). Nada de series ni informes.
+ * Esta versión tiene TODO: las funciones nuevas y el rendimiento.
  *
- *  B) ?proyecto=ID&clave=LACLAVE  ->  DETALLE PRIVADO
- *     Solo si la clave es correcta devuelve la lista de equipos del
- *     cliente con su estado y el enlace a cada informe.
- *     Si la clave es incorrecta, responde {ok:false} y NO envía nada.
+ * QUÉ CAMBIA RESPECTO A LO QUE ESTÁ PUBLICADO
+ *  1) Cada hoja se lee UNA sola vez por petición (antes PREVENTIVOS se
+ *     leía dos veces: para el resumen y para las intervenciones).
+ *  2) fecha_() ya no llama a Utilities.formatDate. Con 107 intervenciones
+ *     y dos fechas cada una eran más de 200 llamadas al servidor de
+ *     Google por visita.  ⚠ REQUISITO: Configuración del proyecto >
+ *     Zona horaria = America/Lima.
+ *  3) La respuesta se guarda en la caché de Apps Script (30 min) y se
+ *     parte en trozos, porque Google admite 100 KB por clave.
+ *  4) Se atiende ?ping=1, que es lo que la web manda para "despertar" el
+ *     script mientras el cliente escribe su clave. Hasta ahora ese ping
+ *     disparaba una lectura completa de las hojas: hacía justo lo
+ *     contrario de lo que buscaba.
+ *  5) ?refrescar=1 salta la caché cuando quieres ver datos frescos ya.
  *
- * Esto es una cerradura de verdad: el detalle no sale de Google
- * mientras no se envíe la clave correcta.
+ * ⚠ ESTE ARCHIVO CONTIENE LA CLAVE DEL CLIENTE.
+ *   Va SOLO dentro de Apps Script. NUNCA lo subas a GitHub.
  *
  * INSTALACIÓN
- *  1) Extensiones > Apps Script > pega esto > Guardar.
- *  2) Llena CATALOGO_ID y PROYECTOS.
+ *  1) Apps Script > selecciona todo el Code.gs > pega esto > Guardar.
+ *  2) Configuración del proyecto > Zona horaria: America/Lima.
  *  3) Ejecuta `probar` (▶) para verificar.
- *  4) Implementar > Nueva implementación > Aplicación web
- *       Ejecutar como: Yo  ·  Acceso: Cualquier persona
- *  5) Pega la URL /exec en js/00-config.js -> CONFIG.DATA_URL
- *
- * Al cambiar el código: Implementar > Gestionar implementaciones >
- * (lápiz) > Versión: Nueva versión. La URL no cambia.
+ *  4) Implementar > Gestionar implementaciones > (lápiz) >
+ *     Versión: NUEVA VERSIÓN > Implementar.   ← sin esto no cambia nada
+ *  5) Activadores (reloj) > Añadir > calentarCache · cada 10 minutos.
  */
 
 // ═════════════════════ CONFIGURACIÓN ═════════════════════
 
-var CATALOGO_ID = "PEGA_AQUI_EL_ID";   // hoja con las pestañas Equipos y Paquetes
+var CATALOGO_ID = "PEGA_AQUI_EL_ID";   // libro Sinergia-Web
 
 var PROYECTOS = [
   {
@@ -45,7 +55,9 @@ var PROYECTOS = [
           "en 15 áreas, con informe individual por intervención y trazabilidad por equipo.",
     hojaResumen: "RESUMEN",
     hojaPreventivos: "PREVENTIVOS",
-    hojaControl: "CONTROL SEGUN COTIZACION",  // pestaña del listado de equipos
+    hojaControl: "CONTROL SEGUN COTIZACION",
+    hojaValorizaciones: "CONTROL_VALORIZACIONES",
+    inicioContrato: "2026-08",
     porArea: true
   }
 ];
@@ -69,17 +81,10 @@ function num_(v) {
   return f === Math.floor(f) ? Math.floor(f) : f;
 }
 
-/* Formato de fecha SIN llamar a la API de Google.
-
-   ANTES esto usaba Utilities.formatDate, que es una llamada al servicio
-   de Apps Script. Con 107 intervenciones y dos fechas cada una, eran más
-   de 200 llamadas por cada vez que un cliente abría su proyecto: una de
-   las causas principales de la demora.
-
-   Los objetos Date que devuelve Sheets ya vienen en la zona horaria del
-   proyecto, así que getDate()/getMonth() dan el mismo resultado.
-   REQUISITO: la zona horaria del proyecto debe ser America/Lima
-   (Configuración del proyecto > Zona horaria).                        */
+/* Fecha SIN llamar a la API de Google. Los Date que devuelve Sheets ya
+   vienen en la zona horaria del proyecto, así que getDate()/getMonth()
+   dan el mismo resultado que Utilities.formatDate, pero sin el viaje.
+   REQUISITO: zona horaria del proyecto = America/Lima.               */
 function fecha_(v) {
   if (v instanceof Date) {
     var d = v.getDate(), m = v.getMonth() + 1, y = v.getFullYear();
@@ -108,6 +113,13 @@ function foto_(txt) {
   return id ? 'https://lh3.googleusercontent.com/d/' + id : t;
 }
 
+/** Varias fotos separadas por coma, punto y coma o salto de línea. */
+function fotos_(txt) {
+  return s_(txt).split(/[\n,;]+/)
+    .map(function (x) { return foto_(x.trim()); })
+    .filter(function (x) { return x; });
+}
+
 function pdf_(txt) {
   var id = driveId_(txt);
   if (!id) return { ver: '', descargar: '' };
@@ -125,18 +137,20 @@ function sha256_(txt) {
   }).join('');
 }
 
-/** Encuentra la fila de encabezados en cualquier parte de la hoja.
-
-    ANTES recorría la hoja ENTERA buscando los encabezados, poniendo cada
-    celda en mayúsculas por el camino. En una hoja de cientos de filas eso
-    es trabajo desperdiciado: los encabezados siempre están arriba. Ahora
-    solo mira las primeras 40 filas.
-
-    Además, la lectura de cada hoja se guarda en memoria: `detalle_` pedía
-    la misma hoja de PREVENTIVOS dos veces (una para el resumen y otra
-    para las intervenciones) y cada lectura era un viaje al servidor. */
+// ═════════════════ lectura de hojas (memorizada) ═════════════════
+/* Cada hoja se trae UNA vez por petición y se guarda en memoria.
+   Antes PREVENTIVOS se leía dos veces —para el resumen y para las
+   intervenciones— y cada lectura era un viaje al servidor.          */
 var LIM_CABECERA = 40;
 var _hojasLeidas = {};
+var _libros = {};
+
+function abrirLibro_(id) {
+  if (_libros[id]) return _libros[id];
+  var ss = SpreadsheetApp.openById(id);
+  _libros[id] = ss;
+  return ss;
+}
 
 function valores_(ss, nombreHoja) {
   var llave = ss.getId() + '::' + nombreHoja;
@@ -161,6 +175,7 @@ function filas_(ss, nombreHoja) {
   return out;
 }
 
+/** Encuentra la fila de encabezados en las primeras filas de la hoja. */
 function tabla_(ss, nombreHoja, columnasClave) {
   var vals = valores_(ss, nombreHoja);
   if (!vals.length) return [];
@@ -188,8 +203,16 @@ function tabla_(ss, nombreHoja, columnasClave) {
 function equipos_(ss) {
   return filas_(ss, 'Equipos').map(function (r) {
     var e = { id: s_(r.id), cat: s_(r.categoria), g: s_(r.grupo), scr: s_(r.icono), code: s_(r.codigo) };
+
     var f = foto_(r.foto);
     if (f) e.photo = f;
+
+    var extra = fotos_(r.fotos);
+    if (extra.length) {
+      e.fotos = extra;
+      if (!e.photo) e.photo = extra[0];
+    }
+
     e.nom = s_(r.nombre); e.marca = s_(r.marca); e.tier = s_(r.tier);
     if (s_(r.apoyo).toUpperCase() === 'SI') {
       e.apoyo = true;
@@ -198,8 +221,15 @@ function equipos_(ss) {
       e.sem = num_(r.precio_semana) || (e.dia ? e.dia * MODELO.mult_semana : null);
       e.mes = num_(r.precio_mes) || (e.dia ? e.dia * MODELO.mult_mes : null);
     }
+
     var fp = pdf_(r.ficha_pdf);
     e.ficha = fp.ver; e.ficha_dl = fp.descargar;
+
+    e.cal_ini = fecha_(r.cal_inicio);
+    e.cal_fin = fecha_(r.cal_fin);
+    var cal = pdf_(r.cal_certificado);
+    e.cal_pdf = cal.ver; e.cal_dl = cal.descargar;
+
     e.desc = s_(r.descripcion);
     try { e.specs = JSON.parse(s_(r.specs_json) || '{}'); } catch (err) { e.specs = {}; }
     return e;
@@ -209,7 +239,7 @@ function equipos_(ss) {
 function paquetes_(ss) {
   return filas_(ss, 'Paquetes').map(function (r) {
     function ids(v) { return s_(v).split(',').map(function (x) { return x.trim(); }).filter(String); }
-    return {
+    var p = {
       id: s_(r.id), app: s_(r.app), nivel: s_(r.nivel), nom: s_(r.nombre),
       items: ids(r.incluye_ids), kit: ids(r.kit_apoyo),
       pe: num_(r.por_equipo), ph: num_(r.por_hora), dia: num_(r.por_dia),
@@ -217,6 +247,13 @@ function paquetes_(ss) {
       eqh: num_(r.equipos_hora), eqd: num_(r.equipos_dia),
       desc: s_(r.descripcion)
     };
+
+    var f = foto_(r.foto);
+    if (f) p.foto = f;
+    var g = fotos_(r.fotos);
+    if (g.length) { p.fotos = g; if (!p.foto) p.foto = g[0]; }
+
+    return p;
   });
 }
 
@@ -224,14 +261,14 @@ function paquetes_(ss) {
 
 function resumen_(ss, cfg) {
   var filas = tabla_(ss, cfg.hojaResumen, ['AREA', 'INTERVENCIONES', 'EJECUTADAS']);
-  var areas = [], total = 0, hechas = 0;
+  var areas = [], total = 0, hechas = 0, fin = false;
   filas.forEach(function (r) {
+    if (fin) return;
     var area = s_(r['AREA']).toUpperCase();
     var inter = num_(r['INTERVENCIONES']) || 0;
     var ejec = num_(r['EJECUTADAS']) || 0;
     if (!area) return;
-    if (area === 'TOTAL') { total = inter; hechas = ejec; return; }
-    if (area.indexOf('ESTADO') === 0 || area.indexOf('CORRECTIVOS') === 0) return;
+    if (area === 'TOTAL') { total = inter; hechas = ejec; fin = true; return; }
     areas.push({ area: area, inter: inter, ejec: ejec });
   });
   if (!total) areas.forEach(function (a) { total += a.inter; hechas += a.ejec; });
@@ -259,10 +296,10 @@ function proyectoPublico_(cfg) {
     id: cfg.id, cliente: cfg.cliente, titulo: cfg.titulo, servicio: cfg.servicio,
     fecha: cfg.fecha, foto: foto_(cfg.foto), desc: cfg.desc,
     clave_hash: cfg.clave ? sha256_(cfg.clave) : '',
-    detalle: true   // avisa a la web que hay detalle disponible al desbloquear
+    detalle: true
   };
   var ss;
-  try { ss = SpreadsheetApp.openById(cfg.sheetId); }
+  try { ss = abrirLibro_(cfg.sheetId); }
   catch (err) {
     base.estado = 'En curso'; base.avance = 0; base.hitos = [];
     base.error = 'No se pudo abrir la hoja: ' + err;
@@ -282,12 +319,8 @@ function proyectoPublico_(cfg) {
 
 // ═════════════════════ proyectos: DETALLE PRIVADO ═════════════════════
 
-/**
- * Lista de equipos del cliente con su estado y sus informes.
- * Solo se ejecuta cuando la clave enviada coincide.
- */
 function detalle_(cfg) {
-  var ss = SpreadsheetApp.openById(cfg.sheetId);
+  var ss = abrirLibro_(cfg.sheetId);
 
   // 1) Equipos del contrato
   var control = tabla_(ss, cfg.hojaControl, ['ITEM COT', 'AREA', 'EQUIPO', 'CODIGO EQUIPO']);
@@ -297,6 +330,8 @@ function detalle_(cfg) {
     if (!cod) return;
     equipos[cod] = {
       cod: cod,
+      foto: foto_(r['FOTO EQUIPO']),
+      criticidad: s_(r['CRITICIDAD']),
       item: num_(r['ITEM COT']),
       area: s_(r['AREA']),
       minsa: s_(r['COD. MINSA']),
@@ -316,16 +351,20 @@ function detalle_(cfg) {
   prev.forEach(function (r) {
     var cod = s_(r['CODIGO EQUIPO']);
     if (!cod || !equipos[cod]) return;
-    var p = pdf_(r['LINK INFORME PDF']);
+    var listo = s_(r['ESTADO FINAL']) !== '';
+    var p = listo ? pdf_(r['LINK INFORME PDF']) : { ver: '', descargar: '' };
+    var sc = listo ? pdf_(r['LINK INFORME SCAN']) : { ver: '', descargar: '' };
     equipos[cod].intervenciones.push({
       tipo: 'MP',
       n: num_(r['SERV. N']) || 1,
       informe: s_(r['N DE INFORME / CARPETA']),
       fecha: fecha_(r['FECHA EJEC.']),
       programada: fecha_(r['FECHA PROGR.']),
+      proximo: fecha_(r['PROXIMO MANT.']),
       estado: s_(r['ESTADO FINAL']),
-      hecho: s_(r['ESTADO FINAL']) !== '',
-      pdf: p.ver, pdf_dl: p.descargar
+      hecho: listo,
+      pdf: p.ver, pdf_dl: p.descargar,
+      scan: sc.ver, scan_dl: sc.descargar
     });
   });
 
@@ -334,7 +373,9 @@ function detalle_(cfg) {
   corr.forEach(function (r) {
     var cod = s_(r['CODIGO EQUIPO']);
     if (!cod || !equipos[cod]) return;
-    var p = pdf_(r['LINK INFORME PDF']);
+    var listo = s_(r['ESTADO FINAL']) !== '';
+    var p = listo ? pdf_(r['LINK INFORME PDF']) : { ver: '', descargar: '' };
+    var sc = listo ? pdf_(r['LINK INFORME SCAN']) : { ver: '', descargar: '' };
     equipos[cod].intervenciones.push({
       tipo: 'MC',
       n: num_(r['CORR. N']) || 1,
@@ -343,17 +384,42 @@ function detalle_(cfg) {
       falla: s_(r['FALLA REPORTADA']),
       trabajo: s_(r['TRABAJO REALIZADO']),
       estado: s_(r['ESTADO FINAL']),
-      hecho: s_(r['ESTADO FINAL']) !== '',
-      pdf: p.ver, pdf_dl: p.descargar
+      hecho: listo,
+      pdf: p.ver, pdf_dl: p.descargar,
+      scan: sc.ver, scan_dl: sc.descargar
     });
   });
 
   var lista = orden.map(function (c) { return equipos[c]; });
+
+  /* Cláusula Tercera: la valorización se presenta el mes siguiente.
+     Mientras el mes sigue abierto, el informe firmado aún no existe:
+     solo se publica el PDF y se marca como PRELIMINAR.                */
+  var estadosVal = estadosValorizacion_(ss, cfg);
+  lista.forEach(function (e) {
+    e.intervenciones.forEach(function (i) {
+      if (!i.hecho) return;
+      var idx = indiceValorizacion_(mesDe_(i.fecha), cfg.inicioContrato);
+      var n = idx ? 'V-' + ('0' + idx).slice(-2) : '';
+      var est = estadosVal[n] || 'En ejecución';
+      i.valorizacion = n;
+      i.preliminar = (est === 'En ejecución');
+      if (i.preliminar) { i.scan = ''; i.scan_dl = ''; }
+    });
+  });
+
+  var vals = valorizaciones_(ss, cfg, lista);
   return {
     ok: true,
+    /* Momento en que se leyó la hoja DE VERDAD. Va dentro de la respuesta,
+       así que se guarda con ella en la caché: cuando el panel muestra una
+       respuesta cacheada, el sello sigue diciendo la verdad en vez de la
+       hora en que el navegador la recibió.                              */
+    generado: new Date().toISOString(),
     proyecto: cfg.id,
     cliente: cfg.cliente,
     equipos: lista,
+    valorizaciones: vals,
     totales: {
       equipos: lista.length,
       en_alcance: lista.filter(function (e) { return e.alcance; }).length,
@@ -365,6 +431,111 @@ function detalle_(cfg) {
   };
 }
 
+// ═════════════════════ valorizaciones ═════════════════════
+
+function mesDe_(v) {
+  if (v instanceof Date) return v.getFullYear() + '-' + ('0' + (v.getMonth() + 1)).slice(-2);
+  var t = s_(v);
+  var m = t.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);   // dd/mm/aaaa
+  if (m) return m[3] + '-' + ('0' + m[2]).slice(-2);
+  m = t.match(/^(\d{4})-(\d{2})/);                              // aaaa-mm
+  if (m) return m[1] + '-' + m[2];
+  return '';
+}
+
+function indiceValorizacion_(mes, inicio) {
+  if (!mes || !inicio) return 0;
+  var a = mes.split('-'), b = inicio.split('-');
+  var n = (Number(a[0]) - Number(b[0])) * 12 + (Number(a[1]) - Number(b[1])) + 1;
+  return n > 0 ? n : 0;
+}
+
+/** Estado que ve el cliente: sin información comercial. */
+function estadoPublico_(e) {
+  var t = s_(e).toLowerCase();
+  if (t.indexOf('factur') >= 0 || t.indexOf('pagad') >= 0) return 'Cerrada';
+  if (t.indexOf('conformidad') >= 0) return 'Con conformidad';
+  if (t.indexOf('presentad') >= 0) return 'Presentada';
+  if (t.indexOf('sin movimiento') >= 0) return 'Sin movimiento';
+  return 'En ejecución';
+}
+
+function aFecha_(v) {
+  if (v instanceof Date) return v;
+  var m = s_(v).match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  return m ? new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])) : null;
+}
+
+function diasHasta_(v) {
+  var f = aFecha_(v);
+  if (!f) return null;
+  var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  return Math.round((f - hoy) / 86400000);
+}
+
+function estadosValorizacion_(ss, cfg) {
+  var out = {};
+  tabla_(ss, cfg.hojaValorizaciones, ['N', 'MES EJECUTADO', 'ESTADO']).forEach(function (r) {
+    var n = s_(r['N']).toUpperCase();
+    if (n) out[n] = estadoPublico_(r['ESTADO']);
+  });
+  return out;
+}
+
+function valorizaciones_(ss, cfg, equipos) {
+  var cab = {};
+  tabla_(ss, cfg.hojaValorizaciones, ['N', 'MES EJECUTADO', 'ESTADO']).forEach(function (r) {
+    var n = s_(r['N']).toUpperCase();
+    if (!n) return;
+    var p = pdf_(r['LINK VALORIZACION']);
+    cab[n] = {
+      n: n,
+      mes: s_(r['MES EJECUTADO']),
+      estado: estadoPublico_(r['ESTADO']),
+      presentacion_max: fecha_(r['PRESENTACION MAX']),
+      conformidad_max: fecha_(r['CONFORMIDAD MAX']),
+      presentacion: fecha_(r['FECHA PRESENTACION']),
+      conformidad: fecha_(r['FECHA CONFORMIDAD']),
+      obs: s_(r['OBSERVACIONES']),
+      pdf: p.ver,
+      dias_conformidad: diasHasta_(r['CONFORMIDAD MAX']),
+      anio_contrato: num_(r['AÑO CONTRATO']) || null,
+      items: []
+    };
+  });
+
+  equipos.forEach(function (e) {
+    e.intervenciones.forEach(function (i) {
+      if (!i.hecho) return;
+      var idx = indiceValorizacion_(mesDe_(i.fecha), cfg.inicioContrato);
+      if (!idx) return;
+      var n = 'V-' + ('0' + idx).slice(-2);
+      if (!cab[n]) cab[n] = { n: n, mes: '', estado: 'En ejecución', items: [] };
+      cab[n].items.push({
+        cod: e.cod, equipo: e.nom, area: e.area,
+        marca: e.marca, modelo: e.modelo, serie: e.serie,
+        tipo: i.tipo, informe: i.informe, fecha: i.fecha,
+        estado: i.estado, pdf: i.pdf, pdf_dl: i.pdf_dl,
+        scan: i.scan, scan_dl: i.scan_dl, preliminar: !!i.preliminar
+      });
+    });
+  });
+
+  var lista = Object.keys(cab).sort().map(function (k) {
+    var v = cab[k];
+    v.total = v.items.length;
+    return v;
+  });
+
+  var PROXIMAS = 3, futuras = 0, out = [];
+  lista.forEach(function (v) {
+    var activa = v.total > 0 || v.presentacion || v.estado === 'Sin movimiento';
+    if (activa) { out.push(v); return; }
+    if (futuras < PROXIMAS) { v.futura = true; futuras++; out.push(v); }
+  });
+  return out;
+}
+
 // ═════════════════════ salida ═════════════════════
 
 function json_(obj) {
@@ -373,11 +544,17 @@ function json_(obj) {
   return out;
 }
 
+function textoJson_(texto) {
+  var out = ContentService.createTextOutput(texto);
+  out.setMimeType(ContentService.MimeType.JSON);
+  return out;
+}
+
 function buildPublico_() {
   var equipos = [], paquetes = [];
   if (CATALOGO_ID && CATALOGO_ID.indexOf('PEGA') !== 0) {
     try {
-      var cat = SpreadsheetApp.openById(CATALOGO_ID);
+      var cat = abrirLibro_(CATALOGO_ID);
       equipos = equipos_(cat); paquetes = paquetes_(cat);
     } catch (err) { /* la web usa su catálogo integrado como respaldo */ }
   }
@@ -389,24 +566,14 @@ function buildPublico_() {
   };
 }
 
-/* ── Caché del servidor ───────────────────────────────────────────────
-   ANTES: cada vez que un cliente abría su proyecto, el script abría la
-   hoja de mantenimiento y la leía completa. Eso son varios segundos, y
-   se pagaban íntegros en cada visita, cada recarga y cada cambio de
-   pestaña dentro del panel. Era la causa principal de la queja.
+// ═════════════════════ caché del servidor ═════════════════════
+/* La caché de Apps Script admite 100 KB por clave, así que las
+   respuestas grandes se parten en trozos y se reconstruyen al leer.
+   Para forzar datos frescos: ?refrescar=1 o limpiarCache().          */
 
-   Ahora la respuesta se guarda en la caché de Apps Script. La caché
-   admite 100 KB por clave, así que las respuestas grandes se parten en
-   trozos y se vuelven a unir al leerlas.
-
-   Lo mejor es combinarla con el activador de más abajo (calentarCache):
-   así la caché está siempre lista y ningún cliente paga la espera.
-
-   Para forzar datos frescos: añade ?refrescar=1 a la URL, o ejecuta
-   limpiarCache() desde el editor.                                     */
 var CACHE_SEG   = 1800;     // 30 minutos
-var CACHE_TROZO = 90000;    // 90 KB por trozo (el tope de Google son 100 KB)
-var CACHE_LLAVE = 'publico_v2';
+var CACHE_TROZO = 90000;    // 90 KB por trozo
+var CACHE_LLAVE = 'publico_v3';
 
 function cacheGuardar_(cache, llave, texto, seg) {
   try {
@@ -454,8 +621,9 @@ function limpiarCache() {
   Logger.log('Caché limpiada. La próxima petición vuelve a leer las hojas.');
 }
 
-function publicoCacheado_(refrescar) {
+function publicoCacheado_(refrescar, sinFreno) {
   var c = cache_();
+  if (refrescar && !sinFreno && !puedeRefrescar_(c, CACHE_LLAVE)) refrescar = false;
   if (c && !refrescar) {
     var g = cacheLeer_(c, CACHE_LLAVE);
     if (g) return g;
@@ -465,8 +633,28 @@ function publicoCacheado_(refrescar) {
   return texto;
 }
 
-function detalleCacheado_(cfg, refrescar) {
+/* ── Freno del botón «Actualizar» ─────────────────────────────────────
+   El botón del panel manda ?refrescar=1, que salta la caché y vuelve a
+   leer las hojas. Sin freno, diez clics seguidos son diez lecturas
+   completas y volvemos justo al problema que acabamos de resolver.
+
+   Con esto, un refresco de verdad se concede como mucho cada 45 s; los
+   clics de más reciben la respuesta cacheada, que de todos modos tiene
+   segundos de vida. El cliente no nota la diferencia.               */
+var REFRESCO_ESPERA = 45;
+
+function puedeRefrescar_(c, llave) {
+  if (!c) return true;
+  try {
+    if (c.get('frena_' + llave)) return false;
+    c.put('frena_' + llave, '1', REFRESCO_ESPERA);
+  } catch (err) {}
+  return true;
+}
+
+function detalleCacheado_(cfg, refrescar, sinFreno) {
   var c = cache_(), llave = 'det_' + cfg.id;
+  if (refrescar && !sinFreno && !puedeRefrescar_(c, llave)) refrescar = false;
   if (c && !refrescar) {
     var g = cacheLeer_(c, llave);
     if (g) return g;
@@ -477,41 +665,29 @@ function detalleCacheado_(cfg, refrescar) {
 }
 
 /* ── Precalentado automático ──────────────────────────────────────────
-   Deja la caché lista ANTES de que llegue ningún cliente, para que nunca
-   les toque esperar la lectura de las hojas.
-
-   CÓMO ACTIVARLO (una sola vez, 30 segundos):
-     Editor de Apps Script > icono del reloj (Activadores) > Añadir
-     activador > Función: calentarCache · Origen: Basado en tiempo ·
-     Tipo: Temporizador por minutos · Cada 10 minutos > Guardar.
-
-   Con eso, los datos que ve el cliente tienen como máximo 10 minutos.  */
+   Deja la caché lista ANTES de que llegue ningún cliente.
+   Activadores (reloj) > Añadir activador > Función: calentarCache ·
+   Basado en tiempo · Temporizador por minutos · Cada 10 minutos.     */
 function calentarCache() {
-  _hojasLeidas = {};
+  _hojasLeidas = {}; _libros = {};
   var ok = 0, fallos = [];
-  try { publicoCacheado_(true); ok++; } catch (err) { fallos.push('público: ' + err); }
+  try { publicoCacheado_(true, true); ok++; } catch (err) { fallos.push('público: ' + err); }
   PROYECTOS.forEach(function (cfg) {
-    try { detalleCacheado_(cfg, true); ok++; }
+    try { detalleCacheado_(cfg, true, true); ok++; }
     catch (err) { fallos.push(cfg.id + ': ' + err); }
   });
-  Logger.log('Caché precalentada: %s bloques. %s', ok, fallos.length ? 'Fallos -> ' + fallos.join(' | ') : 'Sin fallos.');
+  Logger.log('Caché precalentada: %s bloques. %s', ok,
+    fallos.length ? 'Fallos -> ' + fallos.join(' | ') : 'Sin fallos.');
 }
 
-function textoJson_(texto) {
-  var out = ContentService.createTextOutput(texto);
-  out.setMimeType(ContentService.MimeType.JSON);
-  return out;
-}
+// ═════════════════════ punto de entrada ═════════════════════
 
 function doGet(e) {
   var p = (e && e.parameter) ? e.parameter : {};
-  _hojasLeidas = {};   // cada petición parte de cero
+  _hojasLeidas = {}; _libros = {};   // cada petición parte de cero
 
-  /* ── Despertador ──────────────────────────────────────────────────
-     Petición mínima que la web lanza cuando el cliente llega a la
-     pantalla de la clave. Google levanta el script mientras el cliente
-     escribe, así que al pulsar el botón ya está caliente y responde de
-     inmediato en vez de arrancar en frío.                            */
+  /* Despertador: la web lo lanza cuando el cliente llega a la pantalla
+     de la clave. Debe responder al instante y NO leer ninguna hoja. */
   if (p.ping) return textoJson_('{"ok":true}');
 
   // ── Petición de DETALLE: exige clave correcta ──
@@ -535,18 +711,33 @@ function doGet(e) {
   return textoJson_(publicoCacheado_(!!p.refrescar));
 }
 
-/** Ejecuta desde el editor (▶) para probar sin publicar. */
+/** Ejecuta desde el editor (▶) para verificar sin publicar. */
 function probar() {
+  _hojasLeidas = {}; _libros = {};
+  var t0 = new Date().getTime();
   var d = buildPublico_();
-  Logger.log('Equipos catálogo: %s · Paquetes: %s', d.equipos.length, d.paquetes.length);
+  Logger.log('PÚBLICO en %s ms · equipos: %s · paquetes: %s',
+    new Date().getTime() - t0, d.equipos.length, d.paquetes.length);
+
+  var conFoto = d.equipos.filter(function (e) { return e.photo; }).length;
+  var conGal = d.equipos.filter(function (e) { return e.fotos && e.fotos.length; }).length;
+  var conCal = d.equipos.filter(function (e) { return e.cal_fin; }).length;
+  Logger.log('Con portada: %s · con galería: %s · con calibración: %s', conFoto, conGal, conCal);
+
   d.proyectos.forEach(function (p) {
     Logger.log('%s → %s%% (%s/%s)%s', p.id, p.avance,
       p.resumen ? p.resumen.ejecutadas : '?', p.resumen ? p.resumen.intervenciones : '?',
       p.error ? ' · ERROR: ' + p.error : '');
   });
+
+  var t1 = new Date().getTime();
   var det = detalle_(PROYECTOS[0]);
-  Logger.log('DETALLE → %s equipos · %s en alcance · %s intervenciones (%s hechas)',
-    det.totales.equipos, det.totales.en_alcance,
+  Logger.log('DETALLE en %s ms → %s equipos · %s en alcance · %s intervenciones (%s hechas)',
+    new Date().getTime() - t1, det.totales.equipos, det.totales.en_alcance,
     det.totales.intervenciones, det.totales.ejecutadas);
-  Logger.log('Ejemplo: %s', JSON.stringify(det.equipos[1]));
+  (det.valorizaciones || []).forEach(function (v) {
+    Logger.log('%s (%s) → %s · %s informes', v.n, v.mes, v.estado, v.total);
+  });
+  Logger.log('TOTAL: %s ms. Si el público pasa de 10 000 ms, la web se rinde.',
+    new Date().getTime() - t0);
 }
