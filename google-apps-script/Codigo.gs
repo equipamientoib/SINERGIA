@@ -24,6 +24,14 @@
  *     disparaba una lectura completa de las hojas: hacía justo lo
  *     contrario de lo que buscaba.
  *  5) ?refrescar=1 salta la caché cuando quieres ver datos frescos ya.
+ *  6) foto_() ya no arma la URL con lh3.googleusercontent.com/d/ID. Ese
+ *     endpoint no está documentado y Google lo bloquea de forma
+ *     intermitente cuando lo llama otro dominio: por eso el panel del
+ *     equipo mostraba "Sin fotografía" aunque la hoja tuviera el link y
+ *     el archivo fuera público. Ahora se usa drive.google.com/thumbnail,
+ *     que sí está pensado para incrustar, con sz=w800 para que entregue
+ *     la imagen redimensionada en vez del original (las fotos de los
+ *     equipos pesan cerca de 2 MB).
  *
  * ⚠ ESTE ARCHIVO CONTIENE LA CLAVE DEL CLIENTE.
  *   Va SOLO dentro de Apps Script. NUNCA lo subas a GitHub.
@@ -34,12 +42,14 @@
  *  3) Ejecuta `probar` (▶) para verificar.
  *  4) Implementar > Gestionar implementaciones > (lápiz) >
  *     Versión: NUEVA VERSIÓN > Implementar.   ← sin esto no cambia nada
- *  5) Activadores (reloj) > Añadir > calentarCache · cada 10 minutos.
+ *  5) Ejecuta `limpiarCache` (▶). Si no, la caché de 30 minutos sigue
+ *     devolviendo las URLs viejas de las fotos.
+ *  6) Activadores (reloj) > Añadir > calentarCache · cada 10 minutos.
  */
 
 // ═════════════════════ CONFIGURACIÓN ═════════════════════
 
-var CATALOGO_ID = "PEGA_AQUI_EL_ID";   // libro Sinergia-Web
+var CATALOGO_ID = "1cwZrVZIHJFBttN1Uf1GhrYnlWsOgIWIJUn-wO_mchys";   // libro Sinergia-Web
 
 var PROYECTOS = [
   {
@@ -50,7 +60,7 @@ var PROYECTOS = [
     servicio: "Contrato COT-SB-0726-01",
     fecha: "2026",
     foto: "",
-    clave: "CAMBIA_ESTA_CLAVE",   // la que entregas al cliente
+    clave: "limatambo26-sb",   // la que entregas al cliente
     desc: "Programa anual de mantenimiento preventivo sobre 90 equipos biomédicos " +
           "en 15 áreas, con informe individual por intervención y trazabilidad por equipo.",
     hojaResumen: "RESUMEN",
@@ -106,11 +116,20 @@ function driveId_(txt) {
   return m ? m[1] : '';
 }
 
+/* URL para MOSTRAR una foto de Drive dentro de la web.
+   Antes: lh3.googleusercontent.com/d/ID  -> endpoint no documentado, da
+   403 intermitente al llamarlo desde sinergiabiomedica.pe y el panel
+   caía al "Sin fotografía".
+   Ahora: drive.google.com/thumbnail      -> soportado para incrustar.
+   sz=w800 pide la imagen a 800 px de ancho: suficiente para el panel y
+   evita descargar el original de ~2 MB.                              */
+var FOTO_ANCHO = 800;
+
 function foto_(txt) {
   var t = s_(txt);
   if (!t || t.indexOf('img/') === 0) return t;
   var id = driveId_(t);
-  return id ? 'https://lh3.googleusercontent.com/d/' + id : t;
+  return id ? 'https://drive.google.com/thumbnail?id=' + id + '&sz=w' + FOTO_ANCHO : t;
 }
 
 /** Varias fotos separadas por coma, punto y coma o salto de línea. */
@@ -735,6 +754,15 @@ function probar() {
   Logger.log('DETALLE en %s ms → %s equipos · %s en alcance · %s intervenciones (%s hechas)',
     new Date().getTime() - t1, det.totales.equipos, det.totales.en_alcance,
     det.totales.intervenciones, det.totales.ejecutadas);
+
+  /* Cuántos equipos del contrato traen foto y con qué URL sale la
+     primera. Si el número es 0, el problema está en la hoja (columna
+     FOTO EQUIPO vacía o encabezado cambiado), no en el código.       */
+  var conFotoEq = det.equipos.filter(function (e) { return e.foto; });
+  Logger.log('Equipos del contrato con foto: %s de %s%s',
+    conFotoEq.length, det.equipos.length,
+    conFotoEq.length ? ' · ejemplo: ' + conFotoEq[0].cod + ' -> ' + conFotoEq[0].foto : '');
+
   (det.valorizaciones || []).forEach(function (v) {
     Logger.log('%s (%s) → %s · %s informes', v.n, v.mes, v.estado, v.total);
   });
