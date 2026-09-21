@@ -33,8 +33,6 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <!-- Estilos base en línea: la página ya tiene color, tipografía y
      estructura antes de que llegue ningún archivo externo. -->
@@ -55,12 +53,12 @@
   .page{display:none}.page.active{display:block}
 </style>
 
-<!-- Las fuentes ya no bloquean el pintado: la página aparece con la
-     tipografía del sistema y cambia sola al llegar las definitivas. -->
-<link rel="preload" as="style"
-      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Titillium+Web:wght@300;400;600;700&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Titillium+Web:wght@300;400;600;700&display=swap"></noscript>
+<!-- Fuentes alojadas en el propio sitio (fonts/*.woff2, css/00-fuentes.css): sin ir a
+     Google Fonts. font-display:swap → la página aparece con la tipografía del sistema
+     y cambia sola al llegar las definitivas. Se precargan las dos más usadas. -->
+<link rel="preload" as="font" type="font/woff2" href="fonts/TitilliumWeb-400.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/ChakraPetch-600.woff2" crossorigin>
+<link rel="stylesheet" href="css/00-fuentes.css">
 <link rel="stylesheet" href="css/01-base.css">
 <link rel="stylesheet" href="css/02-header.css">
 <link rel="stylesheet" href="css/03-home.css">

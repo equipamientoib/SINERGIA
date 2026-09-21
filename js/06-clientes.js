@@ -151,6 +151,7 @@ function cardProyecto(p){
     </div></div>`;
 }
 function pintarProyectos(){
+  if(typeof mezclarExpedientes==='function') mezclarExpedientes();   // proyectos tipo expediente (06-expediente.js)
   const g=document.getElementById('prGrid'), hm=document.getElementById('prHome'),
         c=document.getElementById('countPr');
 
@@ -235,6 +236,7 @@ async function sha256(s){
 }
 
 function renderProyecto(id){
+  if(typeof mezclarExpedientes==='function') mezclarExpedientes();   // proyectos tipo expediente (06-expediente.js)
   const p=PROYECTOS.find(x=>x.id===id);
   const body=document.getElementById('equipoBody');
   if(!p){
@@ -267,6 +269,9 @@ function renderProyecto(id){
   }
   PR_INTENTOS=0;
   clearTimeout(REINTENTO);
+  /* Expediente técnico ya abierto: lo pinta 06-expediente.js. */
+  if(PR_OPEN.has(id) && p.tipo==='expediente' && typeof renderExpediente==='function'){ renderExpediente(p); return; }
+  body.classList.remove('ex-ancho');   // ancho normal para candado y proyectos de mantenimiento
   if(!PR_OPEN.has(id)){
     body.innerHTML=`
       <div class="crumb"><a onclick="go('#/clientes')">Nuestros clientes</a> &nbsp;/&nbsp; ${p.titulo}</div>
