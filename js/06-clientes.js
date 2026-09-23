@@ -132,7 +132,61 @@ let AREAS_OPEN=false;
 let VAL_EST='', VAL_Q='';   // filtro y búsqueda de valorizaciones   // el bloque de áreas arranca plegado
 
 function prBadge(p){return p.estado==='Completado'?'<span class="st fin">COMPLETADO</span>':'<span class="st curso">EN CURSO</span>';}
+/* Fotos del proyecto (vienen de Drive, nunca del repositorio). Con dos o más
+   se muestran en un carrusel: pasa solo cada 5 s, con puntos, flechas y arrastre.
+   Si una foto no carga (no compartida en Drive) se retira sin romper el resto. */
+const prEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function prCarrusel(p){
+  const fotos=(p.fotos||[]).filter(Boolean);
+  const id='car-'+p.id.replace(/[^a-z0-9-]/gi,'');
+  return `<div class="pr-car" id="${id}" data-i="0" onpointerdown="carTocar(event,'${id}')">
+      ${fotos.map((f,i)=>`<img src="${f}" alt="${prEsc(p.titulo)} ${i+1}" class="${i?'':'on'}"
+          loading="${i?'lazy':'eager'}" decoding="async" onerror="carQuitar('${id}',this)">`).join('')}
+      <button type="button" class="pr-car-b izq" aria-label="Anterior" onclick="event.stopPropagation();carMover('${id}',-1)">‹</button>
+      <button type="button" class="pr-car-b der" aria-label="Siguiente" onclick="event.stopPropagation();carMover('${id}',1)">›</button>
+      <div class="pr-car-p">${fotos.map((f,i)=>`<i class="${i?'':'on'}" onclick="event.stopPropagation();carIr('${id}',${i})"></i>`).join('')}</div>
+    </div>`;
+}
+function carImgs(c){ return [...c.querySelectorAll('img')]; }
+function carIr(id,i){
+  const c=document.getElementById(id); if(!c) return;
+  const im=carImgs(c); if(!im.length) return;
+  i=(i+im.length)%im.length; c.dataset.i=i;
+  im.forEach((x,k)=>x.classList.toggle('on',k===i));
+  c.querySelectorAll('.pr-car-p i').forEach((x,k)=>x.classList.toggle('on',k===i));
+  c.dataset.parado='1';                      // si el visitante toca, deja de pasar solo
+}
+function carMover(id,d){ const c=document.getElementById(id); if(c) carIr(id,(+c.dataset.i||0)+d); }
+function carQuitar(id,img){
+  const c=document.getElementById(id); if(!c) return;
+  const i=carImgs(c).indexOf(img); img.remove();
+  const p=c.querySelectorAll('.pr-car-p i')[i]; if(p) p.remove();
+  const im=carImgs(c);
+  if(!im.length){ c.classList.add('vacio'); return; }
+  if(im.length===1) c.classList.add('una');
+  carIr(id,0); c.dataset.parado='';
+}
+/* arrastre / deslizar con el dedo */
+function carTocar(e,id){
+  const c=document.getElementById(id); if(!c||carImgs(c).length<2) return;
+  const x0=e.clientX; let movido=false;
+  const fin=ev=>{ const dx=ev.clientX-x0; if(Math.abs(dx)>40){ carMover(id,dx<0?1:-1); movido=true; }
+    c.removeEventListener('pointerup',fin); c.removeEventListener('pointercancel',fin); };
+  c.addEventListener('pointerup',fin); c.addEventListener('pointercancel',fin);
+}
+/* paso automático: sólo con la pestaña visible y si nadie ha tocado el carrusel */
+setInterval(()=>{
+  if(document.hidden) return;
+  document.querySelectorAll('.pr-car').forEach(c=>{
+    if(c.dataset.parado||carImgs(c).length<2) return;
+    carIr(c.id,(+c.dataset.i||0)+1);
+    c.dataset.parado='';                     // el paso automático no cuenta como toque
+  });
+},5000);
+
 function prImg(p){
+  if((p.fotos||[]).length>1) return prCarrusel(p);
+  if((p.fotos||[]).length===1) return `<img src="${p.fotos[0]}" alt="${prEsc(p.titulo)}" loading="lazy" decoding="async">`;
   if(p.foto)return `<img src="${p.foto}" alt="${p.titulo}" loading="lazy" decoding="async">`;
   return `<svg viewBox="0 0 312 200" role="img" aria-label="${p.titulo}"><rect x="40" y="30" width="232" height="140" rx="16" fill="#2A2D33"/><rect x="58" y="48" width="196" height="74" rx="8" fill="#0E1A14"/><polyline points="74,85 110,85 122,62 138,104 152,74 164,85 238,85" fill="none" stroke="#67d3ad" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="156" cy="148" r="13" fill="none" stroke="#9A7F4E" stroke-width="2"/><rect x="153" y="138" width="6" height="9" rx="3" fill="#9A7F4E"/></svg>`;
 }

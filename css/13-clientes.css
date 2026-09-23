@@ -6,6 +6,22 @@
   .pr:hover{border-color:var(--bronce);transform:translateY(-3px);box-shadow:0 16px 38px rgba(23,25,29,.08)}
   .pr .img{height:172px;background:linear-gradient(160deg,var(--crema),var(--crema-2));position:relative;border-bottom:1px solid var(--linea);overflow:hidden}
   .pr .img img{width:100%;height:100%;object-fit:cover;display:block}
+  /* carrusel de fotos del proyecto */
+  .pr-car{position:absolute;inset:0;touch-action:pan-y}
+  .pr-car img{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
+  .pr-car img.on{opacity:1}
+  .pr-car.vacio{display:none}
+  .pr-car-b{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;
+    border:0;background:rgba(23,25,29,.42);color:#fff;font-size:18px;line-height:1;cursor:pointer;opacity:0;transition:.18s;z-index:2}
+  .pr-car-b.izq{left:8px} .pr-car-b.der{right:8px}
+  .pr:hover .pr-car-b{opacity:1}
+  .pr-car-b:hover{background:rgba(23,25,29,.72)}
+  .pr-car.una .pr-car-b,.pr-car.una .pr-car-p{display:none}
+  .pr-car-p{position:absolute;left:0;right:0;bottom:9px;display:flex;justify-content:center;gap:6px;z-index:2}
+  .pr-car-p i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);cursor:pointer;transition:.18s;
+    box-shadow:0 1px 3px rgba(0,0,0,.35)}
+  .pr-car-p i.on{background:var(--bronce);width:18px;border-radius:99px}
+  @media(hover:none){ .pr-car-b{opacity:.85} }
   .pr .img svg{width:60%;height:auto;margin:14px auto 0;display:block}
   .pr .st{position:absolute;top:12px;left:12px;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px}
   .pr .st.curso{background:rgba(46,139,107,.13);color:var(--ok);border:1px solid rgba(46,139,107,.28)}
