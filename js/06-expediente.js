@@ -74,6 +74,11 @@ async function consultarEstadoExpedientes(){
      catálogo se pasa del tiempo límite y el portal se queda sin proyectos. */
   for(let i=0;i<180 && !(typeof DATOS_LISTOS!=='undefined'&&DATOS_LISTOS);i++) await new Promise(r=>setTimeout(r,500));
 
+  /* Si el portal arrancó con una copia guardada de antes, los interruptores
+     llegan unos segundos después, con la respuesta de la hoja. Se le da ese
+     margen antes de preguntar nada.                                      */
+  for(let i=0;i<16 && !window.EX_SITIO;i++) await new Promise(r=>setTimeout(r,500));
+
   /* Camino normal: el catálogo ya trajo los interruptores, así que no hay
      nada que preguntar y el cliente no espera detrás de ninguna consulta. */
   if(window.EX_SITIO){

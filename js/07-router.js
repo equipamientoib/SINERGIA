@@ -84,13 +84,14 @@ function aplicarDatos(d, enVivo){
   /* Los proyectos SOLO se toman de una fuente confiable (Apps Script en vivo
      o la caché de esta sesión, que vino de él). El archivo del repositorio
      puede traer proyectos de ejemplo desactualizados.                   */
+  /* Los interruptores "mostrar" de los expedientes vienen dentro del propio
+     catálogo, venga de donde venga. Antes se preguntaban uno por uno: cada
+     pregunta al Apps Script cuesta ~2 s y se atienden de a una, así que el
+     cliente que entraba a su proyecto esperaba detrás de ellas.          */
+  if(d.expedientes) window.EX_SITIO = d.expedientes;
+
   let cambioPro = false;
   if(enVivo){
-    /* Los interruptores "mostrar" de los expedientes vienen dentro del propio
-       catálogo. Antes se preguntaban uno por uno: cada pregunta al Apps Script
-       cuesta ~2 s y se atienden de a una, así que el cliente que entraba a su
-       proyecto esperaba detrás de ellas.                                   */
-    if(d.expedientes) window.EX_SITIO = d.expedientes;
     const fPro = firmaProyectos(d);
     if(fPro !== HUELLA_PRO || !PRO_PINTADOS){
       HUELLA_PRO = fPro; cambioPro = true;
