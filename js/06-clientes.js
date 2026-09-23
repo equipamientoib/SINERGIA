@@ -528,16 +528,12 @@ function setDetTab(id,t){
 const DET_CACHE_MIN = 10;          // minutos que vale la copia del navegador
 let PING_HECHO = false;
 
-/* 1. Despertador — se lanza al mostrar la pantalla de la clave. */
-function despertarSistema(){
-  if(PING_HECHO) return;
-  PING_HECHO = true;
-  const url=(typeof CONFIG!=='undefined'&&(CONFIG.PANEL_URL||CONFIG.DATA_URL))||'';
-  if(url.indexOf('http')!==0) return;
-  try{
-    fetch(url+(url.indexOf('?')>=0?'&':'?')+'ping=1', {cache:'no-store'}).catch(()=>{});
-  }catch(e){}
-}
+/* 1. Despertador — ya no hace falta y por eso no pide nada.
+   El sistema queda despierto solo: al abrir la web se le pide el catálogo,
+   y desde ahí sigue caliente. El ping servía cuando ese pedido no existía;
+   hoy solo gastaba un turno (Apps Script atiende de a una petición, ~2 s
+   cada una) justo antes de que el cliente pidiera su proyecto.          */
+function despertarSistema(){ PING_HECHO = true; }
 
 /* 2. Caché de sesión */
 function detCacheLeer(id){

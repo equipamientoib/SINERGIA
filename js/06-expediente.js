@@ -73,9 +73,24 @@ async function consultarEstadoExpedientes(){
      Apps Script atiende de a una, y si se le pregunta antes, la petición del
      catálogo se pasa del tiempo límite y el portal se queda sin proyectos. */
   for(let i=0;i<180 && !(typeof DATOS_LISTOS!=='undefined'&&DATOS_LISTOS);i++) await new Promise(r=>setTimeout(r,500));
+
+  /* Camino normal: el catálogo ya trajo los interruptores, así que no hay
+     nada que preguntar y el cliente no espera detrás de ninguna consulta. */
+  if(window.EX_SITIO){
+    EXPEDIENTES_LOCAL.forEach(e=>{
+      const d=window.EX_SITIO[e.id];
+      if(d) EXPEDIENTES_ESTADO[e.id]={mostrar:d.mostrar!==false};
+    });
+    repintarSiCambio(); estadoCacheGuardar(); return;
+  }
+
+  /* Respaldo, sólo si el script todavía es de una versión anterior: se
+     pregunta de a uno, despacio y nunca mientras el cliente está dentro
+     de un proyecto (cada pregunta le quitaría el turno). */
   await new Promise(r=>setTimeout(r,1500));
   const base=(typeof CONFIG!=='undefined'&&CONFIG.DATA_URL)||'';
   for(const e of EXPEDIENTES_LOCAL.map(e=>Object.assign({},e,{script:e.script||base})).filter(e=>/^https?:/.test(e.script))){
+    for(let i=0;i<120 && location.hash.indexOf('#/proyecto/')===0;i++) await new Promise(r=>setTimeout(r,500));
     const ctrl=('AbortController' in window)?new AbortController():null;
     const corte=setTimeout(()=>{ if(ctrl) ctrl.abort(); },10000);
     try{
