@@ -651,6 +651,19 @@ async function montarVisorCad(d){
       if(okF){ const b=atob(window.FONT_DATA['Roboto-Latin.ttf']); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i);
                fuente=URL.createObjectURL(new Blob([u],{type:'font/ttf'})); }
       else fuente='';
+    }else{
+      /* Si la fuente no está (caché vieja, archivo movido…), el servidor devuelve
+         su página de error y el visor fallaba entero con "Unsupported OpenType
+         signature <!DO". Se comprueba antes: sin fuente, el dibujo se abre igual,
+         sólo que sin los textos. */
+      try{
+        const rf=await fetch(fuente,{cache:'force-cache'});
+        const bf=rf.ok?await rf.arrayBuffer():null;
+        const firma=bf?new Uint8Array(bf).slice(0,4):null;
+        const valida=firma&&(firma[0]===0||String.fromCharCode(...firma)==='true'||String.fromCharCode(...firma)==='OTTO');
+        if(!valida){ console.warn('Sinergia: fuente del visor no disponible; el dibujo se abre sin textos'); fuente=''; }
+        else fuente=URL.createObjectURL(new Blob([bf],{type:'font/ttf'}));
+      }catch(e){ fuente=''; }
     }
     if(CAD.viewer){ try{ CAD.viewer.Destroy(); }catch(e){} CAD.viewer=null; }
     cont.querySelectorAll('canvas').forEach(c=>c.remove());
