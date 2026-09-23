@@ -175,11 +175,16 @@ function carTocar(e,id){
     c.removeEventListener('pointerup',fin); c.removeEventListener('pointercancel',fin); };
   c.addEventListener('pointerup',fin); c.addEventListener('pointercancel',fin);
 }
-/* paso automático: sólo con la pestaña visible y si nadie ha tocado el carrusel */
+/* Paso automático cada 5 s, sólo con la pestaña visible, sólo en los carruseles
+   que están a la vista y si nadie los ha tocado. Mientras la tarjeta está fuera
+   de pantalla vuelve a la primera foto, para que al llegar a ella se vea
+   siempre la foto que el proyecto pone primero y no una al azar.          */
 setInterval(()=>{
   if(document.hidden) return;
   document.querySelectorAll('.pr-car').forEach(c=>{
     if(c.dataset.parado||!c.offsetParent||carImgs(c).length<2) return;   // ni ocultas ni ya tocadas
+    const r=c.getBoundingClientRect();
+    if(r.bottom<0||r.top>innerHeight){ if(+c.dataset.i) carIr(c.id,0), c.dataset.parado=''; return; }
     carIr(c.id,(+c.dataset.i||0)+1);
     c.dataset.parado='';                     // el paso automático no cuenta como toque
   });
