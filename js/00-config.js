@@ -74,7 +74,7 @@ const CONFIG = {
   /* Tiempo máximo de espera de una descarga, en milisegundos. Si Google
      no responde a tiempo se corta y la web muestra su copia local, en
      vez de quedarse esperando indefinidamente.                        */
-  TIMEOUT_MS: 12000,
+  TIMEOUT_MS: 25000,
 
   /* OPCIONAL. Si algún día contratas un servicio de formularios
      (Formspree, Getform, Basin…), pega aquí la URL del endpoint y las

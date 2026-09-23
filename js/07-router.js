@@ -143,7 +143,10 @@ async function traer(url, ms){
       signal: ctrl ? ctrl.signal : undefined
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
-    return await r.json();
+    const txt = await r.text();
+    if(txt.charAt(0) !== '{' && txt.charAt(0) !== '[')      // Google devuelve su página de error con código 200
+      throw new Error('respuesta no válida del servidor');
+    return JSON.parse(txt);
   }catch(e){
     if(e && e.name==='AbortError') throw new Error('tiempo de espera agotado ('+limite+' ms)');
     throw e;
@@ -176,9 +179,25 @@ function rendirse(motivo){
 /* Compatibilidad con el nombre anterior. */
 function usarRespaldo(motivo){ rendirse(motivo); }
 
-/* Red de seguridad por si una petición se queda colgada sin dar error. */
-const _ESPERA = ((typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 12000);
-setTimeout(()=>rendirse('sin respuesta a tiempo'), _ESPERA + 2000);
+/* Red de seguridad por si una petición se queda colgada sin dar error.
+   Da margen a los dos intentos (Google a veces tarda 30 s en despertar). */
+const _ESPERA = ((typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 25000);
+setTimeout(()=>rendirse('sin respuesta a tiempo'), _ESPERA * 2 + 3000);
+
+/* Última respuesta buena del Apps Script, guardada en el navegador (24 h).
+   Sirve para que el portal muestre los proyectos aunque Google tarde o falle;
+   el dato sigue viniendo de la hoja, solo que de la visita anterior.        */
+const VIVO_KEY = 'sb-datos-vivo', VIVO_HORAS = 24;
+function vivoGuardar(d){
+  try{ localStorage.setItem(VIVO_KEY, JSON.stringify({t:Date.now(), d:d})); }catch(e){}
+}
+function vivoLeer(){
+  try{
+    const o = JSON.parse(localStorage.getItem(VIVO_KEY) || 'null');
+    if(o && o.t && (Date.now()-o.t)/3600000 < VIVO_HORAS) return o.d;
+  }catch(e){}
+  return null;
+}
 
 async function loadData(){
   /* ── 1. copia local: lo que ya tenemos a mano ──────────────────────
@@ -198,6 +217,9 @@ async function loadData(){
       if(window.__catalogo) d = await window.__catalogo;
       if(!d && CONFIG.CACHE_URL) d = await traer(CONFIG.CACHE_URL, 5000);
       hayDatos = aplicarDatos(d, false);
+      /* y, si la hay, la última respuesta buena de la hoja (proyectos incluidos) */
+      const vivo = vivoLeer();
+      if(vivo) hayDatos = aplicarDatos(vivo, true) || hayDatos;
     }
   }catch(e){
     console.warn('Sinergia: no se pudo leer la copia local ('+e.message+')');
@@ -207,9 +229,18 @@ async function loadData(){
   /* ── 2. datos en vivo ─────────────────────────────────────────────── */
   if(!CONFIG.DATA_URL){ rendirse('sin DATA_URL configurada'); return; }
   try{
-    const d = await traer(CONFIG.DATA_URL, _ESPERA);
+    let d;
+    try{
+      d = await traer(CONFIG.DATA_URL, _ESPERA);
+    }catch(e1){
+      /* Apps Script frío: el primer intento se pasa de tiempo o devuelve la
+         página de error de Google. El segundo suele responder en segundos. */
+      console.warn('Sinergia: reintentando la hoja ('+e1.message+')');
+      d = await traer(CONFIG.DATA_URL, _ESPERA);
+    }
     aplicarDatos(d, true);
     try{ sessionStorage.setItem(CACHE_KEY, JSON.stringify(d)); }catch(e){}
+    vivoGuardar(d);
     console.info('Sinergia: datos sincronizados desde la hoja');
   }catch(e){
     rendirse('no se cargó el Apps Script: '+e.message);

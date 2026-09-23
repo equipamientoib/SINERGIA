@@ -54,20 +54,43 @@ let EX_AVANCE_ABIERTO = false; // bloque "Avance del expediente" dentro de Resum
 const EXPEDIENTES_ESTADO={};                 // id -> {mostrar}
 let EX_ESTADO_PEDIDO=false;
 function expedienteVisible(id){ const e=EXPEDIENTES_ESTADO[id]; return !e || e.mostrar!==false; }
-function consultarEstadoExpedientes(){
+/* Apps Script atiende UNA petición por vez: si se le pregunta el estado mientras
+   trae el catálogo, la del catálogo se pasa del tiempo límite y el portal se queda
+   sin los proyectos de la hoja. Por eso el estado se consulta DESPUÉS de que
+   lleguen los datos del sitio, de uno en uno, y se guarda en la sesión.        */
+const EX_ESTADO_CACHE='sb-ex-estado', EX_ESTADO_MIN=30;
+function estadoCacheLeer(){
+  try{ const o=JSON.parse(sessionStorage.getItem(EX_ESTADO_CACHE)||'null');
+    if(o&&o.t&&(Date.now()-o.t)/60000<EX_ESTADO_MIN) return o.d; }catch(e){}
+  return null;
+}
+function estadoCacheGuardar(){ try{ sessionStorage.setItem(EX_ESTADO_CACHE, JSON.stringify({t:Date.now(), d:EXPEDIENTES_ESTADO})); }catch(e){} }
+async function consultarEstadoExpedientes(){
   if(EX_ESTADO_PEDIDO) return; EX_ESTADO_PEDIDO=true;
+  const guardado=estadoCacheLeer();
+  if(guardado){ Object.assign(EXPEDIENTES_ESTADO, guardado); repintarSiCambio(); return; }
+  /* esperar a que el sitio termine con la hoja (o se rinda) antes de preguntar:
+     Apps Script atiende de a una, y si se le pregunta antes, la petición del
+     catálogo se pasa del tiempo límite y el portal se queda sin proyectos. */
+  for(let i=0;i<180 && !(typeof DATOS_LISTOS!=='undefined'&&DATOS_LISTOS);i++) await new Promise(r=>setTimeout(r,500));
+  await new Promise(r=>setTimeout(r,1500));
   const base=(typeof CONFIG!=='undefined'&&CONFIG.DATA_URL)||'';
-  EXPEDIENTES_LOCAL.map(e=>Object.assign({},e,{script:e.script||base})).filter(e=>/^https?:/.test(e.script)).forEach(e=>{
+  for(const e of EXPEDIENTES_LOCAL.map(e=>Object.assign({},e,{script:e.script||base})).filter(e=>/^https?:/.test(e.script))){
     const ctrl=('AbortController' in window)?new AbortController():null;
-    const corte=setTimeout(()=>{ if(ctrl) ctrl.abort(); },8000);
-    fetch(e.script+(e.script.indexOf('?')>=0?'&':'?')+'estado='+encodeURIComponent(e.id),{cache:'no-store',signal:ctrl?ctrl.signal:undefined})
-      .then(r=>r.json()).then(d=>{
-        if(!d||d.ok===false) return;
-        const antes=expedienteVisible(e.id);
-        EXPEDIENTES_ESTADO[e.id]={mostrar:d.mostrar!==false};
-        if(antes!==expedienteVisible(e.id)){ try{ pintarProyectos(); }catch(x){} try{ if(location.hash.indexOf('#/proyecto/')===0) route(true); }catch(x){} }
-      }).catch(()=>{}).finally(()=>clearTimeout(corte));
-  });
+    const corte=setTimeout(()=>{ if(ctrl) ctrl.abort(); },10000);
+    try{
+      const r=await fetch(e.script+(e.script.indexOf('?')>=0?'&':'?')+'estado='+encodeURIComponent(e.id),{cache:'no-store',signal:ctrl?ctrl.signal:undefined});
+      const d=await r.json();
+      if(d&&d.ok!==false){ EXPEDIENTES_ESTADO[e.id]={mostrar:d.mostrar!==false}; repintarSiCambio(); }
+    }catch(x){}                      // sin respuesta: el proyecto se sigue mostrando
+    finally{ clearTimeout(corte); }
+  }
+  estadoCacheGuardar();
+}
+function repintarSiCambio(){
+  const ocultos=EXPEDIENTES_LOCAL.filter(e=>!expedienteVisible(e.id)).length;
+  const enLista=(typeof PROYECTOS!=='undefined'?PROYECTOS:[]).filter(p=>EXPEDIENTES_LOCAL.some(e=>e.id===p.id)).length;
+  if(ocultos&&enLista){ try{ pintarProyectos(); }catch(x){} try{ if(location.hash.indexOf('#/proyecto/')===0) route(true); }catch(x){} }
 }
 function mezclarExpedientes(){
   if(typeof PROYECTOS==='undefined') return;
