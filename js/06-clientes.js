@@ -136,9 +136,10 @@ function prBadge(p){return p.estado==='Completado'?'<span class="st fin">COMPLET
    se muestran en un carrusel: pasa solo cada 5 s, con puntos, flechas y arrastre.
    Si una foto no carga (no compartida en Drive) se retira sin romper el resto. */
 const prEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+let PR_CAR=0;                                   // la misma tarjeta se pinta en el inicio y en Clientes
 function prCarrusel(p){
   const fotos=(p.fotos||[]).filter(Boolean);
-  const id='car-'+p.id.replace(/[^a-z0-9-]/gi,'');
+  const id='car'+(++PR_CAR)+'-'+p.id.replace(/[^a-z0-9-]/gi,'');
   return `<div class="pr-car" id="${id}" data-i="0" onpointerdown="carTocar(event,'${id}')">
       ${fotos.map((f,i)=>`<img src="${f}" alt="${prEsc(p.titulo)} ${i+1}" class="${i?'':'on'}"
           loading="${i?'lazy':'eager'}" decoding="async" onerror="carQuitar('${id}',this)">`).join('')}
@@ -178,7 +179,7 @@ function carTocar(e,id){
 setInterval(()=>{
   if(document.hidden) return;
   document.querySelectorAll('.pr-car').forEach(c=>{
-    if(c.dataset.parado||carImgs(c).length<2) return;
+    if(c.dataset.parado||!c.offsetParent||carImgs(c).length<2) return;   // ni ocultas ni ya tocadas
     carIr(c.id,(+c.dataset.i||0)+1);
     c.dataset.parado='';                     // el paso automático no cuenta como toque
   });
