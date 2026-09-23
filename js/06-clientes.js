@@ -155,7 +155,7 @@ function carIr(id,i){
   i=(i+im.length)%im.length; c.dataset.i=i;
   im.forEach((x,k)=>x.classList.toggle('on',k===i));
   c.querySelectorAll('.pr-car-p i').forEach((x,k)=>x.classList.toggle('on',k===i));
-  c.dataset.parado='1';                      // si el visitante toca, deja de pasar solo
+  c.dataset.parado=Date.now();               // si el visitante toca, se pausa un rato
 }
 function carMover(id,d){ const c=document.getElementById(id); if(c) carIr(id,(+c.dataset.i||0)+d); }
 function carQuitar(id,img){
@@ -176,13 +176,16 @@ function carTocar(e,id){
   c.addEventListener('pointerup',fin); c.addEventListener('pointercancel',fin);
 }
 /* Paso automático cada 5 s, sólo con la pestaña visible, sólo en los carruseles
-   que están a la vista y si nadie los ha tocado. Mientras la tarjeta está fuera
+   que están a la vista; si el visitante las pasa a mano espera 15 s y sigue
+   sola. Mientras la tarjeta está fuera
    de pantalla vuelve a la primera foto, para que al llegar a ella se vea
    siempre la foto que el proyecto pone primero y no una al azar.          */
 setInterval(()=>{
   if(document.hidden) return;
   document.querySelectorAll('.pr-car').forEach(c=>{
-    if(c.dataset.parado||!c.offsetParent||carImgs(c).length<2) return;   // ni ocultas ni ya tocadas
+    if(!c.offsetParent||carImgs(c).length<2) return;                    // ocultas, no
+    const t=+c.dataset.parado||0;
+    if(t && Date.now()-t < 15000) return;    // acaba de pasarlas a mano: espera 15 s
     const r=c.getBoundingClientRect();
     if(r.bottom<0||r.top>innerHeight){ if(+c.dataset.i) carIr(c.id,0), c.dataset.parado=''; return; }
     carIr(c.id,(+c.dataset.i||0)+1);
