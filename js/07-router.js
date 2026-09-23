@@ -136,6 +136,34 @@ function repintarTodo(){
 /* Descarga con límite de tiempo. Sin esto, si Google se queda pensando
    la promesa nunca se resuelve: la web se quedaba esperando para
    siempre y el reintento de proyectos (06-clientes.js) seguía girando. */
+/* Petición con segundo intento en paralelo.
+   El script responde en menos de un segundo (se comprueba en su registro de
+   ejecuciones), pero de vez en cuando una petición se queda atascada ANTES de
+   llegar a él, en el frente de Google, y se lleva 25 s. Aquí no se espera a
+   ese atasco: a los 6 s se lanza otra petición igual sin cancelar la primera
+   y se toma la que conteste antes. Pedir dos veces no cuesta nada (es una
+   lectura, y el script ya tiene la respuesta preparada en su caché).      */
+async function traerPronto(url, ms, segundoEn){
+  const limite = ms || (typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 25000;
+  const espera = segundoEn || 6000;
+  if(espera >= limite) return traer(url, limite);
+  let listo=false;
+  const marcar=p=>p.then(d=>{listo=true; return d;});
+  const primera = marcar(traer(url, limite));
+  const segunda = new Promise((res,rej)=>{
+    setTimeout(()=>{ if(listo) return;            // la primera ya contestó
+      marcar(traer(url, limite)).then(res, rej); }, espera);
+  });
+  /* La que conteste antes; si una falla, se sigue esperando a la otra. */
+  return new Promise((res,rej)=>{
+    let fallos=0, ultimo=null;
+    const mal=e=>{ ultimo=e; if(++fallos>=2) rej(ultimo); };
+    primera.then(res, mal);
+    segunda.then(res, mal);
+    setTimeout(()=>rej(ultimo||new Error('tiempo de espera agotado ('+limite+' ms)')), limite+500);
+  });
+}
+
 async function traer(url, ms){
   const limite = ms || (typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 12000;
   const ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
@@ -237,7 +265,7 @@ async function loadData(){
   try{
     let d;
     try{
-      d = await traer(CONFIG.DATA_URL, _ESPERA);
+      d = await traerPronto(CONFIG.DATA_URL, _ESPERA);
     }catch(e1){
       /* Apps Script frío: el primer intento se pasa de tiempo o devuelve la
          página de error de Google. El segundo suele responder en segundos. */

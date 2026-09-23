@@ -593,7 +593,7 @@ async function cargarDetalle(id, reintento){
   const intento=reintento||0;
   try{
     const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)+'&clave='+encodeURIComponent(PR_KEY[id]||'');
-    const d=await traer(q, 25000);
+    const d=await (typeof traerPronto==='function' ? traerPronto(q, 25000) : traer(q, 25000));
     if(!d||!d.ok)throw new Error((d&&d.motivo)||'sin acceso');
     detCargandoFin();
     PR_DET[id]=d; detCacheGuardar(id,d); PR_SELLO[id]=selloDe(d);
@@ -689,7 +689,7 @@ async function actualizarDetalle(id){
   try{
     const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)
            +'&clave='+encodeURIComponent(PR_KEY[id]||'')+'&refrescar=1';
-    const d=await traer(q, 25000);
+    const d=await traer(q, 25000);      // el botón "Actualizar" pide UNA sola vez: dos pedidos seguidos activarían el freno del script y devolverían lo mismo
     if(!d||!d.ok) throw new Error((d&&d.motivo)||'sin acceso');
     PR_DET[id]=d; detCacheGuardar(id,d); PR_SELLO[id]=selloDe(d);
     pintarPanel(id);                      // conserva pestaña, filtros y scroll
