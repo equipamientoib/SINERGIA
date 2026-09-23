@@ -187,6 +187,7 @@ function pintarExpediente(id){
   const bar=cont.querySelector('.det-tabs'), act=cont.querySelector('.det-tabs button.on');
   if(bar&&act&&bar.scrollWidth>bar.clientWidth) bar.scrollLeft=act.offsetLeft-(bar.clientWidth-act.offsetWidth)/2;
   cerrarVisorCad();                       // el visor vive en Documentación › Planos; se monta al desplegarlo
+  if(EX_TAB==='doc' && d) precargarVisor(d);          // se va trayendo el visor mientras mira los documentos
   if(EX_TAB==='doc' && d && EX_DOC_SEC==='visor' && (d.visor||[]).length) setTimeout(()=>montarVisorCad(d),30);
   if(EX_TAB==='met' && d) montarMetrado(d);
   if(EX_TAB==='res' && d) montarTbResumen(d);
@@ -351,11 +352,12 @@ function paneExConsolidado(c){
         <small>${c.folios?`<b>${c.folios}</b> folios · `:''}${c.mb} MB · armado el ${tbEsc(c.fecha||'')}${c.externo?' · alojado en Drive':''} · ${tbEsc(c.nombre||'')}</small>
       </div>
       <div class="ex-cons-btns">
-        ${(c.ver||!c.externo)?`<button type="button" class="ex-btn ver ex-cons-ver" onclick="verPdfEx('${c.ver||c.url}','Expediente completo · PDF consolidado','${c.url}')" title="Ver el PDF aquí mismo (se va cargando por páginas)">
+        ${((c.ver||!c.externo)&&(c.mb||0)<=100)?`<button type="button" class="ex-btn ver ex-cons-ver" onclick="verPdfEx('${c.ver||c.url}','Expediente completo · PDF consolidado','${c.url}')" title="Ver el PDF aquí mismo (se va cargando por páginas)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>Ver PDF</button>`:''}
         <a class="ex-btn ver ex-cons-descarga" href="${c.url}" ${extAttr(c.url)} title="Descargar${c.mb?' · '+c.mb+' MB':''}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Descargar</a>
         ${secs.length?`<button type="button" class="ex-btn edit" onclick="const e=document.getElementById('exFolios');e.hidden=!e.hidden;this.textContent=e.hidden?'Índice de folios':'Ocultar índice'">Índice de folios</button>`:''}
+        ${((c.mb||0)>100&&c.ver)?`<a class="ex-btn edit" href="${c.ver.replace('/preview','/view')}" target="_blank" rel="noopener" title="Drive no previsualiza archivos tan grandes: se abre en Drive">Abrir en Drive</a>`:''}
       </div>
       ${secs.length?`<div class="ex-folios" id="exFolios" hidden><table><thead><tr><th>Sección</th><th class="n">Páginas</th><th class="n">Folios</th></tr></thead>
         <tbody>${secs.map(x=>`<tr><td>${tbEsc(x.seccion)}</td><td class="n">${tbEsc(x.paginas)}</td><td class="n">${tbEsc(x.folios)}</td></tr>`).join('')}</tbody></table>
@@ -498,6 +500,25 @@ function setExDocSec(sec){
   if(sec==='visor'&&!CAD.viewer&&CAD.datos&&(CAD.datos.visor||[]).length) setTimeout(()=>montarVisorCad(CAD.datos),30);
 }
 
+/* Precarga del visor: mientras el cliente está en Documentación se van trayendo,
+   con prioridad baja, la librería, la fuente y la planta que se abre primero.
+   Así el clic en "Visor DWG" ya no espera la descarga (≈1,5 MB). */
+let CAD_PRECARGA=false;
+function precargarVisor(d){
+  if(CAD_PRECARGA) return; CAD_PRECARGA=true;
+  const v=(d&&d.visor||[])[0]; if(!v) return;
+  const pz=(v.pisos||[])[0];
+  const lista=[['js/lib/dxf-viewer.esm.js','script'],['fonts/Roboto-Latin.ttf','font'],
+               [v.datos,'script'],[pz?pz.url:v.url,'script']].filter(x=>x[0]);
+  const lanzar=()=>lista.forEach(([href,as])=>{
+    const l=document.createElement('link');
+    l.rel='prefetch'; l.href=href; l.as=as;
+    if(as==='font') l.crossOrigin='anonymous';
+    document.head.appendChild(l);
+  });
+  if(window.requestIdleCallback) requestIdleCallback(lanzar,{timeout:3000}); else setTimeout(lanzar,1200);
+}
+
 /* Visor de PDF dentro de la web (misma caja que los informes del portal). */
 function verPdfEx(url,titulo,descarga){
   const prev=document.getElementById('pdfOv'); if(prev) prev.remove();
@@ -622,10 +643,12 @@ async function montarVisorCad(d){
     const texto=await gunzipBase64(window.CAD_DATA[nombre].gz);
     const urlDxf=URL.createObjectURL(new Blob([texto],{type:'text/plain'}));
     /* Tipografía: local; desde file:// va por el .js en base64. */
-    let fuente=new URL('fonts/Roboto-Regular.ttf',location.href).href;   // absoluta: el worker no resuelve rutas relativas
+    /* Roboto recortada a latín + símbolos de plano (11 KB en vez de 503 KB: el visor
+       sólo dibuja los contornos de los textos del dibujo). */
+    let fuente=new URL('fonts/Roboto-Latin.ttf',location.href).href;   // absoluta: el worker no resuelve rutas relativas
     if(location.protocol==='file:'){
-      const okF=await cargarScript('fonts/Roboto-Regular.ttf.js', ()=>window.FONT_DATA&&window.FONT_DATA['Roboto-Regular.ttf']);
-      if(okF){ const b=atob(window.FONT_DATA['Roboto-Regular.ttf']); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i);
+      const okF=await cargarScript('fonts/Roboto-Latin.ttf.js', ()=>window.FONT_DATA&&window.FONT_DATA['Roboto-Latin.ttf']);
+      if(okF){ const b=atob(window.FONT_DATA['Roboto-Latin.ttf']); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i);
                fuente=URL.createObjectURL(new Blob([u],{type:'font/ttf'})); }
       else fuente='';
     }
