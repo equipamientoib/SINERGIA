@@ -233,9 +233,11 @@ function pintarProyectos(){
   const g=document.getElementById('prGrid'), hm=document.getElementById('prHome'),
         c=document.getElementById('countPr');
 
-  /* Mientras no lleguen los proyectos del sistema se muestran marcadores.
-     Así el cliente nunca alcanza a ver los proyectos de ejemplo.        */
-  if(typeof DATOS_LISTOS!=='undefined' && !DATOS_LISTOS){
+  /* Marcadores grises SOLO si todavía no hay nada que enseñar. Si el sitio
+     ya trajo su copia del catálogo, se pinta esa y se corrige cuando llegue
+     la hoja: vale más la lista de la última publicación que un rectángulo
+     gris durante medio minuto.                                          */
+  if(typeof DATOS_LISTOS!=='undefined' && !DATOS_LISTOS && !PROYECTOS.length){
     const hueso=n=>Array.from({length:n},()=>`
       <article class="pr pr-hueso">
         <div class="ph-img"></div>

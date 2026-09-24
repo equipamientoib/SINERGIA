@@ -81,9 +81,23 @@ function aplicarDatos(d, enVivo){
     }
   }
 
-  /* Los proyectos SOLO se toman de una fuente confiable (Apps Script en vivo
-     o la caché de esta sesión, que vino de él). El archivo del repositorio
-     puede traer proyectos de ejemplo desactualizados.                   */
+  /* ── De dónde salen los proyectos ──────────────────────────────────
+     La respuesta en vivo del Apps Script manda siempre. Pero el sitio trae
+     además una copia de esa misma respuesta (data/catalogo.json, generada
+     al publicar y marcada con "generado"), y esa copia se pinta de entrada.
+
+     Antes no: la lista esperaba a Google, y si Google tardaba o fallaba
+     —pasó, con la IP limitada por exceso de peticiones— el cliente veía
+     marcadores grises varios minutos y al final una lista incompleta.
+     Ahora la sección abre al instante con la copia y se corrige sola en
+     cuanto llega la hoja. La copia solo se acepta si trae "generado", para
+     que un archivo de ejemplo escrito a mano nunca entre por aquí.    */
+  if(!enVivo && !PRO_PINTADOS && d.generado && Array.isArray(d.proyectos) && d.proyectos.length
+     && !PROYECTOS.length){
+    PROYECTOS = d.proyectos;
+    HUELLA_PRO = '';                  // la respuesta en vivo la reemplaza igual
+  }
+
   /* Los interruptores "mostrar" de los expedientes vienen dentro del propio
      catálogo, venga de donde venga. Antes se preguntaban uno por uno: cada
      pregunta al Apps Script cuesta ~2 s y se atienden de a una, así que el
