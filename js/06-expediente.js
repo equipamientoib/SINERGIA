@@ -26,7 +26,12 @@ const EXPEDIENTES_LOCAL = [
     titulo: 'Expediente técnico de equipamiento — Centro de Salud San Marcos',
     servicio: 'Contrato 191-2025-MDSM/GM',
     fecha: 'Set 2026',
-    foto: '',
+    /* Render del proyecto, servido desde Drive (RENDER_PAGINA_WEB.png).
+       Las imágenes pesadas no van al repositorio: GitHub es limitado y el
+       Drive no. Basta con que el archivo esté compartido por enlace.
+       El "=w800" se lo pide ya redimensionado: 597 KB en vez de 2,5 MB,
+       de sobra para una tarjeta de 312 px aunque la pantalla sea retina. */
+    foto: 'https://lh3.googleusercontent.com/d/1Tzls67EtPknY0EO16iWr1fEY4BOHU5xX=w800',
     desc: 'Componente de equipamiento del expediente técnico del C.S. San Marcos (I‑4): ' +
           'metrado por ambiente, anexos N1–N13, memoria de cálculo, presupuesto y planos.',
     estado: 'En curso',
@@ -120,7 +125,12 @@ function mezclarExpedientes(){
     if(!expedienteVisible(e.id)){ if(i>=0) PROYECTOS.splice(i,1); return; }
     const d=EX_DET[e.id];
     if(d){ e.avance=d.avance; e.estado=d.avance>=100?'Completado':'En curso'; }
-    if(i<0) PROYECTOS.push(e); else PROYECTOS[i]=Object.assign(PROYECTOS[i],{tipo:e.tipo,datos:e.datos});
+    /* Si el proyecto llega además desde la hoja, se respeta lo que diga la
+       hoja, pero lo que allí venga vacío se completa con esta ficha: la
+       foto vive aquí y no debe perderse por ese camino.                 */
+    if(i<0) PROYECTOS.push(e);
+    else PROYECTOS[i]=Object.assign(PROYECTOS[i],{tipo:e.tipo,datos:e.datos},
+                                    PROYECTOS[i].foto?{}:{foto:e.foto});
   });
 }
 
