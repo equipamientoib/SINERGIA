@@ -167,18 +167,33 @@ function enCola(tarea){
   return turno;
 }
 
-/* Petición con reintento, SIEMPRE de a una.
-   Un fallo suelto (atasco de Google, 404 por encimamiento) se reintenta
-   una vez, esperando un momento; nunca en paralelo.                     */
+/* Petición con reintentos cortos, SIEMPRE de a una.
+   Medido contra el sitio en producción: el script se ejecuta siempre en
+   0,6 s, pero la capa pública de Google contesta a veces en 1,5 s, a veces
+   en 8 s, a veces se cuelga y a veces devuelve 404. Un intento suelto falla
+   a menudo; dos o tres seguidos, casi nunca.
+
+   Por eso se prefieren varios intentos CORTOS antes que uno largo: esperar
+   25 s a una petición que ya se colgó no la salva, solo hace esperar al
+   cliente. Peor caso ≈ 41 s en vez de los 150 s que llegaba a acumular.  */
+const REINTENTOS = [10000, 12000, 15000];     // tiempo límite de cada intento
+const PAUSAS     = [1500, 3000];              // espera entre uno y otro
+
 async function traerPronto(url, ms){
-  const limite = ms || (typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 25000;
-  try{
-    return await traer(url, limite);
-  }catch(e1){
-    console.warn('Sinergia: reintentando ('+e1.message+')');
-    await new Promise(r=>setTimeout(r, 1200));
-    return await traer(url, limite);
+  const tope = ms || (typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 25000;
+  let ultimo;
+  for(let i=0; i<REINTENTOS.length; i++){
+    try{
+      return await traer(url, Math.min(REINTENTOS[i], tope));
+    }catch(e){
+      ultimo = e;
+      if(i < PAUSAS.length){
+        console.warn('Sinergia: intento '+(i+1)+' sin suerte ('+e.message+'), reintentando');
+        await new Promise(r=>setTimeout(r, PAUSAS[i]));
+      }
+    }
   }
+  throw ultimo;
 }
 
 async function traer(url, ms){
@@ -240,7 +255,7 @@ function usarRespaldo(motivo){ rendirse(motivo); }
 /* Red de seguridad por si una petición se queda colgada sin dar error.
    Da margen a los dos intentos (Google a veces tarda 30 s en despertar). */
 const _ESPERA = ((typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 25000);
-setTimeout(()=>rendirse('sin respuesta a tiempo'), _ESPERA * 2 + 3000);
+setTimeout(()=>rendirse('sin respuesta a tiempo'), 45000);   // los tres intentos caben de sobra
 
 /* Última respuesta buena del Apps Script, guardada en el navegador (24 h).
    Sirve para que el portal muestre los proyectos aunque Google tarde o falle;

@@ -597,7 +597,8 @@ const DET_ETAPAS=[
   [0,    'Conectando con el sistema de mantenimiento…'],
   [2500, 'Leyendo la hoja del contrato…'],
   [6000, 'Preparando el listado de equipos e informes…'],
-  [11000,'Está tardando más de lo normal. Seguimos intentándolo…']
+  [11000,'El servidor de Google está lento; reintentando…'],
+  [25000,'Sigue sin responder. Un momento más y le mostramos lo último guardado…']
 ];
 let DET_RELOJ=0, DET_T0=0;
 
@@ -646,23 +647,31 @@ async function cargarDetalle(id, reintento){
   const intento=reintento||0;
   try{
     const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)+'&clave='+encodeURIComponent(PR_KEY[id]||'');
-    const d=await (typeof traerPronto==='function' ? traerPronto(q, 25000) : traer(q, 25000));
+    const d=await (typeof traerPronto==='function' ? traerPronto(q) : traer(q, 25000));
     if(!d||!d.ok)throw new Error((d&&d.motivo)||'sin acceso');
     detCargandoFin();
     PR_DET[id]=d; detCacheGuardar(id,d); PR_SELLO[id]=selloDe(d);
     selLimpia(); DET_Q=''; pintarPanel(id);
   }catch(e){
-    /* Un fallo puntual (red del cliente, arranque en frío) no debe
-       terminar en pantalla de error: se reintenta dos veces solo. */
-    if(intento<2 && location.hash.indexOf(id)>=0){
-      setTimeout(()=>cargarDetalle(id,intento+1), 1200*(intento+1));
+    /* traerPronto ya hizo tres intentos cortos. Aquí solo se concede una
+       tanda más, por si la red del cliente se cayó un momento; encadenar
+       más solo alargaría la espera sin mejorar las probabilidades.     */
+    if(intento<1 && location.hash.indexOf(id)>=0){
+      setTimeout(()=>cargarDetalle(id,intento+1), 2000);
       return;
     }
+    /* Ni con reintentos. En vez de dejar al cliente frente a un cartel de
+       error, se le explica y se sigue probando solo cada 15 s: el servidor
+       de Google suele volver en si en menos de un minuto.               */
     detCargandoFin();
+    const quedan = 6 - intento;
     cont.innerHTML='<div class="dash-card det-card">'+tabsDet(id,0)+
-      '<p class="dnote" style="padding:14px 0">No pudimos cargar el detalle ('+e.message+'). '+
-      'Suele ser un problema momentáneo de conexión.</p>'+
-      '<button class="btn btn-fill" onclick="cargarDetalle(\''+id+'\')">Reintentar</button></div>';
+      '<p class="dnote" style="padding:14px 0"><b>El sistema está tardando en responder.</b> '+
+      (quedan>0 ? 'Seguimos intentándolo; en cuanto conteste, su panel aparece aquí sin que usted haga nada.'
+                : 'Puede reintentar ahora o volver en unos minutos.')+
+      '</p><button class="btn btn-fill" onclick="cargarDetalle(\''+id+'\')">Reintentar ahora</button></div>';
+    if(quedan>0 && location.hash.indexOf(id)>=0)
+      setTimeout(()=>{ if(location.hash.indexOf(id)>=0 && !PR_DET[id]) cargarDetalle(id, intento+1); }, 15000);
   }
 }
 
