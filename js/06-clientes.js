@@ -960,36 +960,9 @@ function filtrarItems(){
   });
 }
 
-/* Importe en soles, como lo escribe la hoja: S/ 23,144.00 */
-const soles=n=>'S/ '+(Number(n)||0).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-/* Reparto del mes: lo que corresponde al contrato y lo autorizado en campo.
-   Los números salen calculados de la hoja (CONTROL_VALORIZACIONES); aquí no
-   se suma nada, solo se muestra. Si la hoja no cuadra, DIFERENCIA ≠ 0 y se
-   avisa en rojo en vez de disimularlo.                                   */
-function valMontos(v){
-  const M=v.montos; if(!M||!M.total) return '';
-  const contrato=(M.contrato_prev||0)+(M.contrato_corr||0);
-  const campo=(M.amp_prev||0)+(M.amp_corr||0);
-  const det=(a,b)=>[a?`preventivo ${soles(a)}`:'',b?`correctivo ${soles(b)}`:''].filter(Boolean).join(' · ');
-  return `<div class="valmontos">
-    <div class="vm-fila">
-      <span class="vm-rot">En contrato</span>
-      <span class="vm-det">${det(M.contrato_prev,M.contrato_corr)||'—'}</span>
-      <b>${soles(contrato)}</b></div>
-    ${campo?`<div class="vm-fila campo">
-      <span class="vm-rot">Autorizado en campo</span>
-      <span class="vm-det">${det(M.amp_prev,M.amp_corr)}</span>
-      <b>${soles(campo)}</b></div>`:''}
-    ${M.fuera?`<div class="vm-fila fuera">
-      <span class="vm-rot">Fuera de alcance</span><span class="vm-det"></span>
-      <b>${soles(M.fuera)}</b></div>`:''}
-    <div class="vm-fila total">
-      <span class="vm-rot">Total del periodo</span><span class="vm-det"></span>
-      <b>${soles(M.total)}</b></div>
-    ${M.diferencia?`<p class="vm-dif">No cuadra por ${soles(M.diferencia)}; se está revisando el detalle.</p>`:''}
-  </div>`;
-}
+/* El panel del cliente NO muestra importes: ni por valorización, ni por
+   intervención. El reparto en soles (contrato / autorizado en campo) se ve
+   en el Excel del expediente, que es interno.                            */
 
 function valBloque(v){
   // Valorización futura: solo se anuncia, no se puede abrir
@@ -1011,7 +984,6 @@ function valBloque(v){
     </button>
     <div class="valbody">
       ${bloqueFechas(v)}
-      ${valMontos(v)}
       ${avisoConformidad(v)}
       ${items.some(i=>i.preliminar)?`<div class="valaviso prelim">
         <b>Informes preliminares.</b> Esta valorización sigue en ejecución: los PDF que ve aquí son
