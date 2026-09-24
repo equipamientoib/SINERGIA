@@ -42,13 +42,20 @@ let TAB_AREAS=[], TAB_ESTADOS=[];
 const SEL={servicio:new Set(), ambiente:new Set(), equipo:new Set(),
            valorizacion:new Set(), criticidad:new Set(), proximo:new Set(), avance:new Set(),
            origen:new Set()};
-/* ── Origen del equipo ──
-   CONTRATO   = venía en el Anexo A de la cotización original.
-   AMPLIACION = se incorporó después, con su fecha y su documento sustento.
-   La hoja lo trae en "ORIGEN ALCANCE"; si un proyecto no usa esa columna,
-   todos los equipos quedan como del contrato y esto no se muestra.      */
-const origenDe=e=>(e&&e.origen==='AMPLIACION')?'AMPLIACION':'CONTRATO';
-const ORIGEN_ROT={CONTRATO:'Contrato inicial', AMPLIACION:'Ampliación'};
+/* ── Alcance del trabajo ──
+   EN CONTRATO         = venía en el Anexo A de la cotización.
+   AUTORIZADO EN CAMPO = se autorizó después, con su fecha y su sustento.
+   FUERA DE ALCANCE    = equipo sin cobertura que aun así se atendió; se
+                         valoriza aparte y por eso se marca en rojo.
+   La hoja lo trae en "ORIGEN ALCANCE". Si un contrato no usa esa columna,
+   todo queda "en contrato" y ni la etiqueta ni el filtro aparecen.      */
+const origenDe=e=>{
+  const o=e&&e.origen;
+  return (o==='AMPLIACION'||o==='FUERA')?o:'CONTRATO';
+};
+const ORIGEN_ROT={CONTRATO:'En contrato', AMPLIACION:'Autorizado en campo',
+                  FUERA:'Fuera de alcance'};
+const ORIGEN_ET ={CONTRATO:'', AMPLIACION:'EN CAMPO', FUERA:'FUERA'};
 /* Valorizaciones en las que se atendió el equipo */
 /* ── Criticidad asistencial ──
    Riesgo para el paciente si el equipo falla:
@@ -411,14 +418,22 @@ function paneCargando(){
 
 
 
+/* El AVANCE del contrato se mide con los mantenimientos PREVENTIVOS, que son
+   los que el contrato programa. Los correctivos son trabajo real, pero no
+   estaban programados: si entraran en el porcentaje, atender una falla haría
+   bajar el avance. Por eso van contados aparte, en su propio indicador.  */
 function metricas(d,lista){
   let equipos=0,inter=0,ejec=0,inop=0,eqListos=0,eqIniciados=0,venc=0,prox=0,vencAlta=0,alta=0;
+  let corr=0,corrEjec=0;
   (lista||d.equipos).forEach(e=>{
     if(!e.alcance)return;
     equipos++;
     let malo=false,h=0,t=0;
-    e.intervenciones.forEach(i=>{inter++;t++; if(i.hecho){ejec++;h++;
-      if((i.estado||'').toUpperCase().indexOf('INOPER')===0)malo=true;}});
+    e.intervenciones.forEach(i=>{
+      if((i.estado||'').toUpperCase().indexOf('INOPER')===0&&i.hecho)malo=true;
+      if(i.tipo==='MC'){ corr++; if(i.hecho)corrEjec++; return; }
+      inter++;t++; if(i.hecho){ejec++;h++;}
+    });
     const px=proximoDe(e);
     if(px.estado==='VENCIDO'){venc++; if(criticidadDe(e)==='ALTA')vencAlta++;}
     else if(px.estado==='PROXIMO')prox++;
@@ -427,8 +442,8 @@ function metricas(d,lista){
     if(h)eqIniciados++;
     if(malo)inop++;
   });
-  return {equipos,inter,ejec,inop,eqListos,eqIniciados,venc,prox,vencAlta,alta,pend:inter-ejec,
-          pct:inter?Math.round(ejec*100/inter):0};
+  return {equipos,inter,ejec,inop,eqListos,eqIniciados,venc,prox,vencAlta,alta,corr,corrEjec,
+          pend:inter-ejec, pct:inter?Math.round(ejec*100/inter):0};
 }
 
 /* Barras por área — cada fila abre la lista filtrada */
@@ -945,6 +960,37 @@ function filtrarItems(){
   });
 }
 
+/* Importe en soles, como lo escribe la hoja: S/ 23,144.00 */
+const soles=n=>'S/ '+(Number(n)||0).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* Reparto del mes: lo que corresponde al contrato y lo autorizado en campo.
+   Los números salen calculados de la hoja (CONTROL_VALORIZACIONES); aquí no
+   se suma nada, solo se muestra. Si la hoja no cuadra, DIFERENCIA ≠ 0 y se
+   avisa en rojo en vez de disimularlo.                                   */
+function valMontos(v){
+  const M=v.montos; if(!M||!M.total) return '';
+  const contrato=(M.contrato_prev||0)+(M.contrato_corr||0);
+  const campo=(M.amp_prev||0)+(M.amp_corr||0);
+  const det=(a,b)=>[a?`preventivo ${soles(a)}`:'',b?`correctivo ${soles(b)}`:''].filter(Boolean).join(' · ');
+  return `<div class="valmontos">
+    <div class="vm-fila">
+      <span class="vm-rot">En contrato</span>
+      <span class="vm-det">${det(M.contrato_prev,M.contrato_corr)||'—'}</span>
+      <b>${soles(contrato)}</b></div>
+    ${campo?`<div class="vm-fila campo">
+      <span class="vm-rot">Autorizado en campo</span>
+      <span class="vm-det">${det(M.amp_prev,M.amp_corr)}</span>
+      <b>${soles(campo)}</b></div>`:''}
+    ${M.fuera?`<div class="vm-fila fuera">
+      <span class="vm-rot">Fuera de alcance</span><span class="vm-det"></span>
+      <b>${soles(M.fuera)}</b></div>`:''}
+    <div class="vm-fila total">
+      <span class="vm-rot">Total del periodo</span><span class="vm-det"></span>
+      <b>${soles(M.total)}</b></div>
+    ${M.diferencia?`<p class="vm-dif">No cuadra por ${soles(M.diferencia)}; se está revisando el detalle.</p>`:''}
+  </div>`;
+}
+
 function valBloque(v){
   // Valorización futura: solo se anuncia, no se puede abrir
   if(v.futura) return `
@@ -965,6 +1011,7 @@ function valBloque(v){
     </button>
     <div class="valbody">
       ${bloqueFechas(v)}
+      ${valMontos(v)}
       ${avisoConformidad(v)}
       ${items.some(i=>i.preliminar)?`<div class="valaviso prelim">
         <b>Informes preliminares.</b> Esta valorización sigue en ejecución: los PDF que ve aquí son
@@ -979,7 +1026,9 @@ function valBloque(v){
              onclick="abrirEquipo(PROY_ACT,'${i.cod}','${v.n}')"
              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirEquipo(PROY_ACT,'${i.cod}','${v.n}')}">
           <span class="vi-cod">${i.cod}</span>
-          <span class="vi-eq">${i.equipo}<em>${i.area} · ${i.tipo==='MC'?'Correctivo':'Preventivo'}</em></span>
+          <span class="vi-eq">${i.equipo}<em>${i.area} · ${i.tipo==='MC'?'Correctivo':'Preventivo'}${
+            i.origen&&i.origen!=='CONTRATO'?` · <b class="vi-alc${i.origen==='FUERA'?' fuera':''}">${
+              ORIGEN_ROT[i.origen]}</b>`:''}</em></span>
           <span class="vi-fec">${i.fecha||'—'}</span>
           ${i.estado?`<span class="iest ${i.estado.toUpperCase().indexOf('INOPER')===0?'bad':'good'}">${i.estado}</span>`:'<span></span>'}
           <span class="vi-btn" onclick="event.stopPropagation()">${botonesInforme(i)}</span>
@@ -1053,7 +1102,7 @@ function filtrosActivos(){
   SEL.valorizacion.forEach(v=>f.push(v==='SIN'?'Sin valorizar':'Valorización '+v));
   SEL.proximo.forEach(v=>f.push(PROX_ROT[v]||v));
   SEL.criticidad.forEach(v=>f.push('Criticidad '+v.toLowerCase()));
-  SEL.origen.forEach(v=>f.push(ORIGEN_ROT[v]||v));
+  SEL.origen.forEach(v=>f.push('Alcance: '+(ORIGEN_ROT[v]||v).toLowerCase()));
   SEL.avance.forEach(v=>f.push(ROT[v]||v));
   
   if(!DET_SOLO)f.push('Incluye fuera de alcance');
@@ -1066,11 +1115,11 @@ function paneEquipos(id,p,d){
   return `
     <div class="avance-band">
       <div class="ab-txt">
-        <span class="ab-lbl">Avance del contrato</span>
-        <span class="ab-det">${m.ejec} de ${m.inter} intervenciones ejecutadas</span>
+        <span class="ab-lbl">Avance ${f.length?'de la selección':'del contrato'}</span>
+        <span class="ab-det">${m.ejec} de ${m.inter} mantenimientos preventivos ejecutados</span>
       </div>
       <div class="ab-bar"><i id="prBar"></i></div>
-      <span class="ab-pct">${p.avance}%</span>
+      <span class="ab-pct">${f.length?m.pct:p.avance}%</span>
     </div>
 
     <details class="bloque areas"${AREAS_OPEN?' open':''} ontoggle="AREAS_OPEN=this.open">
@@ -1082,7 +1131,10 @@ function paneEquipos(id,p,d){
       <button type="button" class="kpi${!f.length?' act':''}" onclick="irAEquipos('${id}',{})">
         <b>${m.equipos}</b><span>equipos totales en el alcance</span></button>
       <button type="button" class="kpi${SEL.avance.has('EJECUTADO')?' act':''}" onclick="irAEquipos('${id}',{estado:'EJECUTADO'})">
-        <b>${m.ejec}<em>/${m.inter}</em></b><span>intervenciones ejecutadas</span></button>
+        <b>${m.ejec}<em>/${m.inter}</em></b><span>preventivos ejecutados</span></button>
+      ${m.corr?`<button type="button" class="kpi" onclick="irAEquipos('${id}',{})">
+        <b>${m.corrEjec}<em>/${m.corr}</em></b><span>correctivos atendidos${
+          m.corr-m.corrEjec?` · ${m.corr-m.corrEjec} en curso`:''}</span></button>`:''}
       <button type="button" class="kpi${SEL.avance.has('COMPLETO')?' act':''}" onclick="irAEquipos('${id}',{estado:'COMPLETO'})">
         <b>${m.eqListos}<em>/${m.equipos}</em></b><span>equipos ejecutados</span></button>
       <button type="button" class="kpi ${m.venc?'alerta':''}${SEL.proximo.has('VENCIDO')?' act':''}"
@@ -1116,16 +1168,23 @@ function paneEquipos(id,p,d){
              onclick="${k?`SEL.avance.has('${k}')?SEL.avance.delete('${k}'):SEL.avance.add('${k}')`
                         :'SEL.avance.clear()'};pintarPanel('${id}')">${t}</button>`).join('')}
       </div>
-      ${(d.totales&&d.totales.ampliacion)?`
-      <div class="chips chips-org" role="group" aria-label="Origen del equipo">
-        ${[['','Todo el alcance'],['CONTRATO','Contrato inicial'],['AMPLIACION','Ampliación']]
-          .map(([k,t])=>`<button type="button" class="chip${(k?SEL.origen.has(k):!SEL.origen.size)?' on':''}"
-             title="${k==='AMPLIACION'?'Equipos incorporados después del contrato inicial'
-                     :(k==='CONTRATO'?'Equipos del Anexo A de la cotización original':'Todos los equipos')}"
+      ${(d.totales&&(d.totales.ampliacion||d.totales.fuera_alcance))?(()=>{
+        const enAlc=d.equipos.filter(e=>e.alcance);
+        const cuenta=k=>enAlc.filter(e=>origenDe(e)===k).length;
+        const ops=[['','Todos',enAlc.length,'Todo lo que cubre el contrato'],
+                   ['CONTRATO','En contrato',cuenta('CONTRATO'),'Equipos del Anexo A de la cotización'],
+                   ['AMPLIACION','Autorizado en campo',cuenta('AMPLIACION'),
+                    'Equipos autorizados después de firmar, con su fecha y su sustento'],
+                   ['FUERA','Fuera de alcance',d.totales.fuera_alcance||0,
+                    'Equipos sin cobertura que aun así se atendieron']]
+                  .filter(([k,,n])=>k===''||n);
+        return `<div class="chips chips-org" role="group" aria-label="Alcance del trabajo">
+        <span class="chips-rot">Alcance</span>
+        ${ops.map(([k,t,n,ay])=>`<button type="button" class="chip${k==='FUERA'?' fuera':''}${
+             (k?SEL.origen.has(k):!SEL.origen.size)?' on':''}" title="${ay}"
              onclick="${k?`SEL.origen.has('${k}')?SEL.origen.delete('${k}'):SEL.origen.add('${k}')`
-                        :'SEL.origen.clear()'};pintarPanel('${id}')">${t}${
-             k==='AMPLIACION'?` <em>${d.totales.ampliacion}</em>`:''}</button>`).join('')}
-      </div>`:''}
+                        :'SEL.origen.clear()'};pintarPanel('${id}')">${t} <em>${n}</em></button>`).join('')}
+      </div>`;})():''}
       <label class="det-chk"><input type="checkbox"${DET_SOLO?' checked':''}
              onchange="DET_SOLO=this.checked;pintarPanel('${id}')"> Solo en alcance</label>
     </div>
@@ -1339,11 +1398,11 @@ function exportarExcel(id){
   if(!filas.length)return;
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const lim=s=>(s&&s!=='S/M'&&s!=='S/S'&&s!=='—')?esc(s):'';
-  /* La columna ORIGEN solo aparece si el contrato tuvo ampliaciones; en los
-     demás sobraría y restaría ancho a lo que sí se lee.                 */
-  const ampl=!!(d.totales&&d.totales.ampliacion);
+  /* La columna ALCANCE solo aparece si hubo trabajos autorizados en campo;
+     en los demás contratos sobraría y restaría ancho a lo que sí se lee. */
+  const ampl=!!(d.totales&&(d.totales.ampliacion||d.totales.fuera_alcance));
   const cab=['AMBIENTE','CÓDIGO','EQUIPO','MARCA','MODELO','SERIE']
-            .concat(ampl?['ORIGEN']:[])
+            .concat(ampl?['ALCANCE']:[])
             .concat(['ESTADO','EJECUTADA','PRÓXIMO MANT.','VAL.','N° DE INFORME']);
   const anchos=[130,88,205,90,80,105].concat(ampl?[96]:[]).concat([88,78,88,52,215]);
   const N=cab.length;
@@ -1358,7 +1417,7 @@ function exportarExcel(id){
       <tr class="${ix%2?'par':''}">
       <td>${esc(e.area)}</td><td class="cod">${esc(e.cod)}</td><td class="eq">${esc(e.nom)}</td>
       <td>${lim(e.marca)}</td><td>${lim(e.modelo)}</td><td class="ser">${lim(e.serie)}</td>
-      ${ampl?`<td class="c">${origenDe(e)==='AMPLIACION'?'Ampliación':'Contrato'}</td>`:''}
+      ${ampl?`<td class="c${origenDe(e)==='FUERA'?' mal':''}">${ORIGEN_ROT[origenDe(e)]}</td>`:''}
       <td class="${est.indexOf('INOPER')===0?'mal':(est?'bien':'')}">${esc(i&&i.estado)}</td>
       <td class="f">${esc(i&&i.fecha)}</td>
       <td class="f ${px.estado==='VENCIDO'?'mal':(px.estado==='PROXIMO'?'ojo':'')}">${esc(px.txt||'')}</td>
@@ -1425,7 +1484,7 @@ function exportarExcel(id){
     <tr><td class="lbl">CLIENTE</td><td colspan="3" class="val">${esc(p.cliente)}</td>
         <td class="lbl">CONTRATO</td><td colspan="2" class="val">${esc((p.servicio||'').replace(/^Contrato\s*/i,''))}</td>
         <td class="lbl">EQUIPOS</td><td class="val" colspan="${ampl?2:1}">${m.equipos}${
-          ampl?` (${d.totales.ampliacion} por ampliación)`:''}</td>
+          ampl?` (${d.totales.ampliacion} autorizados en campo)`:''}</td>
         <td class="lbl">VENCIDOS</td><td class="val">${m.venc}</td></tr>
     <tr><td class="lbl">FILTROS</td>
         <td colspan="${N-1}" class="val">${esc(filtros.length?filtros.join(' · '):'Sin filtros')}</td></tr>
@@ -1453,7 +1512,7 @@ function imprimirReporte(id){
   const {p,d,fecha,filtros,m}=datosCabecera(id);
   const filas=filasReporte(id);
   const esc=s=>String(s==null?'':s);
-  const ampl=!!(d.totales&&d.totales.ampliacion);   // columna ORIGEN solo si hubo ampliaciones
+  const ampl=!!(d.totales&&(d.totales.ampliacion||d.totales.fuera_alcance));   // columna ALCANCE solo si hace falta
   const NC=ampl?12:11;
   let grupo='';
   cont.innerHTML=`
@@ -1461,7 +1520,7 @@ function imprimirReporte(id){
     <table class="rep">
       <thead><tr>
         <th>Ambiente</th><th>Código</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Serie</th>
-        ${ampl?'<th>Origen</th>':''}
+        ${ampl?'<th>Alcance</th>':''}
         <th>Estado</th><th>Ejecutada</th><th>Próximo mant.</th><th>Val.</th>
         <th>N° de informe</th></tr></thead>
       <tbody>
@@ -1475,7 +1534,7 @@ function imprimirReporte(id){
           <td class="cod">${esc(e.cod)}</td>
           <td class="eq">${esc(e.nom)}</td>
           <td>${lim(e.marca)}</td><td>${lim(e.modelo)}</td><td class="ser">${lim(e.serie)}</td>
-          ${ampl?`<td class="c">${origenDe(e)==='AMPLIACION'?'Ampliación':'Contrato'}</td>`:''}
+          ${ampl?`<td class="c${origenDe(e)==='FUERA'?' mal':''}">${ORIGEN_ROT[origenDe(e)]}</td>`:''}
           <td class="${est.indexOf('INOPER')===0?'mal':(est?'bien':'')}">${esc(i&&i.estado)}</td>
           <td class="f">${esc(i&&i.fecha)}</td>
           <td class="f ${px.estado==='VENCIDO'?'mal':(px.estado==='PROXIMO'?'ojo':'')}">${esc(px.txt||'')}</td>
@@ -1534,8 +1593,9 @@ function pintarLista(id){
       <button type="button" class="eqcard${e.alcance?'':' fuera'}${EQ_SEL===e.cod?' sel':''}${nuevo?' g1':''}"
               onclick="abrirEquipo('${id}','${e.cod}')">
         <span class="ec-serv">${DET_ORDEN?g:(nuevo?g:'')}</span>
-        <span class="ec-cod">${e.cod}${origenDe(e)==='AMPLIACION'
-          ?`<i class="ec-amp" title="Incorporado por ampliación${e.incorporado?' el '+e.incorporado:''}">AMPL</i>`:''}</span>
+        <span class="ec-cod">${e.cod}${(()=>{const o=origenDe(e);
+          return o==='CONTRATO'?'':`<i class="ec-amp${o==='FUERA'?' fuera':''}" title="${ORIGEN_ROT[o]}${
+            e.incorporado?' el '+e.incorporado:''}${e.sustento?' · '+e.sustento:''}">${ORIGEN_ET[o]}</i>`;})()}</span>
         <span class="ec-nom">${e.nom}<em>${[e.marca,e.modelo].filter(x=>x&&x!=='S/M').join(' ')||'—'}</em></span>
         <span class="ec-crit ${(()=>criticidadDe(e).toLowerCase())()}" title="${(()=>CRIT_ROT[criticidadDe(e)])()}">
           ${(()=>{const c=criticidadDe(e);return c.charAt(0)+c.slice(1).toLowerCase();})()}</span>
@@ -1591,9 +1651,10 @@ function abrirEquipo(id,cod,desdeVal){
             <div><dt>Serie</dt><dd>${e.serie&&e.serie!=='S/S'?e.serie:'—'}</dd></div>
             <div><dt>Código MINSA</dt><dd>${e.minsa||'—'}</dd></div>
             <div><dt>Ítem del contrato</dt><dd>${e.item||'—'}</dd></div>
-            ${origenDe(e)==='AMPLIACION'?`
-            <div class="kv-amp"><dt>Origen</dt><dd><b>Ampliación</b>${
-              e.incorporado?` · incorporado el ${e.incorporado}`:''}${
+            ${origenDe(e)!=='CONTRATO'?`
+            <div class="kv-amp${origenDe(e)==='FUERA'?' fuera':''}"><dt>Alcance</dt>
+              <dd><b>${ORIGEN_ROT[origenDe(e)]}</b>${
+              e.incorporado?` · ${e.incorporado}`:''}${
               e.sustento?`<em>${e.sustento}</em>`:''}</dd></div>`:''}
           </dl>
         </div>
