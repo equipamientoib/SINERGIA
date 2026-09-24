@@ -462,7 +462,7 @@
   .ep-top{display:grid;grid-template-columns:150px 1fr;gap:16px;margin-bottom:16px}
   .ep-foto{border:1px solid var(--linea);border-radius:var(--r-sm);background:var(--crema);
     height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:6px;overflow:hidden;color:var(--linea-b)}
+    gap:6px;overflow:hidden;color:var(--gris-suave)}
   .ep-foto img{width:100%;height:100%;object-fit:cover;display:block}
   .ep-ico{width:30px;height:30px}
   .sinfoto{font-size:10px;color:var(--gris);letter-spacing:.04em}
@@ -512,7 +512,7 @@
   .val-kv>div{display:flex;flex-direction:column;gap:3px}
   .val-kv dt{font-size:10px;color:var(--gris);letter-spacing:.07em;text-transform:uppercase;margin:0}
   .val-kv dd{margin:0;font-family:var(--ff-d);font-size:14px;font-weight:600;color:var(--onix)}
-  .val-kv dd.gris{color:var(--linea-b)}
+  .val-kv dd.gris{color:var(--gris-suave)}
   .val-acc{margin-left:auto}
   .val-nota{font-size:12px;color:var(--gris);font-style:italic;white-space:nowrap}
 
@@ -698,7 +698,7 @@
     .ec-cod{grid-column:1/-1}
     .ec-amb{grid-column:1;font-size:11px}
   }
-  .ec-amb i{font-style:normal;color:var(--linea-b);font-size:11px}
+  .ec-amb i{font-style:normal;color:var(--gris);font-size:11px}
 
 /* ═══ estilos del tablero descartado (sin uso) ═══ */
   .tablero{display:grid;grid-template-columns:auto 1fr;gap:0;margin:16px 0 14px;
@@ -828,7 +828,7 @@
   @media (prefers-reduced-motion:reduce){ .colmenu{animation:none} }
 
   .cm-tit{padding:8px 11px 7px;border-bottom:1px solid rgba(23,25,29,.07);font-size:9px;
-    letter-spacing:.11em;color:var(--linea-b)}
+    letter-spacing:.11em;color:var(--gris)}
   .cm-lim{font-size:10.5px;padding:2px 0}
 
   .cm-buscar{width:calc(100% - 14px);margin:7px;font-size:12px;padding:5px 8px;
@@ -859,7 +859,7 @@
   .ec-val i{font-style:normal;font-family:var(--ff-d);font-size:10px;font-weight:600;
     letter-spacing:.04em;color:var(--cobre-d);background:rgba(154,127,78,.12);
     border-radius:3px;padding:2px 5px;font-variant-numeric:tabular-nums}
-  .ec-val u{text-decoration:none;color:var(--linea-b);font-size:11px}
+  .ec-val u{text-decoration:none;color:var(--gris-suave);font-size:11px}
   @media(max-width:1000px){
     .eqcard,.eqcab{grid-template-columns:120px 90px 1fr 76px 46px 14px}
     .ec-amb{display:none} .eqcab .th:nth-child(4){display:none}
@@ -888,7 +888,7 @@
 
   /* 4. Jerarquía tipográfica del nombre del equipo */
   .ec-nom{font-size:13.5px;letter-spacing:-.1px}
-  .ec-nom em{font-size:10.5px;letter-spacing:.03em;color:var(--linea-b)}
+  .ec-nom em{font-size:11.5px;letter-spacing:.03em;color:var(--gris)}
 
   /* 5. Separación clara entre bloques de servicio */
   .eqcard.g1{border-top:1px solid var(--linea-b);margin-top:6px;padding-top:12px}
@@ -927,7 +927,7 @@
   .ec-prox b{display:block;font-family:var(--ff-d);font-size:11.5px;font-weight:600;color:var(--onix);
     font-variant-numeric:tabular-nums}
   .ec-prox i{display:block;font-style:normal;font-size:9.5px;color:var(--gris);margin-top:1px}
-  .ec-prox u{text-decoration:none;color:var(--linea-b);font-size:11px}
+  .ec-prox u{text-decoration:none;color:var(--gris-suave);font-size:11px}
   .ec-prox.vencido b{color:#9E342C}  .ec-prox.vencido i{color:#9E342C}
   .ec-prox.proximo b{color:var(--cobre-d)} .ec-prox.proximo i{color:var(--cobre-d)}
   .ep-stats{grid-template-columns:repeat(4,1fr)}
@@ -1054,13 +1054,13 @@
   .ff>span{font-family:var(--ff-d);font-size:10.5px;font-weight:600;letter-spacing:.08em;
     text-transform:uppercase;color:var(--gris)}
   .ff>span i{font-style:normal;font-weight:400;letter-spacing:.02em;text-transform:none;
-    color:var(--linea-b);margin-left:5px}
+    color:var(--gris);margin-left:5px}
   .ff input,.ff textarea{font-family:var(--ff-b);font-size:13.5px;padding:9px 11px;
     border:1px solid var(--linea);border-radius:4px;background:var(--blanco);color:var(--onix);
     width:100%;box-sizing:border-box;resize:vertical}
   .ff input:focus,.ff textarea:focus{outline:none;border-color:var(--bronce);
     box-shadow:0 0 0 3px rgba(154,127,78,.12)}
-  .ff input::placeholder,.ff textarea::placeholder{color:var(--linea-b)}
+  .ff input::placeholder,.ff textarea::placeholder{color:var(--gris-suave)}
 
   .ff-urg{border:1px solid var(--linea);border-radius:4px;padding:12px 14px;margin:0;
     display:flex;flex-wrap:wrap;gap:10px}

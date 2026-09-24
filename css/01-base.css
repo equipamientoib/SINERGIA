@@ -3,6 +3,10 @@
     --onix:#17191D; --grafito:#2A2D33; --grafito-2:#3A3F47;
     --bronce:#9A7F4E; --cobre:#B5945A; --cobre-d:#7E6234; --cobre-l:#D8C49A;
     --gris:#6E727A; --gris-claro:#9aa0a8;
+    /* Texto deliberadamente tenue: guiones de "sin dato", placeholders.
+       NO usar --linea-b (bronce al 28 %) para texto: es color de bordes y
+       sobre blanco deja un contraste de 1,3:1, ilegible. */
+    --gris-suave:#8A8F98;
     --hueso:#F5F3EE; --blanco:#FFFFFF; --crema:#FBFAF6; --crema-2:#F0ECE2;
     --linea:rgba(23,25,29,.09); --linea-b:rgba(154,127,78,.28);
     --ok:#2E8B6B; --ok-l:#67d3ad;
