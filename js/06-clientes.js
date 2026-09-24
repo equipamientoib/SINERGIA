@@ -14,6 +14,8 @@ if(typeof PROYECTOS==='undefined'){ window.PROYECTOS=[]; }
 
 const PR_OPEN=new Set(); // proyectos desbloqueados en esta sesión (solo en memoria)
 const PR_KEY={};              // hash de la clave por proyecto (solo en memoria)
+const PR_PASS={};             // la clave tal cual la escribió el cliente: descifra el panel
+                              // publicado. Nunca se guarda ni se envía; solo el hash viaja.
 /* Aviso discreto dentro del panel. Sustituye a alert(), que bloquea el
    navegador y se ve poco profesional en un panel de cliente.          */
 let AVISO_T=0;
@@ -633,14 +635,21 @@ async function cargarDetalle(id, reintento){
   if(guardado){ PR_DET[id]=guardado; PR_SELLO[id]=selloDe(guardado);
                 selLimpia(); DET_Q=''; pintarPanel(id); return; }
 
-  /* Copia antigua: se pinta YA y se refresca por detrás. Vale más el panel
-     de ayer, con su fecha a la vista, que una pantalla de espera.        */
-  const viejo=detGuardado(id);
-  if(viejo && !reintento){
-    PR_DET[id]=viejo.d; PR_SELLO[id]=selloDe(viejo.d);
-    selLimpia(); DET_Q=''; pintarPanel(id);
-    refrescarPorDetras(id);
-    return;
+  /* Lo que ya se tenga se pinta YA y se refresca por detrás: el panel
+     publicado con la página, o la copia de una visita anterior, lo que sea
+     más reciente. Vale más el panel de ayer, con su fecha a la vista, que
+     una pantalla de espera colgada del servidor de Google.              */
+  if(!reintento){
+    const viejo=detGuardado(id);
+    const pub=await panelPublicado(id);
+    const cual=(viejo&&pub) ? ((viejo.d.generado||'')>(pub.generado||'') ? viejo.d : pub)
+                            : ((viejo&&viejo.d) || pub);
+    if(cual){
+      PR_DET[id]=cual; PR_SELLO[id]=selloDe(cual);
+      selLimpia(); DET_Q=''; pintarPanel(id);
+      refrescarPorDetras(id);
+      return;
+    }
   }
 
   detCargando(cont,id);
@@ -660,6 +669,16 @@ async function cargarDetalle(id, reintento){
       setTimeout(()=>cargarDetalle(id,intento+1), 2000);
       return;
     }
+    /* Antes de dar la cara con un aviso, el panel publicado: puede haberse
+       descargado mientras se esperaba a Google.                         */
+    const pub=await panelPublicado(id);
+    if(pub){
+      detCargandoFin();
+      PR_DET[id]=pub; PR_SELLO[id]=selloDe(pub);
+      selLimpia(); DET_Q=''; pintarPanel(id);
+      return;
+    }
+
     /* Ni con reintentos. En vez de dejar al cliente frente a un cartel de
        error, se le explica y se sigue probando solo cada 15 s: el servidor
        de Google suele volver en si en menos de un minuto.               */
@@ -673,6 +692,43 @@ async function cargarDetalle(id, reintento){
     if(quedan>0 && location.hash.indexOf(id)>=0)
       setTimeout(()=>{ if(location.hash.indexOf(id)>=0 && !PR_DET[id]) cargarDetalle(id, intento+1); }, 15000);
   }
+}
+
+/* ── Panel publicado ───────────────────────────────────────────────────
+   El sitio lleva el panel de cada proyecto como archivo cifrado, publicado
+   al mismo tiempo que la página. Se sirve desde el mismo origen que el
+   HTML: sin CORS, sin Apps Script y sin las rachas de Google, que medidas
+   en producción llegan a fallar 1 de cada 6 peticiones.
+
+   Va cifrado con la clave que el cliente acaba de escribir (PBKDF2-SHA256
+   y AES-256-GCM, ambos del propio navegador). Sin esa clave el archivo es
+   ruido, así que publicarlo no expone nada: hoy, en cambio, el hash viaja
+   en el catálogo público y el Apps Script entrega el detalle a quien lo
+   copie. El JSON viene comprimido dentro del cifrado (160 KB -> 30 KB).  */
+const PANEL_PUB = {};                       // lo leído, por proyecto
+async function panelPublicado(id){
+  if(PANEL_PUB[id]!==undefined) return PANEL_PUB[id];
+  PANEL_PUB[id]=null;
+  const clave=PR_PASS[id];
+  if(!clave || !window.crypto || !crypto.subtle || typeof DecompressionStream==='undefined') return null;
+  try{
+    const r=await fetch('data/p/'+encodeURIComponent(id)+'.json', {cache:'no-cache'});
+    if(!r.ok) return null;
+    const paq=await r.json();
+    const b=t=>Uint8Array.from(atob(t), c=>c.charCodeAt(0));
+    const material=await crypto.subtle.importKey('raw', new TextEncoder().encode(clave), 'PBKDF2', false, ['deriveKey']);
+    const llave=await crypto.subtle.deriveKey(
+      {name:'PBKDF2', salt:b(paq.sal), iterations:paq.iter, hash:'SHA-256'},
+      material, {name:'AES-GCM', length:256}, false, ['decrypt']);
+    const plano=await crypto.subtle.decrypt({name:'AES-GCM', iv:b(paq.iv)}, llave, b(paq.dato));
+    const texto=await new Response(new Blob([plano]).stream()
+                    .pipeThrough(new DecompressionStream('deflate'))).text();
+    const d=JSON.parse(texto);
+    PANEL_PUB[id]=(d&&d.ok)?d:null;
+  }catch(e){
+    console.warn('Sinergia: no se pudo leer el panel publicado ('+e.message+')');
+  }
+  return PANEL_PUB[id];
 }
 
 /* Refresco silencioso: si llega, se repinta con los datos nuevos; si no
@@ -696,7 +752,7 @@ async function tryUnlock(id){
   if(!v){if(err)err.classList.add('show');return;}
   const h=await sha256(v);
   const p=PROYECTOS.find(x=>x.id===id);
-  if(p&&h===p.clave_hash){PR_OPEN.add(id);PR_KEY[id]=h;renderProyecto(id);}
+  if(p&&h===p.clave_hash){PR_OPEN.add(id);PR_KEY[id]=h;PR_PASS[id]=v;renderProyecto(id);}
   else{if(err)err.classList.add('show');if(inp){inp.value='';inp.focus();}}
 }
 
