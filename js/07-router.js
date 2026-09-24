@@ -136,35 +136,45 @@ function repintarTodo(){
 /* Descarga con límite de tiempo. Sin esto, si Google se queda pensando
    la promesa nunca se resuelve: la web se quedaba esperando para
    siempre y el reintento de proyectos (06-clientes.js) seguía girando. */
-/* Petición con segundo intento en paralelo.
-   El script responde en menos de un segundo (se comprueba en su registro de
-   ejecuciones), pero de vez en cuando una petición se queda atascada ANTES de
-   llegar a él, en el frente de Google, y se lleva 25 s. Aquí no se espera a
-   ese atasco: a los 6 s se lanza otra petición igual sin cancelar la primera
-   y se toma la que conteste antes. Pedir dos veces no cuesta nada (es una
-   lectura, y el script ya tiene la respuesta preparada en su caché).      */
-async function traerPronto(url, ms, segundoEn){
+/* ── UNA petición al Apps Script a la vez ──────────────────────────────
+   Google atiende de a una por cuenta. Si se le encima otra, la que llega
+   de más espera decenas de segundos y a veces termina en 404: la primera
+   respuesta es un 302 con una llave de un solo uso, y bajo presión esa
+   llave ya no vale cuando el navegador va a buscar el contenido.
+
+   Por eso aquí se hace cola: dos pedidos nunca salen a la vez, salgan de
+   donde salgan (el catálogo al abrir la web, el detalle del proyecto, un
+   reintento). Medido: una sola petición son 302 en 1,9 s + contenido en
+   1,0 s; encimadas, 13 a 40 s y 404.                                    */
+let _COLA = Promise.resolve();
+function enCola(tarea){
+  const turno = _COLA.then(tarea, tarea);
+  _COLA = turno.then(()=>{}, ()=>{});     // la cola sigue aunque uno falle
+  return turno;
+}
+
+/* Petición con reintento, SIEMPRE de a una.
+   Un fallo suelto (atasco de Google, 404 por encimamiento) se reintenta
+   una vez, esperando un momento; nunca en paralelo.                     */
+async function traerPronto(url, ms){
   const limite = ms || (typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 25000;
-  const espera = segundoEn || 6000;
-  if(espera >= limite) return traer(url, limite);
-  let listo=false;
-  const marcar=p=>p.then(d=>{listo=true; return d;});
-  const primera = marcar(traer(url, limite));
-  const segunda = new Promise((res,rej)=>{
-    setTimeout(()=>{ if(listo) return;            // la primera ya contestó
-      marcar(traer(url, limite)).then(res, rej); }, espera);
-  });
-  /* La que conteste antes; si una falla, se sigue esperando a la otra. */
-  return new Promise((res,rej)=>{
-    let fallos=0, ultimo=null;
-    const mal=e=>{ ultimo=e; if(++fallos>=2) rej(ultimo); };
-    primera.then(res, mal);
-    segunda.then(res, mal);
-    setTimeout(()=>rej(ultimo||new Error('tiempo de espera agotado ('+limite+' ms)')), limite+500);
-  });
+  try{
+    return await traer(url, limite);
+  }catch(e1){
+    console.warn('Sinergia: reintentando ('+e1.message+')');
+    await new Promise(r=>setTimeout(r, 1200));
+    return await traer(url, limite);
+  }
 }
 
 async function traer(url, ms){
+  /* Lo del Apps Script va en cola; los archivos del propio sitio, no:
+     esos los sirve GitHub Pages y pueden ir todos a la vez.            */
+  if(/^https?:\/\/script\.google\.com/.test(url)) return enCola(()=>traerYa(url, ms));
+  return traerYa(url, ms);
+}
+
+async function traerYa(url, ms){
   const limite = ms || (typeof CONFIG!=='undefined' && CONFIG.TIMEOUT_MS) || 12000;
   const ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
   const corte = setTimeout(()=>{ if(ctrl) ctrl.abort(); }, limite);
@@ -263,15 +273,7 @@ async function loadData(){
   /* ── 2. datos en vivo ─────────────────────────────────────────────── */
   if(!CONFIG.DATA_URL){ rendirse('sin DATA_URL configurada'); return; }
   try{
-    let d;
-    try{
-      d = await traerPronto(CONFIG.DATA_URL, _ESPERA);
-    }catch(e1){
-      /* Apps Script frío: el primer intento se pasa de tiempo o devuelve la
-         página de error de Google. El segundo suele responder en segundos. */
-      console.warn('Sinergia: reintentando la hoja ('+e1.message+')');
-      d = await traer(CONFIG.DATA_URL, _ESPERA);
-    }
+    const d = await traerPronto(CONFIG.DATA_URL, _ESPERA);
     aplicarDatos(d, true);
     try{ sessionStorage.setItem(CACHE_KEY, JSON.stringify(d)); }catch(e){}
     vivoGuardar(d);

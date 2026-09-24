@@ -559,17 +559,35 @@ let PING_HECHO = false;
 function despertarSistema(){ PING_HECHO = true; }
 
 /* 2. Caché de sesión */
+/* Copia reciente (esta sesión). Si está fresca, el panel abre sin pedir nada. */
 function detCacheLeer(id){
-  try{
-    const raw=sessionStorage.getItem('sb-det-'+id);
-    if(!raw) return null;
-    const o=JSON.parse(raw);
-    if(!o || !o.t || (Date.now()-o.t)/60000 > DET_CACHE_MIN) return null;
-    return o.d;
-  }catch(e){ return null; }
+  const o=detGuardado(id);
+  if(!o || (Date.now()-o.t)/60000 > DET_CACHE_MIN) return null;
+  return o.d;
+}
+
+/* ÚLTIMA copia buena, con su fecha, guardada hasta 7 días en el navegador.
+   El Apps Script responde en menos de un segundo, pero la capa de Google que
+   sirve la dirección pública a veces tarda medio minuto o devuelve 404. Antes,
+   cuando pasaba eso, el cliente se quedaba mirando "Preparando el listado…".
+   Ahora ve su panel al instante —con el sello de cuándo se trajo— y los datos
+   se refrescan solos cuando la respuesta llega.                            */
+const DET_COPIA_DIAS = 7;
+function detGuardado(id){
+  for(const almacen of [sessionStorage, localStorage]){
+    try{
+      const raw=almacen.getItem('sb-det-'+id);
+      if(!raw) continue;
+      const o=JSON.parse(raw);
+      if(o && o.t && (Date.now()-o.t)/86400000 <= DET_COPIA_DIAS) return o;
+    }catch(e){}
+  }
+  return null;
 }
 function detCacheGuardar(id,d){
-  try{ sessionStorage.setItem('sb-det-'+id, JSON.stringify({t:Date.now(), d:d})); }catch(e){}
+  const paquete=JSON.stringify({t:Date.now(), d:d});
+  try{ sessionStorage.setItem('sb-det-'+id, paquete); }catch(e){}
+  try{ localStorage.setItem('sb-det-'+id, paquete); }catch(e){}
 }
 
 /* 3. Aviso con etapas */
@@ -607,10 +625,20 @@ async function cargarDetalle(id, reintento){
   if(!p||!p.detalle||url.indexOf('http')!==0){cont.innerHTML='';return;}
   if(PR_DET[id]){pintarPanel(id);return;}
 
-  /* Copia guardada en el navegador: aparece al instante, sin pedir nada. */
+  /* Copia fresca de esta sesión: aparece al instante, sin pedir nada. */
   const guardado=detCacheLeer(id);
   if(guardado){ PR_DET[id]=guardado; PR_SELLO[id]=selloDe(guardado);
                 selLimpia(); DET_Q=''; pintarPanel(id); return; }
+
+  /* Copia antigua: se pinta YA y se refresca por detrás. Vale más el panel
+     de ayer, con su fecha a la vista, que una pantalla de espera.        */
+  const viejo=detGuardado(id);
+  if(viejo && !reintento){
+    PR_DET[id]=viejo.d; PR_SELLO[id]=selloDe(viejo.d);
+    selLimpia(); DET_Q=''; pintarPanel(id);
+    refrescarPorDetras(id);
+    return;
+  }
 
   detCargando(cont,id);
   const intento=reintento||0;
@@ -634,6 +662,21 @@ async function cargarDetalle(id, reintento){
       'Suele ser un problema momentáneo de conexión.</p>'+
       '<button class="btn btn-fill" onclick="cargarDetalle(\''+id+'\')">Reintentar</button></div>';
   }
+}
+
+/* Refresco silencioso: si llega, se repinta con los datos nuevos; si no
+   llega, el cliente se queda con lo que ya está viendo y no se entera.  */
+async function refrescarPorDetras(id){
+  const url=(typeof CONFIG!=='undefined'&&(CONFIG.PANEL_URL||CONFIG.DATA_URL))||'';
+  if(url.indexOf('http')!==0) return;
+  try{
+    const q=url+(url.indexOf('?')>=0?'&':'?')+'proyecto='+encodeURIComponent(id)+'&clave='+encodeURIComponent(PR_KEY[id]||'');
+    const d=await (typeof traerPronto==='function'?traerPronto(q,25000):traer(q,25000));
+    if(!d||!d.ok) return;
+    const antes=PR_SELLO[id];
+    PR_DET[id]=d; detCacheGuardar(id,d); PR_SELLO[id]=selloDe(d);
+    if(location.hash.indexOf(id)>=0 && antes!==PR_SELLO[id]) pintarPanel(id);
+  }catch(e){ /* se queda la copia guardada, que ya está en pantalla */ }
 }
 
 async function tryUnlock(id){
