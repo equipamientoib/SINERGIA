@@ -40,7 +40,15 @@ let DET_Q='', DET_SOLO=true, DET_ORDEN='';
 let TAB_AREAS=[], TAB_ESTADOS=[];
 /* Selección múltiple por columna */
 const SEL={servicio:new Set(), ambiente:new Set(), equipo:new Set(),
-           valorizacion:new Set(), criticidad:new Set(), proximo:new Set(), avance:new Set()};
+           valorizacion:new Set(), criticidad:new Set(), proximo:new Set(), avance:new Set(),
+           origen:new Set()};
+/* ── Origen del equipo ──
+   CONTRATO   = venía en el Anexo A de la cotización original.
+   AMPLIACION = se incorporó después, con su fecha y su documento sustento.
+   La hoja lo trae en "ORIGEN ALCANCE"; si un proyecto no usa esa columna,
+   todos los equipos quedan como del contrato y esto no se muestra.      */
+const origenDe=e=>(e&&e.origen==='AMPLIACION')?'AMPLIACION':'CONTRATO';
+const ORIGEN_ROT={CONTRATO:'Contrato inicial', AMPLIACION:'Ampliación'};
 /* Valorizaciones en las que se atendió el equipo */
 /* ── Criticidad asistencial ──
    Riesgo para el paciente si el equipo falla:
@@ -1010,6 +1018,7 @@ function detFiltrados(id){
       if(!ok)return false;
     }
     if(SEL.criticidad.size&&!SEL.criticidad.has(criticidadDe(e)))return false;
+    if(SEL.origen.size&&!SEL.origen.has(origenDe(e)))return false;
     if(SEL.proximo.size &&!SEL.proximo.has(proximoDe(e).estado))return false;
     if(SEL.avance.size  &&![...SEL.avance].some(k=>cumpleAvance(e,k)))return false;
     if(!q)return true;
@@ -1026,6 +1035,7 @@ function irAEquipos(id,f){
   if(f.estado)SEL.avance.add(f.estado);
   if(f.proximo)SEL.proximo.add(f.proximo);
   if(f.criticidad)SEL.criticidad.add(f.criticidad);
+  if(f.origen)SEL.origen.add(f.origen);
   DET_Q='';
   if(f.solo!==undefined)DET_SOLO=f.solo;
   DET_TAB='eq'; pintarPanel(id);
@@ -1043,6 +1053,7 @@ function filtrosActivos(){
   SEL.valorizacion.forEach(v=>f.push(v==='SIN'?'Sin valorizar':'Valorización '+v));
   SEL.proximo.forEach(v=>f.push(PROX_ROT[v]||v));
   SEL.criticidad.forEach(v=>f.push('Criticidad '+v.toLowerCase()));
+  SEL.origen.forEach(v=>f.push(ORIGEN_ROT[v]||v));
   SEL.avance.forEach(v=>f.push(ROT[v]||v));
   
   if(!DET_SOLO)f.push('Incluye fuera de alcance');
@@ -1105,6 +1116,16 @@ function paneEquipos(id,p,d){
              onclick="${k?`SEL.avance.has('${k}')?SEL.avance.delete('${k}'):SEL.avance.add('${k}')`
                         :'SEL.avance.clear()'};pintarPanel('${id}')">${t}</button>`).join('')}
       </div>
+      ${(d.totales&&d.totales.ampliacion)?`
+      <div class="chips chips-org" role="group" aria-label="Origen del equipo">
+        ${[['','Todo el alcance'],['CONTRATO','Contrato inicial'],['AMPLIACION','Ampliación']]
+          .map(([k,t])=>`<button type="button" class="chip${(k?SEL.origen.has(k):!SEL.origen.size)?' on':''}"
+             title="${k==='AMPLIACION'?'Equipos incorporados después del contrato inicial'
+                     :(k==='CONTRATO'?'Equipos del Anexo A de la cotización original':'Todos los equipos')}"
+             onclick="${k?`SEL.origen.has('${k}')?SEL.origen.delete('${k}'):SEL.origen.add('${k}')`
+                        :'SEL.origen.clear()'};pintarPanel('${id}')">${t}${
+             k==='AMPLIACION'?` <em>${d.totales.ampliacion}</em>`:''}</button>`).join('')}
+      </div>`:''}
       <label class="det-chk"><input type="checkbox"${DET_SOLO?' checked':''}
              onchange="DET_SOLO=this.checked;pintarPanel('${id}')"> Solo en alcance</label>
     </div>
@@ -1313,15 +1334,19 @@ function exportarCSV(id){ exportarExcel(id); }
 
 function exportarExcel(id){
   const {p,d,fecha,filtros,m}=datosCabecera(id);
+  const S=(typeof SITE!=='undefined')?SITE:{};   // faltaba: sin esto el botón Exportar lanzaba error
   const filas=filasReporte(id);
   if(!filas.length)return;
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const lim=s=>(s&&s!=='S/M'&&s!=='S/S'&&s!=='—')?esc(s):'';
-  const N=11;
-
-  const cab=['AMBIENTE','CÓDIGO','EQUIPO','MARCA','MODELO','SERIE',
-             'ESTADO','EJECUTADA','PRÓXIMO MANT.','VAL.','N° DE INFORME'];
-  const anchos=[130,88,205,90,80,105,88,78,88,52,215];
+  /* La columna ORIGEN solo aparece si el contrato tuvo ampliaciones; en los
+     demás sobraría y restaría ancho a lo que sí se lee.                 */
+  const ampl=!!(d.totales&&d.totales.ampliacion);
+  const cab=['AMBIENTE','CÓDIGO','EQUIPO','MARCA','MODELO','SERIE']
+            .concat(ampl?['ORIGEN']:[])
+            .concat(['ESTADO','EJECUTADA','PRÓXIMO MANT.','VAL.','N° DE INFORME']);
+  const anchos=[130,88,205,90,80,105].concat(ampl?[96]:[]).concat([88,78,88,52,215]);
+  const N=cab.length;
 
   let grupo='';
   const cuerpo=filas.map(({e,px,i},ix)=>{
@@ -1333,6 +1358,7 @@ function exportarExcel(id){
       <tr class="${ix%2?'par':''}">
       <td>${esc(e.area)}</td><td class="cod">${esc(e.cod)}</td><td class="eq">${esc(e.nom)}</td>
       <td>${lim(e.marca)}</td><td>${lim(e.modelo)}</td><td class="ser">${lim(e.serie)}</td>
+      ${ampl?`<td class="c">${origenDe(e)==='AMPLIACION'?'Ampliación':'Contrato'}</td>`:''}
       <td class="${est.indexOf('INOPER')===0?'mal':(est?'bien':'')}">${esc(i&&i.estado)}</td>
       <td class="f">${esc(i&&i.fecha)}</td>
       <td class="f ${px.estado==='VENCIDO'?'mal':(px.estado==='PROXIMO'?'ojo':'')}">${esc(px.txt||'')}</td>
@@ -1386,26 +1412,27 @@ function exportarExcel(id){
   <table>
     <colgroup>${anchos.map(a=>`<col width="${a}">`).join('')}</colgroup>
     <tr><td colspan="5" class="t1">SINERGIA BIOMÉDICA</td>
-        <td colspan="6" class="tr">Av. Simón Bolívar 2150 · Pueblo Libre, Lima</td></tr>
+        <td colspan="${N-5}" class="tr">Av. Simón Bolívar 2150 · Pueblo Libre, Lima</td></tr>
     <tr><td colspan="5" class="t2">Servicios Integrales Sinergia S.A.C. · RUC 20615862682</td>
-        <td colspan="6" class="tr">T. ${S.telefono||''} · ${S.email||''}</td></tr>
+        <td colspan="${N-5}" class="tr">T. ${S.telefono||''} · ${S.email||''}</td></tr>
     <tr><td colspan="5" class="t2">Herramientas de metrología que distinguen su servicio</td>
-        <td colspan="6" class="web">www.sinergiabiomedica.pe</td></tr>
+        <td colspan="${N-5}" class="web">www.sinergiabiomedica.pe</td></tr>
     <tr><td colspan="${N}" class="rule"></td></tr>
     <tr><td colspan="${N}"></td></tr>
     <tr><td colspan="7" class="doc">${(DOC_TITULO||'Reporte de informes de mantenimiento').toUpperCase()}</td>
-        <td colspan="4" class="tr">Emitido el ${fecha}</td></tr>
+        <td colspan="${N-7}" class="tr">Emitido el ${fecha}</td></tr>
     <tr><td colspan="${N}"></td></tr>
     <tr><td class="lbl">CLIENTE</td><td colspan="3" class="val">${esc(p.cliente)}</td>
         <td class="lbl">CONTRATO</td><td colspan="2" class="val">${esc((p.servicio||'').replace(/^Contrato\s*/i,''))}</td>
-        <td class="lbl">EQUIPOS</td><td class="val">${m.equipos}</td>
+        <td class="lbl">EQUIPOS</td><td class="val" colspan="${ampl?2:1}">${m.equipos}${
+          ampl?` (${d.totales.ampliacion} por ampliación)`:''}</td>
         <td class="lbl">VENCIDOS</td><td class="val">${m.venc}</td></tr>
     <tr><td class="lbl">FILTROS</td>
         <td colspan="${N-1}" class="val">${esc(filtros.length?filtros.join(' · '):'Sin filtros')}</td></tr>
     <tr><td colspan="${N}"></td></tr>
     <tr>${cab.map(c=>`<th>${c}</th>`).join('')}</tr>
     ${cuerpo}
-    <tr class="tot"><td colspan="6">TOTAL</td><td>${nEj} ejecutadas</td>
+    <tr class="tot"><td colspan="${ampl?7:6}">TOTAL</td><td>${nEj} ejecutadas</td>
       <td colspan="2">${filas.length} intervenciones · ${m.equipos} equipos</td>
       <td></td><td>${nInf} informes</td></tr>
     <tr><td colspan="${N}"></td></tr>
@@ -1426,12 +1453,15 @@ function imprimirReporte(id){
   const {p,d,fecha,filtros,m}=datosCabecera(id);
   const filas=filasReporte(id);
   const esc=s=>String(s==null?'':s);
+  const ampl=!!(d.totales&&d.totales.ampliacion);   // columna ORIGEN solo si hubo ampliaciones
+  const NC=ampl?12:11;
   let grupo='';
   cont.innerHTML=`
     ${membrete(id)}
     <table class="rep">
       <thead><tr>
         <th>Ambiente</th><th>Código</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Serie</th>
+        ${ampl?'<th>Origen</th>':''}
         <th>Estado</th><th>Ejecutada</th><th>Próximo mant.</th><th>Val.</th>
         <th>N° de informe</th></tr></thead>
       <tbody>
@@ -1439,12 +1469,13 @@ function imprimirReporte(id){
         const g=grupoDe(e.area), nuevo=g!==grupo; grupo=g;
         const est=(i&&i.estado||'').toUpperCase();
         const lim=s=>(s&&s!=='S/M'&&s!=='S/S'&&s!=='—')?esc(s):'';
-        return `${nuevo?`<tr class="rg"><td colspan="11">${g}</td></tr>`:''}
+        return `${nuevo?`<tr class="rg"><td colspan="${NC}">${g}</td></tr>`:''}
         <tr class="${ix%2?'par':''}">
           <td>${esc(e.area)}</td>
           <td class="cod">${esc(e.cod)}</td>
           <td class="eq">${esc(e.nom)}</td>
           <td>${lim(e.marca)}</td><td>${lim(e.modelo)}</td><td class="ser">${lim(e.serie)}</td>
+          ${ampl?`<td class="c">${origenDe(e)==='AMPLIACION'?'Ampliación':'Contrato'}</td>`:''}
           <td class="${est.indexOf('INOPER')===0?'mal':(est?'bien':'')}">${esc(i&&i.estado)}</td>
           <td class="f">${esc(i&&i.fecha)}</td>
           <td class="f ${px.estado==='VENCIDO'?'mal':(px.estado==='PROXIMO'?'ojo':'')}">${esc(px.txt||'')}</td>
@@ -1455,7 +1486,7 @@ function imprimirReporte(id){
         </tr>`;}).join('')}
       </tbody>
       <tfoot><tr class="tot">
-        <td colspan="6">TOTAL</td>
+        <td colspan="${ampl?7:6}">TOTAL</td>
         <td>${(()=>{const n=filas.filter(x=>x.i&&x.i.hecho).length;
               return n+' ejecutada'+(n===1?'':'s');})()}</td>
         <td colspan="2">${filas.length} intervenci${filas.length===1?'ón':'ones'} ·
@@ -1503,7 +1534,8 @@ function pintarLista(id){
       <button type="button" class="eqcard${e.alcance?'':' fuera'}${EQ_SEL===e.cod?' sel':''}${nuevo?' g1':''}"
               onclick="abrirEquipo('${id}','${e.cod}')">
         <span class="ec-serv">${DET_ORDEN?g:(nuevo?g:'')}</span>
-        <span class="ec-cod">${e.cod}</span>
+        <span class="ec-cod">${e.cod}${origenDe(e)==='AMPLIACION'
+          ?`<i class="ec-amp" title="Incorporado por ampliación${e.incorporado?' el '+e.incorporado:''}">AMPL</i>`:''}</span>
         <span class="ec-nom">${e.nom}<em>${[e.marca,e.modelo].filter(x=>x&&x!=='S/M').join(' ')||'—'}</em></span>
         <span class="ec-crit ${(()=>criticidadDe(e).toLowerCase())()}" title="${(()=>CRIT_ROT[criticidadDe(e)])()}">
           ${(()=>{const c=criticidadDe(e);return c.charAt(0)+c.slice(1).toLowerCase();})()}</span>
@@ -1559,6 +1591,10 @@ function abrirEquipo(id,cod,desdeVal){
             <div><dt>Serie</dt><dd>${e.serie&&e.serie!=='S/S'?e.serie:'—'}</dd></div>
             <div><dt>Código MINSA</dt><dd>${e.minsa||'—'}</dd></div>
             <div><dt>Ítem del contrato</dt><dd>${e.item||'—'}</dd></div>
+            ${origenDe(e)==='AMPLIACION'?`
+            <div class="kv-amp"><dt>Origen</dt><dd><b>Ampliación</b>${
+              e.incorporado?` · incorporado el ${e.incorporado}`:''}${
+              e.sustento?`<em>${e.sustento}</em>`:''}</dd></div>`:''}
           </dl>
         </div>
 
