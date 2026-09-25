@@ -86,13 +86,13 @@ function cardEq(e){
   const fotos=(e.fotos&&e.fotos.length)?e.fotos:(e.photo?[e.photo]:[]);
   const carr=fotos.length>1
     ? `<div class="eqcar" data-i="0">
-         ${fotos.map((u,i)=>`<img class="photo${i?'':' on'}" src="${fotoURL(u,600)}" alt="${e.nom}"
-              loading="${i?'lazy':'eager'}" decoding="async" onerror="eqcarQuitar(this)">`).join('')}
+         ${fotos.map((u,i)=>`<img class="photo${i?'':' on'}" ${i?'data-src':'src'}="${fotoURL(u,600,true)}" alt="${e.nom}"
+              loading="lazy" decoding="async" onerror="eqcarQuitar(this)">`).join('')}
          <button class="eqcar-f izq" onclick="eqcarMover(event,-1)" aria-label="Foto anterior">&#10094;</button>
          <button class="eqcar-f der" onclick="eqcarMover(event,1)" aria-label="Foto siguiente">&#10095;</button>
          <span class="eqcar-p">${fotos.map((u,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</span>
        </div>`
-    : (fotos.length?`<img class="photo" src="${fotoURL(fotos[0],600)}" alt="${e.nom}" loading="lazy" decoding="async">`:device(e));
+    : (fotos.length?`<img class="photo" src="${fotoURL(fotos[0],600,true)}" alt="${e.nom}" loading="lazy" decoding="async">`:device(e));
   return `<div class="eq">
       <div class="img${fotos.length?' has-photo':''}" onclick="go('#/equipo/${e.id}')">
         ${fotos.length?'':'<span class="grid-bg"></span>'}
@@ -133,7 +133,7 @@ function pintarPaquetes(){
     const kitLine=p.kit.length?`<li style="opacity:.7">+ Kit de intervención: ${p.kit.map(k=>APOYO[k]).join(', ')}</li>`:'';
     const badge=p.nivel==='Calibración'?`<span class="ptag">CALIBRACIÓN</span>`:`<span class="ptag" style="background:var(--onix)">MANTENIMIENTO</span>`;
     const pkFoto=(p.fotos&&p.fotos.length)?p.fotos[0]:(p.foto||'');
-    const pkImg=pkFoto?`<div class="pkimg" onclick="go('#/paquete/${p.id}')" style="height:172px;margin:0 0 16px;overflow:hidden;border-radius:12px;border:1px solid var(--linea);cursor:pointer;background:var(--blanco)"><img src="${fotoURL(pkFoto,600)}" alt="${p.nom}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:'';
+    const pkImg=pkFoto?`<div class="pkimg" onclick="go('#/paquete/${p.id}')" style="height:172px;margin:0 0 16px;overflow:hidden;border-radius:12px;border:1px solid var(--linea);cursor:pointer;background:var(--blanco)"><img src="${fotoURL(pkFoto,600,true)}" alt="${p.nom}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:'';
     return `<div class="pkg">
       ${badge}
       ${pkImg}
@@ -204,6 +204,14 @@ function eqcarMover(ev, paso){
 function eqcarIr(c,n){
   const im=[...c.querySelectorAll('img')]; if(!im.length) return;
   n=(n+im.length)%im.length; c.dataset.i=n;
+  /* Solo la primera foto de cada tarjeta lleva dirección; las demás esperan
+     en data-src. Aquí se pide la que toca y la siguiente, para que el cambio
+     no se vea vacío. Antes bajaban las 48 fotos del catálogo de golpe: 1,6 MB
+     para enseñar once. */
+  [n, (n+1)%im.length].forEach(k=>{
+    const f=im[k];
+    if(f && f.dataset.src){ f.src=f.dataset.src; f.removeAttribute('data-src'); }
+  });
   im.forEach((x,k)=>x.classList.toggle('on',k===n));
   c.querySelectorAll('.eqcar-p i').forEach((x,k)=>x.classList.toggle('on',k===n));
 }
@@ -214,6 +222,13 @@ setInterval(()=>{
     const r=c.getBoundingClientRect();
     if(r.bottom<0 || r.top>innerHeight) return;        // fuera de pantalla, no gasta
     if(Date.now() - (+c.dataset.tocado||0) < 15000) return;  // alguien la está pasando a mano
-    eqcarIr(c,(+c.dataset.i||0)+1);
+    /* Como las fotos se piden solo cuando hacen falta, la siguiente puede no
+       haber llegado. Se pide y se pasa en el turno siguiente, ya cargada: es
+       preferible esperar cinco segundos más a enseñar un hueco. */
+    const im = c.querySelectorAll('img');
+    const sig = ((+c.dataset.i||0) + 1) % im.length, f = im[sig];
+    if(f && f.dataset.src){ f.src = f.dataset.src; f.removeAttribute('data-src'); return; }
+    if(f && !f.naturalWidth) return;          // pedida, aún en camino
+    eqcarIr(c, sig);
   });
 },5000);
