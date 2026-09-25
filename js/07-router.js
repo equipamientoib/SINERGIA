@@ -361,6 +361,21 @@ async function loadData(){
 
   /* ── 2. datos en vivo ─────────────────────────────────────────────── */
   if(!CONFIG.DATA_URL){ rendirse('sin DATA_URL configurada'); return; }
+
+  /* Se espera a que la página esté cargada. Medido: esta llamada ocupa una
+     conexión de 10 s (el Apps Script tarda o no contesta y hay que
+     reintentar), y arrancaba a los 300 ms, compitiendo por el ancho de
+     banda con las fotos justo cuando el visitante está mirando. No corre
+     prisa: la página ya se pintó con el archivo publicado, que va completo;
+     esto solo sirve por si la hoja cambió después de publicar. */
+  await new Promise(function(listo){
+    const seguir = () => window.requestIdleCallback
+      ? requestIdleCallback(listo, {timeout: 2000})   // el 2º argumento son opciones, no ms
+      : setTimeout(listo, 1);
+    if(document.readyState === 'complete') seguir();
+    else addEventListener('load', seguir, {once:true});
+  });
+
   try{
     const d = await traerPronto(CONFIG.DATA_URL, _ESPERA);
     const falta = llegaAMedias(d);
