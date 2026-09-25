@@ -49,10 +49,16 @@ let HUELLA_CAT = '';   // firma del catálogo ya pintado (equipos + paquetes + m
 let HUELLA_PRO = '';   // firma de los proyectos ya pintados
 let PRO_PINTADOS = false;
 
+/* Firma del catálogo: si no cambia, no se repinta (y no se recargan todas
+   las fotos por nada). OJO con lo que entra aquí: durante meses solo
+   miraba «photo», la portada. Al añadir fotos a una ficha sin cambiar la
+   portada, la firma salía idéntica, se daba el catálogo por igual y NUNCA
+   se aplicaban: el archivo publicado traía 43 fotos y la web seguía
+   pintando 30. Por eso la lista entera cuenta, no solo la primera. */
 function firmaCatalogo(d){
   return JSON.stringify([
-    (d.equipos ||[]).map(e=>[e.id,e.nom,e.dia,e.photo,e.cal_fin]),
-    (d.paquetes||[]).map(p=>[p.id,p.nom,p.dia]),
+    (d.equipos ||[]).map(e=>[e.id,e.nom,e.dia,e.photo,(e.fotos||[]).join('|'),e.cal_fin]),
+    (d.paquetes||[]).map(p=>[p.id,p.nom,p.dia,(p.fotos||[]).join('|')]),
     d.modelo || null
   ]);
 }
