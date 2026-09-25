@@ -150,7 +150,18 @@
           ['img/catalogo/ms400-01.jpg','Simulador ECG sobre monitor multiparámetros','EN CAMPO','#/equipo/ms400']
         ];
         var h = HERO[Math.floor(Math.random() * HERO.length)], HERO_IR = h[3];
-        document.getElementById('heroFoto').src = h[0];
+        // La foto de portada es lo primero y lo mas pesado que se pinta: si
+        // el navegador entiende WebP se le da esa, que pesa la mitad. El
+        // <noscript> y el respaldo siguen siendo el JPEG.
+        var hf = h[0];
+        try{
+          if(document.createElement('canvas').toDataURL('image/webp')
+               .indexOf('data:image/webp') === 0)
+            hf = hf.replace(/\.jpe?g$/i, '.webp');
+        }catch(e){}
+        var heroImg = document.getElementById('heroFoto');
+        heroImg.onerror = function(){ this.onerror = null; this.src = h[0]; };
+        heroImg.src = hf;
         document.getElementById('heroPie').innerHTML =
           '<span>' + h[1] + '</span><span><b>' + h[2] + '</b></span>';
       </script>
