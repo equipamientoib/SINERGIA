@@ -135,8 +135,26 @@
       </div>
     </div>
     <div class="hero-stage">
-      <img src="img/tienda/esa620.jpg" alt="Analizador de seguridad eléctrica Fluke ESA620" onclick="go('#/equipo/esa620')">
-      <div class="cap"><span>Fluke ESA620 · seguridad eléctrica</span><span><b>IEC 62353</b></span></div>
+      <!-- La portada muestra una de tres fotos de campo, elegida al entrar.
+           No es un carrusel a propósito: al lado están el titular y los dos
+           botones, y lo que se mueve se lleva la mirada. Así hay variedad
+           entre visitas sin que nada compita con la llamada a la acción.
+           El <img> va SIN src: el script de abajo lo pone mientras la página
+           se lee, así no parpadea ni se descarga una foto que no se usa. -->
+      <img id="heroFoto" alt="Instrumento de Sinergia Biomédica verificando un equipo en un hospital" onclick="go(HERO_IR)">
+      <div class="cap" id="heroPie"></div>
+      <noscript><img src="img/catalogo/defib-05.jpg" alt="Analizador de desfibriladores en uso"></noscript>
+      <script>
+        var HERO = [
+          ['img/catalogo/defib-05.jpg','Analizador de desfibriladores · descarga a 200 J','EN CAMPO','#/equipo/defib'],
+          ['img/catalogo/defib-03.jpg','Verificación de un desfibrilador en sala','EN CAMPO','#/equipo/defib'],
+          ['img/catalogo/ms400-01.jpg','Simulador ECG sobre monitor multiparámetros','EN CAMPO','#/equipo/ms400']
+        ];
+        var h = HERO[Math.floor(Math.random() * HERO.length)], HERO_IR = h[3];
+        document.getElementById('heroFoto').src = h[0];
+        document.getElementById('heroPie').innerHTML =
+          '<span>' + h[1] + '</span><span><b>' + h[2] + '</b></span>';
+      </script>
     </div>
   </div>
   <div class="wrap"><div class="ticks" aria-hidden="true"></div></div>
@@ -472,6 +490,8 @@
     </div>
   </div>
 </div>
+
+
 
 </body>
 </html>
