@@ -30,7 +30,7 @@ function renderEquipo(id){
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
     <div class="detail">
       <div class="gallery">
-        <div class="main" id="galMain">${items[0]}<span class="gp"></span></div>
+        <div class="main" id="galMain">${carrusel(items)}<span class="gp"></span></div>
         <div class="thumbs" id="galThumbs">
           ${minis.map((it,i)=>`<div class="thumb ${i===0?'on':''}" onclick="swapGal(${i})">${it}</div>`).join('')}
         </div>
@@ -49,6 +49,7 @@ function renderEquipo(id){
       </div>
     </div>`;
   window._galItems=items;
+  setTimeout(galSiguienteFoto, 400);   // tras dar tiempo a la portada
 }
 function renderPaquete(id){
   const p=PAQUETES.find(x=>x.id===id);
@@ -93,8 +94,56 @@ function swapPk(i){
   document.getElementById('galMain').innerHTML=window._pkGal[i]+'<span class="gp"></span>';
   document.querySelectorAll('#equipoBody .thumb').forEach((t,j)=>t.classList.toggle('on',j===i));
 }
-function swapGal(i){
-  document.getElementById('galMain').innerHTML=window._galItems[i]+'<span class="gp"></span>';
-  document.querySelectorAll('#galThumbs .thumb').forEach((t,j)=>t.classList.toggle('on',j===i));
+/* Las fotos se apilan y se funden entre sí, como en «Nuestros clientes».
+   Antes se reemplazaba el HTML entero al cambiar: la foto nueva empezaba
+   a descargarse en ese momento y se veía el hueco. Ahora ya están todas
+   cargadas y el cambio es instantáneo. */
+function carrusel(items){
+  const una = items.length < 2;
+  /* Solo la primera lleva src. Las demás esperan en data-src y se piden
+     de una en una en cuanto la anterior llega. Si se piden las cinco de
+     golpe, Drive las sirve a 0,9 s cada una y compiten entre sí: la
+     portada, que es la única que el visitante está mirando, tarda lo
+     mismo que la última. Así aparece enseguida y el resto entra sin
+     que se note. */
+  const fotos = items.map(function(it, i){
+    if(it.indexOf('<img') !== 0) return `<span class="photo${i?'':' on'}">${it}</span>`;
+    const etiquetado = it.replace('<img', `<img class="photo${i?'':' on'}"`);
+    return i === 0 ? etiquetado : etiquetado.replace(' src=', ' data-src=');
+  }).join('');
+  const puntos = una ? '' :
+    `<span class="galcar-p">${items.map((_,i)=>`<i class="${i?'':'on'}" onclick="swapGal(${i})"></i>`).join('')}</span>`;
+  return `<div class="galcar${una?' una':''}" data-i="0">${fotos}${puntos}</div>`;
 }
+function swapGal(i, auto){
+  const c = document.querySelector('#galMain .galcar');
+  if(!c) return;
+  const n = c.querySelectorAll('.photo').length;
+  if(i >= n) i = 0;
+  c.dataset.i = i;
+  c.querySelectorAll('.photo').forEach((f,j)=>f.classList.toggle('on', j===i));
+  c.querySelectorAll('.galcar-p i').forEach((d,j)=>d.classList.toggle('on', j===i));
+  document.querySelectorAll('#galThumbs .thumb').forEach((t,j)=>t.classList.toggle('on', j===i));
+  /* Si lo tocó una persona, la rotación se detiene un rato: no hay nada
+     más molesto que una foto que se va justo cuando la estabas mirando. */
+  if(!auto) GAL_TOCADO = Date.now();
+}
+let GAL_TOCADO = 0;
+
+/* Encadena las descargas: cada foto pide la siguiente al terminar. */
+function galSiguienteFoto(){
+  const f = document.querySelector('#galMain .galcar img[data-src]');
+  if(!f) return;
+  f.addEventListener('load', galSiguienteFoto, {once:true});
+  f.addEventListener('error', galSiguienteFoto, {once:true});
+  f.src = f.dataset.src;
+  f.removeAttribute('data-src');
+}
+setInterval(function(){
+  const c = document.querySelector('#galMain .galcar:not(.una)');
+  if(!c || Date.now() - GAL_TOCADO < 15000) return;
+  const p = document.getElementById('page-equipo');
+  if(!p || !p.classList.contains('active') || document.hidden) return;
+  swapGal((+c.dataset.i || 0) + 1, true);
+}, 5000);
 

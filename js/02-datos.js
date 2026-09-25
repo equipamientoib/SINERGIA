@@ -78,7 +78,62 @@ function device(e){
    Google corta las primeras y salen rotas. Con "=w<ancho>" las entrega ya
    redimensionadas, una por caja, y dejan de fallar. Solo se le añade a las
    de lh3 que no traigan ya un tamaño; las locales quedan intactas. */
+/* Mapa «id de Drive → archivo de este sitio», que llega en el catálogo
+   publicado. Lo rellena bajar_fotos.py. Se guarda aparte y no se borra al
+   llegar los datos en vivo: la respuesta del Apps Script trae las URL de
+   Drive (la hoja es la que manda), pero servirlas desde Drive es lo que
+   hacía fallar las fotos. */
+/* MAPA-FOTOS-LOCALES: lo reescribe bajar_fotos.py. Va aquí y no solo en
+   data/catalogo.json porque el archivo publicado no siempre se lee: si el
+   visitante ya tiene datos guardados de la sesión, la web tira de ellos y
+   el mapa no llegaría. Aquí carga siempre y antes de pintar nada. */
+let FOTOS_LOCALES = {
+   "1CgzYTMecptuSqUY1LAh24ZkEHV7heGC7": "img/catalogo/esa620-01.jpg",
+   "1iPDKbLYWF2Fa9smDeyRCn2j15jId9Y8o": "img/catalogo/esa620-02.jpg",
+   "1skpycp6fkEvDwY3axq7qbU5Kepw8wtRu": "img/catalogo/esa620-03.jpg",
+   "1feymSzWNGDN_ugyk4j9novT-CUglW8Gt": "img/catalogo/esa620-04.jpg",
+   "1NgKt_yZdGGDznwtXQdiw7K-FaT12uN9a": "img/catalogo/esa620-05.jpg",
+   "1iBW1VsoYCNN-i4yui2-yBdSeg_zEtLEg": "img/catalogo/defib-01.jpg",
+   "1eyohw3fm2SxKLjNJ01uoR-Mc0eHbfLNG": "img/catalogo/defib-02.jpg",
+   "14SVCuRxa4PsYNQ62FDJjSwlvPWqd6YBg": "img/catalogo/defib-03.jpg",
+   "1PzEihjQ11aOhmPWOl6n2cN2s8O7JP7aY": "img/catalogo/defib-04.jpg",
+   "1mWGh7QbejkJYHy161yzyav7evNflF7Gh": "img/catalogo/defib-05.jpg",
+   "1BfVK0f3fjPN8zXZ1PGi8C2S_mmdKLaUQ": "img/catalogo/ms400-01.jpg",
+   "1fLr9I0y_hH9BWk_wIqEUwNVPGmc23d5p": "img/catalogo/ms400-02.jpg",
+   "13oqKB7LW07-B_JSl8NZgyTTCpJomhbnf": "img/catalogo/ms400-03.jpg",
+   "1eD9czzNe7hQXFu-gXjW0O6Mm8Tr8dc4b": "img/catalogo/ms400-04.jpg",
+   "1hD5mnnX102PZUkRJ2WNUweOtPzk3K9Jf": "img/catalogo/sp-sim-01.jpg",
+   "1IU2lH0RnnfHy48aWFMFt36azcUAoQbsl": "img/catalogo/sp-sim-02.jpg",
+   "1mAOZCQXYL12MPqKX2OmtL6UYJ8Y-UXKA": "img/catalogo/sp-sim-03.jpg",
+   "1B9G4JWbNvuFKSclONH-71ZVuri2eGwU4": "img/catalogo/fluke-945-01.jpg",
+   "1IuCCUbUmktDvXUW-DKXJFsHeAjF35mho": "img/catalogo/fluke-945-02.jpg",
+   "1sE_BNyav94WMNVHRhXQ6zRE2JV9UuEms": "img/catalogo/fluke-51-01.jpg",
+   "1b9mab3Eee9BMm0cm2NIrmt2vILFridNf": "img/catalogo/fluke-51-02.jpg",
+   "1NNHRnI90HU95uQ5wulNYQKDFKUCUbovJ": "img/catalogo/fluke-51-03.jpg",
+   "1Sj1YSWM0R0_hULNR4V9zsSwLJNH6wgC8": "img/catalogo/fluke-51-04.jpg",
+   "1cBQBZ0w13RYfseqTG8dYOshCw5sFpkIt": "img/catalogo/manometro-01.jpg",
+   "1zg5DTWSMHEyagYCGwQ9O7-a6SUuvegxq": "img/catalogo/luxometro-01.jpg",
+   "10mS8pA2flmiltBKKwJkbS5Rz664O0K3P": "img/catalogo/luxometro-02.jpg",
+   "1ipd3EJDHlt0Pysq47Jbhmq14Dg06wULQ": "img/catalogo/luxometro-03.jpg",
+   "1nV5x33fK3JID9dN00CGY_D0DXmmWdP8R": "img/catalogo/luxometro-04.jpg",
+   "1PRMs4HmfapeIYEK3YvhASWAKyA_ySXHG": "img/catalogo/luxometro-05.jpg",
+   "1tx7UIbvxin8hqGDQFuCWPWyQcDRebhZ5": "img/catalogo/phantom-flujo-01.jpg",
+   "1XAnI4hWRv-94Rs1_Z3_L43-8dr_Qls-H": "img/catalogo/limatambo-2026-01.jpg",
+   "1JJnFPVxYD7z58iGuC2XYd5Z14g8-p9NZ": "img/catalogo/limatambo-2026-02.jpg",
+   "1Tzls67EtPknY0EO16iWr1fEY4BOHU5xX": "img/catalogo/expediente-1Tzls67E.png"
+  };
+/* MAPA-FIN */
+function fotosLocales(mapa){ if(mapa) FOTOS_LOCALES = mapa; }
+
 function fotoURL(u, ancho){
+  if(!u) return u;
+  /* Si la foto ya está en el sitio, se sirve de aquí. Medido en el
+     navegador con las mismas 30 fotos a la vez: desde Drive llegaron 4
+     y fallaron 26 con «429 demasiadas peticiones»; desde aquí, las 30
+     en una décima de segundo. Google limita cuántas imágenes sirve por
+     navegador, y una ficha con cinco fotos se pasa de la raya. */
+  const id = (u.match(/(?:\/d\/|id=|\/file\/d\/)([A-Za-z0-9_-]{20,})/) || [])[1];
+  if(id && FOTOS_LOCALES[id]) return FOTOS_LOCALES[id];
   return (/lh3\.googleusercontent\.com/.test(u) && !/=[ws]\d/.test(u)) ? u+'=w'+ancho : u;
 }
 // galería: foto real (si existe) + vista técnica ilustrada

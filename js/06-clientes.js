@@ -158,7 +158,7 @@ function prCarrusel(p){
   const fotos=(p.fotos||[]).filter(Boolean);
   const id='car'+(++PR_CAR)+'-'+p.id.replace(/[^a-z0-9-]/gi,'');
   return `<div class="pr-car" id="${id}" data-i="0" onpointerdown="carTocar(event,'${id}')">
-      ${fotos.map((f,i)=>`<img src="${f}" alt="${prEsc(p.titulo)} ${i+1}" class="${i?'':'on'}"
+      ${fotos.map((f,i)=>`<img src="${fotoURL(f,900)}" alt="${prEsc(p.titulo)} ${i+1}" class="${i?'':'on'}"
           loading="${i?'lazy':'eager'}" decoding="async" onerror="carQuitar('${id}',this)">`).join('')}
       <button type="button" class="pr-car-b izq" aria-label="Anterior" onclick="event.stopPropagation();carMover('${id}',-1)">‹</button>
       <button type="button" class="pr-car-b der" aria-label="Siguiente" onclick="event.stopPropagation();carMover('${id}',1)">›</button>
@@ -212,8 +212,8 @@ setInterval(()=>{
 
 function prImg(p){
   if((p.fotos||[]).length>1) return prCarrusel(p);
-  if((p.fotos||[]).length===1) return `<img src="${p.fotos[0]}" alt="${prEsc(p.titulo)}" loading="lazy" decoding="async">`;
-  if(p.foto)return `<img src="${p.foto}" alt="${p.titulo}" loading="lazy" decoding="async">`;
+  if((p.fotos||[]).length===1) return `<img src="${fotoURL(p.fotos[0],900)}" alt="${prEsc(p.titulo)}" loading="lazy" decoding="async">`;
+  if(p.foto)return `<img src="${fotoURL(p.foto,900)}" alt="${p.titulo}" loading="lazy" decoding="async">`;
   return `<svg viewBox="0 0 312 200" role="img" aria-label="${p.titulo}"><rect x="40" y="30" width="232" height="140" rx="16" fill="#2A2D33"/><rect x="58" y="48" width="196" height="74" rx="8" fill="#0E1A14"/><polyline points="74,85 110,85 122,62 138,104 152,74 164,85 238,85" fill="none" stroke="#67d3ad" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="156" cy="148" r="13" fill="none" stroke="#9A7F4E" stroke-width="2"/><rect x="153" y="138" width="6" height="9" rx="3" fill="#9A7F4E"/></svg>`;
 }
 function cardProyecto(p){
@@ -1723,7 +1723,7 @@ function abrirEquipo(id,cod,desdeVal){
 
       <div class="ep-body">
         <div class="ep-top">
-          <div class="ep-foto">${e.foto?`<img src="${e.foto}" alt="${e.nom}" loading="lazy">`
+          <div class="ep-foto">${e.foto?`<img src="${fotoURL(e.foto,900)}" alt="${e.nom}" loading="lazy">`
             :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="ep-ico">
                  <rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/>
                  <path d="m3 17 5-4 4 3 3-2 6 5"/></svg><span class="sinfoto">Sin fotografía</span>`}</div>

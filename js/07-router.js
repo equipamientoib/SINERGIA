@@ -63,6 +63,11 @@ function firmaProyectos(d){
 function aplicarDatos(d, enVivo){
   if(!d) return false;
   if(enVivo) DATOS_LISTOS = true;
+  /* El mapa de fotos locales solo viene en el archivo publicado, nunca en
+     la respuesta en vivo. Se guarda la primera vez y no se pisa después:
+     si se perdiera, la web volvería a pedirle las fotos a Drive y Drive
+     las rechazaría con 429. */
+  if(d.local) fotosLocales(d.local);
 
   const primeraVez = !CATALOGO_LISTO;
   const fCat = firmaCatalogo(d);
