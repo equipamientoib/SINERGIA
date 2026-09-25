@@ -88,6 +88,8 @@ function cardEq(e){
     ? `<div class="eqcar" data-i="0">
          ${fotos.map((u,i)=>`<img class="photo${i?'':' on'}" src="${fotoURL(u,600)}" alt="${e.nom}"
               loading="${i?'lazy':'eager'}" decoding="async" onerror="eqcarQuitar(this)">`).join('')}
+         <button class="eqcar-f izq" onclick="eqcarMover(event,-1)" aria-label="Foto anterior">&#10094;</button>
+         <button class="eqcar-f der" onclick="eqcarMover(event,1)" aria-label="Foto siguiente">&#10095;</button>
          <span class="eqcar-p">${fotos.map((u,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</span>
        </div>`
     : (fotos.length?`<img class="photo" src="${fotoURL(fotos[0],600)}" alt="${e.nom}" loading="lazy" decoding="async">`:device(e));
@@ -190,6 +192,15 @@ function eqcarQuitar(img){
   if(q.length===1) c.classList.add('una');
   eqcarIr(c,0);
 }
+/* La tarjeta entera es un enlace a la ficha: sin detener el evento, pasar
+   una foto te sacaría de la página. Y se marca la tarjeta como tocada para
+   que deje de girar sola mientras alguien la mira. */
+function eqcarMover(ev, paso){
+  ev.stopPropagation(); ev.preventDefault();
+  const c = ev.currentTarget.closest('.eqcar'); if(!c) return;
+  eqcarIr(c, (+c.dataset.i || 0) + paso);
+  c.dataset.tocado = Date.now();
+}
 function eqcarIr(c,n){
   const im=[...c.querySelectorAll('img')]; if(!im.length) return;
   n=(n+im.length)%im.length; c.dataset.i=n;
@@ -202,6 +213,7 @@ setInterval(()=>{
     if(!c.offsetParent || c.querySelectorAll('img').length<2) return;
     const r=c.getBoundingClientRect();
     if(r.bottom<0 || r.top>innerHeight) return;        // fuera de pantalla, no gasta
+    if(Date.now() - (+c.dataset.tocado||0) < 15000) return;  // alguien la está pasando a mano
     eqcarIr(c,(+c.dataset.i||0)+1);
   });
 },5000);

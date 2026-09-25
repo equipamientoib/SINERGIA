@@ -18,6 +18,17 @@
     box-shadow:0 1px 3px rgba(0,0,0,.4);transition:.2s}
   .eqcar-p i.on{background:var(--bronce);width:16px;border-radius:99px}
   .eqcar.una .eqcar-p{display:none}
+  /* Flechas de la tarjeta: más pequeñas que las de la ficha, porque la caja
+     también lo es, y con algo de transparencia para no tapar la foto. */
+  .eqcar-f{position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+    width:28px;height:28px;border-radius:50%;border:0;cursor:pointer;padding:0;
+    background:rgba(255,255,255,.8);color:var(--tinta);font-size:12px;line-height:1;
+    display:grid;place-items:center;box-shadow:0 1px 6px rgba(23,25,29,.2);
+    transition:background .15s,transform .15s}
+  .eqcar-f:hover{background:#fff;transform:translateY(-50%) scale(1.12)}
+  .eqcar-f.izq{left:8px}
+  .eqcar-f.der{right:8px}
+  .eqcar.una .eqcar-f{display:none}
   .eq .img .grid-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(23,25,29,.05) 1px,transparent 1px);background-size:16px 16px;opacity:.55}
   .eq .badge{position:absolute;top:13px;left:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:rgba(46,139,107,.13);color:var(--ok);border:1px solid rgba(46,139,107,.28)}
   .eq .tier{position:absolute;top:13px;right:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:rgba(154,127,78,.15);color:var(--cobre-d);border:1px solid var(--linea-b)}
