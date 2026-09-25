@@ -113,7 +113,12 @@ function carrusel(items){
   }).join('');
   const puntos = una ? '' :
     `<span class="galcar-p">${items.map((_,i)=>`<i class="${i?'':'on'}" onclick="swapGal(${i})"></i>`).join('')}</span>`;
-  return `<div class="galcar${una?' una':''}" data-i="0">${fotos}${puntos}</div>`;
+  /* Los puntos dicen cuántas fotos hay; las flechas invitan a pasarlas.
+     Con solo puntos, mucha gente no se da cuenta de que puede moverse. */
+  const flechas = una ? '' :
+    `<button class="galcar-f izq" onclick="galMover(-1)" aria-label="Foto anterior">&#10094;</button>
+     <button class="galcar-f der" onclick="galMover(1)" aria-label="Foto siguiente">&#10095;</button>`;
+  return `<div class="galcar${una?' una':''}" data-i="0">${fotos}${flechas}${puntos}</div>`;
 }
 function swapGal(i, auto){
   const c = document.querySelector('#galMain .galcar');
@@ -127,6 +132,12 @@ function swapGal(i, auto){
   /* Si lo tocó una persona, la rotación se detiene un rato: no hay nada
      más molesto que una foto que se va justo cuando la estabas mirando. */
   if(!auto) GAL_TOCADO = Date.now();
+}
+function galMover(paso){
+  const c = document.querySelector('#galMain .galcar');
+  if(!c) return;
+  const n = c.querySelectorAll('.photo').length;
+  swapGal(((+c.dataset.i || 0) + paso + n) % n);
 }
 let GAL_TOCADO = 0;
 
