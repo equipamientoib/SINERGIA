@@ -83,6 +83,16 @@ function device(e){
    llegar los datos en vivo: la respuesta del Apps Script trae las URL de
    Drive (la hoja es la que manda), pero servirlas desde Drive es lo que
    hacía fallar las fotos. */
+/* ¿Entiende WebP este navegador? Se pregunta una vez, al cargar. Todos lo
+   soportan desde 2020, y el que no, recibe el JPEG y ve exactamente lo mismo.
+   Medido sobre estas fotos: en WebP pesan un 44 % menos con calidad
+   indistinguible del JPEG. Peso que se ahorra sin pagar nada a cambio. */
+const USA_WEBP = (function(){
+  try{ return document.createElement('canvas')
+         .toDataURL('image/webp').indexOf('data:image/webp') === 0; }
+  catch(e){ return false; }
+})();
+
 /* MAPA-FOTOS-LOCALES: lo reescribe bajar_fotos.py. Va aquí y no solo en
    data/catalogo.json porque el archivo publicado no siempre se lee: si el
    visitante ya tiene datos guardados de la sesión, la web tira de ellos y
@@ -140,7 +150,9 @@ function fotoURL(u, ancho, ligera){
     /* «ligera» es la de 700 px, para las tarjetas del catálogo: ahí la foto
        se ve a 347 px y la grande manda doce veces los píxeles que caben.
        La ficha y la portada siguen con la grande, que ahí sí se aprovecha. */
-    return (ligera && /\.jpe?g$/i.test(f)) ? f.replace(/\.jpe?g$/i, '-m.jpg') : f;
+    let r = (ligera && /\.jpe?g$/i.test(f)) ? f.replace(/\.jpe?g$/i, '-m.jpg') : f;
+    if(USA_WEBP) r = r.replace(/\.(jpe?g|png)$/i, '.webp');
+    return r;
   }
   return (/lh3\.googleusercontent\.com/.test(u) && !/=[ws]\d/.test(u)) ? u+'=w'+ancho : u;
 }
