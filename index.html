@@ -24,7 +24,14 @@
     try{
       var c = new AbortController();
       setTimeout(function(){ c.abort(); }, 5000);
-      return fetch('data/catalogo.json', {signal: c.signal})
+      /* 'no-cache' NO desactiva la caché: obliga a preguntarle al servidor
+         si el archivo cambió. Si no cambió responde 304 y se reutiliza la
+         copia local, así que no cuesta ancho de banda. Sin esto, GitHub
+         Pages manda "max-age=600" y el visitante se queda hasta diez
+         minutos con el catálogo anterior después de publicar; peor aún,
+         si vuelve a entrar dentro de esa ventana, se renueva. Los .js y
+         .css no lo necesitan porque llevan sello de versión en la URL. */
+      return fetch('data/catalogo.json', {signal: c.signal, cache: 'no-cache'})
         .then(function(r){ return r.ok ? r.json() : null; })
         .catch(function(){ return null; });
     }catch(e){ return null; }
