@@ -68,6 +68,10 @@ const CONFIG = {
      Regenéralo con scripts/build_catalogo.py cuando cambie el catálogo. */
   CACHE_URL: "data/catalogo.json",
 
+  /* ── VISTA PREVIA LOCAL · REVERTIR ANTES DE PUBLICAR ──────────────
+     Con DATA_URL vacío la web usa solo data/catalogo.json, que aquí
+     lleva las fotos de uso. Si no, la respuesta en vivo del Apps
+     Script las reemplazaría a los pocos segundos.                  */
   DATA_URL: "https://script.google.com/macros/s/AKfycbyCC42QwfzqLYKo0J9ahH_m1upJ0uMIhd2hF2R7YOdNhtceXmhzRVYlydhkdjk-Xh_1Rg/exec",
   WHATSAPP: SITE.whatsapp,
 

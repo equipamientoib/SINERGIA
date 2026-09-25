@@ -66,6 +66,22 @@ function firmaProyectos(d){
   return JSON.stringify((d.proyectos||[]).map(p=>[p.id,p.avance]));
 }
 
+let REF_EQUIPOS = 0, REF_PROYECTOS = 0;
+
+/* El Apps Script contesta a medias de vez en cuando: devuelve el JSON con
+   alguna sección vacía. Si se aplica tal cual, desaparecen proyectos de la
+   pantalla; y como además se guarda 24 h, siguen desaparecidos al volver.
+   Es lo que hacía que «Nuestros clientes» perdiera Limatambo cada tanto.
+
+   Una sección vacía cuando el archivo publicado la traía llena no es un
+   borrado del cliente: es una respuesta incompleta. Se descarta. */
+function llegaAMedias(d){
+  if(!d) return true;
+  if(REF_EQUIPOS   && !(d.equipos   || []).length) return 'sin equipos';
+  if(REF_PROYECTOS && !(d.proyectos || []).length) return 'sin proyectos';
+  return false;
+}
+
 function aplicarDatos(d, enVivo){
   if(!d) return false;
   if(enVivo) DATOS_LISTOS = true;
@@ -74,6 +90,12 @@ function aplicarDatos(d, enVivo){
      si se perdiera, la web volvería a pedirle las fotos a Drive y Drive
      las rechazaría con 429. */
   if(d.local) fotosLocales(d.local);
+  /* Del archivo publicado se anota CUÁNTO traía. Sirve de vara de medir
+     para descartar respuestas en vivo que lleguen a medias. */
+  if(!enVivo){
+    REF_EQUIPOS   = Math.max(REF_EQUIPOS,   (d.equipos   || []).length);
+    REF_PROYECTOS = Math.max(REF_PROYECTOS, (d.proyectos || []).length);
+  }
 
   const primeraVez = !CATALOGO_LISTO;
   const fCat = firmaCatalogo(d);
@@ -103,8 +125,13 @@ function aplicarDatos(d, enVivo){
      Ahora la sección abre al instante con la copia y se corrige sola en
      cuanto llega la hoja. La copia solo se acepta si trae "generado", para
      que un archivo de ejemplo escrito a mano nunca entre por aquí.    */
-  if(!enVivo && !PRO_PINTADOS && d.generado && Array.isArray(d.proyectos) && d.proyectos.length
-     && !PROYECTOS.length){
+  /* Se acepta «generado» o «actualizado»: el Apps Script pone uno u otro
+     según por dónde salga la respuesta, y exigir solo el primero dejó la
+     sección sin proyectos. Lo que importa es que el archivo lleve una marca
+     de tiempo puesta por el script, no que se llame de una manera concreta:
+     un archivo de ejemplo escrito a mano seguiría sin entrar. */
+  if(!enVivo && !PRO_PINTADOS && (d.generado || d.actualizado)
+     && Array.isArray(d.proyectos) && d.proyectos.length && !PROYECTOS.length){
     PROYECTOS = d.proyectos;
     HUELLA_PRO = '';                  // la respuesta en vivo la reemplaza igual
   }
@@ -288,6 +315,10 @@ function vivoLeer(publicado){
       localStorage.removeItem(VIVO_KEY);
       return null;
     }
+    if(llegaAMedias(o.d)){       // guardada de una respuesta mala anterior
+      localStorage.removeItem(VIVO_KEY);
+      return null;
+    }
     return o.d;
   }catch(e){}
   return null;
@@ -300,20 +331,28 @@ async function loadData(){
      integrado y el catálogo aparece igual.                            */
   let hayDatos = false;
   try{
+    /* SIEMPRE se parte del archivo publicado, aunque haya copia de sesión.
+       Antes, si la había, se pintaba esa y ya: el archivo ni se miraba. Y
+       como esa copia puede venir de una respuesta incompleta de la hoja,
+       no había forma de saber que faltaba algo ni con qué compararlo. De
+       ahí que «Nuestros clientes» perdiera Limatambo cada tanto.
+
+       index.html arrancó esta descarga en el <head>, antes de que
+       existiera este archivo: aquí solo se recoge, ya suele estar lista. */
+    let d = null;
+    if(window.__catalogo) d = await window.__catalogo;
+    if(!d && CONFIG.CACHE_URL) d = await traer(CONFIG.CACHE_URL, 5000);
+    hayDatos = aplicarDatos(d, false);          // base completa y vara de medir
+
+    /* Y encima, lo más fresco que haya de la hoja: primero lo de esta
+       sesión; si no, la última respuesta buena guardada. Cualquiera de las
+       dos se descarta si llega a medias. */
     const guardado = sessionStorage.getItem(CACHE_KEY);
-    if(guardado){
-      hayDatos = aplicarDatos(JSON.parse(guardado), true);   // la caché vino del Apps Script
-    }else{
-      /* index.html arrancó esta descarga en el <head>, antes de que
-         existiera este archivo. Aquí solo se recoge el resultado, así
-         que normalmente ya está lista y no se espera nada.          */
-      let d = null;
-      if(window.__catalogo) d = await window.__catalogo;
-      if(!d && CONFIG.CACHE_URL) d = await traer(CONFIG.CACHE_URL, 5000);
-      hayDatos = aplicarDatos(d, false);
-      /* y, si la hay, la última respuesta buena de la hoja (proyectos incluidos) */
-      const vivo = vivoLeer(d && d.actualizado);
-      if(vivo) hayDatos = aplicarDatos(vivo, true) || hayDatos;
+    const extra = guardado ? JSON.parse(guardado) : vivoLeer(d && d.actualizado);
+    if(extra && !llegaAMedias(extra)) hayDatos = aplicarDatos(extra, true) || hayDatos;
+    else if(extra){
+      console.warn('Sinergia: copia guardada incompleta, se descarta');
+      try{ sessionStorage.removeItem(CACHE_KEY); }catch(e){}
     }
   }catch(e){
     console.warn('Sinergia: no se pudo leer la copia local ('+e.message+')');
@@ -324,6 +363,12 @@ async function loadData(){
   if(!CONFIG.DATA_URL){ rendirse('sin DATA_URL configurada'); return; }
   try{
     const d = await traerPronto(CONFIG.DATA_URL, _ESPERA);
+    const falta = llegaAMedias(d);
+    if(falta){
+      /* Ni se pinta ni se guarda: se deja lo que ya había, que está completo. */
+      console.warn('Sinergia: respuesta incompleta de la hoja ('+falta+'), se ignora');
+      return;
+    }
     aplicarDatos(d, true);
     try{ sessionStorage.setItem(CACHE_KEY, JSON.stringify(d)); }catch(e){}
     vivoGuardar(d);
