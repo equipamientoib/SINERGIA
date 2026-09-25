@@ -4,6 +4,7 @@ function renderEquipo(id){
   const body=document.getElementById('equipoBody');
   if(!e){body.innerHTML='<div class="pagehead"><h1>Equipo no encontrado</h1></div>';return;}
   const items=galleryItems(e);
+  const minis=galleryItems(e,200);          // la miniatura mide 82 px: no hace falta más
   const idx=EQUIPOS.indexOf(e);
   /* Un equipo nuevo de la hoja puede venir sin ficha: no debe romper la página. */
   const specRows=Object.entries(e.specs||{}).map(([k,v])=>`<div class="row"><span class="l">${k}</span><span class="v">${v}</span></div>`).join('');
@@ -31,7 +32,7 @@ function renderEquipo(id){
       <div class="gallery">
         <div class="main" id="galMain">${items[0]}<span class="gp"></span></div>
         <div class="thumbs" id="galThumbs">
-          ${items.map((it,i)=>`<div class="thumb ${i===0?'on':''}" onclick="swapGal(${i})">${it}</div>`).join('')}
+          ${minis.map((it,i)=>`<div class="thumb ${i===0?'on':''}" onclick="swapGal(${i})">${it}</div>`).join('')}
         </div>
       </div>
       <div class="dinfo">
@@ -60,14 +61,17 @@ function renderPaquete(id){
   /* Galería del paquete: fotos del conjunto (hoja Paquetes, columnas foto / fotos). */
   const pkFotos=(p.fotos&&p.fotos.length)?p.fotos:(p.foto?[p.foto]:[]);
   const pkGal=pkFotos.length
-    ? pkFotos.map(u=>`<img src="${u}" alt="${p.nom}">`)
+    ? pkFotos.map(u=>`<img src="${fotoURL(u,900)}" alt="${p.nom}">`)
     : items.map(e=>device(e));
+  const pkMini=pkFotos.length
+    ? pkFotos.map(u=>`<img src="${fotoURL(u,200)}" alt="${p.nom}">`)
+    : pkGal;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; Paquetes &nbsp;/&nbsp; ${p.nom}</div>
     <div class="detail">
       <div class="gallery">
         <div class="main" id="galMain">${pkGal[0]}<span class="gp"></span></div>
-        <div class="thumbs">${pkGal.map((it,i)=>`<div class="thumb ${i===0?'on':''}" onclick="swapPk(${i})">${it}</div>`).join('')}</div>
+        <div class="thumbs">${pkMini.map((it,i)=>`<div class="thumb ${i===0?'on':''}" onclick="swapPk(${i})">${it}</div>`).join('')}</div>
       </div>
       <div class="dinfo">
         <div class="dcat">Paquete · ${p.nivel}</div>

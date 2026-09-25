@@ -73,11 +73,19 @@ function device(e){
     <circle cx="156" cy="150" r="18" fill="#23262C"/><circle cx="156" cy="150" r="18" fill="none" stroke="${dial}" stroke-width="2"/><rect x="153" y="136" width="6" height="11" rx="3" fill="${dial}"/>
     <rect x="120" y="132" width="22" height="13" rx="4" fill="#23262C"/><rect x="170" y="132" width="22" height="13" rx="4" fill="#23262C"/></svg>`;
 }
+/* Las fotos del Drive vienen de la hoja SIN tamaño, y así lh3 entrega el
+   original: varios MB cada una. Pidiendo siete de golpe (galería del detalle)
+   Google corta las primeras y salen rotas. Con "=w<ancho>" las entrega ya
+   redimensionadas, una por caja, y dejan de fallar. Solo se le añade a las
+   de lh3 que no traigan ya un tamaño; las locales quedan intactas. */
+function fotoURL(u, ancho){
+  return (/lh3\.googleusercontent\.com/.test(u) && !/=[ws]\d/.test(u)) ? u+'=w'+ancho : u;
+}
 // galería: foto real (si existe) + vista técnica ilustrada
-function galleryItems(e){
+function galleryItems(e, ancho){
   const items=[];
   const fotos=(e.fotos&&e.fotos.length)?e.fotos:(e.photo?[e.photo]:[]);
-  fotos.forEach(u=>items.push(`<img src="${u}" alt="${e.nom}">`));
+  fotos.forEach(u=>items.push(`<img src="${fotoURL(u, ancho||900)}" alt="${e.nom}">`));
   if(!items.length) items.push(device(e));   // el ícono solo cuando no hay foto
   return items;
 }
