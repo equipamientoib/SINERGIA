@@ -264,10 +264,20 @@ const VIVO_KEY = 'sb-datos-vivo', VIVO_HORAS = 24;
 function vivoGuardar(d){
   try{ localStorage.setItem(VIVO_KEY, JSON.stringify({t:Date.now(), d:d})); }catch(e){}
 }
-function vivoLeer(){
+function vivoLeer(publicado){
   try{
     const o = JSON.parse(localStorage.getItem(VIVO_KEY) || 'null');
-    if(o && o.t && (Date.now()-o.t)/3600000 < VIVO_HORAS) return o.d;
+    if(!o || !o.t || (Date.now()-o.t)/3600000 >= VIVO_HORAS) return null;
+    /* Esta copia se pinta ENCIMA de data/catalogo.json. Si el archivo
+       publicado es más nuevo que ella, aplicarla sería retroceder: el
+       visitante que ya entró antes vería el catálogo viejo hasta 24 h
+       después de publicar. Pasó con las fotos de las herramientas: ya
+       estaban publicadas y la página seguía pintando las de antes. */
+    if(publicado && o.d && o.d.actualizado && o.d.actualizado < publicado){
+      localStorage.removeItem(VIVO_KEY);
+      return null;
+    }
+    return o.d;
   }catch(e){}
   return null;
 }
@@ -291,7 +301,7 @@ async function loadData(){
       if(!d && CONFIG.CACHE_URL) d = await traer(CONFIG.CACHE_URL, 5000);
       hayDatos = aplicarDatos(d, false);
       /* y, si la hay, la última respuesta buena de la hoja (proyectos incluidos) */
-      const vivo = vivoLeer();
+      const vivo = vivoLeer(d && d.actualizado);
       if(vivo) hayDatos = aplicarDatos(vivo, true) || hayDatos;
     }
   }catch(e){
