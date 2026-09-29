@@ -148,7 +148,9 @@ async function cargarExpediente(id, reintento){
   const enMemoria=()=>window.EXPEDIENTES_DATA&&window.EXPEDIENTES_DATA[id];
   if(enMemoria()) return listo(enMemoria());
   try{
-    const r=await fetch(p.datos,{cache:'no-store'});
+    /* 'no-cache' y no 'no-store': igual pregunta al servidor si cambió,
+       pero si no cambió responde 304 y no se vuelven a bajar ~270 KB. */
+    const r=await fetch(p.datos,{cache:'no-cache'});
     const d=r.ok?await r.json():null;
     if(!d||!d.ok) throw new Error('JSON inválido');
     return listo(d);

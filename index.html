@@ -80,7 +80,7 @@ css/11-personaliza.css
 css/12-extras.css
 css/14-footer.css
 -->
-<link rel="stylesheet" href="css/app.css?v=85cfb547">
+<link rel="stylesheet" href="css/app.css?v=8afcf933">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -113,7 +113,7 @@ js/09-menu.js
 js/10-modal.js
 js/11-solicitudes.js
 -->
-<script defer src="js/app.js?v=85cfb547"></script>
+<script defer src="js/app.js?v=8afcf933"></script>
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -146,7 +146,7 @@ js/11-solicitudes.js
            entre visitas sin que nada compita con la llamada a la acción.
            El <img> va SIN src: el script de abajo lo pone mientras la página
            se lee, así no parpadea ni se descarga una foto que no se usa. -->
-      <img id="heroFoto" alt="Instrumento de Sinergia Biomédica verificando un equipo en un hospital" onclick="go(HERO_IR)">
+      <img id="heroFoto" fetchpriority="high" alt="Instrumento de Sinergia Biomédica verificando un equipo en un hospital" onclick="go(HERO_IR)">
       <div class="cap" id="heroPie"></div>
       <noscript><img src="img/catalogo/defib-05.jpg" alt="Analizador de desfibriladores en uso"></noscript>
       <script>
