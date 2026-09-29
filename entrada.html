@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sinergia Biomédica — Venta de equipamiento y alquiler de analizadores biomédicos</title>
+<meta name="description" content="Venta de equipamiento biomédico para hospitales y clínicas, y alquiler de analizadores y simuladores con certificado de calibración vigente. Lima y provincias, Perú.">
+<meta name="theme-color" content="#17191D">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_PE">
+<meta property="og:title" content="Sinergia Biomédica">
+<meta property="og:description" content="Venta de equipamiento biomédico y alquiler de analizadores y simuladores. Lima y provincias.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<!-- BORRADOR: esta página será la portada (index.html) cuando se publique.
+     La web de alquiler pasará a alquiler.html y la de venta a venta.html. -->
+<script>
+  /* Enlaces antiguos: sinergiabiomedica.pe/#/catalogo, /#/equipo/…, etc.
+     eran de la web de alquiler. Se mandan allí antes de pintar nada. */
+  if (/^#\//.test(location.hash) && location.hash !== '#/')
+    location.replace('index.html' + location.hash);
+</script>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ChakraPetch-600.woff2" crossorigin>
+<link rel="stylesheet" href="/css/00-fuentes.css">
+<style>
+  :root{--onix:#17191D;--grafito:#2A2D33;--bronce:#9A7F4E;--bronce-cl:#C8AE7C;
+    --gris:#6E727A;--hueso:#F5F3EE;--blanco:#fff;--linea:rgba(23,25,29,.09);
+    --ff-d:'Chakra Petch',system-ui,sans-serif;--ff-b:'Titillium Web',system-ui,sans-serif;
+    --pad:clamp(16px,4vw,40px)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--ff-b);background:var(--onix);color:var(--onix);
+    -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+
+  /* ── Cabecera ─────────────────────────────────────────── */
+  .top{background:var(--hueso);border-bottom:1px solid var(--linea)}
+  .top .in{max-width:1280px;margin:0 auto;padding:0 var(--pad);height:74px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{height:44px;width:auto;display:block}
+  .logo text{font-family:var(--ff-d)}
+  .top .cta{font-family:var(--ff-d);font-weight:600;font-size:14px;color:var(--grafito);
+    display:flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--linea);
+    border-radius:10px;background:var(--blanco);transition:border-color .2s}
+  .top .cta:hover{border-color:var(--bronce)}
+  .top .cta svg{width:18px;height:18px;fill:#25D366}
+
+  /* ── Encabezado ───────────────────────────────────────── */
+  .intro{background:var(--hueso);text-align:center;padding:clamp(28px,5vw,48px) var(--pad) clamp(22px,4vw,36px)}
+  .eyebrow{font-family:var(--ff-d);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--bronce)}
+  .intro h1{font-family:var(--ff-d);font-weight:600;font-size:clamp(26px,4vw,42px);
+    line-height:1.15;margin-top:10px;letter-spacing:-.5px}
+  .intro p{color:var(--gris);font-size:clamp(15px,1.6vw,17px);margin-top:10px}
+
+  /* ── Las dos puertas ──────────────────────────────────── */
+  .puertas{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:480px}
+  .puerta{position:relative;overflow:hidden;display:flex;align-items:flex-end;
+    color:var(--blanco);isolation:isolate;min-height:420px;
+    text-shadow:0 1px 12px rgba(0,0,0,.35)}
+  .puerta img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;
+    transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+  .puerta::before{content:"";position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(180deg,rgba(23,25,29,.35) 0%,rgba(23,25,29,.78) 40%,rgba(23,25,29,.96) 100%)}
+  .puerta + .puerta{border-left:1px solid rgba(255,255,255,.08)}
+  .puerta .txt{padding:clamp(24px,4vw,48px);max-width:560px}
+  .num{font-family:var(--ff-d);font-weight:600;font-size:13px;letter-spacing:3px;color:var(--bronce-cl);
+    display:flex;align-items:center;gap:10px}
+  .num::after{content:"";width:34px;height:1px;background:var(--bronce-cl)}
+  .puerta h2{font-family:var(--ff-d);font-weight:600;font-size:clamp(26px,3.2vw,40px);
+    line-height:1.1;margin:12px 0 12px;letter-spacing:-.3px}
+  .puerta p{color:rgba(255,255,255,.82);font-size:16px;line-height:1.55}
+  .puerta ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px}
+  .puerta li{font-size:13px;padding:5px 11px;border:1px solid rgba(255,255,255,.22);
+    border-radius:99px;background:rgba(255,255,255,.06);backdrop-filter:blur(4px)}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--ff-d);font-weight:600;
+    font-size:15px;padding:13px 22px;border-radius:12px;background:var(--bronce);color:var(--blanco);
+    transition:background .2s,gap .2s}
+  .btn span{transition:transform .2s}
+  .puerta:hover img,.puerta:focus-visible img{transform:scale(1.04)}
+  .puerta:hover .btn,.puerta:focus-visible .btn{background:#B0925C}
+  .puerta:hover .btn span,.puerta:focus-visible .btn span{transform:translateX(4px)}
+  .puerta:focus-visible{outline:3px solid var(--bronce-cl);outline-offset:-3px}
+
+  /* ── Pie ──────────────────────────────────────────────── */
+  .pie{background:var(--onix);color:rgba(255,255,255,.6);font-size:13px;
+    border-top:1px solid rgba(255,255,255,.08)}
+  .pie .in{max-width:1280px;margin:0 auto;padding:16px var(--pad);display:flex;
+    flex-wrap:wrap;gap:8px 22px;justify-content:space-between}
+  .pie a:hover{color:var(--blanco)}
+  .pie .datos{display:flex;flex-wrap:wrap;gap:6px 18px}
+
+  @media (max-width:760px){
+    .puertas{grid-template-columns:1fr}
+    .puerta{min-height:380px}
+    .puerta + .puerta{border-left:0;border-top:1px solid rgba(255,255,255,.08)}
+    .top .cta b{display:none}
+    .logo{height:38px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="in">
+  <a href="/" aria-label="Sinergia Biomédica — inicio">
+    <svg class="logo" viewBox="0 0 880 240" role="img" aria-label="Sinergia Biomédica">
+      <text x="40" y="208" font-weight="700" font-size="212" textLength="252" lengthAdjust="spacingAndGlyphs"><tspan fill="#9A7F4E">S</tspan><tspan fill="#2A2D33">B</tspan></text>
+      <text x="342" y="158" font-weight="700" font-size="100" fill="#17191D" textLength="498" lengthAdjust="spacingAndGlyphs">SINERGIA</text>
+      <text x="342" y="212" font-weight="600" font-size="52" fill="#2A2D33" textLength="498" lengthAdjust="spacingAndGlyphs">BIOMÉDICA</text>
+      <rect x="342" y="228" width="498" height="3" fill="#9A7F4E"/>
+    </svg>
+  </a>
+  <a class="cta" href="https://wa.me/51908704131" target="_blank" rel="noopener">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.6.8 5 2.3 7L4 29l7.3-2.2c1.9 1 4 1.6 6.2 1.6h.1c6.6 0 12-5.3 12-11.9 0-3.2-1.3-6.2-3.5-8.4A12 12 0 0 0 16 3zm7 16.9c-.3.8-1.7 1.6-2.4 1.7-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.8-3.6-1.5-5.9-5.1-6.1-5.4-.2-.2-1.4-1.9-1.4-3.7s.9-2.6 1.3-3c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6l1.1 2.7c.1.2.2.5 0 .7l-.4.7-.6.6c-.2.2-.4.4-.2.8.2.3 1 1.6 2.1 2.6 1.5 1.3 2.7 1.7 3 1.9.4.2.6.1.8-.1l1.2-1.4c.3-.3.5-.2.8-.1l2.6 1.2c.4.2.6.3.7.5.1.1.1.8-.2 1.6z"/></svg>
+    <b>+51 908 704 131</b>
+  </a>
+</div></header>
+
+<section class="intro">
+  <div class="eyebrow">Equipamiento · Metrología · Alquiler</div>
+  <h1>¿Qué necesita tu institución hoy?</h1>
+  <p>Elige la línea de servicio y te llevamos directo a lo que buscas.</p>
+</section>
+
+<main class="puertas">
+  <!-- FOTO DE MUESTRA: reemplazar por una foto de equipos en venta. -->
+  <a class="puerta" href="venta.html">
+    <img src="/img/catalogo/defib-03.webp" alt="" fetchpriority="high">
+    <div class="txt">
+      <div class="num">01 · VENTA</div>
+      <h2>Venta de equipamiento biomédico</h2>
+      <p>Equipos e instrumentos para hospitales, clínicas y obras de equipamiento: desde la cotización y el expediente técnico hasta la entrega e instalación.</p>
+      <ul><li>Hospitales y clínicas</li><li>Obras y proyectos</li><li>Expedientes técnicos</li></ul>
+      <span class="btn">Ver equipamiento <span>→</span></span>
+    </div>
+  </a>
+  <a class="puerta" href="index.html">
+    <img src="/img/catalogo/esa620-02.webp" alt="">
+    <div class="txt">
+      <div class="num">02 · ALQUILER</div>
+      <h2>Alquiler de analizadores y simuladores biomédicos</h2>
+      <p>Instrumentos Fluke, Rigel y Contec por días, con certificado de calibración vigente y técnico instrumentista si lo necesitas.</p>
+      <ul><li>Calibración vigente</li><li>Por hora, día o mes</li><li>Lima y provincias</li></ul>
+      <span class="btn">Ver catálogo de alquiler <span>→</span></span>
+    </div>
+  </a>
+</main>
+
+<footer class="pie"><div class="in">
+  <span>© Servicios Integrales Sinergia S.A.C. · RUC 20615862682</span>
+  <span class="datos">
+    <a href="mailto:logistica@sinergiabiomedica.pe">logistica@sinergiabiomedica.pe</a>
+    <span>Pueblo Libre, Lima — Perú</span>
+  </span>
+</div></footer>
+
+</body>
+</html>
