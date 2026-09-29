@@ -80,7 +80,7 @@ function cardEq(e){
     :(VER_PRECIOS
       ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${precioHora(e.dia)}<span>/hora · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`
       :`<div class="foot"><div class="price" style="font-size:15px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Consultar tarifa<small style="font-weight:400">te respondemos con precio y disponibilidad</small></div><button class="btn" onclick="go('#/contacto')">Cotizar</button></div>`);
-  /* Varias fotos: la tarjeta las pasa sola. La primera suele ser la de
+  /* Varias fotos: se ve la primera y las flechas pasan a las demás. La primera suele ser la de
      estudio y las siguientes, el instrumento midiendo en un equipo real:
      eso es lo que distingue un catálogo propio de uno bajado del fabricante. */
   const fotos=(e.fotos&&e.fotos.length)?e.fotos:(e.photo?[e.photo]:[]);
@@ -179,8 +179,10 @@ function toggleFiltros(){document.getElementById('filtersSide').classList.toggle
 
 
 /* ── Carrusel de las tarjetas del catálogo ────────────────────────────
-   Pasa solo cada 5 s, y únicamente en las tarjetas que están a la vista:
-   una rejilla con doce equipos no debe estar animando lo que nadie mira.
+   Las tarjetas NO pasan las fotos solas: con varias tarjetas cambiando a
+   la vez la rejilla no paraba quieta. Queda la primera foto fija y las
+   flechas para quien quiera ver más; el pase automático vive solo en la
+   ficha del equipo (05-detalle.js).
    Si una foto no carga, se retira sin dejar hueco.                     */
 function eqcarQuitar(img){
   const c=img.closest('.eqcar'); if(!c) return;
@@ -193,13 +195,11 @@ function eqcarQuitar(img){
   eqcarIr(c,0);
 }
 /* La tarjeta entera es un enlace a la ficha: sin detener el evento, pasar
-   una foto te sacaría de la página. Y se marca la tarjeta como tocada para
-   que deje de girar sola mientras alguien la mira. */
+   una foto te sacaría de la página. */
 function eqcarMover(ev, paso){
   ev.stopPropagation(); ev.preventDefault();
   const c = ev.currentTarget.closest('.eqcar'); if(!c) return;
   eqcarIr(c, (+c.dataset.i || 0) + paso);
-  c.dataset.tocado = Date.now();
 }
 function eqcarIr(c,n){
   const im=[...c.querySelectorAll('img')]; if(!im.length) return;
@@ -215,20 +215,3 @@ function eqcarIr(c,n){
   im.forEach((x,k)=>x.classList.toggle('on',k===n));
   c.querySelectorAll('.eqcar-p i').forEach((x,k)=>x.classList.toggle('on',k===n));
 }
-setInterval(()=>{
-  if(document.hidden) return;
-  document.querySelectorAll('.eqcar').forEach(c=>{
-    if(!c.offsetParent || c.querySelectorAll('img').length<2) return;
-    const r=c.getBoundingClientRect();
-    if(r.bottom<0 || r.top>innerHeight) return;        // fuera de pantalla, no gasta
-    if(Date.now() - (+c.dataset.tocado||0) < 15000) return;  // alguien la está pasando a mano
-    /* Como las fotos se piden solo cuando hacen falta, la siguiente puede no
-       haber llegado. Se pide y se pasa en el turno siguiente, ya cargada: es
-       preferible esperar cinco segundos más a enseñar un hueco. */
-    const im = c.querySelectorAll('img');
-    const sig = ((+c.dataset.i||0) + 1) % im.length, f = im[sig];
-    if(f && f.dataset.src){ f.src = f.dataset.src; f.removeAttribute('data-src'); return; }
-    if(f && !f.naturalWidth) return;          // pedida, aún en camino
-    eqcarIr(c, sig);
-  });
-},5000);
