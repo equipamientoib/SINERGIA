@@ -74,7 +74,7 @@
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
   /* HERO */
-  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:80px 0 70px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding-top:80px;padding-bottom:70px}
   .eyebrow{font-family:var(--ff-d);font-weight:500;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--cobre-d);margin-bottom:22px;display:flex;align-items:center;gap:12px}
   .eyebrow::before{content:"";width:32px;height:1px;background:var(--bronce)}
   .hero-grid h1{font-size:clamp(32px,4.6vw,52px);font-weight:700;line-height:1.07;letter-spacing:-1.4px}
@@ -86,7 +86,7 @@
   .hero-stage img{position:relative;display:block;width:100%;border-radius:14px;cursor:pointer}
   .hero-stage .cap{position:relative;display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-family:var(--ff-d);font-size:12px;letter-spacing:1px;color:var(--gris)}
   .hero-stage .cap b{color:var(--cobre-d);font-weight:600}
-  @media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:34px;padding:48px 0 40px}}
+  @media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:34px;padding-top:48px;padding-bottom:40px}}
 
   /* MARCAS */
   .marcas{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);background:var(--crema)}
@@ -101,7 +101,9 @@
   .shead .k{font-family:var(--ff-d);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--cobre-d)}
   .shead h2{font-size:clamp(25px,3.3vw,36px);font-weight:600;letter-spacing:-.6px;margin-top:10px}
   .shead p{color:var(--gris);font-weight:400;max-width:44ch;font-size:15px}
-  .pagehead{padding:54px 0 0}
+  /* padding-top y no «padding:54px 0 0»: el atajo ponía en cero el margen
+     lateral de .wrap y en el celular el texto quedaba pegado al borde. */
+  .pagehead{padding-top:54px}
   .pagehead h1{font-size:clamp(30px,4vw,46px);font-weight:700;letter-spacing:-1px;margin-top:10px}
   .pagehead p{color:var(--gris);font-size:16px;margin-top:12px;max-width:60ch}
 
@@ -170,8 +172,9 @@
   .eqcar-f.der{right:8px}
   .eqcar.una .eqcar-f{display:none}
   .eq .img .grid-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(23,25,29,.05) 1px,transparent 1px);background-size:16px 16px;opacity:.55}
-  .eq .badge{position:absolute;top:13px;left:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:rgba(46,139,107,.13);color:var(--ok);border:1px solid rgba(46,139,107,.28)}
-  .eq .tier{position:absolute;top:13px;right:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:rgba(154,127,78,.15);color:var(--cobre-d);border:1px solid var(--linea-b)}
+  /* Fondo sólido: sobre fotos oscuras el semitransparente no se leía. */
+  .eq .badge{position:absolute;top:13px;left:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:#EAF4EF;color:var(--ok);border:1px solid rgba(46,139,107,.35);box-shadow:0 1px 4px rgba(23,25,29,.12)}
+  .eq .tier{position:absolute;top:13px;right:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:#F4EEE3;color:var(--cobre-d);border:1px solid var(--linea-b);box-shadow:0 1px 4px rgba(23,25,29,.12)}
   .eq .body{padding:20px;flex:1;display:flex;flex-direction:column}
   .eq .cat{font-family:var(--ff-d);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cobre-d);margin-bottom:7px}
   .eq h3{font-size:18px;font-weight:600;margin:0 0 3px;line-height:1.2;cursor:pointer}
@@ -189,6 +192,9 @@
   .nota{margin-top:36px;background:var(--blanco);border:1px solid var(--linea-b);border-radius:var(--r-md);padding:18px 22px;display:flex;gap:16px;align-items:center}
   .nota .tag{font-family:var(--ff-d);font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--blanco);background:var(--bronce);padding:7px 12px;border-radius:6px;white-space:nowrap}
   .nota p{font-size:14px;color:var(--grafito)}
+  /* En el celular la etiqueta va arriba: al lado dejaba el texto en una
+     columna de cuatro palabras por renglón. */
+  @media(max-width:600px){.nota{flex-direction:column;align-items:flex-start;gap:10px}}
 
   /* DETALLE EQUIPO */
   .crumb{font-size:13px;color:var(--gris);padding-top:30px}
@@ -312,7 +318,11 @@
   .save-box{margin-left:auto;font-family:var(--ff-d);font-weight:600;font-size:12px;color:var(--ok);background:rgba(46,139,107,.12);border:1px solid rgba(46,139,107,.26);padding:6px 11px;border-radius:6px}
 
   /* CATÁLOGO: filtro lateral + submenú */
-  .catalog-layout{display:grid;grid-template-columns:228px 1fr;gap:28px;align-items:start}
+  /* minmax(0,1fr) y min-width:0: sin esto la columna se estira hasta el ancho
+     de la fila de filtros deslizable y en el celular la página se sale por la
+     derecha (medido: 825 px de ancho en una pantalla de 390). */
+  .catalog-layout{display:grid;grid-template-columns:228px minmax(0,1fr);gap:28px;align-items:start}
+  .catalog-main{min-width:0}
   .filters-side{position:sticky;top:88px;background:var(--blanco);border:1px solid var(--linea);border-radius:14px;overflow:hidden}
   .facet{border-bottom:1px solid var(--linea)}
   .facet[open] summary{color:var(--cobre-d)}
@@ -335,7 +345,7 @@
   .pmodbig{font-size:13px;color:var(--cobre-d);margin:10px 0 2px;font-weight:600}
   .modnote{font-size:11.5px;color:var(--gris);margin-bottom:6px}
   @media(max-width:880px){
-    .catalog-layout{grid-template-columns:1fr;gap:0}
+    .catalog-layout{grid-template-columns:minmax(0,1fr);gap:0}
     .filters-side{position:static;display:none;margin-bottom:18px}
     .filters-side.open{display:block}
     .filtros-btn{display:block}
@@ -401,7 +411,7 @@
 /* ===== css/11-personaliza.css ===== */
   /* PERSONALIZA */
   .custom-layout{display:grid;grid-template-columns:1fr 322px;gap:28px;align-items:start}
-  .catalog-layout.nofilters{grid-template-columns:1fr}
+  .catalog-layout.nofilters{grid-template-columns:minmax(0,1fr)}
   .custom-intro{font-size:14px;color:var(--gris);line-height:1.55;margin-bottom:22px;max-width:760px}
   .cgroup{margin-bottom:22px}
   .cgh{font-family:var(--ff-d);font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cobre-d);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--linea)}

@@ -830,17 +830,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=cd2704b8';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=a8e3baf5';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=cd2704b8';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=a8e3baf5';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=cd2704b8','js/06-tablero.js?v=cd2704b8'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=a8e3baf5','js/06-tablero.js?v=a8e3baf5'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=cd2704b8'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=a8e3baf5'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1007,8 +1007,14 @@ function aplicarDatos(d, enVivo){
 
   if(cambioCat){
     HUELLA_CAT = fCat;
-    if(Array.isArray(d.equipos)  && d.equipos.length)  EQUIPOS  = d.equipos;
-    if(Array.isArray(d.paquetes) && d.paquetes.length) PAQUETES = d.paquetes;
+    /* Solo se aceptan filas con id y nombre. Si la hoja cambia de forma
+       (p. ej. un bloque de parámetros encima de los encabezados) llegan
+       filas vacías, y pintarlas dejaba tarjetas en blanco en la web: mejor
+       quedarse con lo que ya había.                                     */
+    const validos = a => Array.isArray(a) ? a.filter(x => x && x.id && x.nom) : [];
+    const eqOk = validos(d.equipos), pkOk = validos(d.paquetes);
+    if(eqOk.length) EQUIPOS  = eqOk;
+    if(pkOk.length) PAQUETES = pkOk;
     if(d.modelo){
       const m=d.modelo;
       if(m.instrumentista_dia!=null) TEC_DIA=m.instrumentista_dia;

@@ -183,9 +183,16 @@ function valores_(ss, nombreHoja) {
 function filas_(ss, nombreHoja) {
   var vals = valores_(ss, nombreHoja);
   if (vals.length < 2) return [];
-  var heads = vals[0].map(function (h) { return s_(h); });
+  /* Los encabezados son la primera fila que empieza con «id». Antes se
+     daba por hecho que eran la fila 1, y cuando la hoja Paquetes ganó un
+     bloque de PARÁMETROS arriba, la web recibió 14 paquetes vacíos.     */
+  var fh = 0, tope = Math.min(vals.length, LIM_CABECERA);
+  for (var k = 0; k < tope; k++) {
+    if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  }
+  var heads = vals[fh].map(function (h) { return s_(h); });
   var out = [];
-  for (var i = 1; i < vals.length; i++) {
+  for (var i = fh + 1; i < vals.length; i++) {
     if (s_(vals[i][0]) === '') continue;
     var r = {};
     for (var j = 0; j < heads.length; j++) if (heads[j]) r[heads[j]] = vals[i][j];
