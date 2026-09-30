@@ -36,7 +36,9 @@ jobs:
             echo "datos=/tmp/vivo.json" >> "$GITHUB_OUTPUT"
           else
             echo "::warning::El Apps Script no devolvió el catálogo; se usa data/catalogo.json. Inicio de la respuesta:"
-            head -c 400 /tmp/vivo.json 2>/dev/null || true; echo
+            # Título y texto visible de la página que devolvió Google (suele
+            # decir el error del script o que pide iniciar sesión).
+            python3 -c "import re,html;t=open('/tmp/vivo.json',errors='ignore').read();m=re.search(r'<title>(.*?)</title>',t,re.S);print('titulo:',html.unescape(m.group(1)).strip() if m else '-');b=re.sub(r'(?s)<(script|style).*?</\\1>','',t);print('texto:',re.sub(r'\\s+',' ',html.unescape(re.sub(r'<[^>]+>',' ',b))).strip()[:500])" || true
             echo "datos=data/catalogo.json" >> "$GITHUB_OUTPUT"
           fi
 
