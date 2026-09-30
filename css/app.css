@@ -496,6 +496,9 @@
 
   .cat-chips{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .cat-chips>span{font-family:var(--ff-d);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gris);margin-right:4px}
+  .tipos-alq{margin-top:12px}
+  .tipos-alq a{font-family:var(--ff-b);line-height:1.15;font-weight:600;font-size:13px;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--linea);background:var(--blanco);color:var(--gris);transition:.2s}
+  .tipos-alq a:hover{border-color:var(--bronce);color:var(--cobre-d)}
 
 /* ===== css/14-footer.css ===== */
   /* FOOTER */

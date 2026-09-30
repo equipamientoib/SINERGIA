@@ -10,6 +10,9 @@
 <meta property="og:locale" content="es_PE">
 <meta property="og:title" content="Sinergia Biomédica — Metrología y alquiler de equipos biomédicos">
 <meta property="og:description" content="Analizadores y simuladores premium con certificado de calibración vigente. Lima y provincias.">
+<meta property="og:url" content="https://sinergiabiomedica.pe/">
+<meta property="og:image" content="https://sinergiabiomedica.pe/img/catalogo/defib-05.jpg">
+<link rel="canonical" href="https://sinergiabiomedica.pe/">
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="img/icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="img/icons/favicon-16.png">
@@ -80,7 +83,7 @@ css/11-personaliza.css
 css/12-extras.css
 css/14-footer.css
 -->
-<link rel="stylesheet" href="css/app.css?v=a8e3baf5">
+<link rel="stylesheet" href="css/app.css?v=08f3009c">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -113,7 +116,7 @@ js/09-menu.js
 js/10-modal.js
 js/11-solicitudes.js
 -->
-<script defer src="js/app.js?v=a8e3baf5"></script>
+<script defer src="js/app.js?v=08f3009c"></script>
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -196,6 +199,10 @@ js/11-solicitudes.js
         <button class="chip" onclick="go('#/catalogo/paquetes')">Paquetes completos</button>
         <button class="chip" onclick="go('#/catalogo/custom')">Arma tu paquete</button>
       </div>
+      <!-- Enlaces reales a las páginas por tipo (alquiler/…): los rellena
+           scripts/generar_paginas.py entre los dos marcadores. Google los
+           sigue desde la portada sin ejecutar JavaScript. -->
+      <nav class="cat-chips tipos-alq" aria-label="Alquiler por tipo de equipo"><span>Alquiler por tipo</span><!--TIPOS-INICIO--><a href="/alquiler/analizador-de-seguridad-electrica/">Analizador de seguridad eléctrica</a><a href="/alquiler/analizador-de-desfibriladores/">Analizador de desfibriladores</a><a href="/alquiler/simulador-de-signos-vitales/">Simulador de signos vitales (ECG)</a><a href="/alquiler/simulador-de-spo2/">Simulador de SpO2</a><a href="/alquiler/phantom-de-puncion-ecoguiada/">Phantom de punción ecoguiada</a><a href="/alquiler/sonometro/">Sonómetro</a><a href="/alquiler/termometro-digital/">Termómetro digital de termocupla</a><a href="/alquiler/manometro-digital/">Manómetro digital</a><a href="/alquiler/luxometro/">Luxómetro</a><a href="/alquiler/tacometro/">Tacómetro</a><a href="/alquiler/multimetro/">Multímetro digital</a><!--TIPOS-FIN--></nav>
     </div>
   </section>
 

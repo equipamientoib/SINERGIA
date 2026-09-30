@@ -1,0 +1,49 @@
+# Regenera las páginas de alquiler por tipo (alquiler/…) y el sitemap con los
+# datos EN VIVO de la hoja, una vez al día. Si la hoja no cambió, no hace nada.
+# También se puede lanzar a mano: pestaña Actions → «Páginas de alquiler» → Run workflow.
+name: Páginas de alquiler
+
+on:
+  schedule:
+    - cron: '0 11 * * *'        # 06:00 en Lima
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: paginas-alquiler
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Traer el catálogo en vivo del Apps Script
+        run: |
+          URL=$(grep -oE 'https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec' js/00-config.js | head -1)
+          curl -sSL --retry 3 --max-time 90 "$URL" -o /tmp/vivo.json
+          # Si Google falla o la hoja viene vacía, no se toca nada.
+          python3 -c "import json,sys; d=json.load(open('/tmp/vivo.json')); n=sum(1 for e in d.get('equipos',[]) if e.get('id') and e.get('nom')); print('equipos:',n); sys.exit(0 if n else 1)"
+
+      - name: Generar páginas
+        run: python3 scripts/generar_paginas.py --datos /tmp/vivo.json
+
+      - name: Publicar si algo cambió
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet; then echo "Sin cambios."; exit 0; fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A alquiler sitemap.xml robots.txt index.html
+          git commit -m "Paginas de alquiler al dia con la hoja"
+          git push
+          # Un push hecho con GITHUB_TOKEN no siempre dispara GitHub Pages:
+          # se le pide la publicación explícitamente.
+          curl -sS -X POST -H "Authorization: Bearer $GH_TOKEN" \
+               -H "Accept: application/vnd.github+json" \
+               "https://api.github.com/repos/${{ github.repository }}/pages/builds" || true
