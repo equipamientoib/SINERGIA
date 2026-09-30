@@ -20,17 +20,28 @@ jobs:
   generar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Traer el catálogo en vivo del Apps Script
+        id: vivo
         run: |
           URL=$(grep -oE 'https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec' js/00-config.js | head -1)
-          curl -sSL --retry 3 --max-time 90 "$URL" -o /tmp/vivo.json
-          # Si Google falla o la hoja viene vacía, no se toca nada.
-          python3 -c "import json,sys; d=json.load(open('/tmp/vivo.json')); n=sum(1 for e in d.get('equipos',[]) if e.get('id') and e.get('nom')); print('equipos:',n); sys.exit(0 if n else 1)"
+          CODIGO=$(curl -sSL --retry 3 --max-time 90 -A "Mozilla/5.0 (paginas-alquiler)" \
+                   -w '%{http_code}' -o /tmp/vivo.json "$URL" || echo "000")
+          echo "HTTP $CODIGO · $(wc -c < /tmp/vivo.json 2>/dev/null || echo 0) bytes"
+          # Solo se usa si trae equipos con id y nombre. Si Google responde
+          # otra cosa (error, página de acceso), se sigue con el catálogo
+          # del repositorio: las páginas no se rompen y el job no falla.
+          if python3 -c "import json,sys; d=json.load(open('/tmp/vivo.json')); n=sum(1 for e in d.get('equipos',[]) if e.get('id') and e.get('nom')); print('equipos en vivo:',n); sys.exit(0 if n else 1)"; then
+            echo "datos=/tmp/vivo.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::El Apps Script no devolvió el catálogo; se usa data/catalogo.json. Inicio de la respuesta:"
+            head -c 400 /tmp/vivo.json 2>/dev/null || true; echo
+            echo "datos=data/catalogo.json" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Generar páginas
-        run: python3 scripts/generar_paginas.py --datos /tmp/vivo.json
+        run: python3 scripts/generar_paginas.py --datos "${{ steps.vivo.outputs.datos }}"
 
       - name: Publicar si algo cambió
         env:
