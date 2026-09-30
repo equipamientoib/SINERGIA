@@ -30,8 +30,9 @@
   .eqcar-f.der{right:8px}
   .eqcar.una .eqcar-f{display:none}
   .eq .img .grid-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(23,25,29,.05) 1px,transparent 1px);background-size:16px 16px;opacity:.55}
-  .eq .badge{position:absolute;top:13px;left:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:rgba(46,139,107,.13);color:var(--ok);border:1px solid rgba(46,139,107,.28)}
-  .eq .tier{position:absolute;top:13px;right:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:rgba(154,127,78,.15);color:var(--cobre-d);border:1px solid var(--linea-b)}
+  /* Fondo sólido: sobre fotos oscuras el semitransparente no se leía. */
+  .eq .badge{position:absolute;top:13px;left:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:#EAF4EF;color:var(--ok);border:1px solid rgba(46,139,107,.35);box-shadow:0 1px 4px rgba(23,25,29,.12)}
+  .eq .tier{position:absolute;top:13px;right:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:#F4EEE3;color:var(--cobre-d);border:1px solid var(--linea-b);box-shadow:0 1px 4px rgba(23,25,29,.12)}
   .eq .body{padding:20px;flex:1;display:flex;flex-direction:column}
   .eq .cat{font-family:var(--ff-d);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cobre-d);margin-bottom:7px}
   .eq h3{font-size:18px;font-weight:600;margin:0 0 3px;line-height:1.2;cursor:pointer}
@@ -49,6 +50,9 @@
   .nota{margin-top:36px;background:var(--blanco);border:1px solid var(--linea-b);border-radius:var(--r-md);padding:18px 22px;display:flex;gap:16px;align-items:center}
   .nota .tag{font-family:var(--ff-d);font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--blanco);background:var(--bronce);padding:7px 12px;border-radius:6px;white-space:nowrap}
   .nota p{font-size:14px;color:var(--grafito)}
+  /* En el celular la etiqueta va arriba: al lado dejaba el texto en una
+     columna de cuatro palabras por renglón. */
+  @media(max-width:600px){.nota{flex-direction:column;align-items:flex-start;gap:10px}}
 
   /* DETALLE EQUIPO */
   .crumb{font-size:13px;color:var(--gris);padding-top:30px}

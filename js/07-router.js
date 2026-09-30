@@ -103,8 +103,14 @@ function aplicarDatos(d, enVivo){
 
   if(cambioCat){
     HUELLA_CAT = fCat;
-    if(Array.isArray(d.equipos)  && d.equipos.length)  EQUIPOS  = d.equipos;
-    if(Array.isArray(d.paquetes) && d.paquetes.length) PAQUETES = d.paquetes;
+    /* Solo se aceptan filas con id y nombre. Si la hoja cambia de forma
+       (p. ej. un bloque de parámetros encima de los encabezados) llegan
+       filas vacías, y pintarlas dejaba tarjetas en blanco en la web: mejor
+       quedarse con lo que ya había.                                     */
+    const validos = a => Array.isArray(a) ? a.filter(x => x && x.id && x.nom) : [];
+    const eqOk = validos(d.equipos), pkOk = validos(d.paquetes);
+    if(eqOk.length) EQUIPOS  = eqOk;
+    if(pkOk.length) PAQUETES = pkOk;
     if(d.modelo){
       const m=d.modelo;
       if(m.instrumentista_dia!=null) TEC_DIA=m.instrumentista_dia;
