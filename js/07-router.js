@@ -4,6 +4,12 @@ function go(hash){location.hash=hash;closeMenu();}
 function route(sinMover){
   const h=location.hash||'#/';
   let pageId, navKey;
+  /* La ficha de un equipo es su página alquiler/<tipo>/ (la que indexa
+     Google). #/equipo/<id> queda solo para equipos sin página, y los
+     enlaces antiguos se redirigen. */
+  if(h.startsWith('#/equipo/') && (window.PAGINA_TIPO||{})[h.split('/')[2]]){
+    location.replace(window.PAGINA_TIPO[h.split('/')[2]]); return;
+  }
   if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/paquete/')){renderPaquete(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/proyecto/')){renderProyecto(h.split('/')[2]);pageId='page-equipo';navKey='#/clientes';}

@@ -413,6 +413,14 @@ function matchEq(e){
   if(F.origen.size&&!F.origen.has(eqOrigen(e)))return false;
   return true;
 }
+/* El clic en un equipo abre su página de alquiler (alquiler/<tipo>/), que
+   es la que Google indexa. PAGINA_TIPO la escribe generar_paginas.py en
+   index.html; un equipo que aún no tiene página va a su ficha #/equipo. */
+function urlEquipo(id){ return (window.PAGINA_TIPO||{})[id] || '#/equipo/'+id; }
+function irEquipo(id){
+  const u = (window.PAGINA_TIPO||{})[id];
+  if(u) location.href = u; else go('#/equipo/'+id);
+}
 function cardEq(e){
   const idx=EQUIPOS.indexOf(e);
   const badge=e.apoyo?`<span class="badge" style="background:rgba(154,127,78,.13);color:var(--cobre-d);border-color:var(--linea-b)">COMPLEMENTARIA</span>`:`<span class="badge">DISPONIBLE</span>`;
@@ -435,14 +443,14 @@ function cardEq(e){
        </div>`
     : (fotos.length?`<img class="photo" src="${fotoURL(fotos[0],600,true)}" alt="${e.nom}" loading="lazy" decoding="async">`:device(e));
   return `<div class="eq">
-      <div class="img${fotos.length?' has-photo':''}" onclick="go('#/equipo/${e.id}')">
+      <div class="img${fotos.length?' has-photo':''}" onclick="irEquipo('${e.id}')">
         ${fotos.length?'':'<span class="grid-bg"></span>'}
         ${badge}<span class="tier">${e.tier}</span>
         ${carr}
       </div>
       <div class="body">
         <div class="cat">${e.cat}</div>
-        <h3 onclick="go('#/equipo/${e.id}')">${e.nom}</h3>
+        <h3><a href="${urlEquipo(e.id)}">${e.nom}</a></h3>
         <div class="marca">${e.marca}</div>
       ${e.cal_fin?`<div class="calchip" style="margin-top:7px;display:inline-block;font-family:var(--ff-d);font-size:10px;letter-spacing:.6px;padding:3px 8px;border-radius:5px;background:rgba(46,139,107,.10);color:var(--ok);border:1px solid rgba(46,139,107,.25)">CALIBRACIÓN VIGENTE HASTA ${e.cal_fin}</div>`:''}
         <div class="desc">${e.desc}</div>
@@ -686,7 +694,7 @@ function renderPaquete(id){
   const body=document.getElementById('equipoBody');
   if(!p){body.innerHTML='<div class="pagehead"><h1>Paquete no encontrado</h1></div>';return;}
   const items=p.items.map(x=>byId(x));
-  const rows=items.map(e=>`<div class="row" onclick="go('#/equipo/${e.id}')"><span>${e.nom}</span><span class="v">${VER_PRECIOS?'S/ '+e.dia+'/día':'consultar'}</span></div>`).join('');
+  const rows=items.map(e=>`<div class="row" onclick="irEquipo('${e.id}')"><span>${e.nom}</span><span class="v">${VER_PRECIOS?'S/ '+e.dia+'/día':'consultar'}</span></div>`).join('');
   const kitRows=p.kit.map(k=>`<div class="row"><span>${APOYO[k]}</span><span class="v">incluido</span></div>`).join('');
   const kitBlock=p.kit.length?`<div class="pkinc"><div class="sh">Kit de intervención (+ S/ ${KIT_DIA}/día)</div>${kitRows}</div>`:'';
   /* Galería del paquete: fotos del conjunto (hoja Paquetes, columnas foto / fotos). */
@@ -830,17 +838,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=08f3009c';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=61dbecd5';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=08f3009c';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=61dbecd5';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=08f3009c','js/06-tablero.js?v=08f3009c'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=61dbecd5','js/06-tablero.js?v=61dbecd5'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=08f3009c'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=61dbecd5'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -908,6 +916,12 @@ function go(hash){location.hash=hash;closeMenu();}
 function route(sinMover){
   const h=location.hash||'#/';
   let pageId, navKey;
+  /* La ficha de un equipo es su página alquiler/<tipo>/ (la que indexa
+     Google). #/equipo/<id> queda solo para equipos sin página, y los
+     enlaces antiguos se redirigen. */
+  if(h.startsWith('#/equipo/') && (window.PAGINA_TIPO||{})[h.split('/')[2]]){
+    location.replace(window.PAGINA_TIPO[h.split('/')[2]]); return;
+  }
   if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/paquete/')){renderPaquete(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/proyecto/')){renderProyecto(h.split('/')[2]);pageId='page-equipo';navKey='#/clientes';}

@@ -19,7 +19,7 @@ img{max-width:100%;display:block}
 .top .wrap{height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .logo{height:40px;width:auto}.logo text{font-family:var(--ff-d)}
 .top nav{display:flex;gap:22px;font-family:var(--ff-d);font-weight:500;font-size:14px;color:var(--grafito)}
-.top nav a:hover{color:var(--cobre-d)}
+.top nav a:hover,.top nav a.on{color:var(--cobre-d)}
 
 .migas{font-size:13px;color:var(--gris);padding:22px 0 0}
 .migas a{color:var(--cobre-d)}.migas a:hover{text-decoration:underline}
@@ -38,7 +38,12 @@ h2{font-size:clamp(21px,2.4vw,26px);margin-bottom:18px}
 .equipo{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:28px;background:var(--blanco);
   border:1px solid var(--linea);border-radius:18px;overflow:hidden;margin-bottom:18px}
 .equipo .foto{background:var(--crema);display:block}
-.equipo .foto img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/3}
+.equipo{scroll-margin-top:90px}
+.galeria{display:flex;flex-direction:column;background:var(--crema)}
+.minis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:6px}
+.minis img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:6px;border:1px solid var(--linea)}
+.minis a:hover img{border-color:var(--bronce)}
+.equipo .foto img{width:100%;height:auto;object-fit:cover;aspect-ratio:4/3}
 @media(max-width:700px){.equipo .foto img{height:auto}}
 .equipo .info{padding:26px 28px 26px 0}
 .k{font-family:var(--ff-d);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--bronce)}
@@ -107,8 +112,14 @@ h2{font-size:clamp(21px,2.4vw,26px);margin-bottom:18px}
   .equipo .info{padding:20px}
   .usos ul{grid-template-columns:1fr}
   .top nav{gap:14px;font-size:13px}
-  .top nav a:not(:first-child):not(:last-child){display:none}
+  .top nav a:not(.on):not(:last-child){display:none}
   .logo{height:34px}
 }
 @media(max-width:520px){.tipos{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* enlaces de documentos de la ficha */
+.docs{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-size:14px}
+.docs a{color:var(--cobre-d);border-bottom:1px solid var(--linea-b)}
+.docs a:hover{border-color:var(--bronce)}
+.docs .cal{color:#2E8B6B;font-weight:600}
