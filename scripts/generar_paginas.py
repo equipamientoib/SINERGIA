@@ -9,6 +9,7 @@ de verdad:
     alquiler/index.html                         todos los tipos
     alquiler/<tipo>/index.html                  un tipo, con todos sus modelos
     sitemap.xml, robots.txt
+    index.html: window.PAGINA_TIPO (a qué página va cada equipo del catálogo)
 
 Por tipo y no por modelo: la gente busca «alquiler de analizador de
 seguridad eléctrica», no «ESA620». Y si mañana hay dos analizadores, los dos
@@ -139,8 +140,9 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
         'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': n,
                              'item': SITIO + r} for i, (n, r) in enumerate(migas)],
     }]}
+    visible = {'/alquiler/': '/#/catalogo'}
     migas_html = ' <span>/</span> '.join(
-        ('<a href="%s">%s</a>' % (r, e(n))) if i < len(migas) - 1 else '<span>%s</span>' % e(n)
+        ('<a href="%s">%s</a>' % (visible.get(r, r), e(n))) if i < len(migas) - 1 else '<span>%s</span>' % e(n)
         for i, (n, r) in enumerate(migas))
     return f'''<!DOCTYPE html>
 <html lang="es">
@@ -171,9 +173,11 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <header class="top"><div class="wrap">
   <a href="/" aria-label="Sinergia Biomédica — inicio">{LOGO}</a>
   <nav>
-    <a href="/alquiler/">Alquiler</a>
-    <a href="/#/catalogo">Catálogo</a>
+    <a href="/">Inicio</a>
+    <a href="/#/servicios">Servicios</a>
+    <a href="/#/catalogo" class="on">Catálogo</a>
     <a href="/#/talleres">Talleres</a>
+    <a href="/#/clientes">Clientes</a>
     <a href="/#/contacto">Contacto</a>
   </nav>
 </div></header>
@@ -199,17 +203,32 @@ def tarjeta_equipo(eq, tipo, cfg, locales):
     img = ('<img src="%s" alt="%s" loading="lazy" decoding="async" width="700" height="525">'
            % (fotos[0], e(eq['nom'] + ' — ' + eq.get('marca', '')))) if fotos else \
           '<div class="sinfoto">%s</div>' % ICONO
+    # Miniaturas del resto de fotos: sin JavaScript, cada una abre la foto grande.
+    minis = ''.join('<a href="%s" target="_blank" rel="noopener"><img src="%s" alt="%s — foto %d" loading="lazy" decoding="async" width="120" height="90"></a>'
+                    % (f.replace('-m.webp', '.webp'), f, e(eq['nom']), i + 2)
+                    for i, f in enumerate(fotos[1:5]))
     specs = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(str(v)))
                     for k, v in (eq.get('specs') or {}).items())
     texto = 'Hola Sinergia Biomédica, quiero cotizar el alquiler del %s (%s).' % (
         eq['nom'].lower(), eq.get('marca', '').split('·')[0].strip())
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
+    correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote(
+        'Cotización: ' + eq['nom']), urllib.parse.quote(texto))
+    enl = []
+    if eq.get('cal_fin'):
+        enl.append('<span class="cal">Calibración vigente hasta %s</span>' % e(eq['cal_fin']))
+    if eq.get('cal_pdf'):
+        enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración (PDF)</a>' % e(eq['cal_pdf']))
+    if eq.get('ficha'):
+        enl.append('<a href="%s" target="_blank" rel="noopener">Ficha técnica (PDF)</a>' % e(eq['ficha']))
+    docs = ('<div class="docs">%s</div>' % ''.join(enl)) if enl else ''
     precio = ''
     if cfg['precios'] and eq.get('dia'):
         precio = '<p class="precio">Desde <b>S/ %s</b> por día · IGV incluido</p>' % eq['dia']
     return f'''
-    <article class="equipo">
-      <a class="foto" href="/#/equipo/{e(eq['id'])}">{img}</a>
+    <article class="equipo" id="{e(eq['id'])}">
+      <div class="galeria">{('<a class="foto" href="%s" target="_blank" rel="noopener">%s</a>' % (fotos[0].replace('-m.webp', '.webp'), img)) if fotos else '<div class="foto">' + img + '</div>'}
+        {('<div class="minis">' + minis + '</div>') if minis else ''}</div>
       <div class="info">
         <div class="k">{e(eq.get('cat', ''))}</div>
         <h3>{e(eq['nom'])}</h3>
@@ -217,9 +236,10 @@ def tarjeta_equipo(eq, tipo, cfg, locales):
         <p>{e(eq.get('desc', ''))}</p>
         {('<table class="specs">' + specs + '</table>') if specs else ''}
         {precio}
+        {docs}
         <div class="btns">
           <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-          <a class="btn" href="/#/equipo/{e(eq['id'])}">Ver ficha completa</a>
+          <a class="btn" href="{correo}">Cotizar por correo</a>
         </div>
       </div>
     </article>'''
@@ -279,7 +299,7 @@ def pagina_tipo(t, equipos, todos, cfg, locales):
         'areaServed': {'@type': 'Country', 'name': 'Perú'},
         'url': SITIO + ruta,
     }]
-    migas = [('Inicio', '/'), ('Alquiler', '/alquiler/'), (t['nombre'], ruta)]
+    migas = [('Inicio', '/'), ('Catálogo', '/alquiler/'), (t['nombre'], ruta)]
     return ruta, pagina(cfg, ruta=ruta, title=t['title'], descripcion=t['descripcion'],
                         migas=migas, cuerpo=cuerpo, jsonld=jsonld,
                         imagen=fotos[0] if fotos else None)
@@ -331,7 +351,7 @@ def pagina_hub(hub, publicados, cfg, locales):
                             for i, (t, _) in enumerate(publicados)],
     }]
     return ruta, pagina(cfg, ruta=ruta, title=hub['title'], descripcion=hub['descripcion'],
-                        migas=[('Inicio', '/'), ('Alquiler', ruta)], cuerpo=cuerpo, jsonld=jsonld)
+                        migas=[('Inicio', '/'), ('Catálogo', ruta)], cuerpo=cuerpo, jsonld=jsonld)
 
 
 # ─────────────────────────── escritura ───────────────────────────
@@ -356,18 +376,21 @@ def fechas_previas():
     return dict(re.findall(r'<loc>([^<]+)</loc>\s*<lastmod>([^<]+)</lastmod>', txt))
 
 
-def enlaces_portada(publicados, cambios):
-    """Lista de tipos dentro de index.html, entre marcadores: enlaces que Google
-    ve desde la portada sin ejecutar nada."""
+def mapa_portada(publicados, cambios):
+    """window.PAGINA_TIPO = {id_equipo: '/alquiler/<tipo>/#<id>'} en index.html:
+    el catálogo lo usa para que el clic en un equipo abra su página."""
     txt = open(INDEX, encoding='utf-8').read()
-    ini, fin = '<!--TIPOS-INICIO-->', '<!--TIPOS-FIN-->'
+    ini, fin = '<!--TIPOS-URL-INICIO-->', '<!--TIPOS-URL-FIN-->'
     if ini not in txt or fin not in txt:
         print('aviso: index.html no tiene los marcadores %s … %s' % (ini, fin))
         return
-    links = ''.join('<a href="/alquiler/%s/">%s</a>' % (t['slug'], e(t['nombre']))
-                    for t, _ in publicados)
+    # Con un solo modelo se abre la página desde arriba (se ve el título);
+    # con varios, se salta al modelo pulsado.
+    mapa = {x['id']: '/alquiler/%s/%s' % (t['slug'], '#' + x['id'] if len(eqs) > 1 else '')
+            for t, eqs in publicados for x in eqs}
+    js = '<script>window.PAGINA_TIPO=%s;</script>' % json.dumps(mapa, ensure_ascii=False, sort_keys=True)
     nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
-                   lambda m: ini + links + fin, txt, flags=re.S)
+                   lambda m: ini + js + fin, txt, flags=re.S)
     escribir('index.html', nuevo, cambios)
 
 
@@ -433,7 +456,7 @@ def main():
             os.rmdir(os.path.join(base, d))
             cambios.append('alquiler/%s/ (borrada)' % d)
 
-    enlaces_portada(publicados, cambios)
+    mapa_portada(publicados, cambios)
 
     hoy = datetime.date.today().isoformat()
     previas = fechas_previas()

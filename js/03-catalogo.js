@@ -72,6 +72,14 @@ function matchEq(e){
   if(F.origen.size&&!F.origen.has(eqOrigen(e)))return false;
   return true;
 }
+/* El clic en un equipo abre su página de alquiler (alquiler/<tipo>/), que
+   es la que Google indexa. PAGINA_TIPO la escribe generar_paginas.py en
+   index.html; un equipo que aún no tiene página va a su ficha #/equipo. */
+function urlEquipo(id){ return (window.PAGINA_TIPO||{})[id] || '#/equipo/'+id; }
+function irEquipo(id){
+  const u = (window.PAGINA_TIPO||{})[id];
+  if(u) location.href = u; else go('#/equipo/'+id);
+}
 function cardEq(e){
   const idx=EQUIPOS.indexOf(e);
   const badge=e.apoyo?`<span class="badge" style="background:rgba(154,127,78,.13);color:var(--cobre-d);border-color:var(--linea-b)">COMPLEMENTARIA</span>`:`<span class="badge">DISPONIBLE</span>`;
@@ -94,14 +102,14 @@ function cardEq(e){
        </div>`
     : (fotos.length?`<img class="photo" src="${fotoURL(fotos[0],600,true)}" alt="${e.nom}" loading="lazy" decoding="async">`:device(e));
   return `<div class="eq">
-      <div class="img${fotos.length?' has-photo':''}" onclick="go('#/equipo/${e.id}')">
+      <div class="img${fotos.length?' has-photo':''}" onclick="irEquipo('${e.id}')">
         ${fotos.length?'':'<span class="grid-bg"></span>'}
         ${badge}<span class="tier">${e.tier}</span>
         ${carr}
       </div>
       <div class="body">
         <div class="cat">${e.cat}</div>
-        <h3 onclick="go('#/equipo/${e.id}')">${e.nom}</h3>
+        <h3><a href="${urlEquipo(e.id)}">${e.nom}</a></h3>
         <div class="marca">${e.marca}</div>
       ${e.cal_fin?`<div class="calchip" style="margin-top:7px;display:inline-block;font-family:var(--ff-d);font-size:10px;letter-spacing:.6px;padding:3px 8px;border-radius:5px;background:rgba(46,139,107,.10);color:var(--ok);border:1px solid rgba(46,139,107,.25)">CALIBRACIÓN VIGENTE HASTA ${e.cal_fin}</div>`:''}
         <div class="desc">${e.desc}</div>

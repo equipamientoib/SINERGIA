@@ -56,7 +56,7 @@ function renderPaquete(id){
   const body=document.getElementById('equipoBody');
   if(!p){body.innerHTML='<div class="pagehead"><h1>Paquete no encontrado</h1></div>';return;}
   const items=p.items.map(x=>byId(x));
-  const rows=items.map(e=>`<div class="row" onclick="go('#/equipo/${e.id}')"><span>${e.nom}</span><span class="v">${VER_PRECIOS?'S/ '+e.dia+'/día':'consultar'}</span></div>`).join('');
+  const rows=items.map(e=>`<div class="row" onclick="irEquipo('${e.id}')"><span>${e.nom}</span><span class="v">${VER_PRECIOS?'S/ '+e.dia+'/día':'consultar'}</span></div>`).join('');
   const kitRows=p.kit.map(k=>`<div class="row"><span>${APOYO[k]}</span><span class="v">incluido</span></div>`).join('');
   const kitBlock=p.kit.length?`<div class="pkinc"><div class="sh">Kit de intervención (+ S/ ${KIT_DIA}/día)</div>${kitRows}</div>`:'';
   /* Galería del paquete: fotos del conjunto (hoja Paquetes, columnas foto / fotos). */

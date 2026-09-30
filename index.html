@@ -83,7 +83,7 @@ css/11-personaliza.css
 css/12-extras.css
 css/14-footer.css
 -->
-<link rel="stylesheet" href="css/app.css?v=08f3009c">
+<link rel="stylesheet" href="css/app.css?v=61dbecd5">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -116,7 +116,11 @@ js/09-menu.js
 js/10-modal.js
 js/11-solicitudes.js
 -->
-<script defer src="js/app.js?v=08f3009c"></script>
+<!-- Qué página de alquiler/… corresponde a cada equipo: la escribe
+     scripts/generar_paginas.py. El catálogo la usa para que el clic en un
+     equipo abra su página; si un equipo no está aquí, abre la ficha #/equipo. -->
+<!--TIPOS-URL-INICIO--><script>window.PAGINA_TIPO={"defib": "/alquiler/analizador-de-desfibriladores/", "esa620": "/alquiler/analizador-de-seguridad-electrica/", "fluke-51": "/alquiler/termometro-digital/", "fluke-945": "/alquiler/sonometro/", "luxometro": "/alquiler/luxometro/", "manometro": "/alquiler/manometro-digital/", "ms400": "/alquiler/simulador-de-signos-vitales/", "multimetro": "/alquiler/multimetro/", "phantom-flujo": "/alquiler/phantom-de-puncion-ecoguiada/", "sp-sim": "/alquiler/simulador-de-spo2/", "tacometro": "/alquiler/tacometro/"};</script><!--TIPOS-URL-FIN-->
+<script defer src="js/app.js?v=61dbecd5"></script>
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -199,10 +203,6 @@ js/11-solicitudes.js
         <button class="chip" onclick="go('#/catalogo/paquetes')">Paquetes completos</button>
         <button class="chip" onclick="go('#/catalogo/custom')">Arma tu paquete</button>
       </div>
-      <!-- Enlaces reales a las páginas por tipo (alquiler/…): los rellena
-           scripts/generar_paginas.py entre los dos marcadores. Google los
-           sigue desde la portada sin ejecutar JavaScript. -->
-      <nav class="cat-chips tipos-alq" aria-label="Alquiler por tipo de equipo"><span>Alquiler por tipo</span><!--TIPOS-INICIO--><a href="/alquiler/analizador-de-seguridad-electrica/">Analizador de seguridad eléctrica</a><a href="/alquiler/analizador-de-desfibriladores/">Analizador de desfibriladores</a><a href="/alquiler/simulador-de-signos-vitales/">Simulador de signos vitales (ECG)</a><a href="/alquiler/simulador-de-spo2/">Simulador de SpO2</a><a href="/alquiler/phantom-de-puncion-ecoguiada/">Phantom de punción ecoguiada</a><a href="/alquiler/sonometro/">Sonómetro</a><a href="/alquiler/termometro-digital/">Termómetro digital de termocupla</a><a href="/alquiler/manometro-digital/">Manómetro digital</a><a href="/alquiler/luxometro/">Luxómetro</a><a href="/alquiler/tacometro/">Tacómetro</a><a href="/alquiler/multimetro/">Multímetro digital</a><!--TIPOS-FIN--></nav>
     </div>
   </section>
 
