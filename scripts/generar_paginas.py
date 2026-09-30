@@ -104,6 +104,48 @@ def fotos_de(eq, locales):
 
 # ─────────────────────────── plantilla ───────────────────────────
 
+GALERIA_JS = r'''
+(function(){
+  var V=document.getElementById('visor'), VI=V&&V.querySelector('img'), VN=V&&V.querySelector('.v-n'), actual=null;
+  function mostrar(g,i){
+    var f=JSON.parse(g.dataset.fotos), n=f.length; i=(i+n)%n; g.dataset.i=i;
+    g.querySelector('.gal-main img').src=f[i];
+    var c=g.querySelector('.gal-n'); if(c) c.textContent=(i+1)+' / '+n;
+    g.querySelectorAll('.gal-minis button').forEach(function(b,k){b.classList.toggle('on',k===i);});
+    if(actual===g) abrir(g);
+  }
+  function abrir(g){
+    var G=JSON.parse(g.dataset.grandes), i=+g.dataset.i||0; actual=g;
+    VI.src=G[i]; VN.textContent=G.length>1?(i+1)+' / '+G.length:'';
+    V.classList.toggle('una',G.length<2); V.hidden=false; document.body.style.overflow='hidden';
+  }
+  function cerrar(){ V.hidden=true; actual=null; document.body.style.overflow=''; }
+  document.querySelectorAll('.gal[data-fotos]').forEach(function(g){
+    g.dataset.i=0;
+    g.addEventListener('click',function(ev){
+      var b=ev.target.closest('button');
+      if(b&&b.dataset.i!=null) return mostrar(g,+b.dataset.i);
+      if(b&&b.classList.contains('izq')) return mostrar(g,(+g.dataset.i)-1);
+      if(b&&b.classList.contains('der')) return mostrar(g,(+g.dataset.i)+1);
+      if(ev.target.closest('.gal-main')) abrir(g);
+    });
+  });
+  if(!V) return;
+  V.addEventListener('click',function(ev){
+    var b=ev.target.closest('button');
+    if(b&&b.classList.contains('izq')) return mostrar(actual,(+actual.dataset.i)-1);
+    if(b&&b.classList.contains('der')) return mostrar(actual,(+actual.dataset.i)+1);
+    if(ev.target!==VI) cerrar();
+  });
+  document.addEventListener('keydown',function(ev){
+    if(V.hidden) return;
+    if(ev.key==='Escape') cerrar();
+    if(ev.key==='ArrowLeft') mostrar(actual,(+actual.dataset.i)-1);
+    if(ev.key==='ArrowRight') mostrar(actual,(+actual.dataset.i)+1);
+  });
+})();
+'''
+
 LOGO = '''<svg class="logo" viewBox="0 0 880 240" role="img" aria-label="Sinergia Biomédica">
       <text x="40" y="208" font-weight="700" font-size="212" textLength="252" lengthAdjust="spacingAndGlyphs"><tspan fill="#9A7F4E">S</tspan><tspan fill="#2A2D33">B</tspan></text>
       <text x="342" y="158" font-weight="700" font-size="100" fill="#17191D" textLength="498" lengthAdjust="spacingAndGlyphs">SINERGIA</text>
@@ -193,21 +235,38 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <a class="wafab" href="{wa}" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
   <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.6.8 5 2.3 7L4 29l7.3-2.2c1.9 1 4 1.6 6.2 1.6h.1c6.6 0 12-5.3 12-11.9 0-3.2-1.3-6.2-3.5-8.4A12 12 0 0 0 16 3zm7 16.9c-.3.8-1.7 1.6-2.4 1.7-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.8-3.6-1.5-5.9-5.1-6.1-5.4-.2-.2-1.4-1.9-1.4-3.7s.9-2.6 1.3-3c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6l1.1 2.7c.1.2.2.5 0 .7l-.4.7-.6.6c-.2.2-.4.4-.2.8.2.3 1 1.6 2.1 2.6 1.5 1.3 2.7 1.7 3 1.9.4.2.6.1.8-.1l1.2-1.4c.3-.3.5-.2.8-.1l2.6 1.2c.4.2.6.3.7.5.1.1.1.8-.2 1.6z"/></svg>
 </a>
+<div class="visor" id="visor" hidden><button type="button" class="v-x" aria-label="Cerrar">&#10005;</button><button type="button" class="v-f izq" aria-label="Anterior">&#8249;</button><img alt=""><button type="button" class="v-f der" aria-label="Siguiente">&#8250;</button><span class="v-n"></span></div>
+<script>{GALERIA_JS}</script>
 </body>
 </html>
 '''
 
 
-def tarjeta_equipo(eq, tipo, cfg, locales):
+def tarjeta_equipo(eq, tipo, cfg, locales, primera=False):
     fotos = fotos_de(eq, locales)
-    img = ('<img src="%s" alt="%s" loading="lazy" decoding="async" width="700" height="525">'
-           % (fotos[0], e(eq['nom'] + ' — ' + eq.get('marca', '')))) if fotos else \
-          '<div class="sinfoto">%s</div>' % ICONO
-    # Miniaturas del resto de fotos: sin JavaScript, cada una abre la foto grande.
-    minis = ''.join('<a href="%s" target="_blank" rel="noopener"><img src="%s" alt="%s — foto %d" loading="lazy" decoding="async" width="120" height="90"></a>'
-                    % (f.replace('-m.webp', '.webp'), f, e(eq['nom']), i + 2)
-                    for i, f in enumerate(fotos[1:5]))
-    specs = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(str(v)))
+    alt = e(eq['nom'] + ' — ' + eq.get('marca', ''))
+    n = len(fotos)
+    if fotos:
+        # Galería: la foto ligera se ve en la ficha; la grande, al ampliar.
+        # Sin JavaScript se ve la primera foto; con él, flechas, miniaturas
+        # y visor a pantalla completa (script al final de la página).
+        grandes = [f.replace('-m.webp', '.webp') for f in fotos]
+        minis = ''.join('<button type="button" class="%s" data-i="%d" aria-label="Foto %d">'
+                        '<img src="%s" alt="" loading="lazy" decoding="async" width="120" height="90"></button>'
+                        % ('on' if k == 0 else '', k, k + 1, f) for k, f in enumerate(fotos)) if n > 1 else ''
+        galeria = f'''
+      <div class="gal" data-fotos="{e(json.dumps(fotos))}" data-grandes="{e(json.dumps(grandes))}">
+        <div class="gal-main">
+          <img src="{fotos[0]}" alt="{alt}" {'fetchpriority="high"' if primera else 'loading="lazy"'} decoding="async" width="700" height="525">
+          {'<button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button><button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button><span class="gal-n">1 / %d</span>' % n if n > 1 else ''}
+          <span class="gal-zoom" aria-hidden="true">Ampliar</span>
+        </div>
+        {('<div class="gal-minis">' + minis + '</div>') if minis else ''}
+      </div>'''
+    else:
+        galeria = '<div class="gal"><div class="gal-main sinfoto">%s</div></div>' % ICONO
+
+    specs = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (e(k), e(str(v)))
                     for k, v in (eq.get('specs') or {}).items())
     texto = 'Hola Sinergia Biomédica, quiero cotizar el alquiler del %s (%s).' % (
         eq['nom'].lower(), eq.get('marca', '').split('·')[0].strip())
@@ -222,25 +281,34 @@ def tarjeta_equipo(eq, tipo, cfg, locales):
     if eq.get('ficha'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Ficha técnica (PDF)</a>' % e(eq['ficha']))
     docs = ('<div class="docs">%s</div>' % ''.join(enl)) if enl else ''
-    precio = ''
     if cfg['precios'] and eq.get('dia'):
-        precio = '<p class="precio">Desde <b>S/ %s</b> por día · IGV incluido</p>' % eq['dia']
+        precio = '<div class="tarifa"><b>Desde S/ %s</b> por día<small>IGV incluido · también por hora, semana o mes</small></div>' % eq['dia']
+    else:
+        precio = '<div class="tarifa"><b>Consultar tarifa</b><small>Te respondemos con precio y disponibilidad</small></div>'
+    tier = ('<span class="tier">%s</span>' % e(eq['tier'])) if eq.get('tier') else ''
     return f'''
     <article class="equipo" id="{e(eq['id'])}">
-      <div class="galeria">{('<a class="foto" href="%s" target="_blank" rel="noopener">%s</a>' % (fotos[0].replace('-m.webp', '.webp'), img)) if fotos else '<div class="foto">' + img + '</div>'}
-        {('<div class="minis">' + minis + '</div>') if minis else ''}</div>
+      {galeria}
       <div class="info">
+        <div class="chips-eq"><span class="disp">Disponible</span>{tier}</div>
         <div class="k">{e(eq.get('cat', ''))}</div>
-        <h3>{e(eq['nom'])}</h3>
+        <h2>{e(eq['nom'])}</h2>
         <div class="marca">{e(eq.get('marca', ''))}</div>
-        <p>{e(eq.get('desc', ''))}</p>
-        {('<table class="specs">' + specs + '</table>') if specs else ''}
-        {precio}
+        <p class="desc">{e(eq.get('desc', ''))}</p>
+        {('<dl class="specs">' + specs + '</dl>') if specs else ''}
         {docs}
-        <div class="btns">
-          <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-          <a class="btn" href="{correo}">Cotizar por correo</a>
+        <div class="cta">
+          {precio}
+          <div class="btns">
+            <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+            <a class="btn" href="{correo}">Cotizar por correo</a>
+          </div>
         </div>
+        <ul class="garantias">
+          <li>Por hora, día, semana o mes</li>
+          <li>Técnico instrumentista opcional</li>
+          <li>Entrega en Lima y provincias</li>
+        </ul>
       </div>
     </article>'''
 
@@ -258,19 +326,18 @@ def pagina_tipo(t, equipos, todos, cfg, locales):
   <section class="cabeza">
     <div class="eyebrow">Alquiler · Lima y provincias</div>
     <h1>{e(t['h1'])}</h1>
-    <p class="lead">{e(t['intro'])}</p>
     <p class="cuantos">{n} {"modelo disponible" if n == 1 else "modelos disponibles"} · por hora, día, semana o mes · técnico instrumentista opcional</p>
   </section>
 
-  <section>
-    <h2>{"Equipo disponible" if n == 1 else "Equipos disponibles"}</h2>
-    {''.join(tarjeta_equipo(x, t, cfg, locales) for x in equipos)}
+  <section class="productos">
+    {''.join(tarjeta_equipo(x, t, cfg, locales, primera=(k == 0)) for k, x in enumerate(equipos))}
   </section>
 
-  {f"""<section class="usos">
-    <h2>¿Para qué se usa?</h2>
-    <ul>{usos}</ul>
-  </section>""" if usos else ''}
+  <section class="que-es">
+    <h2>¿Qué es y para qué se usa?</h2>
+    <p class="lead">{e(t['intro'])}</p>
+    {f'<ul class="usos">{usos}</ul>' if usos else ''}
+  </section>
 
   <section class="pasos">
     <h2>Cómo funciona el alquiler</h2>
