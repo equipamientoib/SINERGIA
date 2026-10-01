@@ -37,6 +37,7 @@ const V_ICO = {
   esterilizacion: '<rect x="4" y="6" width="16" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 3v3M16 3v3"/>',
   laboratorio:    '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/>',
   mobiliario:     '<path d="M3 18V8M3 14h18v4M21 18v-4M7 14v-3h10a4 4 0 0 1 4 4"/><circle cx="6" cy="11" r="1.6"/>',
+  'cadena-frio':  '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12M9 6v2M9 13v3M15 14l-2 2 2 2"/>',
   metrologia:     '<path d="M4 18h16M6 18V8M10 18v-6M14 18V6M18 18v-8"/>'
 };
 function vIco(id, cls){
@@ -113,7 +114,8 @@ function vHueso(){
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
 function vPortada(){
-  const dest = VENTA.productos.filter(p => p.destacado).slice(0,8);
+  /* destacado = puesto (1, 2, 3…) según las compras públicas 2024-2025 (OECE). */
+  const dest = VENTA.productos.filter(p => p.destacado).sort((a,b) => Number(a.destacado)-Number(b.destacado)).slice(0,8);
   const n = VENTA.productos.length;
   return `
   <section class="v-hero"><div class="wrap v-hero-grid">
@@ -147,7 +149,7 @@ function vPortada(){
   </div></section>
 
   ${dest.length ? `<section class="v-sec" data-sin-busqueda><div class="wrap">
-    <div class="shead"><div><div class="k">Destacados</div><h2>Los equipos más pedidos</h2></div><p>Los que más se repiten en expedientes técnicos y compras de clínicas.</p></div>
+    <div class="shead"><div><div class="k">Destacados</div><h2>Los equipos más pedidos</h2></div><p>Los que más compraron hospitales y centros de salud públicos en 2024 y 2025.</p></div>
     <div class="v-grid">${dest.map(vCard).join('')}</div>
   </div></section>` : ''}
 
