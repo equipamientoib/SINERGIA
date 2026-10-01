@@ -1,1038 +1,1188 @@
 {
- "_nota": "Catálogo de VENTA. Cada producto lleva su categoría (cat), marca, modelo y, si aplica, el nombre y código con que aparece en los expedientes técnicos (expediente, clave). Las fotos van en img/venta/<id>-01.jpg (con versiones -m y .webp) y se listan en «fotos». Lo que falte no se muestra.",
- "categorias": [
-  {
-   "id": "monitoreo",
-   "nombre": "Monitoreo de pacientes",
-   "ejemplos": "Monitores de signos vitales, pulsioxímetros y monitores para UCI"
-  },
-  {
-   "id": "reanimacion",
-   "nombre": "Desfibriladores y reanimación",
-   "ejemplos": "Desfibriladores, DEA y coches de paro"
-  },
-  {
-   "id": "diagnostico",
-   "nombre": "Diagnóstico",
-   "ejemplos": "Electrocardiógrafos, espirómetros, MAPA, tensiómetros y estetoscopios"
-  },
-  {
-   "id": "neonatal",
-   "nombre": "Neonatología y obstetricia",
-   "ejemplos": "Cunas de calor radiante, incubadoras de transporte, monitores fetales y detectores de latidos"
-  },
-  {
-   "id": "quirofano",
-   "nombre": "Quirófano y aspiración",
-   "ejemplos": "Mesas de operaciones, lámparas quirúrgicas, electrobisturíes, máquinas de anestesia y aspiradores"
-  },
-  {
-   "id": "uci",
-   "nombre": "Ventilación e infusión",
-   "ejemplos": "Ventiladores mecánicos y bombas de infusión"
-  },
-  {
-   "id": "imagenes",
-   "nombre": "Imagenología",
-   "ejemplos": "Ecógrafos y equipos de rayos X digitales"
-  },
-  {
-   "id": "esterilizacion",
-   "nombre": "Esterilización",
-   "ejemplos": "Autoclaves de vapor, esterilizadores por plasma y por calor seco"
-  },
-  {
-   "id": "laboratorio",
-   "nombre": "Laboratorio",
-   "ejemplos": "Analizadores, microscopios, centrífugas, incubadoras de cultivo y cabinas de flujo laminar"
-  },
-  {
-   "id": "cadena-frio",
-   "nombre": "Cadena de frío",
-   "ejemplos": "Refrigeradoras de medicamentos y vacunas, banco de sangre y congeladores de laboratorio"
-  },
-  {
-   "id": "mobiliario",
-   "nombre": "Mobiliario clínico y balanzas",
-   "ejemplos": "Camas clínicas y balanzas con tallímetro"
-  }
- ],
- "productos": [
-  {
-   "id": "edan-im20",
-   "cat": "monitoreo",
-   "nom": "Monitor de signos vitales de 5 parámetros",
-   "marca": "Edan",
-   "modelo": "iM20",
-   "origen": "China",
-   "resumen": "Monitor portátil y compacto para tópico, consulta, hospitalización y traslado.",
-   "caracteristicas": [
-    "Pantalla de 5 pulgadas",
-    "5 parámetros",
-    "ECG de 3, 5 o 10 derivaciones",
-    "Sin impresora"
-   ],
-   "expediente": "MONITOR DE FUNCIONES VITALES DE 5 PARAMETROS",
-   "clave": "D-18",
-   "areas": [
-    "Emergencia",
-    "Hospitalización",
-    "Consulta externa"
-   ]
-  },
-  {
-   "id": "edan-im50",
-   "cat": "monitoreo",
-   "nom": "Monitor de signos vitales de 5 parámetros con impresora",
-   "marca": "Edan",
-   "modelo": "iM50",
-   "origen": "China",
-   "resumen": "Monitor multiparámetro con pantalla táctil para emergencia, hospitalización y recuperación.",
-   "caracteristicas": [
-    "Pantalla táctil de 8 pulgadas",
-    "5 parámetros",
-    "Impresora térmica incorporada"
-   ],
-   "expediente": "MONITOR DE FUNCIONES VITALES DE 5 PARAMETROS",
-   "clave": "D-18",
-   "areas": [
-    "Emergencia",
-    "Hospitalización",
-    "Centro quirúrgico"
-   ],
-   "destacado": 4
-  },
-  {
-   "id": "edan-im70",
-   "cat": "monitoreo",
-   "nom": "Monitor multiparámetro de 12 pulgadas para UCI",
-   "marca": "Edan",
-   "modelo": "iM70",
-   "origen": "China",
-   "resumen": "Monitor de cabecera de pantalla grande para cuidados intensivos y sala de operaciones.",
-   "caracteristicas": [
-    "Pantalla táctil de 12 pulgadas",
-    "5 parámetros (configurable a 6 con etCO2 o PI)",
-    "Impresora térmica incorporada"
-   ],
-   "areas": [
-    "Cuidados intensivos",
-    "Centro quirúrgico"
-   ]
-  },
-  {
-   "id": "edan-m3",
-   "cat": "monitoreo",
-   "nom": "Pulsioxímetro de sobremesa",
-   "marca": "Edan",
-   "modelo": "M3",
-   "origen": "China",
-   "resumen": "Pulsioxímetro de mesa con batería para hospitalización, emergencia y consulta.",
-   "caracteristicas": [
-    "Pantalla a color de 5,6 pulgadas",
-    "SpO2 y frecuencia de pulso",
-    "Batería de litio"
-   ],
-   "expediente": "PULSIOXIMETRO",
-   "clave": "D-17",
-   "areas": [
-    "Hospitalización",
-    "Emergencia"
-   ]
-  },
-  {
-   "id": "edan-h100b",
-   "cat": "monitoreo",
-   "nom": "Pulsioxímetro de mano",
-   "marca": "Edan",
-   "modelo": "H100B",
-   "origen": "China",
-   "resumen": "Pulsioxímetro portátil para triaje, atención extramural y visitas domiciliarias.",
-   "caracteristicas": [
-    "SpO2 y frecuencia de pulso",
-    "Pantalla monocromática",
-    "Versión con baterías alcalinas o recargables"
-   ],
-   "expediente": "PULSIOXIMETRO PORTATIL",
-   "clave": "D-334",
-   "areas": [
-    "Consulta externa",
-    "Emergencia"
-   ]
-  },
-  {
-   "id": "cu-medical-hd1",
-   "cat": "reanimacion",
-   "nom": "Desfibrilador con monitor y paletas externas",
-   "marca": "CU Medical",
-   "modelo": "CU-HD1",
-   "origen": "Corea",
-   "resumen": "Desfibrilador bifásico con monitor a color para emergencia, UCI y sala de operaciones.",
-   "caracteristicas": [
-    "Energía hasta 360 J",
-    "Paletas externas reutilizables",
-    "Marcapaso transcutáneo",
-    "Opción con SpO2 y presión no invasiva"
-   ],
-   "expediente": "DESFIBRILADOR CON MONITOR Y PALETAS EXTERNAS",
-   "clave": "D-447",
-   "areas": [
-    "Emergencia",
-    "Cuidados intensivos",
-    "Centro quirúrgico"
-   ]
-  },
-  {
-   "id": "cu-medical-dea",
-   "cat": "reanimacion",
-   "nom": "Desfibrilador externo automático (DEA)",
-   "marca": "CU Medical",
-   "modelo": "Serie i-PAD",
-   "origen": "Corea",
-   "resumen": "DEA de acceso público para centros de salud, empresas, colegios y ambulancias.",
-   "caracteristicas": [
-    "Uso automático con guía por voz",
-    "Versión con pantalla y batería recargable",
-    "Parches desechables adulto y pediátrico"
-   ],
-   "expediente": "DESFIBRILADOR EXTERNO AUTOMATICO",
-   "clave": "D-373",
-   "areas": [
-    "Emergencia",
-    "Ambulancias"
-   ]
-  },
-  {
-   "id": "metro-lifeline-lec2",
-   "cat": "reanimacion",
-   "nom": "Coche de paro de 4 cajones",
-   "marca": "Metro",
-   "modelo": "Lifeline LEC2",
-   "origen": "EE.UU.",
-   "resumen": "Coche de paro con soportes para balón de oxígeno, suero, aspirador y desfibrilador.",
-   "caracteristicas": [
-    "4 cajones",
-    "Porta balón de oxígeno, porta suero, porta aspirador y porta desfibrilador"
-   ],
-   "expediente": "COCHE DE PARO EQUIPADO",
-   "clave": "D-109",
-   "areas": [
-    "Emergencia",
-    "Hospitalización",
-    "Cuidados intensivos"
-   ]
-  },
-  {
-   "id": "edan-se301",
-   "cat": "diagnostico",
-   "nom": "Electrocardiógrafo de 3 canales",
-   "marca": "Edan",
-   "modelo": "SE-301",
-   "origen": "China",
-   "resumen": "Electrocardiógrafo interpretativo para consulta, emergencia y hospitalización.",
-   "caracteristicas": [
-    "3 canales",
-    "Pantalla táctil a color de 5 pulgadas",
-    "Interpretación automática",
-    "Papel de 80 mm, puerto USB"
-   ],
-   "expediente": "ELECTROCARDIOGRAFO",
-   "clave": "D-1",
-   "areas": [
-    "Consulta externa",
-    "Emergencia",
-    "Hospitalización"
-   ]
-  },
-  {
-   "id": "edan-se1200-express",
-   "cat": "diagnostico",
-   "nom": "Electrocardiógrafo de 12 canales",
-   "marca": "Edan",
-   "modelo": "SE-1200 Express",
-   "origen": "China",
-   "resumen": "Electrocardiógrafo de 12 canales para cardiología y hospitales.",
-   "caracteristicas": [
-    "12 canales",
-    "Pantalla táctil a color de 8 pulgadas",
-    "Interpretación automática",
-    "Papel de 210 mm"
-   ],
-   "expediente": "ELECTROCARDIOGRAFO",
-   "clave": "D-1",
-   "areas": [
-    "Consulta externa",
-    "Cardiología"
-   ]
-  },
-  {
-   "id": "heine-gamma-xxl-lf-s",
-   "cat": "diagnostico",
-   "nom": "Tensiómetro aneroide rodable",
-   "marca": "Heine",
-   "modelo": "Gamma XXL LF-S",
-   "origen": "Alemania",
-   "resumen": "Tensiómetro de pedestal con ruedas para consultorios y hospitalización.",
-   "caracteristicas": [
-    "Brazalete adulto con velcro",
-    "Base rodable"
-   ],
-   "expediente": "TENSIOMETRO ANEROIDE RODABLE ADULTO",
-   "clave": "D-135",
-   "areas": [
-    "Consulta externa",
-    "Hospitalización"
-   ]
-  },
-  {
-   "id": "riester-exacta",
-   "cat": "diagnostico",
-   "nom": "Tensiómetro aneroide de mano",
-   "marca": "Riester",
-   "modelo": "Exacta",
-   "origen": "Alemania",
-   "resumen": "Tensiómetro aneroide de mano para consulta y atención extramural.",
-   "caracteristicas": [
-    "Brazalete adulto con velcro, 2 tubos",
-    "También en versión pediátrica"
-   ],
-   "expediente": "TENSIOMETRO ANEROIDE ADULTO",
-   "areas": [
-    "Consulta externa"
-   ]
-  },
-  {
-   "id": "riester-duplex-2",
-   "cat": "diagnostico",
-   "nom": "Estetoscopio de doble campana",
-   "marca": "Riester",
-   "modelo": "Duplex 2.0",
-   "origen": "Alemania",
-   "resumen": "Estetoscopio de cabezal de acero inoxidable para examen clínico.",
-   "caracteristicas": [
-    "Cabezal de acero inoxidable de doble campana",
-    "Versiones adulto, pediátrica y neonatal"
-   ],
-   "expediente": "ESTETOSCOPIO ADULTO",
-   "areas": [
-    "Consulta externa",
-    "Hospitalización"
-   ]
-  },
-  {
-   "id": "david-hkn-93a",
-   "cat": "neonatal",
-   "nom": "Cuna de calor radiante",
-   "marca": "Ningbo David",
-   "modelo": "HKN-93A",
-   "origen": "China",
-   "resumen": "Servocuna térmica para recepción del recién nacido en sala de partos y neonatología.",
-   "caracteristicas": [
-    "Altura variable",
-    "Accesorios estándar incluidos",
-    "Opciones: lámpara UV, elevador eléctrico, balanza"
-   ],
-   "expediente": "CUNA DE CALOR RADIANTE",
-   "clave": "D-350",
-   "areas": [
-    "Centro obstétrico",
-    "Neonatología"
-   ]
-  },
-  {
-   "id": "david-ti-2000",
-   "cat": "neonatal",
-   "nom": "Incubadora de transporte neonatal",
-   "marca": "Ningbo David",
-   "modelo": "TI-2000",
-   "origen": "China",
-   "resumen": "Incubadora para el traslado seguro de neonatos entre servicios y en ambulancia.",
-   "caracteristicas": [
-    "Pantalla LED",
-    "Batería para traslado",
-    "Opción de rango de temperatura hasta 38 °C"
-   ],
-   "expediente": "INCUBADORA DE TRANSPORTE",
-   "clave": "D-112",
-   "areas": [
-    "Neonatología",
-    "Emergencia",
-    "Ambulancias"
-   ]
-  },
-  {
-   "id": "edan-f3",
-   "cat": "neonatal",
-   "nom": "Monitor fetal gemelar",
-   "marca": "Edan",
-   "modelo": "F3",
-   "origen": "China",
-   "resumen": "Monitor fetal de sobremesa para control prenatal y sala de partos.",
-   "caracteristicas": [
-    "Pantalla a color de 5,6 pulgadas",
-    "Monitoreo de gemelos",
-    "Con batería",
-    "Versión con presión intrauterina"
-   ],
-   "expediente": "MONITOR FETAL GEMELAR",
-   "clave": "D-16",
-   "areas": [
-    "Centro obstétrico",
-    "Consulta externa"
-   ]
-  },
-  {
-   "id": "edan-f9",
-   "cat": "neonatal",
-   "nom": "Monitor fetal-materno de 12 pulgadas",
-   "marca": "Edan",
-   "modelo": "F9",
-   "origen": "China",
-   "resumen": "Monitor fetal gemelar con parámetros maternos para centros obstétricos.",
-   "caracteristicas": [
-    "Pantalla a color de 12 pulgadas",
-    "Monitoreo de gemelos",
-    "Opción con ECG, PNI, SpO2 y temperatura materna"
-   ],
-   "expediente": "MONITOR FETAL",
-   "clave": "D-15",
-   "areas": [
-    "Centro obstétrico"
-   ]
-  },
-  {
-   "id": "edan-sd3-plus",
-   "cat": "neonatal",
-   "nom": "Detector de latidos fetales portátil",
-   "marca": "Edan",
-   "modelo": "SD-3 Plus",
-   "origen": "China",
-   "resumen": "Doppler fetal de bolsillo para control prenatal.",
-   "caracteristicas": [
-    "Sonda de 2,0 MHz",
-    "Batería recargable"
-   ],
-   "expediente": "DETECTOR DE LATIDOS FETALES PORTATIL",
-   "clave": "D-97",
-   "areas": [
-    "Consulta externa",
-    "Centro obstétrico"
-   ]
-  },
-  {
-   "id": "edan-sd5",
-   "cat": "neonatal",
-   "nom": "Detector de latidos fetales de sobremesa",
-   "marca": "Edan",
-   "modelo": "SD-5",
-   "origen": "China",
-   "resumen": "Doppler fetal de mesa para consultorios de obstetricia.",
-   "caracteristicas": [
-    "Sonda de 2,0 MHz alámbrica",
-    "Versión SD-6 con sonda inalámbrica"
-   ],
-   "expediente": "DETECTOR DE LATIDOS FETALES DE SOBREMESA",
-   "clave": "D-96",
-   "areas": [
-    "Consulta externa",
-    "Centro obstétrico"
-   ]
-  },
-  {
-   "id": "david-yp-2000",
-   "cat": "neonatal",
-   "nom": "Incubadora neonatal",
-   "marca": "Ningbo David",
-   "modelo": "YP-2000",
-   "origen": "China",
-   "resumen": "Incubadora cerrada para el cuidado del recién nacido en neonatología e intermedios.",
-   "caracteristicas": [
-    "Pantalla LCD a color de 7 pulgadas",
-    "Balanza incorporada",
-    "Lámpara de observación",
-    "Opción de sensor de oxígeno"
-   ],
-   "expediente": "INCUBADORA NEONATAL",
-   "areas": [
-    "Neonatología",
-    "Centro obstétrico"
-   ],
-   "destacado": 5
-  },
-  {
-   "id": "medifa-6000",
-   "cat": "quirofano",
-   "nom": "Mesa de operaciones eléctrica",
-   "marca": "Medifa",
-   "modelo": "6000",
-   "origen": "Alemania",
-   "resumen": "Mesa quirúrgica universal de 4 secciones con accionamiento eléctrico.",
-   "caracteristicas": [
-    "4 secciones",
-    "Carga hasta 454 kg",
-    "Versión universal o traumatológica"
-   ],
-   "areas": [
-    "Centro quirúrgico"
-   ]
-  },
-  {
-   "id": "kls-marled-e9i",
-   "cat": "quirofano",
-   "nom": "Lámpara quirúrgica LED rodable",
-   "marca": "KLS Martin",
-   "modelo": "marLED E9i",
-   "origen": "Alemania",
-   "resumen": "Lámpara quirúrgica LED móvil con batería para quirófanos, tópicos y salas de procedimientos.",
-   "caracteristicas": [
-    "160 000 lux",
-    "Base rodable",
-    "Con batería"
-   ],
-   "expediente": "LAMPARA QUIRURGICA RODABLE",
-   "clave": "D-34",
-   "areas": [
-    "Centro quirúrgico",
-    "Emergencia",
-    "Centro obstétrico"
-   ],
-   "destacado": 7
-  },
-  {
-   "id": "kls-marled-x",
-   "cat": "quirofano",
-   "nom": "Lámpara quirúrgica LED de techo",
-   "marca": "KLS Martin",
-   "modelo": "marLED X",
-   "origen": "Alemania",
-   "resumen": "Lámpara quirúrgica LED de techo para sala de operaciones.",
-   "caracteristicas": [
-    "1 cabezal de 160 000 lux",
-    "También en versión de 2 cabezales"
-   ],
-   "expediente": "LAMPARA QUIRURGICA DE TECHO SIMPLE",
-   "clave": "D-33",
-   "areas": [
-    "Centro quirúrgico"
-   ]
-  },
-  {
-   "id": "ledspa-surtron-300",
-   "cat": "quirofano",
-   "nom": "Electrobisturí de alta potencia",
-   "marca": "LED SpA",
-   "modelo": "Surtron 300 HP",
-   "origen": "Italia",
-   "resumen": "Unidad electroquirúrgica monopolar y bipolar para cirugía general.",
-   "caracteristicas": [
-    "300 W",
-    "Monopolar y bipolar",
-    "Versión táctil y de 400 W"
-   ],
-   "areas": [
-    "Centro quirúrgico"
-   ],
-   "destacado": 8
-  },
-  {
-   "id": "comen-ax800",
-   "cat": "quirofano",
-   "nom": "Máquina de anestesia",
-   "marca": "Comen",
-   "modelo": "AX800",
-   "origen": "China",
-   "resumen": "Estación de anestesia con flujómetros electrónicos para sala de operaciones.",
-   "caracteristicas": [
-    "Flujómetros electrónicos",
-    "2 vaporizadores",
-    "Pantalla de 15 pulgadas"
-   ],
-   "areas": [
-    "Centro quirúrgico"
-   ]
-  },
-  {
-   "id": "cami-new-hospivac-350",
-   "cat": "quirofano",
-   "nom": "Aspirador de secreciones rodable",
-   "marca": "CA-MI",
-   "modelo": "New Hospivac 350",
-   "origen": "Italia",
-   "resumen": "Aspirador rodable de alto flujo para quirófano, emergencia y UCI.",
-   "caracteristicas": [
-    "60 L/min",
-    "2 frascos de 5 L",
-    "Pedal de control"
-   ],
-   "expediente": "ASPIRADOR DE SECRECIONES RODABLE",
-   "clave": "D-88",
-   "areas": [
-    "Centro quirúrgico",
-    "Emergencia",
-    "Cuidados intensivos"
-   ]
-  },
-  {
-   "id": "cami-new-askir-30",
-   "cat": "quirofano",
-   "nom": "Aspirador de secreciones portátil",
-   "marca": "CA-MI",
-   "modelo": "New Askir 30",
-   "origen": "Italia",
-   "resumen": "Aspirador portátil para emergencia, tópico y atención domiciliaria.",
-   "caracteristicas": [
-    "40 L/min",
-    "Frasco de 1 L",
-    "Versión con batería: Askir 36 BR"
-   ],
-   "expediente": "ASPIRADOR DE SECRECION PORTATIL",
-   "areas": [
-    "Emergencia",
-    "Hospitalización"
-   ]
-  },
-  {
-   "id": "siare-aria-104",
-   "cat": "uci",
-   "nom": "Ventilador mecánico para UCI",
-   "marca": "Siare",
-   "modelo": "Aria 104",
-   "origen": "Italia",
-   "resumen": "Ventilador rodable con turbina para pacientes adultos y pediátricos.",
-   "caracteristicas": [
-    "Turbina incorporada",
-    "Pantalla táctil de 10 pulgadas",
-    "Adulto y pediátrico",
-    "Versión Aria 150 con pantalla de 15 pulgadas"
-   ],
-   "areas": [
-    "Cuidados intensivos",
-    "Emergencia"
-   ],
-   "destacado": 2
-  },
-  {
-   "id": "medrena-vp50-pro",
-   "cat": "uci",
-   "nom": "Bomba de infusión volumétrica",
-   "marca": "Medrena",
-   "modelo": "VP50 Pro",
-   "origen": "China",
-   "resumen": "Bomba volumétrica apilable para hospitalización, emergencia y UCI.",
-   "caracteristicas": [
-    "1 canal (también de 2 y 3 canales)",
-    "Pantalla táctil a color",
-    "Wi-Fi e infrarrojo"
-   ],
-   "expediente": "BOMBA DE INFUSION",
-   "clave": "D-105",
-   "areas": [
-    "Cuidados intensivos",
-    "Hospitalización",
-    "Emergencia"
-   ]
-  },
-  {
-   "id": "medrena-sp50",
-   "cat": "uci",
-   "nom": "Bomba de infusión de jeringa",
-   "marca": "Medrena",
-   "modelo": "SP-50",
-   "origen": "China",
-   "resumen": "Bomba de jeringa apilable para infusiones de precisión.",
-   "caracteristicas": [
-    "Apilable en rack",
-    "Versión SP-50 Pro con Wi-Fi"
-   ],
-   "areas": [
-    "Cuidados intensivos",
-    "Neonatología"
-   ]
-  },
-  {
-   "id": "edan-dus60",
-   "cat": "imagenes",
-   "nom": "Ecógrafo portátil",
-   "marca": "Edan",
-   "modelo": "DUS 60",
-   "origen": "China",
-   "resumen": "Ecógrafo portátil para consulta, obstetricia y atención primaria.",
-   "caracteristicas": [
-    "Pantalla LCD de 12 pulgadas",
-    "2 puertos",
-    "Incluye transductor convexo y lineal",
-    "Para Doppler color: modelos portátiles Edan y SIUI de 15 pulgadas"
-   ],
-   "expediente": "ECOGRAFO PORTATIL",
-   "clave": "D-103",
-   "areas": [
-    "Consulta externa",
-    "Centro obstétrico"
-   ],
-   "destacado": 3
-  },
-  {
-   "id": "perlove-rx-digital",
-   "cat": "imagenes",
-   "nom": "Equipo de rayos X digital estacionario",
-   "marca": "Perlove",
-   "modelo": "Mesa flotante, 1 detector",
-   "origen": "China",
-   "resumen": "Equipo de radiografía digital con detector plano para centros de salud y clínicas.",
-   "caracteristicas": [
-    "Generador de 65 kW",
-    "Detector plano de 17 x 17 pulgadas",
-    "Mesa flotante (también fija o elevada)",
-    "Versiones con 2 detectores"
-   ],
-   "expediente": "EQUIPO DE RAYOS X ESTACIONARIO DIGITAL",
-   "areas": [
-    "Diagnóstico por imágenes"
-   ],
-   "destacado": 6
-  },
-  {
-   "id": "tuttnauer-t-top-11",
-   "cat": "esterilizacion",
-   "nom": "Autoclave de mesa de 25 litros clase B",
-   "marca": "Tuttnauer",
-   "modelo": "T-Top 11 P",
-   "origen": "Israel",
-   "resumen": "Autoclave de vapor clase B para consultorios, odontología y centros de salud.",
-   "caracteristicas": [
-    "25 litros",
-    "Clase B",
-    "Impresora incorporada"
-   ],
-   "expediente": "ESTERILIZADOR CON GENERADOR ELECTRICO DE VAPOR DE 20 LITROS",
-   "clave": "D-212",
-   "areas": [
-    "Central de esterilización",
-    "Odontología"
-   ],
-   "destacado": 1
-  },
-  {
-   "id": "baix-48l",
-   "cat": "esterilizacion",
-   "nom": "Autoclave de mesa de 48 litros clase B",
-   "marca": "Baix",
-   "modelo": "48 L clase B",
-   "origen": "China",
-   "resumen": "Autoclave de vapor clase B de mayor capacidad para centrales de esterilización.",
-   "caracteristicas": [
-    "48 litros",
-    "Clase B con bomba de vacío",
-    "Generador de vapor",
-    "220 V / 60 Hz"
-   ],
-   "expediente": "ESTERILIZADOR CON GENERADOR ELECTRICO DE VAPOR DE 50 LITROS",
-   "clave": "D-217",
-   "areas": [
-    "Central de esterilización"
-   ]
-  },
-  {
-   "id": "tuttnauer-3870-ea",
-   "cat": "esterilizacion",
-   "nom": "Autoclave automático de 85 litros",
-   "marca": "Tuttnauer",
-   "modelo": "3870 EA",
-   "origen": "Israel",
-   "resumen": "Autoclave automático para centrales de esterilización de mayor volumen.",
-   "caracteristicas": [
-    "85 litros",
-    "Clase N",
-    "Impresora incorporada"
-   ],
-   "areas": [
-    "Central de esterilización"
-   ]
-  },
-  {
-   "id": "memmert-sn55",
-   "cat": "esterilizacion",
-   "nom": "Esterilizador por calor seco de 53 litros",
-   "marca": "Memmert",
-   "modelo": "SN-55",
-   "origen": "Alemania",
-   "resumen": "Esterilizador de aire caliente para centros de salud y laboratorios.",
-   "caracteristicas": [
-    "53 litros",
-    "Hasta 250 °C",
-    "Pantalla táctil a color",
-    "Convección natural (versión SF con ventilación forzada)"
-   ],
-   "expediente": "ESTERILIZADOR POR CALOR SECO 50 LITROS",
-   "areas": [
-    "Central de esterilización",
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "edan-h30-pro",
-   "cat": "laboratorio",
-   "nom": "Analizador hematológico de 3 diferenciales",
-   "marca": "Edan",
-   "modelo": "H30 Pro",
-   "origen": "China",
-   "resumen": "Analizador automático de hemograma para laboratorios de centros de salud y clínicas.",
-   "caracteristicas": [
-    "3 diferenciales",
-    "Pantalla táctil de 10,4 pulgadas",
-    "Versiones de 5 diferenciales: H60 y H80S"
-   ],
-   "expediente": "ANALIZADOR HEMATOLOGICO",
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "mindray-ba88a",
-   "cat": "laboratorio",
-   "nom": "Analizador bioquímico semiautomático",
-   "marca": "Mindray",
-   "modelo": "BA-88A",
-   "origen": "China",
-   "resumen": "Analizador de química clínica semiautomático para laboratorios pequeños y medianos.",
-   "caracteristicas": [
-    "Semiautomático"
-   ],
-   "expediente": "ANALIZADOR BIOQUIMICO SEMI AUTOMATICO",
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "boeco-bm-120",
-   "cat": "laboratorio",
-   "nom": "Microscopio binocular",
-   "marca": "Boeco",
-   "modelo": "BM-120",
-   "origen": "Alemania",
-   "resumen": "Microscopio de rutina para laboratorio clínico.",
-   "caracteristicas": [
-    "Cabezal binocular"
-   ],
-   "expediente": "MICROSCOPIO BINOCULAR ESTANDAR",
-   "clave": "D-60",
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "boeco-hc-240",
-   "cat": "laboratorio",
-   "nom": "Centrífuga de microhematocrito",
-   "marca": "Boeco",
-   "modelo": "HC-240",
-   "origen": "Alemania",
-   "resumen": "Centrífuga para determinación de hematocrito en laboratorio.",
-   "caracteristicas": [
-    "Rotor para 24 capilares"
-   ],
-   "expediente": "CENTRIFUGA PARA MICROHEMATOCRITO",
-   "clave": "D-269",
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "boeco-c-28a",
-   "cat": "laboratorio",
-   "nom": "Centrífuga de laboratorio de 12 y 16 tubos",
-   "marca": "Boeco",
-   "modelo": "C-28A",
-   "origen": "Alemania",
-   "resumen": "Centrífuga electrónica de mesa para tubos de 15 ml.",
-   "caracteristicas": [
-    "Rotor angular de 12 tubos y oscilante de 16 tubos",
-    "Tubos de 15 ml"
-   ],
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "memmert-in55",
-   "cat": "laboratorio",
-   "nom": "Incubadora de cultivo de 53 litros",
-   "marca": "Memmert",
-   "modelo": "IN-55",
-   "origen": "Alemania",
-   "resumen": "Incubadora para microbiología y cultivos.",
-   "caracteristicas": [
-    "53 litros",
-    "Hasta 80 °C",
-    "Pantalla táctil a color"
-   ],
-   "expediente": "INCUBADORA PARA CULTIVO",
-   "clave": "D-369",
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "biobase-bsc-4fa2",
-   "cat": "laboratorio",
-   "nom": "Cabina de flujo laminar vertical de 4 pies",
-   "marca": "Biobase",
-   "modelo": "BSC-4FA2",
-   "origen": "China",
-   "resumen": "Cabina de seguridad biológica para laboratorio y microbiología.",
-   "caracteristicas": [
-    "Flujo laminar vertical",
-    "Ancho de 4 pies"
-   ],
-   "expediente": "CABINA DE FLUJO LAMINAR VERTICAL (4 PIES TIPO A/B3)",
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "boeco-s200",
-   "cat": "laboratorio",
-   "nom": "Espectrofotómetro visible",
-   "marca": "Boeco",
-   "modelo": "S-200 Vis",
-   "origen": "Alemania",
-   "resumen": "Espectrofotómetro para química clínica y docencia.",
-   "caracteristicas": [
-    "Rango de 320 a 1100 nm"
-   ],
-   "expediente": "ESPECTROFOTOMETRO",
-   "areas": [
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "meling-yc-315l",
-   "cat": "cadena-frio",
-   "nom": "Refrigeradora de medicamentos y vacunas de 315 litros",
-   "marca": "Meling",
-   "modelo": "YC-315L",
-   "origen": "China",
-   "resumen": "Refrigeradora de +2 a +8 °C para farmacia, inmunizaciones y almacén de medicamentos.",
-   "caracteristicas": [
-    "Rango de +2 a +8 °C",
-    "315 litros (11 pies cúbicos)",
-    "También en 130 L (YC-130L) y 525 L (YC-525L)"
-   ],
-   "expediente": "REFRIGERADORA PARA MEDICAMENTOS",
-   "areas": [
-    "Farmacia",
-    "Inmunizaciones",
-    "Cadena de frío"
-   ]
-  },
-  {
-   "id": "meling-xc-630l",
-   "cat": "cadena-frio",
-   "nom": "Refrigeradora para banco de sangre",
-   "marca": "Meling",
-   "modelo": "XC-630L",
-   "origen": "China",
-   "resumen": "Refrigeradora a +4 °C para conservación de hemocomponentes.",
-   "caracteristicas": [
-    "Temperatura de +4 °C",
-    "630 litros (22 pies cúbicos)"
-   ],
-   "areas": [
-    "Banco de sangre",
-    "Laboratorio"
-   ]
-  },
-  {
-   "id": "meling-dw-fl528",
-   "cat": "cadena-frio",
-   "nom": "Congelador vertical para laboratorio",
-   "marca": "Meling",
-   "modelo": "DW-FL528",
-   "origen": "China",
-   "resumen": "Congelador vertical de -20 a -40 °C para muestras y reactivos.",
-   "caracteristicas": [
-    "Rango de -20 a -40 °C",
-    "528 litros",
-    "Versión ultracongelador -86 °C: DW-HL528S"
-   ],
-   "areas": [
-    "Laboratorio",
-    "Banco de sangre"
-   ]
-  },
-  {
-   "id": "hebei-pukang-b21-1",
-   "cat": "mobiliario",
-   "nom": "Cama clínica mecánica de 1 movimiento",
-   "marca": "Hebei Pukang",
-   "modelo": "B-21-1",
-   "origen": "China",
-   "resumen": "Cama clínica con barandas para hospitalización.",
-   "caracteristicas": [
-    "1 movimiento (semi-Fowler)",
-    "Barandas laterales",
-    "214 x 94 x 50 cm"
-   ],
-   "expediente": "CAMA CLINICA RODABLE PARA ADULTOS",
-   "clave": "M-75",
-   "areas": [
-    "Hospitalización"
-   ]
-  },
-  {
-   "id": "detecto-solo",
-   "cat": "mobiliario",
-   "nom": "Balanza digital adulto con tallímetro",
-   "marca": "Detecto",
-   "modelo": "SOLO",
-   "origen": "EE.UU.",
-   "resumen": "Balanza de pie con tallímetro para consulta y triaje.",
-   "caracteristicas": [
-    "Capacidad 250 kg, división 100 g",
-    "Tallímetro mecánico"
-   ],
-   "expediente": "BALANZA DIGITAL CON TALLIMETRO ADULTO",
-   "areas": [
-    "Consulta externa",
-    "Triaje"
-   ]
-  },
-  {
-   "id": "detecto-mb130",
-   "cat": "mobiliario",
-   "nom": "Balanza digital pediátrica con tallímetro",
-   "marca": "Detecto",
-   "modelo": "MB130",
-   "origen": "EE.UU.",
-   "resumen": "Balanza para lactantes y niños con tallímetro.",
-   "caracteristicas": [
-    "Hasta 20 kg (5 g hasta 10 kg)",
-    "Tallímetro incluido"
-   ],
-   "expediente": "BALANZA DIGITAL CON TALLIMETRO PEDIATRICA",
-   "areas": [
-    "Consulta externa",
-    "Neonatología"
-   ]
-  },
-  {
-   "id": "optium-emergeum",
-   "cat": "mobiliario",
-   "nom": "Camilla hidráulica de emergencia y trauma",
-   "marca": "Optium Medikal",
-   "modelo": "Emergeum",
-   "origen": "Turquía",
-   "resumen": "Camilla hidráulica radiolúcida para emergencia, trauma y UCI.",
-   "caracteristicas": [
-    "Accionamiento hidráulico",
-    "Radiolúcida",
-    "Posición Trendelenburg"
-   ],
-   "expediente": "CAMILLA",
-   "areas": [
-    "Emergencia",
-    "Cuidados intensivos"
-   ]
-  }
- ]
+  "_nota": "Catálogo de VENTA. Cada producto lleva su categoría (cat), marca, modelo y, si aplica, el nombre y código con que aparece en los expedientes técnicos (expediente, clave). Las fotos van en img/venta/<id>-01.jpg (con versiones -m y .webp) y se listan en «fotos». Lo que falte no se muestra.",
+  "categorias": [
+    {
+      "id": "monitoreo",
+      "nombre": "Monitoreo de pacientes",
+      "ejemplos": "Monitores de signos vitales, pulsioxímetros y monitores para UCI"
+    },
+    {
+      "id": "reanimacion",
+      "nombre": "Desfibriladores y reanimación",
+      "ejemplos": "Desfibriladores, DEA y coches de paro"
+    },
+    {
+      "id": "diagnostico",
+      "nombre": "Diagnóstico",
+      "ejemplos": "Electrocardiógrafos, espirómetros, MAPA, tensiómetros y estetoscopios"
+    },
+    {
+      "id": "neonatal",
+      "nombre": "Neonatología y obstetricia",
+      "ejemplos": "Cunas de calor radiante, incubadoras de transporte, monitores fetales y detectores de latidos"
+    },
+    {
+      "id": "quirofano",
+      "nombre": "Quirófano y aspiración",
+      "ejemplos": "Mesas de operaciones, lámparas quirúrgicas, electrobisturíes, máquinas de anestesia y aspiradores"
+    },
+    {
+      "id": "uci",
+      "nombre": "Ventilación e infusión",
+      "ejemplos": "Ventiladores mecánicos y bombas de infusión"
+    },
+    {
+      "id": "imagenes",
+      "nombre": "Imagenología",
+      "ejemplos": "Ecógrafos y equipos de rayos X digitales"
+    },
+    {
+      "id": "esterilizacion",
+      "nombre": "Esterilización",
+      "ejemplos": "Autoclaves de vapor, esterilizadores por plasma y por calor seco"
+    },
+    {
+      "id": "laboratorio",
+      "nombre": "Laboratorio",
+      "ejemplos": "Analizadores, microscopios, centrífugas, incubadoras de cultivo y cabinas de flujo laminar"
+    },
+    {
+      "id": "cadena-frio",
+      "nombre": "Cadena de frío",
+      "ejemplos": "Refrigeradoras de medicamentos y vacunas, banco de sangre y congeladores de laboratorio"
+    },
+    {
+      "id": "mobiliario",
+      "nombre": "Mobiliario clínico y balanzas",
+      "ejemplos": "Camas clínicas y balanzas con tallímetro"
+    }
+  ],
+  "productos": [
+    {
+      "id": "edan-im20",
+      "cat": "monitoreo",
+      "nom": "Monitor de signos vitales de 5 parámetros",
+      "marca": "Edan",
+      "modelo": "iM20",
+      "origen": "China",
+      "resumen": "Monitor portátil y compacto para tópico, consulta, hospitalización y traslado.",
+      "caracteristicas": [
+        "Pantalla de 5 pulgadas",
+        "5 parámetros",
+        "ECG de 3, 5 o 10 derivaciones",
+        "Sin impresora"
+      ],
+      "expediente": "MONITOR DE FUNCIONES VITALES DE 5 PARAMETROS",
+      "clave": "D-18",
+      "areas": [
+        "Emergencia",
+        "Hospitalización",
+        "Consulta externa"
+      ],
+      "fotos": [
+        "img/venta/edan-im20.jpg"
+      ]
+    },
+    {
+      "id": "edan-im50",
+      "cat": "monitoreo",
+      "nom": "Monitor de signos vitales de 5 parámetros con impresora",
+      "marca": "Edan",
+      "modelo": "iM50",
+      "origen": "China",
+      "resumen": "Monitor multiparámetro con pantalla táctil para emergencia, hospitalización y recuperación.",
+      "caracteristicas": [
+        "Pantalla táctil de 8 pulgadas",
+        "5 parámetros",
+        "Impresora térmica incorporada"
+      ],
+      "expediente": "MONITOR DE FUNCIONES VITALES DE 5 PARAMETROS",
+      "clave": "D-18",
+      "areas": [
+        "Emergencia",
+        "Hospitalización",
+        "Centro quirúrgico"
+      ],
+      "destacado": 4,
+      "fotos": [
+        "img/venta/edan-im50.jpg"
+      ]
+    },
+    {
+      "id": "edan-im70",
+      "cat": "monitoreo",
+      "nom": "Monitor multiparámetro de 12 pulgadas para UCI",
+      "marca": "Edan",
+      "modelo": "iM70",
+      "origen": "China",
+      "resumen": "Monitor de cabecera de pantalla grande para cuidados intensivos y sala de operaciones.",
+      "caracteristicas": [
+        "Pantalla táctil de 12 pulgadas",
+        "5 parámetros (configurable a 6 con etCO2 o PI)",
+        "Impresora térmica incorporada"
+      ],
+      "areas": [
+        "Cuidados intensivos",
+        "Centro quirúrgico"
+      ],
+      "fotos": [
+        "img/venta/edan-im70.jpg"
+      ]
+    },
+    {
+      "id": "edan-m3",
+      "cat": "monitoreo",
+      "nom": "Pulsioxímetro de sobremesa",
+      "marca": "Edan",
+      "modelo": "M3",
+      "origen": "China",
+      "resumen": "Pulsioxímetro de mesa con batería para hospitalización, emergencia y consulta.",
+      "caracteristicas": [
+        "Pantalla a color de 5,6 pulgadas",
+        "SpO2 y frecuencia de pulso",
+        "Batería de litio"
+      ],
+      "expediente": "PULSIOXIMETRO",
+      "clave": "D-17",
+      "areas": [
+        "Hospitalización",
+        "Emergencia"
+      ],
+      "fotos": [
+        "img/venta/edan-m3.jpg"
+      ]
+    },
+    {
+      "id": "edan-h100b",
+      "cat": "monitoreo",
+      "nom": "Pulsioxímetro de mano",
+      "marca": "Edan",
+      "modelo": "H100B",
+      "origen": "China",
+      "resumen": "Pulsioxímetro portátil para triaje, atención extramural y visitas domiciliarias.",
+      "caracteristicas": [
+        "SpO2 y frecuencia de pulso",
+        "Pantalla monocromática",
+        "Versión con baterías alcalinas o recargables"
+      ],
+      "expediente": "PULSIOXIMETRO PORTATIL",
+      "clave": "D-334",
+      "areas": [
+        "Consulta externa",
+        "Emergencia"
+      ],
+      "fotos": [
+        "img/venta/edan-h100b.jpg"
+      ]
+    },
+    {
+      "id": "cu-medical-hd1",
+      "cat": "reanimacion",
+      "nom": "Desfibrilador con monitor y paletas externas",
+      "marca": "CU Medical",
+      "modelo": "CU-HD1",
+      "origen": "Corea",
+      "resumen": "Desfibrilador bifásico con monitor a color para emergencia, UCI y sala de operaciones.",
+      "caracteristicas": [
+        "Energía hasta 360 J",
+        "Paletas externas reutilizables",
+        "Marcapaso transcutáneo",
+        "Opción con SpO2 y presión no invasiva"
+      ],
+      "expediente": "DESFIBRILADOR CON MONITOR Y PALETAS EXTERNAS",
+      "clave": "D-447",
+      "areas": [
+        "Emergencia",
+        "Cuidados intensivos",
+        "Centro quirúrgico"
+      ],
+      "fotos": [
+        "img/venta/cu-medical-hd1.jpg"
+      ]
+    },
+    {
+      "id": "cu-medical-dea",
+      "cat": "reanimacion",
+      "nom": "Desfibrilador externo automático (DEA)",
+      "marca": "CU Medical",
+      "modelo": "Serie i-PAD",
+      "origen": "Corea",
+      "resumen": "DEA de acceso público para centros de salud, empresas, colegios y ambulancias.",
+      "caracteristicas": [
+        "Uso automático con guía por voz",
+        "Versión con pantalla y batería recargable",
+        "Parches desechables adulto y pediátrico"
+      ],
+      "expediente": "DESFIBRILADOR EXTERNO AUTOMATICO",
+      "clave": "D-373",
+      "areas": [
+        "Emergencia",
+        "Ambulancias"
+      ],
+      "fotos": [
+        "img/venta/cu-medical-dea.jpg"
+      ]
+    },
+    {
+      "id": "metro-lifeline-lec2",
+      "cat": "reanimacion",
+      "nom": "Coche de paro de 4 cajones",
+      "marca": "Metro",
+      "modelo": "Lifeline LEC2",
+      "origen": "EE.UU.",
+      "resumen": "Coche de paro con soportes para balón de oxígeno, suero, aspirador y desfibrilador.",
+      "caracteristicas": [
+        "4 cajones",
+        "Porta balón de oxígeno, porta suero, porta aspirador y porta desfibrilador"
+      ],
+      "expediente": "COCHE DE PARO EQUIPADO",
+      "clave": "D-109",
+      "areas": [
+        "Emergencia",
+        "Hospitalización",
+        "Cuidados intensivos"
+      ],
+      "fotos": [
+        "img/venta/metro-lifeline-lec2.jpg"
+      ]
+    },
+    {
+      "id": "edan-se301",
+      "cat": "diagnostico",
+      "nom": "Electrocardiógrafo de 3 canales",
+      "marca": "Edan",
+      "modelo": "SE-301",
+      "origen": "China",
+      "resumen": "Electrocardiógrafo interpretativo para consulta, emergencia y hospitalización.",
+      "caracteristicas": [
+        "3 canales",
+        "Pantalla táctil a color de 5 pulgadas",
+        "Interpretación automática",
+        "Papel de 80 mm, puerto USB"
+      ],
+      "expediente": "ELECTROCARDIOGRAFO",
+      "clave": "D-1",
+      "areas": [
+        "Consulta externa",
+        "Emergencia",
+        "Hospitalización"
+      ],
+      "fotos": [
+        "img/venta/edan-se301.jpg"
+      ]
+    },
+    {
+      "id": "edan-se1200-express",
+      "cat": "diagnostico",
+      "nom": "Electrocardiógrafo de 12 canales",
+      "marca": "Edan",
+      "modelo": "SE-1200 Express",
+      "origen": "China",
+      "resumen": "Electrocardiógrafo de 12 canales para cardiología y hospitales.",
+      "caracteristicas": [
+        "12 canales",
+        "Pantalla táctil a color de 8 pulgadas",
+        "Interpretación automática",
+        "Papel de 210 mm"
+      ],
+      "expediente": "ELECTROCARDIOGRAFO",
+      "clave": "D-1",
+      "areas": [
+        "Consulta externa",
+        "Cardiología"
+      ],
+      "fotos": [
+        "img/venta/edan-se1200-express.jpg"
+      ]
+    },
+    {
+      "id": "heine-gamma-xxl-lf-s",
+      "cat": "diagnostico",
+      "nom": "Tensiómetro aneroide rodable",
+      "marca": "Heine",
+      "modelo": "Gamma XXL LF-S",
+      "origen": "Alemania",
+      "resumen": "Tensiómetro de pedestal con ruedas para consultorios y hospitalización.",
+      "caracteristicas": [
+        "Brazalete adulto con velcro",
+        "Base rodable"
+      ],
+      "expediente": "TENSIOMETRO ANEROIDE RODABLE ADULTO",
+      "clave": "D-135",
+      "areas": [
+        "Consulta externa",
+        "Hospitalización"
+      ],
+      "fotos": [
+        "img/venta/heine-gamma-xxl-lf-s.jpg"
+      ]
+    },
+    {
+      "id": "riester-exacta",
+      "cat": "diagnostico",
+      "nom": "Tensiómetro aneroide de mano",
+      "marca": "Riester",
+      "modelo": "Exacta",
+      "origen": "Alemania",
+      "resumen": "Tensiómetro aneroide de mano para consulta y atención extramural.",
+      "caracteristicas": [
+        "Brazalete adulto con velcro, 2 tubos",
+        "También en versión pediátrica"
+      ],
+      "expediente": "TENSIOMETRO ANEROIDE ADULTO",
+      "areas": [
+        "Consulta externa"
+      ],
+      "fotos": [
+        "img/venta/riester-exacta.jpg"
+      ]
+    },
+    {
+      "id": "riester-duplex-2",
+      "cat": "diagnostico",
+      "nom": "Estetoscopio de doble campana",
+      "marca": "Riester",
+      "modelo": "Duplex 2.0",
+      "origen": "Alemania",
+      "resumen": "Estetoscopio de cabezal de acero inoxidable para examen clínico.",
+      "caracteristicas": [
+        "Cabezal de acero inoxidable de doble campana",
+        "Versiones adulto, pediátrica y neonatal"
+      ],
+      "expediente": "ESTETOSCOPIO ADULTO",
+      "areas": [
+        "Consulta externa",
+        "Hospitalización"
+      ],
+      "fotos": [
+        "img/venta/riester-duplex-2.jpg"
+      ]
+    },
+    {
+      "id": "david-hkn-93a",
+      "cat": "neonatal",
+      "nom": "Cuna de calor radiante",
+      "marca": "Ningbo David",
+      "modelo": "HKN-93A",
+      "origen": "China",
+      "resumen": "Servocuna térmica para recepción del recién nacido en sala de partos y neonatología.",
+      "caracteristicas": [
+        "Altura variable",
+        "Accesorios estándar incluidos",
+        "Opciones: lámpara UV, elevador eléctrico, balanza"
+      ],
+      "expediente": "CUNA DE CALOR RADIANTE",
+      "clave": "D-350",
+      "areas": [
+        "Centro obstétrico",
+        "Neonatología"
+      ],
+      "fotos": [
+        "img/venta/david-hkn-93a.jpg"
+      ]
+    },
+    {
+      "id": "david-ti-2000",
+      "cat": "neonatal",
+      "nom": "Incubadora de transporte neonatal",
+      "marca": "Ningbo David",
+      "modelo": "TI-2000",
+      "origen": "China",
+      "resumen": "Incubadora para el traslado seguro de neonatos entre servicios y en ambulancia.",
+      "caracteristicas": [
+        "Pantalla LED",
+        "Batería para traslado",
+        "Opción de rango de temperatura hasta 38 °C"
+      ],
+      "expediente": "INCUBADORA DE TRANSPORTE",
+      "clave": "D-112",
+      "areas": [
+        "Neonatología",
+        "Emergencia",
+        "Ambulancias"
+      ],
+      "fotos": [
+        "img/venta/david-ti-2000.jpg"
+      ]
+    },
+    {
+      "id": "edan-f3",
+      "cat": "neonatal",
+      "nom": "Monitor fetal gemelar",
+      "marca": "Edan",
+      "modelo": "F3",
+      "origen": "China",
+      "resumen": "Monitor fetal de sobremesa para control prenatal y sala de partos.",
+      "caracteristicas": [
+        "Pantalla a color de 5,6 pulgadas",
+        "Monitoreo de gemelos",
+        "Con batería",
+        "Versión con presión intrauterina"
+      ],
+      "expediente": "MONITOR FETAL GEMELAR",
+      "clave": "D-16",
+      "areas": [
+        "Centro obstétrico",
+        "Consulta externa"
+      ],
+      "fotos": [
+        "img/venta/edan-f3.jpg"
+      ]
+    },
+    {
+      "id": "edan-f9",
+      "cat": "neonatal",
+      "nom": "Monitor fetal-materno de 12 pulgadas",
+      "marca": "Edan",
+      "modelo": "F9",
+      "origen": "China",
+      "resumen": "Monitor fetal gemelar con parámetros maternos para centros obstétricos.",
+      "caracteristicas": [
+        "Pantalla a color de 12 pulgadas",
+        "Monitoreo de gemelos",
+        "Opción con ECG, PNI, SpO2 y temperatura materna"
+      ],
+      "expediente": "MONITOR FETAL",
+      "clave": "D-15",
+      "areas": [
+        "Centro obstétrico"
+      ],
+      "fotos": [
+        "img/venta/edan-f9.jpg"
+      ]
+    },
+    {
+      "id": "edan-sd3-plus",
+      "cat": "neonatal",
+      "nom": "Detector de latidos fetales portátil",
+      "marca": "Edan",
+      "modelo": "SD-3 Plus",
+      "origen": "China",
+      "resumen": "Doppler fetal de bolsillo para control prenatal.",
+      "caracteristicas": [
+        "Sonda de 2,0 MHz",
+        "Batería recargable"
+      ],
+      "expediente": "DETECTOR DE LATIDOS FETALES PORTATIL",
+      "clave": "D-97",
+      "areas": [
+        "Consulta externa",
+        "Centro obstétrico"
+      ],
+      "fotos": [
+        "img/venta/edan-sd3-plus.jpg"
+      ]
+    },
+    {
+      "id": "edan-sd5",
+      "cat": "neonatal",
+      "nom": "Detector de latidos fetales de sobremesa",
+      "marca": "Edan",
+      "modelo": "SD-5",
+      "origen": "China",
+      "resumen": "Doppler fetal de mesa para consultorios de obstetricia.",
+      "caracteristicas": [
+        "Sonda de 2,0 MHz alámbrica",
+        "Versión SD-6 con sonda inalámbrica"
+      ],
+      "expediente": "DETECTOR DE LATIDOS FETALES DE SOBREMESA",
+      "clave": "D-96",
+      "areas": [
+        "Consulta externa",
+        "Centro obstétrico"
+      ],
+      "fotos": [
+        "img/venta/edan-sd5.jpg"
+      ]
+    },
+    {
+      "id": "david-yp-2000",
+      "cat": "neonatal",
+      "nom": "Incubadora neonatal",
+      "marca": "Ningbo David",
+      "modelo": "YP-2000",
+      "origen": "China",
+      "resumen": "Incubadora cerrada para el cuidado del recién nacido en neonatología e intermedios.",
+      "caracteristicas": [
+        "Pantalla LCD a color de 7 pulgadas",
+        "Balanza incorporada",
+        "Lámpara de observación",
+        "Opción de sensor de oxígeno"
+      ],
+      "expediente": "INCUBADORA NEONATAL",
+      "areas": [
+        "Neonatología",
+        "Centro obstétrico"
+      ],
+      "destacado": 5,
+      "fotos": [
+        "img/venta/david-yp-2000.jpg"
+      ]
+    },
+    {
+      "id": "medifa-6000",
+      "cat": "quirofano",
+      "nom": "Mesa de operaciones eléctrica",
+      "marca": "Medifa",
+      "modelo": "6000",
+      "origen": "Alemania",
+      "resumen": "Mesa quirúrgica universal de 4 secciones con accionamiento eléctrico.",
+      "caracteristicas": [
+        "4 secciones",
+        "Carga hasta 454 kg",
+        "Versión universal o traumatológica"
+      ],
+      "areas": [
+        "Centro quirúrgico"
+      ],
+      "fotos": [
+        "img/venta/medifa-6000.jpg"
+      ]
+    },
+    {
+      "id": "kls-marled-e9i",
+      "cat": "quirofano",
+      "nom": "Lámpara quirúrgica LED rodable",
+      "marca": "KLS Martin",
+      "modelo": "marLED E9i",
+      "origen": "Alemania",
+      "resumen": "Lámpara quirúrgica LED móvil con batería para quirófanos, tópicos y salas de procedimientos.",
+      "caracteristicas": [
+        "160 000 lux",
+        "Base rodable",
+        "Con batería"
+      ],
+      "expediente": "LAMPARA QUIRURGICA RODABLE",
+      "clave": "D-34",
+      "areas": [
+        "Centro quirúrgico",
+        "Emergencia",
+        "Centro obstétrico"
+      ],
+      "destacado": 7,
+      "fotos": [
+        "img/venta/kls-marled-e9i.jpg"
+      ]
+    },
+    {
+      "id": "kls-marled-x",
+      "cat": "quirofano",
+      "nom": "Lámpara quirúrgica LED de techo",
+      "marca": "KLS Martin",
+      "modelo": "marLED X",
+      "origen": "Alemania",
+      "resumen": "Lámpara quirúrgica LED de techo para sala de operaciones.",
+      "caracteristicas": [
+        "1 cabezal de 160 000 lux",
+        "También en versión de 2 cabezales"
+      ],
+      "expediente": "LAMPARA QUIRURGICA DE TECHO SIMPLE",
+      "clave": "D-33",
+      "areas": [
+        "Centro quirúrgico"
+      ],
+      "fotos": [
+        "img/venta/kls-marled-x.jpg"
+      ]
+    },
+    {
+      "id": "ledspa-surtron-300",
+      "cat": "quirofano",
+      "nom": "Electrobisturí de alta potencia",
+      "marca": "LED SpA",
+      "modelo": "Surtron 300 HP",
+      "origen": "Italia",
+      "resumen": "Unidad electroquirúrgica monopolar y bipolar para cirugía general.",
+      "caracteristicas": [
+        "300 W",
+        "Monopolar y bipolar",
+        "Versión táctil y de 400 W"
+      ],
+      "areas": [
+        "Centro quirúrgico"
+      ],
+      "destacado": 8,
+      "fotos": [
+        "img/venta/ledspa-surtron-300.jpg"
+      ]
+    },
+    {
+      "id": "comen-ax800",
+      "cat": "quirofano",
+      "nom": "Máquina de anestesia",
+      "marca": "Comen",
+      "modelo": "AX800",
+      "origen": "China",
+      "resumen": "Estación de anestesia con flujómetros electrónicos para sala de operaciones.",
+      "caracteristicas": [
+        "Flujómetros electrónicos",
+        "2 vaporizadores",
+        "Pantalla de 15 pulgadas"
+      ],
+      "areas": [
+        "Centro quirúrgico"
+      ],
+      "fotos": [
+        "img/venta/comen-ax800.jpg"
+      ]
+    },
+    {
+      "id": "cami-new-hospivac-350",
+      "cat": "quirofano",
+      "nom": "Aspirador de secreciones rodable",
+      "marca": "CA-MI",
+      "modelo": "New Hospivac 350",
+      "origen": "Italia",
+      "resumen": "Aspirador rodable de alto flujo para quirófano, emergencia y UCI.",
+      "caracteristicas": [
+        "60 L/min",
+        "2 frascos de 5 L",
+        "Pedal de control"
+      ],
+      "expediente": "ASPIRADOR DE SECRECIONES RODABLE",
+      "clave": "D-88",
+      "areas": [
+        "Centro quirúrgico",
+        "Emergencia",
+        "Cuidados intensivos"
+      ],
+      "fotos": [
+        "img/venta/cami-new-hospivac-350.jpg"
+      ]
+    },
+    {
+      "id": "cami-new-askir-30",
+      "cat": "quirofano",
+      "nom": "Aspirador de secreciones portátil",
+      "marca": "CA-MI",
+      "modelo": "New Askir 30",
+      "origen": "Italia",
+      "resumen": "Aspirador portátil para emergencia, tópico y atención domiciliaria.",
+      "caracteristicas": [
+        "40 L/min",
+        "Frasco de 1 L",
+        "Versión con batería: Askir 36 BR"
+      ],
+      "expediente": "ASPIRADOR DE SECRECION PORTATIL",
+      "areas": [
+        "Emergencia",
+        "Hospitalización"
+      ],
+      "fotos": [
+        "img/venta/cami-new-askir-30.jpg"
+      ]
+    },
+    {
+      "id": "siare-aria-104",
+      "cat": "uci",
+      "nom": "Ventilador mecánico para UCI",
+      "marca": "Siare",
+      "modelo": "Aria 104",
+      "origen": "Italia",
+      "resumen": "Ventilador rodable con turbina para pacientes adultos y pediátricos.",
+      "caracteristicas": [
+        "Turbina incorporada",
+        "Pantalla táctil de 10 pulgadas",
+        "Adulto y pediátrico",
+        "Versión Aria 150 con pantalla de 15 pulgadas"
+      ],
+      "areas": [
+        "Cuidados intensivos",
+        "Emergencia"
+      ],
+      "destacado": 2,
+      "fotos": [
+        "img/venta/siare-aria-104.jpg"
+      ]
+    },
+    {
+      "id": "medrena-vp50-pro",
+      "cat": "uci",
+      "nom": "Bomba de infusión volumétrica",
+      "marca": "Medrena",
+      "modelo": "VP50 Pro",
+      "origen": "China",
+      "resumen": "Bomba volumétrica apilable para hospitalización, emergencia y UCI.",
+      "caracteristicas": [
+        "1 canal (también de 2 y 3 canales)",
+        "Pantalla táctil a color",
+        "Wi-Fi e infrarrojo"
+      ],
+      "expediente": "BOMBA DE INFUSION",
+      "clave": "D-105",
+      "areas": [
+        "Cuidados intensivos",
+        "Hospitalización",
+        "Emergencia"
+      ],
+      "fotos": [
+        "img/venta/medrena-vp50-pro.jpg"
+      ]
+    },
+    {
+      "id": "medrena-sp50",
+      "cat": "uci",
+      "nom": "Bomba de infusión de jeringa",
+      "marca": "Medrena",
+      "modelo": "SP-50",
+      "origen": "China",
+      "resumen": "Bomba de jeringa apilable para infusiones de precisión.",
+      "caracteristicas": [
+        "Apilable en rack",
+        "Versión SP-50 Pro con Wi-Fi"
+      ],
+      "areas": [
+        "Cuidados intensivos",
+        "Neonatología"
+      ],
+      "fotos": [
+        "img/venta/medrena-sp50.jpg"
+      ]
+    },
+    {
+      "id": "edan-dus60",
+      "cat": "imagenes",
+      "nom": "Ecógrafo portátil",
+      "marca": "Edan",
+      "modelo": "DUS 60",
+      "origen": "China",
+      "resumen": "Ecógrafo portátil para consulta, obstetricia y atención primaria.",
+      "caracteristicas": [
+        "Pantalla LCD de 12 pulgadas",
+        "2 puertos",
+        "Incluye transductor convexo y lineal",
+        "Para Doppler color: modelos portátiles Edan y SIUI de 15 pulgadas"
+      ],
+      "expediente": "ECOGRAFO PORTATIL",
+      "clave": "D-103",
+      "areas": [
+        "Consulta externa",
+        "Centro obstétrico"
+      ],
+      "destacado": 3,
+      "fotos": [
+        "img/venta/edan-dus60.jpg"
+      ]
+    },
+    {
+      "id": "perlove-rx-digital",
+      "cat": "imagenes",
+      "nom": "Equipo de rayos X digital estacionario",
+      "marca": "Perlove",
+      "modelo": "Mesa flotante, 1 detector",
+      "origen": "China",
+      "resumen": "Equipo de radiografía digital con detector plano para centros de salud y clínicas.",
+      "caracteristicas": [
+        "Generador de 65 kW",
+        "Detector plano de 17 x 17 pulgadas",
+        "Mesa flotante (también fija o elevada)",
+        "Versiones con 2 detectores"
+      ],
+      "expediente": "EQUIPO DE RAYOS X ESTACIONARIO DIGITAL",
+      "areas": [
+        "Diagnóstico por imágenes"
+      ],
+      "destacado": 6,
+      "fotos": [
+        "img/venta/perlove-rx-digital.jpg"
+      ]
+    },
+    {
+      "id": "tuttnauer-t-top-11",
+      "cat": "esterilizacion",
+      "nom": "Autoclave de mesa de 25 litros clase B",
+      "marca": "Tuttnauer",
+      "modelo": "T-Top 11 P",
+      "origen": "Israel",
+      "resumen": "Autoclave de vapor clase B para consultorios, odontología y centros de salud.",
+      "caracteristicas": [
+        "25 litros",
+        "Clase B",
+        "Impresora incorporada"
+      ],
+      "expediente": "ESTERILIZADOR CON GENERADOR ELECTRICO DE VAPOR DE 20 LITROS",
+      "clave": "D-212",
+      "areas": [
+        "Central de esterilización",
+        "Odontología"
+      ],
+      "destacado": 1,
+      "fotos": [
+        "img/venta/tuttnauer-t-top-11.jpg"
+      ]
+    },
+    {
+      "id": "baix-48l",
+      "cat": "esterilizacion",
+      "nom": "Autoclave de mesa de 48 litros clase B",
+      "marca": "Baix",
+      "modelo": "48 L clase B",
+      "origen": "China",
+      "resumen": "Autoclave de vapor clase B de mayor capacidad para centrales de esterilización.",
+      "caracteristicas": [
+        "48 litros",
+        "Clase B con bomba de vacío",
+        "Generador de vapor",
+        "220 V / 60 Hz"
+      ],
+      "expediente": "ESTERILIZADOR CON GENERADOR ELECTRICO DE VAPOR DE 50 LITROS",
+      "clave": "D-217",
+      "areas": [
+        "Central de esterilización"
+      ]
+    },
+    {
+      "id": "tuttnauer-3870-ea",
+      "cat": "esterilizacion",
+      "nom": "Autoclave automático de 85 litros",
+      "marca": "Tuttnauer",
+      "modelo": "3870 EA",
+      "origen": "Israel",
+      "resumen": "Autoclave automático para centrales de esterilización de mayor volumen.",
+      "caracteristicas": [
+        "85 litros",
+        "Clase N",
+        "Impresora incorporada"
+      ],
+      "areas": [
+        "Central de esterilización"
+      ],
+      "fotos": [
+        "img/venta/tuttnauer-3870-ea.jpg"
+      ]
+    },
+    {
+      "id": "memmert-sn55",
+      "cat": "esterilizacion",
+      "nom": "Esterilizador por calor seco de 53 litros",
+      "marca": "Memmert",
+      "modelo": "SN-55",
+      "origen": "Alemania",
+      "resumen": "Esterilizador de aire caliente para centros de salud y laboratorios.",
+      "caracteristicas": [
+        "53 litros",
+        "Hasta 250 °C",
+        "Pantalla táctil a color",
+        "Convección natural (versión SF con ventilación forzada)"
+      ],
+      "expediente": "ESTERILIZADOR POR CALOR SECO 50 LITROS",
+      "areas": [
+        "Central de esterilización",
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/memmert-sn55.jpg"
+      ]
+    },
+    {
+      "id": "edan-h30-pro",
+      "cat": "laboratorio",
+      "nom": "Analizador hematológico de 3 diferenciales",
+      "marca": "Edan",
+      "modelo": "H30 Pro",
+      "origen": "China",
+      "resumen": "Analizador automático de hemograma para laboratorios de centros de salud y clínicas.",
+      "caracteristicas": [
+        "3 diferenciales",
+        "Pantalla táctil de 10,4 pulgadas",
+        "Versiones de 5 diferenciales: H60 y H80S"
+      ],
+      "expediente": "ANALIZADOR HEMATOLOGICO",
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/edan-h30-pro.jpg"
+      ]
+    },
+    {
+      "id": "mindray-ba88a",
+      "cat": "laboratorio",
+      "nom": "Analizador bioquímico semiautomático",
+      "marca": "Mindray",
+      "modelo": "BA-88A",
+      "origen": "China",
+      "resumen": "Analizador de química clínica semiautomático para laboratorios pequeños y medianos.",
+      "caracteristicas": [
+        "Semiautomático"
+      ],
+      "expediente": "ANALIZADOR BIOQUIMICO SEMI AUTOMATICO",
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/mindray-ba88a.jpg"
+      ]
+    },
+    {
+      "id": "boeco-bm-120",
+      "cat": "laboratorio",
+      "nom": "Microscopio binocular",
+      "marca": "Boeco",
+      "modelo": "BM-120",
+      "origen": "Alemania",
+      "resumen": "Microscopio de rutina para laboratorio clínico.",
+      "caracteristicas": [
+        "Cabezal binocular"
+      ],
+      "expediente": "MICROSCOPIO BINOCULAR ESTANDAR",
+      "clave": "D-60",
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/boeco-bm-120.jpg"
+      ]
+    },
+    {
+      "id": "boeco-hc-240",
+      "cat": "laboratorio",
+      "nom": "Centrífuga de microhematocrito",
+      "marca": "Boeco",
+      "modelo": "HC-240",
+      "origen": "Alemania",
+      "resumen": "Centrífuga para determinación de hematocrito en laboratorio.",
+      "caracteristicas": [
+        "Rotor para 24 capilares"
+      ],
+      "expediente": "CENTRIFUGA PARA MICROHEMATOCRITO",
+      "clave": "D-269",
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/boeco-hc-240.jpg"
+      ]
+    },
+    {
+      "id": "boeco-c-28a",
+      "cat": "laboratorio",
+      "nom": "Centrífuga de laboratorio de 12 y 16 tubos",
+      "marca": "Boeco",
+      "modelo": "C-28A",
+      "origen": "Alemania",
+      "resumen": "Centrífuga electrónica de mesa para tubos de 15 ml.",
+      "caracteristicas": [
+        "Rotor angular de 12 tubos y oscilante de 16 tubos",
+        "Tubos de 15 ml"
+      ],
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/boeco-c-28a.jpg"
+      ]
+    },
+    {
+      "id": "memmert-in55",
+      "cat": "laboratorio",
+      "nom": "Incubadora de cultivo de 53 litros",
+      "marca": "Memmert",
+      "modelo": "IN-55",
+      "origen": "Alemania",
+      "resumen": "Incubadora para microbiología y cultivos.",
+      "caracteristicas": [
+        "53 litros",
+        "Hasta 80 °C",
+        "Pantalla táctil a color"
+      ],
+      "expediente": "INCUBADORA PARA CULTIVO",
+      "clave": "D-369",
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/memmert-in55.jpg"
+      ]
+    },
+    {
+      "id": "biobase-bsc-4fa2",
+      "cat": "laboratorio",
+      "nom": "Cabina de flujo laminar vertical de 4 pies",
+      "marca": "Biobase",
+      "modelo": "BSC-4FA2",
+      "origen": "China",
+      "resumen": "Cabina de seguridad biológica para laboratorio y microbiología.",
+      "caracteristicas": [
+        "Flujo laminar vertical",
+        "Ancho de 4 pies"
+      ],
+      "expediente": "CABINA DE FLUJO LAMINAR VERTICAL (4 PIES TIPO A/B3)",
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/biobase-bsc-4fa2.jpg"
+      ]
+    },
+    {
+      "id": "boeco-s200",
+      "cat": "laboratorio",
+      "nom": "Espectrofotómetro visible",
+      "marca": "Boeco",
+      "modelo": "S-200 Vis",
+      "origen": "Alemania",
+      "resumen": "Espectrofotómetro para química clínica y docencia.",
+      "caracteristicas": [
+        "Rango de 320 a 1100 nm"
+      ],
+      "expediente": "ESPECTROFOTOMETRO",
+      "areas": [
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/boeco-s200.jpg"
+      ]
+    },
+    {
+      "id": "meling-yc-315l",
+      "cat": "cadena-frio",
+      "nom": "Refrigeradora de medicamentos y vacunas de 315 litros",
+      "marca": "Meling",
+      "modelo": "YC-315L",
+      "origen": "China",
+      "resumen": "Refrigeradora de +2 a +8 °C para farmacia, inmunizaciones y almacén de medicamentos.",
+      "caracteristicas": [
+        "Rango de +2 a +8 °C",
+        "315 litros (11 pies cúbicos)",
+        "También en 130 L (YC-130L) y 525 L (YC-525L)"
+      ],
+      "expediente": "REFRIGERADORA PARA MEDICAMENTOS",
+      "areas": [
+        "Farmacia",
+        "Inmunizaciones",
+        "Cadena de frío"
+      ],
+      "fotos": [
+        "img/venta/meling-yc-315l.jpg"
+      ]
+    },
+    {
+      "id": "meling-xc-630l",
+      "cat": "cadena-frio",
+      "nom": "Refrigeradora para banco de sangre",
+      "marca": "Meling",
+      "modelo": "XC-630L",
+      "origen": "China",
+      "resumen": "Refrigeradora a +4 °C para conservación de hemocomponentes.",
+      "caracteristicas": [
+        "Temperatura de +4 °C",
+        "630 litros (22 pies cúbicos)"
+      ],
+      "areas": [
+        "Banco de sangre",
+        "Laboratorio"
+      ],
+      "fotos": [
+        "img/venta/meling-xc-630l.jpg"
+      ]
+    },
+    {
+      "id": "meling-dw-fl528",
+      "cat": "cadena-frio",
+      "nom": "Congelador vertical para laboratorio",
+      "marca": "Meling",
+      "modelo": "DW-FL528",
+      "origen": "China",
+      "resumen": "Congelador vertical de -20 a -40 °C para muestras y reactivos.",
+      "caracteristicas": [
+        "Rango de -20 a -40 °C",
+        "528 litros",
+        "Versión ultracongelador -86 °C: DW-HL528S"
+      ],
+      "areas": [
+        "Laboratorio",
+        "Banco de sangre"
+      ],
+      "fotos": [
+        "img/venta/meling-dw-fl528.jpg"
+      ]
+    },
+    {
+      "id": "hebei-pukang-b21-1",
+      "cat": "mobiliario",
+      "nom": "Cama clínica mecánica de 1 movimiento",
+      "marca": "Hebei Pukang",
+      "modelo": "B-21-1",
+      "origen": "China",
+      "resumen": "Cama clínica con barandas para hospitalización.",
+      "caracteristicas": [
+        "1 movimiento (semi-Fowler)",
+        "Barandas laterales",
+        "214 x 94 x 50 cm"
+      ],
+      "expediente": "CAMA CLINICA RODABLE PARA ADULTOS",
+      "clave": "M-75",
+      "areas": [
+        "Hospitalización"
+      ],
+      "fotos": [
+        "img/venta/hebei-pukang-b21-1.jpg"
+      ]
+    },
+    {
+      "id": "detecto-solo",
+      "cat": "mobiliario",
+      "nom": "Balanza digital adulto con tallímetro",
+      "marca": "Detecto",
+      "modelo": "SOLO",
+      "origen": "EE.UU.",
+      "resumen": "Balanza de pie con tallímetro para consulta y triaje.",
+      "caracteristicas": [
+        "Capacidad 250 kg, división 100 g",
+        "Tallímetro mecánico"
+      ],
+      "expediente": "BALANZA DIGITAL CON TALLIMETRO ADULTO",
+      "areas": [
+        "Consulta externa",
+        "Triaje"
+      ],
+      "fotos": [
+        "img/venta/detecto-solo.jpg"
+      ]
+    },
+    {
+      "id": "detecto-mb130",
+      "cat": "mobiliario",
+      "nom": "Balanza digital pediátrica con tallímetro",
+      "marca": "Detecto",
+      "modelo": "MB130",
+      "origen": "EE.UU.",
+      "resumen": "Balanza para lactantes y niños con tallímetro.",
+      "caracteristicas": [
+        "Hasta 20 kg (5 g hasta 10 kg)",
+        "Tallímetro incluido"
+      ],
+      "expediente": "BALANZA DIGITAL CON TALLIMETRO PEDIATRICA",
+      "areas": [
+        "Consulta externa",
+        "Neonatología"
+      ],
+      "fotos": [
+        "img/venta/detecto-mb130.jpg"
+      ]
+    },
+    {
+      "id": "optium-emergeum",
+      "cat": "mobiliario",
+      "nom": "Camilla hidráulica de emergencia y trauma",
+      "marca": "Optium Medikal",
+      "modelo": "Emergeum",
+      "origen": "Turquía",
+      "resumen": "Camilla hidráulica radiolúcida para emergencia, trauma y UCI.",
+      "caracteristicas": [
+        "Accionamiento hidráulico",
+        "Radiolúcida",
+        "Posición Trendelenburg"
+      ],
+      "expediente": "CAMILLA",
+      "areas": [
+        "Emergencia",
+        "Cuidados intensivos"
+      ],
+      "fotos": [
+        "img/venta/optium-emergeum.jpg"
+      ]
+    }
+  ]
 }
