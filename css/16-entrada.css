@@ -59,14 +59,3 @@
     .ent-top .logo-h{height:38px}
     .ent-top nav{font-size:13px}
   }
-
-  /* =====================================================================
-     VENTA (#/venta): primera versión, sin catálogo de productos todavía.
-     ===================================================================== */
-  .venta-ref{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  .venta-ref .item{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);padding:24px 26px}
-  .venta-ref .item .k{font-family:var(--ff-d);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cobre-d)}
-  .venta-ref .item h3{font-size:18px;font-weight:600;margin:8px 0 8px}
-  .venta-ref .item p{font-size:14px;color:var(--gris)}
-  .venta-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
-  @media(max-width:760px){.venta-ref{grid-template-columns:1fr}}

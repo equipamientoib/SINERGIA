@@ -83,8 +83,9 @@ css/11-personaliza.css
 css/12-extras.css
 css/14-footer.css
 css/16-entrada.css
+css/17-venta.css
 -->
-<link rel="stylesheet" href="css/app.css?v=c2dfb110">
+<link rel="stylesheet" href="css/app.css?v=c48d07b5">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -117,12 +118,13 @@ js/08-ui.js
 js/09-menu.js
 js/10-modal.js
 js/11-solicitudes.js
+js/12-venta.js
 -->
 <!-- Qué página de alquiler/… corresponde a cada equipo: la escribe
      scripts/generar_paginas.py. El catálogo la usa para que el clic en un
      equipo abra su página; si un equipo no está aquí, abre la ficha #/equipo. -->
 <!--TIPOS-URL-INICIO--><script>window.PAGINA_TIPO={"defib": "/alquiler/analizador-de-desfibriladores/", "esa620": "/alquiler/analizador-de-seguridad-electrica/", "fluke-51": "/alquiler/termometro-digital/", "fluke-945": "/alquiler/sonometro/", "luxometro": "/alquiler/luxometro/", "manometro": "/alquiler/manometro-digital/", "ms400": "/alquiler/simulador-de-signos-vitales/", "multimetro": "/alquiler/multimetro/", "phantom-flujo": "/alquiler/phantom-de-puncion-ecoguiada/", "sp-sim": "/alquiler/simulador-de-spo2/", "tacometro": "/alquiler/tacometro/"};window.FOTOS_EXTRA={"fluke-51": ["img/catalogo/fluke-51-00.jpg"], "ms400": ["img/catalogo/ms400-00.jpg"], "multimetro": ["img/catalogo/multimetro-01.jpg"], "tacometro": ["img/catalogo/tacometro-01.jpg"]};</script><!--TIPOS-URL-FIN-->
-<script defer src="js/app.js?v=c2dfb110"></script>
+<script defer src="js/app.js?v=c48d07b5"></script>
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -348,36 +350,8 @@ js/11-solicitudes.js
   </section>
 </div>
 
-<!-- ===== VENTA (#/venta) — primera versión, sin catálogo de productos todavía ===== -->
-<div class="page" id="page-venta">
-  <div class="wrap pagehead"><div class="k">Venta</div>
-    <h1>Venta de equipamiento biomédico</h1>
-    <p>Equipos e instrumentos para hospitales, clínicas y obras de equipamiento, desde la cotización hasta la entrega. Con el mismo respaldo técnico de nuestro servicio de metrología.</p>
-  </div>
-  <section style="padding-top:34px">
-    <div class="wrap">
-      <div class="svc">
-        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/></svg></div><div class="tagn">HOSPITALES Y CLÍNICAS</div><h3>Equipos biomédicos</h3><p>Cotizamos los equipos que necesita cada área de tu institución, con especificaciones técnicas claras y entrega coordinada.</p><a class="btn" onclick="go('#/contacto')">Solicitar cotización →</a></div>
-        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg></div><div class="tagn">OBRAS Y PROYECTOS</div><h3>Expedientes técnicos</h3><p>Componente de equipamiento para obras: metrado por ambiente, especificaciones, memoria de cálculo, presupuesto y planos.</p><a class="btn" onclick="go('#/clientes')">Ver proyectos →</a></div>
-        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div><div class="tagn">RESPALDO TÉCNICO</div><h3>Mantenimiento y metrología</h3><p>Después de la entrega, mantenimiento preventivo y verificación con instrumentos calibrados Fluke, Rigel y Contec.</p><a class="btn" onclick="go('#/alquiler')">Ver alquiler de equipos →</a></div>
-      </div>
-    </div>
-  </section>
-  <section style="padding-top:20px">
-    <div class="wrap">
-      <div class="shead"><div><div class="k">Cómo trabajamos</div><h2>De tu requerimiento a la entrega</h2></div><p>Te acompañamos en todo el proceso, con una sola empresa como contacto.</p></div>
-      <div class="steps">
-        <div class="step"><div class="num">1</div><h3>Nos envías tu requerimiento</h3><p>La lista de equipos, el área o el expediente técnico de tu obra.</p></div>
-        <div class="step"><div class="num">2</div><h3>Te cotizamos</h3><p>Con especificaciones técnicas, plazos de entrega y condiciones claras.</p></div>
-        <div class="step"><div class="num">3</div><h3>Entregamos y damos respaldo</h3><p>Coordinamos la entrega y te acompañamos con mantenimiento y verificación.</p></div>
-      </div>
-      <div class="venta-cta">
-        <a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a>
-        <a class="btn btn-lg" href="https://wa.me/51908704131" target="_blank" rel="noopener">Escribir por WhatsApp</a>
-      </div>
-    </div>
-  </section>
-</div>
+<!-- ===== VENTA (#/venta, #/venta/cat/<id>, #/venta/p/<id>) — la pinta js/12-venta.js con data/venta.json ===== -->
+<div class="page" id="page-venta"><div id="ventaBody"></div></div>
 
 <!-- ===== CATÁLOGO ===== -->
 <div class="page" id="page-catalogo">
