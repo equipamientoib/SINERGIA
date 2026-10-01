@@ -142,6 +142,13 @@ GALERIA_JS = r'''
       if(ev.target.closest('.gal-main')) abrir(g);
     });
   });
+  document.querySelectorAll('[data-tabs]').forEach(function(w){
+    var bs=w.querySelectorAll('.tab'), ps=w.querySelectorAll('.panel');
+    bs.forEach(function(b,i){ b.addEventListener('click',function(){
+      bs.forEach(function(x){x.classList.toggle('on',x===b);});
+      ps.forEach(function(p,k){p.hidden=k!==i;});
+    }); });
+  });
   if(!V) return;
   V.addEventListener('click',function(ev){
     var b=ev.target.closest('button');
@@ -258,39 +265,15 @@ def pdf_ficha(eq_id):
     return '/fichas/ficha-tecnica-%s.pdf' % eq_id
 
 
-def seccion_ficha(f):
-    """Ficha técnica en la página web (texto que Google puede leer)."""
-    grupos = ''.join('<div class="ft-grupo"><h4>%s</h4><table>%s</table></div>' % (
-        e(g['titulo']), ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas']))
-        for g in f['secciones'])
-    normas = ''.join('<span>%s</span>' % e(n) for n in f.get('normas', []))
-    incluye = ''.join('<li>%s</li>' % e(i) for i in f.get('incluye', []))
-    pdf = pdf_ficha(f['id'])
-    tiene_pdf = os.path.exists(os.path.join(ROOT, pdf.lstrip('/')))
-    return f'''
-    <section class="ficha-tec" id="ficha-{e(f['id'])}">
-      <div class="ft-cab">
-        <div><div class="k">Ficha técnica</div><h3>{e(f['titulo'])}</h3></div>
-        {f'<a class="btn fill" href="{pdf}" download>Descargar ficha técnica (PDF)</a>' if tiene_pdf else ''}
-      </div>
-      <p class="ft-resumen">{e(f.get('resumen', ''))}</p>
-      {f'<div class="ft-normas"><b>Normas</b>{normas}</div>' if normas else ''}
-      <div class="ft-grupos">{grupos}</div>
-      {f'<div class="ft-incluye"><b>Incluye en el alquiler</b><ul>{incluye}</ul></div>' if incluye else ''}
-      <p class="ft-fuente">Fuente: {e(f.get('fuente', 'fabricante'))}. Especificaciones sujetas a cambios del fabricante.</p>
-    </section>'''
-
-
 def pagina_ficha_a4(f, eq, cfg, locales):
     """Hoja A4 imprimible: de aquí sale el PDF (scripts/generar_pdf_fichas.js)."""
     fotos = fotos_de(eq, locales)
-    foto = fotos[0].replace('-m.webp', '.webp') if fotos else ''
+    foto = fotos[0] if fotos else ''   # la ligera: el PDF pesa ~3 veces menos
     grupos = ''.join('<div class="g"><h4>%s</h4><table>%s</table></div>' % (
         e(g['titulo']), ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas']))
         for g in f['secciones'])
     normas = ' · '.join(e(n) for n in f.get('normas', []))
     incluye = ''.join('<li>%s</li>' % e(i) for i in f.get('incluye', []))
-    hoy = datetime.date.today().strftime('%m/%Y')
     return f'''<!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ficha técnica — {e(f['titulo'])} | Sinergia Biomédica</title>
@@ -344,7 +327,7 @@ def pagina_ficha_a4(f, eq, cfg, locales):
   {f'<div class="incluye"><b>Incluye en el alquiler</b><ul>{incluye}</ul></div>' if incluye else ''}
   <footer>
     <div><b>Sinergia Biomédica</b> · Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú · {e(cfg['email'])} · {e(cfg['telefono'])}</div>
-    <div style="text-align:right">sinergiabiomedica.pe<br>Fuente: {e(f.get('fuente', 'fabricante'))} · {hoy}</div>
+    <div style="text-align:right">sinergiabiomedica.pe<br>Fuente: {e(f.get('fuente', 'fabricante'))}</div>
   </footer>
 </div>
 <button class="boton" onclick="print()">Guardar como PDF</button>
@@ -352,76 +335,103 @@ def pagina_ficha_a4(f, eq, cfg, locales):
 '''
 
 
-def tarjeta_equipo(eq, tipo, cfg, locales, primera=False):
+def galeria(eq, locales, primera=False):
     fotos = fotos_de(eq, locales)
     alt = e(eq['nom'] + ' — ' + eq.get('marca', ''))
     n = len(fotos)
-    if fotos:
-        # Galería: la foto ligera se ve en la ficha; la grande, al ampliar.
-        # Sin JavaScript se ve la primera foto; con él, flechas, miniaturas
-        # y visor a pantalla completa (script al final de la página).
-        grandes = [f.replace('-m.webp', '.webp') for f in fotos]
-        minis = ''.join('<button type="button" class="%s" data-i="%d" aria-label="Foto %d">'
-                        '<img src="%s" alt="" loading="lazy" decoding="async" width="120" height="90"></button>'
-                        % ('on' if k == 0 else '', k, k + 1, f) for k, f in enumerate(fotos)) if n > 1 else ''
-        galeria = f'''
-      <div class="gal" data-fotos="{e(json.dumps(fotos))}" data-grandes="{e(json.dumps(grandes))}">
+    if not fotos:
+        return '<div class="gal una"><div class="gal-main sinfoto">%s</div></div>' % ICONO
+    # La foto ligera se ve en la ficha; la grande, al ampliar. Sin JavaScript
+    # se ve la primera; con él, flechas, miniaturas y visor (al final de la página).
+    grandes = [f.replace('-m.webp', '.webp') for f in fotos]
+    minis = ''.join('<button type="button" class="%s" data-i="%d" aria-label="Foto %d">'
+                    '<img src="%s" alt="" loading="lazy" decoding="async" width="120" height="90"></button>'
+                    % ('on' if k == 0 else '', k, k + 1, f) for k, f in enumerate(fotos)) if n > 1 else ''
+    flechas = ('<button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button>'
+               '<button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button>'
+               '<span class="gal-n">1 / %d</span>' % n) if n > 1 else ''
+    return f'''<div class="gal{' una' if n < 2 else ''}" data-fotos="{e(json.dumps(fotos))}" data-grandes="{e(json.dumps(grandes))}">
+        {('<div class="gal-minis">' + minis + '</div>') if minis else ''}
         <div class="gal-main">
           <img src="{fotos[0]}" alt="{alt}" {'fetchpriority="high"' if primera else 'loading="lazy"'} decoding="async" width="700" height="525">
-          {'<button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button><button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button><span class="gal-n">1 / %d</span>' % n if n > 1 else ''}
-          <span class="gal-zoom" aria-hidden="true">Ampliar</span>
+          {flechas}
         </div>
-        {('<div class="gal-minis">' + minis + '</div>') if minis else ''}
       </div>'''
-    else:
-        galeria = '<div class="gal"><div class="gal-main sinfoto">%s</div></div>' % ICONO
 
-    specs = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (e(k), e(str(v)))
-                    for k, v in (eq.get('specs') or {}).items())
+
+def producto(eq, t, cfg, locales, ficha=None, primera=False):
+    """Formato «tienda»: miniaturas, foto y datos clave arriba (columnas de
+    igual altura); debajo, pestañas Descripción / Parámetros / Incluye."""
+    specs = eq.get('specs') or {}
     texto = 'Hola Sinergia Biomédica, quiero cotizar el alquiler del %s (%s).' % (
         eq['nom'].lower(), eq.get('marca', '').split('·')[0].strip())
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
     correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote(
         'Cotización: ' + eq['nom']), urllib.parse.quote(texto))
+    chips = ''.join('<span>%s <b>%s</b></span>' % (e(k), e(str(specs[k])))
+                    for k in ('Modelo', 'Marca') if specs.get(k))
+    chips += '<span>Alquiler <b>por hora, día o mes</b></span>'
+    pdf = pdf_ficha(eq['id'])
     enl = []
-    if eq.get('cal_fin'):
-        enl.append('<span class="cal">Calibración vigente hasta %s</span>' % e(eq['cal_fin']))
+    if os.path.exists(os.path.join(ROOT, pdf.lstrip('/'))):
+        enl.append('<a href="%s" download>↓ Descargar ficha técnica (PDF)</a>' % pdf)
     if eq.get('cal_pdf'):
-        enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración (PDF)</a>' % e(eq['cal_pdf']))
+        enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración</a>' % e(eq['cal_pdf']))
     if eq.get('ficha'):
-        enl.append('<a href="%s" target="_blank" rel="noopener">Ficha técnica (PDF)</a>' % e(eq['ficha']))
-    docs = ('<div class="docs">%s</div>' % ''.join(enl)) if enl else ''
+        enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
+    precio = ''
     if cfg['precios'] and eq.get('dia'):
-        precio = '<div class="tarifa"><b>Desde S/ %s</b> por día<small>IGV incluido · también por hora, semana o mes</small></div>' % eq['dia']
+        precio = '<p class="prod-precio">Desde <b>S/ %s</b> por día · IGV incluido</p>' % eq['dia']
+    resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
+
+    # pestaña Descripción: el equipo + para qué sirve el tipo
+    usos = ''.join('<li>%s</li>' % e(u) for u in t.get('usos', []))
+    normas = ' · '.join(e(n) for n in (ficha or {}).get('normas', []))
+    desc = '<p>%s</p>' % e(t.get('intro', ''))
+    if usos:
+        desc += '<ul>%s</ul>' % usos
+    if normas:
+        desc += '<p class="nota-p"><b>Normas:</b> %s</p>' % normas
+    # pestaña Parámetros: una tabla, grupos como subtítulos
+    if ficha:
+        filas = ''.join('<tr class="g"><th colspan="2">%s</th></tr>' % e(g['titulo'])
+                        + ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
+                        for g in ficha['secciones'])
+        filas_pie = '<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del fabricante.</p>' % e(ficha.get('fuente', 'fabricante'))
     else:
-        precio = '<div class="tarifa"><b>Consultar tarifa</b><small>Te respondemos con precio y disponibilidad</small></div>'
-    tier = ('<span class="tier">%s</span>' % e(eq['tier'])) if eq.get('tier') else ''
+        filas = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(str(v))) for k, v in specs.items())
+        filas_pie = ''
+    incluye = ''.join('<li>%s</li>' % e(i) for i in (ficha or {}).get('incluye', []))
+    pest = [('Descripción', desc)]
+    if filas:
+        pest.append(('Parámetros técnicos', '<table>%s</table>%s' % (filas, filas_pie)))
+    if incluye:
+        pest.append(('Incluye', '<ul>%s</ul>' % incluye))
+    tabs = ''.join('<button type="button" class="tab%s" role="tab">%s</button>' % (' on' if k == 0 else '', e(n))
+                   for k, (n, _) in enumerate(pest))
+    panels = ''.join('<div class="panel" role="tabpanel"%s>%s</div>' % ('' if k == 0 else ' hidden', c)
+                     for k, (_, c) in enumerate(pest))
     return f'''
-    <article class="equipo" id="{e(eq['id'])}">
-      {galeria}
-      <div class="info">
-        <div class="chips-eq"><span class="disp">Disponible</span>{tier}</div>
+    <article class="prod" id="{e(eq['id'])}">
+      {galeria(eq, locales, primera)}
+      <div class="prod-info">
         <div class="k">{e(eq.get('cat', ''))}</div>
         <h2>{e(eq['nom'])}</h2>
         <div class="marca">{e(eq.get('marca', ''))}</div>
-        <p class="desc">{e(eq.get('desc', ''))}</p>
-        {('<dl class="specs">' + specs + '</dl>') if specs else ''}
-        {docs}
-        <div class="cta">
-          {precio}
-          <div class="btns">
-            <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-            <a class="btn" href="{correo}">Cotizar por correo</a>
-          </div>
+        <p class="prod-desc">{e(resumen)}</p>
+        <div class="prod-chips">{chips}</div>
+        {precio}
+        <div class="prod-btns">
+          <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+          <a class="btn" href="{correo}">Cotizar por correo</a>
         </div>
-        <ul class="garantias">
-          <li>Por hora, día o mes</li>
-          <li>Técnico opcional</li>
-          <li>Lima y provincias</li>
-        </ul>
+        {('<div class="prod-docs">' + ' · '.join(enl) + '</div>') if enl else ''}
       </div>
-    </article>'''
-
+    </article>
+    <div class="pest" data-tabs>
+      <div class="tabs" role="tablist">{tabs}</div>
+      {panels}
+    </div>'''
 
 def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
     fichas = fichas or {}
@@ -433,31 +443,15 @@ def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
     otros = ''.join('<a href="/alquiler/%s/">%s</a>' % (o['slug'], e(o['nombre']))
                     for o in todos if o['slug'] != t['slug'])
     fotos = fotos_de(equipos[0], locales) if equipos else []
+    bloques = ''.join(producto(x, t, cfg, locales, fichas.get(x['id']), primera=(k == 0))
+                      for k, x in enumerate(equipos))
     cuerpo = f'''
   <section class="cabeza">
-    <div class="eyebrow">Alquiler · Lima y provincias</div>
     <h1>{e(t['h1'])}</h1>
-    <p class="cuantos">{n} {"modelo disponible" if n == 1 else "modelos disponibles"} · por hora, día, semana o mes · técnico instrumentista opcional</p>
+    <p class="cuantos">{n} {"modelo disponible" if n == 1 else "modelos disponibles"} · por hora, día, semana o mes · Lima y provincias</p>
   </section>
 
-  <section class="productos">
-    {''.join(tarjeta_equipo(x, t, cfg, locales, primera=(k == 0)) + (seccion_ficha(fichas[x['id']]) if x['id'] in fichas else '') for k, x in enumerate(equipos))}
-  </section>
-
-  <section class="que-es">
-    <h2>¿Qué es y para qué se usa?</h2>
-    <p class="lead">{e(t['intro'])}</p>
-    {f'<ul class="usos">{usos}</ul>' if usos else ''}
-  </section>
-
-  <section class="pasos">
-    <h2>Cómo funciona el alquiler</h2>
-    <ol>
-      <li><b>Eliges el equipo</b> y nos dices las fechas o las horas que lo necesitas.</li>
-      <li><b>Te enviamos la cotización</b> con la disponibilidad, con IGV incluido.</li>
-      <li><b>Coordinamos la entrega</b> en Lima o provincias, con técnico si lo pides.</li>
-    </ol>
-  </section>
+  {bloques}
 
   {f"""<section class="faq">
     <h2>Preguntas frecuentes</h2>
