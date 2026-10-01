@@ -107,6 +107,7 @@ function aplicarDatos(d, enVivo){
   }
 
   conFotosExtra(d.equipos);
+  if(d.venta) ventaEnVivo(d.venta);   // catálogo de venta en vivo (12-venta.js)
   const primeraVez = !CATALOGO_LISTO;
   const fCat = firmaCatalogo(d);
   const cambioCat = (fCat !== HUELLA_CAT);
