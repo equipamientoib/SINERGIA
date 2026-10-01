@@ -26,6 +26,9 @@
  */
 
 var VENTA_ID = "11fnh5teSU1ysJUpUiq-hYgmqVUoj4Dq9wnWWT_XybyY";   // hoja «Sinergia - Venta (catálogo en vivo)»
+/* Dirección publicada de ESTE proyecto (Implementar › Gestionar implementaciones).
+   Hace falta porque, desde el editor, Google devuelve la de pruebas (/dev). */
+var URL_PUBLICA = "https://script.google.com/macros/s/AKfycbySXJ34IsPuR98QvLbIpiSh7-N6-PG6xsbFuuDPuNv9eNAFONN3Ndh3I4jYJe9KvHFuDw/exec";
 var LIM_CABECERA = 40;
 var CACHE_VENTA = 'venta_v1', CACHE_SEG = 600;
 
@@ -227,7 +230,9 @@ function crearBotonProveedor() {
   var props = PropertiesService.getScriptProperties();
   var k = props.getProperty('ATL_CLAVE');
   if (!k) { k = Utilities.getUuid().replace(/-/g, ''); props.setProperty('ATL_CLAVE', k); }
-  var url = ScriptApp.getService().getUrl();
+  /* Desde el editor, getUrl() devuelve la dirección de PRUEBAS (/dev), que
+     no sirve fuera de tu sesión. El botón necesita la publicada (/exec). */
+  var url = URL_PUBLICA || String(ScriptApp.getService().getUrl() || '');
   var boton = "javascript:(function(){window.SB_ATL={k:'" + k + "',u:'" + url + "'};" +
     "var s=document.createElement('script');s.charset='utf-8';s.src='https://sinergiabiomedica.pe/js/proveedor-atl.js?'+Date.now();" +
     "document.body.appendChild(s);})()";
