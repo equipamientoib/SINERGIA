@@ -1,0 +1,14 @@
+{
+  "_nota": "Catálogo de VENTA. Cada producto va en «productos» con la categoría (cat) de la lista. Las fotos se guardan en img/venta/ (la página usa la versión -m y .webp si existen). Los campos que falten simplemente no se muestran. Una categoría sin productos sale como «a pedido» con botón de cotizar.",
+  "categorias": [
+    {"id": "monitoreo",      "nombre": "Monitoreo de pacientes",     "ejemplos": "Monitores multiparámetro, pulsioxímetros y tensiómetros"},
+    {"id": "emergencia",     "nombre": "Emergencia y soporte vital", "ejemplos": "Desfibriladores, DEA, aspiradores y ventiladores de transporte"},
+    {"id": "diagnostico",    "nombre": "Diagnóstico",                "ejemplos": "Electrocardiógrafos, ecógrafos y doppler fetal"},
+    {"id": "quirofano",      "nombre": "Quirófano",                  "ejemplos": "Lámparas cialíticas, mesas quirúrgicas y electrobisturíes"},
+    {"id": "esterilizacion", "nombre": "Esterilización",             "ejemplos": "Autoclaves, selladoras y esterilizadores de mesa"},
+    {"id": "laboratorio",    "nombre": "Laboratorio",                "ejemplos": "Centrífugas, baños maría y microscopios"},
+    {"id": "mobiliario",     "nombre": "Mobiliario hospitalario",    "ejemplos": "Camas clínicas, camillas y coches de paro"},
+    {"id": "metrologia",     "nombre": "Instrumentos de metrología", "ejemplos": "Analizadores, simuladores y patrones para tu propio taller"}
+  ],
+  "productos": []
+}
