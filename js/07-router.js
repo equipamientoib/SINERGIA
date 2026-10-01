@@ -103,6 +103,7 @@ function aplicarDatos(d, enVivo){
     REF_PROYECTOS = Math.max(REF_PROYECTOS, (d.proyectos || []).length);
   }
 
+  conFotosExtra(d.equipos);
   const primeraVez = !CATALOGO_LISTO;
   const fCat = firmaCatalogo(d);
   const cambioCat = (fCat !== HUELLA_CAT);

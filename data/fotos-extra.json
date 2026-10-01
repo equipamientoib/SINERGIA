@@ -1,0 +1,7 @@
+{
+  "_nota": "Fotos guardadas en el sitio que se ponen DELANTE de las de la hoja (la primera es la de la tarjeta del catálogo). Sirve para equipos sin foto en Drive o para una foto de estudio como portada. Los archivos van en img/catalogo/ con sus versiones -m y .webp.",
+  "tacometro":  ["img/catalogo/tacometro-01.jpg"],
+  "multimetro": ["img/catalogo/multimetro-01.jpg"],
+  "ms400":      ["img/catalogo/ms400-00.jpg"],
+  "fluke-51":   ["img/catalogo/fluke-51-00.jpg"]
+}
