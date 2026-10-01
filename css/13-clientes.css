@@ -1,6 +1,8 @@
   /* ===== NUESTROS CLIENTES / PROYECTOS ===== */
   .pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
   @media(max-width:960px){.pr-grid{grid-template-columns:repeat(2,1fr)}}
+  /* Con solo dos proyectos, dos columnas: con tres quedaba un hueco a la derecha. */
+  @media(min-width:561px){.pr-grid:has(>:nth-child(2):last-child){grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.pr-grid{grid-template-columns:1fr}}
   .pr{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;transition:.2s;animation:rise .35s ease both}
   .pr:hover{border-color:var(--bronce);transform:translateY(-3px);box-shadow:0 16px 38px rgba(23,25,29,.08)}
