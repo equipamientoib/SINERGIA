@@ -56,6 +56,7 @@ function pintarSelectContacto(){
   const sel=document.getElementById('cEq'); if(!sel)return;
   const previo=sel.value;
   sel.innerHTML='<option value="">— Selecciona —</option>'+
+    '<option value="Venta de equipamiento biomédico">Venta de equipamiento biomédico</option>'+
     EQUIPOS.map(e=>`<option value="${e.nom}">${e.nom}</option>`).join('')+
     '<option value="Otro / no está en la lista">Otro / no está en la lista</option>';
   if(previo){

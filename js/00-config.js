@@ -40,7 +40,8 @@ const SITE = {
   /* nav: el header muestra estas entradas. Las marcadas con pie:true salen
      solo en el pie de página, para no recargar el menú de arriba. */
   nav: [
-    { t: "Inicio",        r: "#/" },
+    { t: "Inicio",        r: "#/alquiler" },
+    { t: "Venta",         r: "#/venta" },
     { t: "Servicios",     r: "#/servicios" },
     { t: "Catálogo",      r: "#/catalogo" },
     { t: "Talleres",      r: "#/talleres" },
