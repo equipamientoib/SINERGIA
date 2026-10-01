@@ -47,6 +47,11 @@
    "ejemplos": "Analizadores, microscopios, centrífugas, incubadoras de cultivo y cabinas de flujo laminar"
   },
   {
+   "id": "cadena-frio",
+   "nombre": "Cadena de frío",
+   "ejemplos": "Refrigeradoras de medicamentos y vacunas, banco de sangre y congeladores de laboratorio"
+  },
+  {
    "id": "mobiliario",
    "nombre": "Mobiliario clínico y balanzas",
    "ejemplos": "Camas clínicas y balanzas con tallímetro"
@@ -73,8 +78,7 @@
     "Emergencia",
     "Hospitalización",
     "Consulta externa"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "edan-im50",
@@ -96,7 +100,7 @@
     "Hospitalización",
     "Centro quirúrgico"
    ],
-   "destacado": true
+   "destacado": 4
   },
   {
    "id": "edan-im70",
@@ -176,8 +180,7 @@
     "Emergencia",
     "Cuidados intensivos",
     "Centro quirúrgico"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "cu-medical-dea",
@@ -197,8 +200,7 @@
    "areas": [
     "Emergencia",
     "Ambulancias"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "metro-lifeline-lec2",
@@ -240,8 +242,7 @@
     "Consulta externa",
     "Emergencia",
     "Hospitalización"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "edan-se1200-express",
@@ -262,40 +263,6 @@
    "areas": [
     "Consulta externa",
     "Cardiología"
-   ]
-  },
-  {
-   "id": "edan-sa10",
-   "cat": "diagnostico",
-   "nom": "Monitor ambulatorio de presión arterial (MAPA)",
-   "marca": "Edan",
-   "modelo": "SA-10",
-   "origen": "China",
-   "resumen": "Presurómetro portátil para el registro de presión arterial de 24 horas.",
-   "caracteristicas": [
-    "Registro ambulatorio",
-    "Incluye software de análisis"
-   ],
-   "areas": [
-    "Consulta externa",
-    "Cardiología"
-   ]
-  },
-  {
-   "id": "sibelmed-easy",
-   "cat": "diagnostico",
-   "nom": "Espirómetro de mesa",
-   "marca": "Sibelmed",
-   "modelo": "EASY",
-   "origen": "España",
-   "resumen": "Espirómetro con pantalla táctil para consulta de neumología y medicina ocupacional.",
-   "caracteristicas": [
-    "Pantalla táctil a color",
-    "Transductor tipo turbina o tipo Fleisch"
-   ],
-   "areas": [
-    "Consulta externa",
-    "Salud ocupacional"
    ]
   },
   {
@@ -370,8 +337,7 @@
    "areas": [
     "Centro obstétrico",
     "Neonatología"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "david-ti-2000",
@@ -392,8 +358,7 @@
     "Neonatología",
     "Emergencia",
     "Ambulancias"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "edan-f3",
@@ -414,8 +379,7 @@
    "areas": [
     "Centro obstétrico",
     "Consulta externa"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "edan-f9",
@@ -475,6 +439,27 @@
    ]
   },
   {
+   "id": "david-yp-2000",
+   "cat": "neonatal",
+   "nom": "Incubadora neonatal",
+   "marca": "Ningbo David",
+   "modelo": "YP-2000",
+   "origen": "China",
+   "resumen": "Incubadora cerrada para el cuidado del recién nacido en neonatología e intermedios.",
+   "caracteristicas": [
+    "Pantalla LCD a color de 7 pulgadas",
+    "Balanza incorporada",
+    "Lámpara de observación",
+    "Opción de sensor de oxígeno"
+   ],
+   "expediente": "INCUBADORA NEONATAL",
+   "areas": [
+    "Neonatología",
+    "Centro obstétrico"
+   ],
+   "destacado": 5
+  },
+  {
    "id": "medifa-6000",
    "cat": "quirofano",
    "nom": "Mesa de operaciones eléctrica",
@@ -489,8 +474,7 @@
    ],
    "areas": [
     "Centro quirúrgico"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "kls-marled-e9i",
@@ -512,7 +496,7 @@
     "Emergencia",
     "Centro obstétrico"
    ],
-   "destacado": true
+   "destacado": 7
   },
   {
    "id": "kls-marled-x",
@@ -547,7 +531,8 @@
    ],
    "areas": [
     "Centro quirúrgico"
-   ]
+   ],
+   "destacado": 8
   },
   {
    "id": "comen-ax800",
@@ -585,8 +570,7 @@
     "Centro quirúrgico",
     "Emergencia",
     "Cuidados intensivos"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "cami-new-askir-30",
@@ -625,7 +609,7 @@
     "Cuidados intensivos",
     "Emergencia"
    ],
-   "destacado": true
+   "destacado": 2
   },
   {
    "id": "medrena-vp50-pro",
@@ -676,7 +660,8 @@
    "caracteristicas": [
     "Pantalla LCD de 12 pulgadas",
     "2 puertos",
-    "Incluye transductor convexo y lineal"
+    "Incluye transductor convexo y lineal",
+    "Para Doppler color: modelos portátiles Edan y SIUI de 15 pulgadas"
    ],
    "expediente": "ECOGRAFO PORTATIL",
    "clave": "D-103",
@@ -684,7 +669,7 @@
     "Consulta externa",
     "Centro obstétrico"
    ],
-   "destacado": true
+   "destacado": 3
   },
   {
    "id": "perlove-rx-digital",
@@ -703,7 +688,8 @@
    "expediente": "EQUIPO DE RAYOS X ESTACIONARIO DIGITAL",
    "areas": [
     "Diagnóstico por imágenes"
-   ]
+   ],
+   "destacado": 6
   },
   {
    "id": "tuttnauer-t-top-11",
@@ -724,7 +710,7 @@
     "Central de esterilización",
     "Odontología"
    ],
-   "destacado": true
+   "destacado": 1
   },
   {
    "id": "baix-48l",
@@ -744,8 +730,7 @@
    "clave": "D-217",
    "areas": [
     "Central de esterilización"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "tuttnauer-3870-ea",
@@ -762,24 +747,6 @@
    ],
    "areas": [
     "Central de esterilización"
-   ]
-  },
-  {
-   "id": "renosem-s20",
-   "cat": "esterilizacion",
-   "nom": "Esterilizador por plasma de 20 litros",
-   "marca": "Renosem",
-   "modelo": "S-20",
-   "origen": "Corea",
-   "resumen": "Esterilización a baja temperatura para instrumental sensible al calor.",
-   "caracteristicas": [
-    "Peróxido de hidrógeno en plasma",
-    "20 litros",
-    "1 puerta"
-   ],
-   "areas": [
-    "Central de esterilización",
-    "Centro quirúrgico"
    ]
   },
   {
@@ -818,8 +785,7 @@
    "expediente": "ANALIZADOR HEMATOLOGICO",
    "areas": [
     "Laboratorio"
-   ],
-   "destacado": true
+   ]
   },
   {
    "id": "mindray-ba88a",
@@ -835,24 +801,6 @@
    "expediente": "ANALIZADOR BIOQUIMICO SEMI AUTOMATICO",
    "areas": [
     "Laboratorio"
-   ]
-  },
-  {
-   "id": "edan-i15",
-   "cat": "laboratorio",
-   "nom": "Analizador de gases arteriales portátil",
-   "marca": "Edan",
-   "modelo": "i15",
-   "origen": "China",
-   "resumen": "Analizador portátil de gases en sangre para UCI y emergencia.",
-   "caracteristicas": [
-    "Portátil y automático"
-   ],
-   "expediente": "ANALIZADOR DE ELECTROLITICOS Y GASES DE SANGRE PORTATIL",
-   "areas": [
-    "Laboratorio",
-    "Cuidados intensivos",
-    "Emergencia"
    ]
   },
   {
@@ -958,6 +906,61 @@
    ]
   },
   {
+   "id": "meling-yc-315l",
+   "cat": "cadena-frio",
+   "nom": "Refrigeradora de medicamentos y vacunas de 315 litros",
+   "marca": "Meling",
+   "modelo": "YC-315L",
+   "origen": "China",
+   "resumen": "Refrigeradora de +2 a +8 °C para farmacia, inmunizaciones y almacén de medicamentos.",
+   "caracteristicas": [
+    "Rango de +2 a +8 °C",
+    "315 litros (11 pies cúbicos)",
+    "También en 130 L (YC-130L) y 525 L (YC-525L)"
+   ],
+   "expediente": "REFRIGERADORA PARA MEDICAMENTOS",
+   "areas": [
+    "Farmacia",
+    "Inmunizaciones",
+    "Cadena de frío"
+   ]
+  },
+  {
+   "id": "meling-xc-630l",
+   "cat": "cadena-frio",
+   "nom": "Refrigeradora para banco de sangre",
+   "marca": "Meling",
+   "modelo": "XC-630L",
+   "origen": "China",
+   "resumen": "Refrigeradora a +4 °C para conservación de hemocomponentes.",
+   "caracteristicas": [
+    "Temperatura de +4 °C",
+    "630 litros (22 pies cúbicos)"
+   ],
+   "areas": [
+    "Banco de sangre",
+    "Laboratorio"
+   ]
+  },
+  {
+   "id": "meling-dw-fl528",
+   "cat": "cadena-frio",
+   "nom": "Congelador vertical para laboratorio",
+   "marca": "Meling",
+   "modelo": "DW-FL528",
+   "origen": "China",
+   "resumen": "Congelador vertical de -20 a -40 °C para muestras y reactivos.",
+   "caracteristicas": [
+    "Rango de -20 a -40 °C",
+    "528 litros",
+    "Versión ultracongelador -86 °C: DW-HL528S"
+   ],
+   "areas": [
+    "Laboratorio",
+    "Banco de sangre"
+   ]
+  },
+  {
    "id": "hebei-pukang-b21-1",
    "cat": "mobiliario",
    "nom": "Cama clínica mecánica de 1 movimiento",
@@ -1010,6 +1013,25 @@
    "areas": [
     "Consulta externa",
     "Neonatología"
+   ]
+  },
+  {
+   "id": "optium-emergeum",
+   "cat": "mobiliario",
+   "nom": "Camilla hidráulica de emergencia y trauma",
+   "marca": "Optium Medikal",
+   "modelo": "Emergeum",
+   "origen": "Turquía",
+   "resumen": "Camilla hidráulica radiolúcida para emergencia, trauma y UCI.",
+   "caracteristicas": [
+    "Accionamiento hidráulico",
+    "Radiolúcida",
+    "Posición Trendelenburg"
+   ],
+   "expediente": "CAMILLA",
+   "areas": [
+    "Emergencia",
+    "Cuidados intensivos"
    ]
   }
  ]

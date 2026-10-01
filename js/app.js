@@ -861,17 +861,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=81b99061';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=3b83f005';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=81b99061';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=3b83f005';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=81b99061','js/06-tablero.js?v=81b99061'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=3b83f005','js/06-tablero.js?v=3b83f005'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=81b99061'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=3b83f005'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1646,6 +1646,7 @@ const V_ICO = {
   esterilizacion: '<rect x="4" y="6" width="16" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 3v3M16 3v3"/>',
   laboratorio:    '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/>',
   mobiliario:     '<path d="M3 18V8M3 14h18v4M21 18v-4M7 14v-3h10a4 4 0 0 1 4 4"/><circle cx="6" cy="11" r="1.6"/>',
+  'cadena-frio':  '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12M9 6v2M9 13v3M15 14l-2 2 2 2"/>',
   metrologia:     '<path d="M4 18h16M6 18V8M10 18v-6M14 18V6M18 18v-8"/>'
 };
 function vIco(id, cls){
@@ -1722,7 +1723,8 @@ function vHueso(){
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
 function vPortada(){
-  const dest = VENTA.productos.filter(p => p.destacado).slice(0,8);
+  /* destacado = puesto (1, 2, 3…) según las compras públicas 2024-2025 (OECE). */
+  const dest = VENTA.productos.filter(p => p.destacado).sort((a,b) => Number(a.destacado)-Number(b.destacado)).slice(0,8);
   const n = VENTA.productos.length;
   return `
   <section class="v-hero"><div class="wrap v-hero-grid">
@@ -1756,7 +1758,7 @@ function vPortada(){
   </div></section>
 
   ${dest.length ? `<section class="v-sec" data-sin-busqueda><div class="wrap">
-    <div class="shead"><div><div class="k">Destacados</div><h2>Los equipos más pedidos</h2></div><p>Los que más se repiten en expedientes técnicos y compras de clínicas.</p></div>
+    <div class="shead"><div><div class="k">Destacados</div><h2>Los equipos más pedidos</h2></div><p>Los que más compraron hospitales y centros de salud públicos en 2024 y 2025.</p></div>
     <div class="v-grid">${dest.map(vCard).join('')}</div>
   </div></section>` : ''}
 
