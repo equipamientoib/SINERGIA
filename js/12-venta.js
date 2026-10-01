@@ -31,7 +31,13 @@ function ventaEnVivo(v){
   }
 }
 function vMezclar(){
-  if(VENTA && VENTA_VIVO){ VENTA.productos = VENTA_VIVO.productos; VENTA.actualizado = VENTA_VIVO.actualizado; }
+  if(VENTA && VENTA_VIVO){
+    /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
+    const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
+    VENTA.base = VENTA.base || VENTA.productos;
+    VENTA.productos = VENTA_VIVO.productos.map(p => (p.fotos && p.fotos.length) || !base.get(p.id) ? p : Object.assign({}, p, {fotos: base.get(p.id).fotos}));
+    VENTA.actualizado = VENTA_VIVO.actualizado;
+  }
 }
 
 function cargarVenta(){
@@ -87,7 +93,7 @@ function vBuscarEn(q, destino){
   const otros = document.querySelectorAll('[data-sin-busqueda]');
   otros.forEach(e => e.hidden = !!q.trim());
   caja.innerHTML = !q.trim() ? '' : (r.length
-    ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="v-grid">${r.map(vCard).join('')}</div>`
+    ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid">${r.map(vCard).join('')}</div>`
     : `<div class="v-vacio"><h3>No encontramos «${vEsc(q)}» en el catálogo publicado</h3><p>Igual podemos conseguirlo. Escríbenos con el nombre o el código de tu listado y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+q)}" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div></div>`);
 }
 function vBuscador(destino, ph){
@@ -134,21 +140,32 @@ function vStock(p){
 /* Foto del producto: la versión ligera (-m) en tarjetas y la grande en la ficha. */
 function vFoto(p, i, ligera){ const u=(p.fotos||[])[i||0]; return u ? fotoURL(u, ligera?700:1200, ligera) : ''; }
 
+/* Tarjeta con el mismo formato que la del catálogo de alquiler (.eq):
+   foto arriba con etiquetas, categoría, nombre, marca y pie con precio. */
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
-  return `<article class="v-card" onclick="go('#/venta/p/${p.id}')">
-    <div class="v-card-img${foto?'':' sin'}">${foto?`<img src="${foto}" alt="${vEsc(p.nom)}" loading="lazy" decoding="async">`:vIco(p.cat,'v-ico-xl')}</div>
-    <div class="v-card-txt">
-      <div class="v-k">${vEsc(c?c.nombre:'')}</div>
-      <h3>${vEsc(p.nom)}</h3>
-      <div class="v-marca"><b>${vEsc(p.marca||'')}</b>${p.modelo?' · '+vEsc(p.modelo):''}</div>
-      ${p.expediente?`<div class="v-exp" title="Nombre en expedientes técnicos">${vEsc(p.expediente)}${p.clave?' · '+vEsc(p.clave):''}</div>`:''}
-      ${p.resumen?`<p>${vEsc(p.resumen)}</p>`:''}
-      ${vStock(p)}
-      <div class="v-card-pie">${p.precio?`<span class="v-precio" title="Precio referencial">${vSoles(p.precio)}</span>`:'<span>Ver ficha →</span>'}<a class="btn" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.modelo?' ('+p.modelo+')':''))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Cotizar</a></div>
+  const url = `#/venta/p/${p.id}`;
+  const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
+    (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
+  const tag = p.destacado ? '<span class="tier">Más pedido</span>' : '';
+  const pie = p.precio
+    ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>sujeto a confirmación</small></div>`
+    : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
+  return `<div class="eq v-eq">
+    <div class="img${foto?' has-photo':''}" onclick="go('${url}')">
+      ${foto?'':'<span class="grid-bg"></span>'}${st}${tag}
+      ${foto?`<img class="photo" src="${foto}" alt="${vEsc(p.nom)} ${vEsc(p.marca||'')} ${vEsc(p.modelo||'')}" loading="lazy" decoding="async">`:`<span class="v-sinfoto">${vIco(p.cat,'v-ico-xl')}</span>`}
     </div>
-  </article>`;
+    <div class="body">
+      <div class="cat">${vEsc(c?c.nombre:'')}</div>
+      <h3><a onclick="go('${url}')">${vEsc(p.nom)}</a></h3>
+      <div class="marca">${vEsc([p.marca,p.modelo].filter(Boolean).join(' ').trim())}${p.origen?' · '+vEsc(p.origen):''}</div>
+      ${p.clave?`<div class="v-exp" title="Código en expedientes técnicos (NTS 113-MINSA)">Expediente ${vEsc(p.clave)}</div>`:''}
+      <div class="desc">${vEsc(p.resumen||'')}</div>
+      <div class="foot">${pie}<a class="btn" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:''))}" target="_blank" rel="noopener">Cotizar</a></div>
+    </div>
+  </div>`;
 }
 
 function vHueso(){
@@ -158,47 +175,56 @@ function vHueso(){
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
 function vPortada(){
-  /* destacado = puesto (1, 2, 3…) según las compras públicas 2024-2025 (OECE). */
-  const dest = VENTA.productos.filter(p => p.destacado).sort((a,b) => Number(a.destacado)-Number(b.destacado)).slice(0,8);
+  /* Mismo esquema que el inicio de alquiler: hero con imagen, franja de
+     marcas, «más pedidos» con acceso a la tienda y accesos por categoría.
+     destacado = puesto según las compras públicas 2024-2025 (OECE). */
+  const dest = VENTA.productos.filter(p => p.destacado).sort((a,b) => Number(a.destacado)-Number(b.destacado));
   const n = VENTA.productos.length;
+  const mosaico = dest.filter(p => (p.fotos||[]).length).slice(0,4);
+  const marcas = ['EDAN','TUTTNAUER','KLS MARTIN','CU MEDICAL','SIARE','MEMMERT'];
   return `
-  <section class="v-hero"><div class="wrap v-hero-grid">
+  <div class="wrap hero-grid v-hero2">
     <div>
-      <div class="k">Venta de equipamiento biomédico</div>
-      <h1>Equipamiento médico para tu institución, <em>con respaldo técnico</em>.</h1>
-      <p class="lead">${n} equipos de marcas como Edan, Tuttnauer, KLS Martin, CU Medical y Siare para hospitales, clínicas y obras de equipamiento. Con ficha técnica, entrega coordinada y respaldo de mantenimiento.</p>
-      ${vBuscador('vResPortada')}
-      <div class="v-marcas-hero">Edan · Tuttnauer · KLS Martin · CU Medical · Siare · Medifa · Memmert · Boeco · Heine · Riester</div>
+      <div class="eyebrow">Venta · Equipamiento · Expedientes</div>
+      <h1>Equipamiento médico con <em>respaldo técnico</em>.</h1>
+      <p class="lead">${n} equipos de marcas como Edan, Tuttnauer, KLS Martin y CU Medical para hospitales, clínicas y obras de equipamiento en Lima y provincias.</p>
+      <div class="hero-props">
+        <span>Ficha técnica y código de expediente</span>
+        <span>Mantenimiento después de la venta</span>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-fill btn-lg" onclick="go('#/venta/tienda')">Ver la tienda</a>
+        <a class="btn btn-lg" onclick="document.getElementById('cotiza-lista').scrollIntoView({behavior:'smooth',block:'center'})">Cotizar mi lista</a>
+      </div>
     </div>
-    <ul class="v-garantias">
-      <li><b>Especificaciones claras</b><span>Cada cotización con ficha técnica, marca, modelo y plazo de entrega.</span></li>
-      <li><b>Entrega coordinada</b><span>En Lima y provincias, con la documentación que pide tu institución.</span></li>
-      <li><b>Respaldo después de la venta</b><span>Mantenimiento preventivo y verificación con instrumentos calibrados.</span></li>
-    </ul>
+    <div class="hero-stage v-mosaico">
+      <div class="v-mos">${mosaico.map(p => `<a onclick="go('#/venta/p/${p.id}')" title="${vEsc(p.nom)}"><img src="${vFoto(p,0,true)}" alt="${vEsc(p.nom)}"></a>`).join('')}</div>
+      <div class="cap"><span>Los más comprados por hospitales en 2024 y 2025</span><span><b>VENTA</b></span></div>
+    </div>
+  </div>
+  <div class="marcas v-marcas">
+    <div class="wrap"><span class="lab">Marcas que vendemos</span>
+      <div class="names">${marcas.map(m => `<span>${m}</span>`).join('')}</div>
+    </div>
+  </div>
+
+  <section><div class="wrap">
+    <div class="v-portada-busca">${vBuscador('vResPortada')}</div>
+    <div id="vResPortada"></div>
+    <div data-sin-busqueda>
+      <div class="shead">
+        <div><div class="k">Tienda de venta</div><h2>Equipos más pedidos</h2></div>
+        <a class="btn btn-fill" onclick="go('#/venta/tienda')">Ver toda la tienda →</a>
+      </div>
+      <div class="grid">${dest.slice(0,6).map(vCard).join('')}</div>
+      <div class="cat-chips">
+        <span>Ir directo a</span>
+        ${VENTA.categorias.filter(c => vDeCat(c.id).length).map(c => `<button class="chip" onclick="go('#/venta/cat/${c.id}')">${vEsc(c.nombre)}</button>`).join('')}
+      </div>
+    </div>
   </div></section>
 
-  <section class="v-sec" style="padding-top:8px"><div class="wrap"><div id="vResPortada"></div></div></section>
-
-  <section class="v-sec" data-sin-busqueda><div class="wrap">
-    <div class="shead"><div><div class="k">Catálogo de venta</div><h2>Explora por tipo de equipo</h2></div>
-      <p>Si no ves el equipo que buscas, te lo cotizamos a pedido. <a class="v-ir-tienda" onclick="go('#/venta/tienda')">Ver toda la tienda →</a></p></div>
-    <div class="v-cats">${VENTA.categorias.map(c => {
-      const n = vDeCat(c.id).length;
-      return `<a class="v-cat" onclick="go('#/venta/cat/${c.id}')">
-        <span class="v-cat-ico">${vIco(c.id)}</span>
-        <b>${vEsc(c.nombre)}</b>
-        <small>${vEsc(c.ejemplos)}</small>
-        <span class="v-cat-n">${n ? n+(n===1?' equipo':' equipos') : 'Cotización a pedido'} →</span>
-      </a>`;}).join('')}</div>
-  </div></section>
-
-  ${dest.length ? `<section class="v-sec" data-sin-busqueda><div class="wrap">
-    <div class="shead"><div><div class="k">Destacados</div><h2>Los equipos más pedidos</h2></div><p>Los que más compraron hospitales y centros de salud públicos en 2024 y 2025.</p></div>
-    <div class="v-grid">${dest.map(vCard).join('')}</div>
-    <div class="v-mas"><a class="btn" onclick="go('#/venta/tienda')">Ver los ${n} equipos de la tienda →</a></div>
-  </div></section>` : ''}
-
-  <section class="v-sec" data-sin-busqueda><div class="wrap v-dos">
+  <section style="padding-top:0" data-sin-busqueda><div class="wrap v-dos">
     <div class="v-panel oscuro">
       <div class="k">Obras y proyectos</div>
       <h3>¿Equipas una obra? Hacemos el expediente técnico.</h3>
@@ -208,7 +234,7 @@ function vPortada(){
     ${vListaCaja()}
   </div></section>
 
-  <section class="v-sec" data-sin-busqueda><div class="wrap">
+  <section style="padding-top:0" data-sin-busqueda><div class="wrap">
     <div class="shead"><div><div class="k">Cómo trabajamos</div><h2>De tu requerimiento a la entrega</h2></div>
       <p>Una sola empresa como contacto, de la cotización al mantenimiento.</p></div>
     <div class="steps">
@@ -220,35 +246,7 @@ function vPortada(){
 }
 
 /* ── Categoría ────────────────────────────────────────────────────── */
-function vCategoria(id){
-  const c = vCat(id);
-  if(!c) return vPortada();
-  const lista = vDeCat(id);
-  const lado = VENTA.categorias.map(x => {
-    const n = vDeCat(x.id).length;
-    return `<a class="${x.id===id?'on':''}" onclick="go('#/venta/cat/${x.id}')">${vEsc(x.nombre)}<span>${n||''}</span></a>`;
-  }).join('');
-  const vacio = `<div class="v-vacio">
-      <span class="v-cat-ico">${vIco(id)}</span>
-      <h3>${vEsc(c.nombre)}: te cotizamos a pedido</h3>
-      <p>Todavía no publicamos equipos de esta categoría en la web, pero sí los conseguimos: ${vEsc(c.ejemplos.charAt(0).toLowerCase()+c.ejemplos.slice(1))}. Cuéntanos qué necesitas y te enviamos opciones con su ficha técnica.</p>
-      <div class="hero-cta">
-        <a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, quiero cotizar equipos de '+c.nombre+'.')}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-        <a class="btn" onclick="go('#/contacto')">Usar el formulario</a>
-      </div>
-    </div>`;
-  return `
-  <div class="wrap pagehead">
-    <div class="crumb"><a onclick="go('#/venta')">Venta</a> &nbsp;/&nbsp; ${vEsc(c.nombre)}</div>
-    <h1>${vEsc(c.nombre)}</h1>
-    <p>${vEsc(c.ejemplos)}.</p>
-  </div>
-  <section style="padding-top:30px"><div class="wrap v-lista">
-    <nav class="v-lado" aria-label="Categorías de venta"><div class="v-lado-t">Categorías</div>${lado}</nav>
-    <div>${vBuscador('vResCat','Buscar en todo el catálogo de venta')}<div id="vResCat"></div>
-      <div data-sin-busqueda>${lista.length ? `<div class="v-cuenta">${lista.length} ${lista.length===1?'equipo':'equipos'}</div><div class="v-grid">${lista.map(vCard).join('')}</div>` : vacio}</div></div>
-  </div></section>`;
-}
+
 
 
 /* ── Tienda: todo el catálogo de venta con filtros ─────────────────────
@@ -309,7 +307,7 @@ function vTienda(catInicial){
         </div>
         <div class="vt-activos" id="vtActivos"></div>
         <div class="v-cuenta" id="vtCuenta"></div>
-        <div class="v-grid vt-grid" id="vtGrid"></div>
+        <div class="grid vt-grid" id="vtGrid"></div>
       </div>
     </div>
   </div></section>
@@ -407,7 +405,7 @@ function vProducto(id){
       <div class="v-tabs" role="tablist">${pest.map((t,i)=>`<button type="button" role="tab" class="${i?'':'on'}" onclick="vTab(this,${i})">${t[0]}</button>`).join('')}</div>
       ${pest.map((t,i)=>`<div class="v-panel-t" ${i?'hidden':''}>${t[1]}</div>`).join('')}
     </div>`:''}
-    ${otros.length?`<section class="v-sec" style="padding-bottom:0"><div class="shead"><div><div class="k">Misma categoría</div><h2>También te puede interesar</h2></div></div><div class="v-grid">${otros.map(vCard).join('')}</div></section>`:''}
+    ${otros.length?`<section class="v-sec" style="padding-bottom:0"><div class="shead"><div><div class="k">Misma categoría</div><h2>También te puede interesar</h2></div></div><div class="grid">${otros.map(vCard).join('')}</div></section>`:''}
   </div>
   <section class="v-sec"></section>`;
 }

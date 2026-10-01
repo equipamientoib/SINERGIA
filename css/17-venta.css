@@ -177,3 +177,28 @@
   .v-ir-tienda{color:var(--cobre-d);font-weight:600;cursor:pointer;white-space:nowrap}
   @media (max-width:640px){ .vt-barra{flex-direction:column} .vt-orden{padding:12px 14px} }
   .pagehead .crumb + .k{margin-top:16px}
+
+  /* Tarjetas de venta con el formato del alquiler (.eq de 05-catalogo.css).
+     Las fotos de producto son de estudio sobre blanco: se muestran enteras. */
+  .v-eq .img .photo{object-fit:contain;padding:16px 20px;transition:transform .3s}
+  .v-eq:hover .img .photo{transform:scale(1.04)}
+  .v-eq .badge.v-apedido{background:#F4EEE3;color:var(--gris);border-color:var(--linea)}
+  .v-eq .v-sinfoto{position:absolute;inset:0;display:grid;place-items:center}
+  .v-eq h3 a{cursor:pointer;color:inherit}
+  .v-eq .v-exp{margin-top:9px}
+  .v-eq .price.v-consulta{font-size:15px;color:var(--gris);font-weight:600}
+  .v-eq .price small{font-weight:400}
+
+  /* Inicio de venta: mosaico de los más pedidos en lugar de la foto */
+  .v-mosaico{background:var(--blanco);border:1px solid var(--linea)}
+  .v-mosaico::after{display:none}
+  .v-mosaico .cap{left:0;right:0;bottom:0;padding:13px 20px;background:rgba(23,25,29,.86);backdrop-filter:blur(4px)}
+  .v-mos{bottom:48px!important}
+  .v-mos{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:var(--linea)}
+  .v-mos a{background:var(--blanco);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+  .hero-stage .v-mos img{position:static;width:84%;height:78%;object-fit:contain;transition:transform .3s}
+  .v-mos a:hover img{transform:scale(1.06)}
+  .v-portada-busca{max-width:780px;margin:0 auto 34px}
+  .v-portada-busca .v-busca{margin:0}
+  .v-marcas .names span{white-space:nowrap}
+  @media(max-width:880px){ .v-marcas .names{flex-wrap:wrap;justify-content:center;gap:8px 18px} }
