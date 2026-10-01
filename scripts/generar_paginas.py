@@ -186,6 +186,15 @@ LOGO = '''<svg class="logo" viewBox="0 0 880 240" role="img" aria-label="Sinergi
 ICONO = '''<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>'''
 
 
+def sello_css():
+    """Huella de css/alquiler.css: al cambiar los estilos cambia la dirección
+    y el navegador no puede quedarse con la copia vieja (GitHub Pages deja
+    guardar 10 minutos; con estilos viejos la página nueva se ve rota)."""
+    import hashlib
+    with open(os.path.join(ROOT, 'css', 'alquiler.css'), 'rb') as f:
+        return hashlib.sha256(f.read()).hexdigest()[:8]
+
+
 def negocio(cfg):
     return {
         '@type': 'LocalBusiness',
@@ -236,7 +245,7 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
 <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
 <link rel="stylesheet" href="/css/00-fuentes.css">
-<link rel="stylesheet" href="/css/alquiler.css">
+<link rel="stylesheet" href="/css/alquiler.css?v={sello_css()}">
 <script type="application/ld+json">{json.dumps(graph, ensure_ascii=False)}</script>
 </head>
 <body>
