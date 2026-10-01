@@ -142,6 +142,13 @@ GALERIA_JS = r'''
       if(ev.target.closest('.gal-main')) abrir(g);
     });
   });
+  document.querySelectorAll('[data-tabs]').forEach(function(w){
+    var bs=w.querySelectorAll('.tab'), ps=w.querySelectorAll('.panel');
+    bs.forEach(function(b,i){ b.addEventListener('click',function(){
+      bs.forEach(function(x){x.classList.toggle('on',x===b);});
+      ps.forEach(function(p,k){p.hidden=k!==i;});
+    }); });
+  });
   if(!V) return;
   V.addEventListener('click',function(ev){
     var b=ev.target.closest('button');
@@ -343,30 +350,31 @@ def galeria(eq, locales, primera=False):
     flechas = ('<button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button>'
                '<button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button>'
                '<span class="gal-n">1 / %d</span>' % n) if n > 1 else ''
-    return f'''<div class="gal" data-fotos="{e(json.dumps(fotos))}" data-grandes="{e(json.dumps(grandes))}">
+    return f'''<div class="gal{' una' if n < 2 else ''}" data-fotos="{e(json.dumps(fotos))}" data-grandes="{e(json.dumps(grandes))}">
+        {('<div class="gal-minis">' + minis + '</div>') if minis else ''}
         <div class="gal-main">
           <img src="{fotos[0]}" alt="{alt}" {'fetchpriority="high"' if primera else 'loading="lazy"'} decoding="async" width="700" height="525">
           {flechas}
         </div>
-        {('<div class="gal-minis">' + minis + '</div>') if minis else ''}
       </div>'''
 
 
-def producto(eq, cfg, locales, ficha=None, primera=False):
-    """Bloque comercial: foto a la izquierda; nombre, resumen, modelo/marca y
-    botones a la derecha. Lo técnico va en parametros(), debajo."""
+def producto(eq, t, cfg, locales, ficha=None, primera=False):
+    """Formato «tienda»: miniaturas, foto y datos clave arriba (columnas de
+    igual altura); debajo, pestañas Descripción / Parámetros / Incluye."""
     specs = eq.get('specs') or {}
-    meta = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (e(k), e(str(specs[k])))
-                   for k in ('Modelo', 'Marca', 'Origen') if specs.get(k))
     texto = 'Hola Sinergia Biomédica, quiero cotizar el alquiler del %s (%s).' % (
         eq['nom'].lower(), eq.get('marca', '').split('·')[0].strip())
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
     correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote(
         'Cotización: ' + eq['nom']), urllib.parse.quote(texto))
+    chips = ''.join('<span>%s <b>%s</b></span>' % (e(k), e(str(specs[k])))
+                    for k in ('Modelo', 'Marca') if specs.get(k))
+    chips += '<span>Alquiler <b>por hora, día o mes</b></span>'
     pdf = pdf_ficha(eq['id'])
     enl = []
     if os.path.exists(os.path.join(ROOT, pdf.lstrip('/'))):
-        enl.append('<a href="%s" download>Ficha técnica (PDF)</a>' % pdf)
+        enl.append('<a href="%s" download>↓ Descargar ficha técnica (PDF)</a>' % pdf)
     if eq.get('cal_pdf'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración</a>' % e(eq['cal_pdf']))
     if eq.get('ficha'):
@@ -375,6 +383,34 @@ def producto(eq, cfg, locales, ficha=None, primera=False):
     if cfg['precios'] and eq.get('dia'):
         precio = '<p class="prod-precio">Desde <b>S/ %s</b> por día · IGV incluido</p>' % eq['dia']
     resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
+
+    # pestaña Descripción: el equipo + para qué sirve el tipo
+    usos = ''.join('<li>%s</li>' % e(u) for u in t.get('usos', []))
+    normas = ' · '.join(e(n) for n in (ficha or {}).get('normas', []))
+    desc = '<p>%s</p>' % e(t.get('intro', ''))
+    if usos:
+        desc += '<ul>%s</ul>' % usos
+    if normas:
+        desc += '<p class="nota-p"><b>Normas:</b> %s</p>' % normas
+    # pestaña Parámetros: una tabla, grupos como subtítulos
+    if ficha:
+        filas = ''.join('<tr class="g"><th colspan="2">%s</th></tr>' % e(g['titulo'])
+                        + ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
+                        for g in ficha['secciones'])
+        filas_pie = '<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del fabricante.</p>' % e(ficha.get('fuente', 'fabricante'))
+    else:
+        filas = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(str(v))) for k, v in specs.items())
+        filas_pie = ''
+    incluye = ''.join('<li>%s</li>' % e(i) for i in (ficha or {}).get('incluye', []))
+    pest = [('Descripción', desc)]
+    if filas:
+        pest.append(('Parámetros técnicos', '<table>%s</table>%s' % (filas, filas_pie)))
+    if incluye:
+        pest.append(('Incluye', '<ul>%s</ul>' % incluye))
+    tabs = ''.join('<button type="button" class="tab%s" role="tab">%s</button>' % (' on' if k == 0 else '', e(n))
+                   for k, (n, _) in enumerate(pest))
+    panels = ''.join('<div class="panel" role="tabpanel"%s>%s</div>' % ('' if k == 0 else ' hidden', c)
+                     for k, (_, c) in enumerate(pest))
     return f'''
     <article class="prod" id="{e(eq['id'])}">
       {galeria(eq, locales, primera)}
@@ -383,7 +419,7 @@ def producto(eq, cfg, locales, ficha=None, primera=False):
         <h2>{e(eq['nom'])}</h2>
         <div class="marca">{e(eq.get('marca', ''))}</div>
         <p class="prod-desc">{e(resumen)}</p>
-        {('<dl class="prod-meta">' + meta + '</dl>') if meta else ''}
+        <div class="prod-chips">{chips}</div>
         {precio}
         <div class="prod-btns">
           <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
@@ -391,36 +427,11 @@ def producto(eq, cfg, locales, ficha=None, primera=False):
         </div>
         {('<div class="prod-docs">' + ' · '.join(enl) + '</div>') if enl else ''}
       </div>
-    </article>'''
-
-
-def parametros(eq, ficha=None):
-    """Una sola tabla, como la de un fabricante: grupos como subtítulos."""
-    if ficha:
-        filas = ''
-        for g in ficha['secciones']:
-            filas += '<tr class="grupo"><th colspan="2">%s</th></tr>' % e(g['titulo'])
-            filas += ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
-        normas = ' · '.join(e(n) for n in ficha.get('normas', []))
-        incluye = ', '.join(e(i) for i in ficha.get('incluye', []))
-        extra = ''
-        if normas:
-            extra += '<p class="nota-p"><b>Normas:</b> %s</p>' % normas
-        if incluye:
-            extra += '<p class="nota-p"><b>Incluye en el alquiler:</b> %s.</p>' % incluye
-        extra += '<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del fabricante.</p>' % e(ficha.get('fuente', 'fabricante'))
-    else:
-        specs = eq.get('specs') or {}
-        if not specs:
-            return ''
-        filas = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(str(v))) for k, v in specs.items())
-        extra = ''
-    return f'''
-    <section class="param">
-      <h2>Parámetros técnicos{(' · ' + e(eq.get('marca', '').split('·')[0].strip())) if eq.get('marca') else ''}</h2>
-      <table>{filas}</table>
-      {extra}
-    </section>'''
+    </article>
+    <div class="pest" data-tabs>
+      <div class="tabs" role="tablist">{tabs}</div>
+      {panels}
+    </div>'''
 
 def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
     fichas = fichas or {}
@@ -432,8 +443,8 @@ def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
     otros = ''.join('<a href="/alquiler/%s/">%s</a>' % (o['slug'], e(o['nombre']))
                     for o in todos if o['slug'] != t['slug'])
     fotos = fotos_de(equipos[0], locales) if equipos else []
-    bloques = ''.join(producto(x, cfg, locales, fichas.get(x['id']), primera=(k == 0))
-                      + parametros(x, fichas.get(x['id'])) for k, x in enumerate(equipos))
+    bloques = ''.join(producto(x, t, cfg, locales, fichas.get(x['id']), primera=(k == 0))
+                      for k, x in enumerate(equipos))
     cuerpo = f'''
   <section class="cabeza">
     <h1>{e(t['h1'])}</h1>
@@ -441,12 +452,6 @@ def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
   </section>
 
   {bloques}
-
-  <section class="caract">
-    <h2>Características y usos</h2>
-    <p>{e(t['intro'])}</p>
-    {f'<ul>{usos}</ul>' if usos else ''}
-  </section>
 
   {f"""<section class="faq">
     <h2>Preguntas frecuentes</h2>
