@@ -75,6 +75,27 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .prod-docs a{color:var(--cobre-d);font-weight:600}
 .prod-docs a:hover{text-decoration:underline}
 
+/* ficha técnica: recuadro con Ver / Descargar */
+.doc{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;margin-top:14px;
+  padding:12px 14px;border:1px solid var(--linea-b);border-radius:12px;background:linear-gradient(180deg,#FBF8F2,#fff)}
+.doc-ico{width:40px;height:48px;border-radius:6px;background:#B3261E;color:#fff;font-family:var(--ff-d);font-weight:700;font-size:12px;
+  display:grid;place-items:end center;padding-bottom:7px;position:relative;clip-path:polygon(0 0,72% 0,100% 22%,100% 100%,0 100%)}
+.doc-txt b{display:block;font-family:var(--ff-d);font-size:15px;font-weight:600;line-height:1.2}
+.doc-txt small{font-size:12.5px;color:var(--gris)}
+.doc .btn{padding:9px 16px;font-size:13.5px;cursor:pointer;background:#fff}
+.doc .btn.fill{background:var(--onix)}
+
+/* visor de la ficha */
+.doc-visor{position:fixed;inset:0;z-index:60;background:rgba(15,16,19,.75);display:flex;align-items:center;justify-content:center;padding:24px}
+.doc-visor[hidden]{display:none}
+.dv-caja{width:min(900px,100%);height:min(92vh,1200px);background:#fff;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+.dv-cab{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 18px;border-bottom:1px solid var(--linea);background:var(--crema)}
+.dv-tit{flex:1;font-family:var(--ff-d);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dv-cab .btn{padding:8px 14px;font-size:13.5px}
+.dv-x{width:38px;height:38px;border-radius:50%;border:1px solid var(--linea);background:#fff;cursor:pointer;font-size:16px}
+.dv-x:hover{border-color:var(--bronce)}
+.doc-visor iframe{flex:1;width:100%;border:0;background:#e9e7e2}
+
 /* pestañas bajo cada producto */
 .pest{margin-top:14px;background:var(--blanco);border:1px solid var(--linea);border-radius:16px;overflow:hidden}
 .tabs{display:flex;border-bottom:1px solid var(--linea);background:var(--crema);overflow-x:auto}
@@ -163,6 +184,12 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
   .panel th{width:45%}
   .panel th,.panel td{padding:8px 8px;font-size:13.5px}
   .tab{padding:12px 14px;font-size:13px}
+  .doc{grid-template-columns:auto 1fr;}
+  .doc .btn{grid-row:2}
+  .doc-ver{grid-column:1/2}.doc-dl{grid-column:2/3}
+  .doc-visor{padding:0}
+  .dv-caja{height:100%;border-radius:0}
+  .dv-tit{font-size:13px}
 }
 @media(max-width:700px){
   .top nav{gap:14px;font-size:13px}

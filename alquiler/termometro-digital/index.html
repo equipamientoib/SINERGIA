@@ -69,6 +69,7 @@
           <a class="btn" href="mailto:logistica@sinergiabiomedica.pe?subject=Cotizaci%C3%B3n%3A%20Term%C3%B3metro%20digital%20%28tipo%20termocupla%29&body=Hola%20Sinergia%20Biom%C3%A9dica%2C%20quiero%20cotizar%20el%20alquiler%20del%20term%C3%B3metro%20digital%20%28tipo%20termocupla%29%20%28Fluke%2051%20II%29.">Cotizar por correo</a>
         </div>
         
+        
       </div>
     </article>
     <div class="pest" data-tabs>
@@ -94,6 +95,12 @@
 <a class="wafab" href="https://wa.me/51908704131?text=Hola%20Sinergia%20Biom%C3%A9dica%2C%20quiero%20cotizar%20un%20alquiler." target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
   <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.6.8 5 2.3 7L4 29l7.3-2.2c1.9 1 4 1.6 6.2 1.6h.1c6.6 0 12-5.3 12-11.9 0-3.2-1.3-6.2-3.5-8.4A12 12 0 0 0 16 3zm7 16.9c-.3.8-1.7 1.6-2.4 1.7-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.8-3.6-1.5-5.9-5.1-6.1-5.4-.2-.2-1.4-1.9-1.4-3.7s.9-2.6 1.3-3c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6l1.1 2.7c.1.2.2.5 0 .7l-.4.7-.6.6c-.2.2-.4.4-.2.8.2.3 1 1.6 2.1 2.6 1.5 1.3 2.7 1.7 3 1.9.4.2.6.1.8-.1l1.2-1.4c.3-.3.5-.2.8-.1l2.6 1.2c.4.2.6.3.7.5.1.1.1.8-.2 1.6z"/></svg>
 </a>
+<div class="doc-visor" id="docVisor" hidden role="dialog" aria-modal="true" aria-label="Ficha técnica">
+  <div class="dv-caja">
+    <div class="dv-cab"><b class="dv-tit"></b><a class="btn fill dv-dl" download>Descargar PDF</a><button type="button" class="dv-x" aria-label="Cerrar">&#10005;</button></div>
+    <iframe title="Ficha técnica" loading="lazy"></iframe>
+  </div>
+</div>
 <div class="visor" id="visor" hidden><button type="button" class="v-x" aria-label="Cerrar">&#10005;</button><button type="button" class="v-f izq" aria-label="Anterior">&#8249;</button><img alt=""><button type="button" class="v-f der" aria-label="Siguiente">&#8250;</button><span class="v-n"></span></div>
 <script>
 (function(){
@@ -128,6 +135,17 @@
       ps.forEach(function(p,k){p.hidden=k!==i;});
     }); });
   });
+  var D=document.getElementById('docVisor');
+  if(D){
+    var DF=D.querySelector('iframe');
+    var cerrarDoc=function(){ D.hidden=true; DF.src='about:blank'; document.body.style.overflow=''; };
+    document.querySelectorAll('.doc-ver').forEach(function(b){ b.addEventListener('click',function(){
+      DF.src=b.dataset.ver; D.querySelector('.dv-tit').textContent=b.dataset.titulo;
+      D.querySelector('.dv-dl').href=b.dataset.pdf; D.hidden=false; document.body.style.overflow='hidden';
+    }); });
+    D.addEventListener('click',function(ev){ if(ev.target===D||ev.target.closest('.dv-x')) cerrarDoc(); });
+    document.addEventListener('keydown',function(ev){ if(ev.key==='Escape'&&!D.hidden) cerrarDoc(); });
+  }
   if(!V) return;
   V.addEventListener('click',function(ev){
     var b=ev.target.closest('button');
