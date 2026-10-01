@@ -861,17 +861,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=3b83f005';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=64e352d5';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=3b83f005';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=64e352d5';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=3b83f005','js/06-tablero.js?v=3b83f005'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=64e352d5','js/06-tablero.js?v=64e352d5'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=3b83f005'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=64e352d5'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1042,6 +1042,7 @@ function aplicarDatos(d, enVivo){
   }
 
   conFotosExtra(d.equipos);
+  if(d.venta) ventaEnVivo(d.venta);   // catálogo de venta en vivo (12-venta.js)
   const primeraVez = !CATALOGO_LISTO;
   const fCat = firmaCatalogo(d);
   const cambioCat = (fCat !== HUELLA_CAT);
@@ -1615,16 +1616,40 @@ function enviar(via){
                                 alquiler: galería + datos + pestañas)
    Los datos viven en data/venta.json; se cargan la primera vez que se
    entra a Venta, no antes (la portada y el alquiler no los necesitan).
+   EN VIVO: el Apps Script lee la hoja «Sinergia - Venta (catálogo en
+   vivo)» y manda los productos con publicar = SI (precio publicado,
+   stock y fecha de actualización incluidos). Cuando llegan, reemplazan
+   a los de venta.json, que queda como respaldo si Google no responde.
    ===================================================================== */
 /* var y no let: 07-router.js corre antes en el paquete y puede llamar a renderVenta al cargar. */
-var VENTA = null, VENTA_CARGA = null;
+var VENTA = null, VENTA_CARGA = null, VENTA_VIVO = null, VENTA_FIRMA = '';
+
+/* Llamada desde aplicarDatos (07-router.js) con d.venta del Apps Script.
+   Puede llegar antes de que este archivo termine de cargar (caché de la
+   sesión), por eso solo guarda y el repintado va diferido.            */
+function ventaEnVivo(v){
+  if(!v || !Array.isArray(v.productos)) return;
+  const ok = v.productos.filter(p => p && p.id && p.nom);
+  if(!ok.length) return;              // hoja vacía o mal leída: se queda lo publicado
+  const firma = JSON.stringify([ok, v.actualizado]);
+  if(firma === VENTA_FIRMA) return;   // nada cambió: no se repinta (ni se borra la búsqueda)
+  VENTA_FIRMA = firma;
+  VENTA_VIVO = {productos: ok, actualizado: v.actualizado || ''};
+  if(VENTA){
+    vMezclar();
+    setTimeout(() => { if(location.hash.startsWith('#/venta')) renderVenta(location.hash.split('/').slice(2)); }, 0);
+  }
+}
+function vMezclar(){
+  if(VENTA && VENTA_VIVO){ VENTA.productos = VENTA_VIVO.productos; VENTA.actualizado = VENTA_VIVO.actualizado; }
+}
 
 function cargarVenta(){
   if(!VENTA_CARGA){
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
-      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom)}; return VENTA; });
+      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom)}; vMezclar(); return VENTA; });
   }
   return VENTA_CARGA;
 }
@@ -1697,6 +1722,14 @@ function vMail(asunto){
   return `mailto:${SITE.email}?subject=${encodeURIComponent(asunto)}`;
 }
 
+/* Precio publicado (proveedor + margen, calculado en la hoja) y stock. */
+const vSoles = n => 'S/ ' + Number(n).toLocaleString('es-PE', {maximumFractionDigits: 0});
+function vStock(p){
+  if(p.stock === undefined || p.stock === null || p.stock === '') return '';
+  const n = Number(p.stock);
+  return n > 0 ? `<span class="v-stock si">En stock${n<=5?' · '+n+' und.':''}</span>` : '<span class="v-stock">A pedido</span>';
+}
+
 /* Foto del producto: la versión ligera (-m) en tarjetas y la grande en la ficha. */
 function vFoto(p, i, ligera){ const u=(p.fotos||[])[i||0]; return u ? fotoURL(u, ligera?700:1200, ligera) : ''; }
 
@@ -1711,7 +1744,8 @@ function vCard(p){
       <div class="v-marca"><b>${vEsc(p.marca||'')}</b>${p.modelo?' · '+vEsc(p.modelo):''}</div>
       ${p.expediente?`<div class="v-exp" title="Nombre en expedientes técnicos">${vEsc(p.expediente)}${p.clave?' · '+vEsc(p.clave):''}</div>`:''}
       ${p.resumen?`<p>${vEsc(p.resumen)}</p>`:''}
-      <div class="v-card-pie"><span>Ver ficha →</span><a class="btn" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.modelo?' ('+p.modelo+')':''))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Cotizar</a></div>
+      ${vStock(p)}
+      <div class="v-card-pie">${p.precio?`<span class="v-precio" title="Precio referencial">${vSoles(p.precio)}</span>`:'<span>Ver ficha →</span>'}<a class="btn" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.modelo?' ('+p.modelo+')':''))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Cotizar</a></div>
     </div>
   </article>`;
 }
@@ -1852,6 +1886,7 @@ function vProducto(id){
         <h1>${vEsc(p.nom)}</h1>
         <div class="v-marca">${vEsc([p.marca,p.modelo,p.origen].filter(Boolean).join(' · '))}</div>
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
+        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p)}<small>${p.precio?'Precio referencial, sujeto a confirmación en la cotización':'Consulta precio y plazo de entrega'}${VENTA.actualizado?' · Precios y stock al '+vEsc(VENTA.actualizado):''}</small></div>`:''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">

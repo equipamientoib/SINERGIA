@@ -111,3 +111,34 @@ Las apps web de Apps Script suelen leerse sin problema desde el navegador. Si en
 **Qué es público y qué es privado:** la tarjeta (foto, cliente, título, descripción) es pública; el panel de avance (porcentaje + hitos) pide la clave. La clave demo de los proyectos de ejemplo es `demo123`.
 
 **Nota honesta de seguridad:** en esta versión estática la clave viaja cifrada y no puede leerse, pero los datos de avance van dentro del JSON del catálogo; una persona muy técnica podría verlos. Para confidencialidad estricta, la Fase 2 (Supabase) mueve esto a una base de datos con inicio de sesión real.
+
+---
+
+## Catálogo de VENTA en vivo
+
+La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (catálogo en vivo)»** (Drive › 3. Página WEB). Su ID va en `VENTA_ID`, al inicio de `google-apps-script/Codigo.gs`. Si el Apps Script no responde, la web usa `data/venta.json` como respaldo.
+
+**Parámetros (arriba de los encabezados):**
+- `A1 margen · B1 35`: el % que se suma al precio del proveedor.
+- `A2 actualizado · B2 fecha`: la fecha de la última revisión de precios y stock, cada lunes. La web muestra «Precios y stock al …».
+
+**Columnas (fila de encabezados que empieza con `id`):**
+
+| Columna | Qué es | ¿Se publica? |
+|---|---|---|
+| `id` | identificador, es la dirección de la ficha (`#/venta/p/<id>`); no cambiarlo una vez publicado | sí |
+| `publicar` | `SI` = aparece en la web · `NO` = solo base de datos | — |
+| `destacado` | 1…8 = orden en la portada de Venta | sí |
+| `categoria` | `monitoreo`, `reanimacion`, `diagnostico`, `neonatal`, `quirofano`, `uci`, `imagenes`, `esterilizacion`, `laboratorio`, `cadena-frio`, `mobiliario` | sí |
+| `nombre`, `marca`, `modelo`, `origen`, `resumen` | datos del equipo | sí |
+| `precio_proveedor` | lo que cobra el proveedor | **no** |
+| `precio_publicado` | fórmula = proveedor × (1 + B1/100); si falta, el Apps Script la calcula | sí |
+| `stock_proveedor` | stock del proveedor | **no** |
+| `stock_sinergia` | fórmula = stock del proveedor; 0 o vacío = «A pedido» | sí |
+| `caracteristicas` | separadas con `\|` | sí |
+| `expediente`, `clave` | nombre y código en expedientes técnicos (NTS 113) | sí |
+| `areas` | separadas con coma | sí |
+| `fotos`, `ficha_pdf` | enlaces de Drive (compartidos con «cualquiera con el enlace») | sí |
+| `codigo_proveedor`, `descripcion_proveedor`, `notas` | uso interno | **no** |
+
+**Primera vez:** pega el `Codigo.gs` actualizado en Apps Script, ejecuta `prepararHojaVenta` (▶) una vez (nombra la pestaña, pone las fórmulas y el formato), luego **Implementar › Gestionar implementaciones › Nueva versión** y ejecuta `limpiarCache`.
