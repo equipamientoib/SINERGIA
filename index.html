@@ -83,7 +83,7 @@ css/11-personaliza.css
 css/12-extras.css
 css/14-footer.css
 -->
-<link rel="stylesheet" href="css/app.css?v=f60785dc">
+<link rel="stylesheet" href="css/app.css?v=7d88c50c">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -96,6 +96,7 @@ css/14-footer.css
   "telephone": "+51 908 704 131",
   "address": {"@type": "PostalAddress", "addressLocality": "Pueblo Libre", "addressRegion": "Lima", "addressCountry": "PE"},
   "areaServed": "Lima y provincias, Perú",
+  "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:00", "closes": "17:00"}],
   "knowsAbout": ["Metrología biomédica", "IEC 62353", "IEC 60601-1", "Calibración de equipos médicos"]
 }
 </script>
@@ -120,7 +121,7 @@ js/11-solicitudes.js
      scripts/generar_paginas.py. El catálogo la usa para que el clic en un
      equipo abra su página; si un equipo no está aquí, abre la ficha #/equipo. -->
 <!--TIPOS-URL-INICIO--><script>window.PAGINA_TIPO={"defib": "/alquiler/analizador-de-desfibriladores/", "esa620": "/alquiler/analizador-de-seguridad-electrica/", "fluke-51": "/alquiler/termometro-digital/", "fluke-945": "/alquiler/sonometro/", "luxometro": "/alquiler/luxometro/", "manometro": "/alquiler/manometro-digital/", "ms400": "/alquiler/simulador-de-signos-vitales/", "multimetro": "/alquiler/multimetro/", "phantom-flujo": "/alquiler/phantom-de-puncion-ecoguiada/", "sp-sim": "/alquiler/simulador-de-spo2/", "tacometro": "/alquiler/tacometro/"};window.FOTOS_EXTRA={"fluke-51": ["img/catalogo/fluke-51-00.jpg"], "ms400": ["img/catalogo/ms400-00.jpg"], "multimetro": ["img/catalogo/multimetro-01.jpg"], "tacometro": ["img/catalogo/tacometro-01.jpg"]};</script><!--TIPOS-URL-FIN-->
-<script defer src="js/app.js?v=f60785dc"></script>
+<script defer src="js/app.js?v=7d88c50c"></script>
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -421,13 +422,14 @@ js/11-solicitudes.js
           <button class="btn btn-fill" onclick="enviarContacto('whatsapp')">Enviar por WhatsApp</button>
           <button class="btn" onclick="enviarContacto('correo')">Enviar por correo</button>
         </div>
-        <div class="form-nota">Se abre tu WhatsApp o tu correo con la solicitud ya redactada. Respondemos en horario de oficina.</div>
+        <div class="form-nota">Se abre tu WhatsApp o tu correo con la solicitud ya redactada. Atendemos de lunes a viernes, de 8:00 a.m. a 5:00 p.m.</div>
       </div>
       <div class="contact-side">
       <div class="facts">
         <div class="row"><span class="l">Correo</span><span class="v" id="factMail">—</span></div>
         <div class="row"><span class="l">Web</span><span class="v" id="factWeb">—</span></div>
         <div class="row"><span class="l">Teléfono</span><span class="v" id="factTel">—</span></div>
+        <div class="row"><span class="l">Horario</span><span class="v">Lunes a viernes<small>8:00 a.m. – 5:00 p.m.</small></span></div>
         <div class="row"><span class="l">Sede</span><span class="v">Pueblo Libre, Lima<small>Perú</small></span></div>
         <div class="row"><span class="l">RUC</span><span class="v" id="factRuc">—</span></div>
       </div>
