@@ -1,0 +1,54 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "esa620",
+  "titulo": "Analizador de seguridad eléctrica Fluke ESA620",
+  "resumen": "Analizador portátil para verificar la seguridad eléctrica de equipos médicos según normas internacionales. Mide tensión de red, resistencia de tierra de protección, corrientes de fuga y aislamiento, y simula señales de ECG para pruebas combinadas de seguridad y desempeño.",
+  "normas": ["IEC 60601-1", "IEC / EN 62353", "ANSI/AAMI ES1", "NFPA 99", "AS/NZS 3551", "IEC 61010", "VDE 751"],
+  "secciones": [
+    {"titulo": "Tensión de red", "filas": [
+      ["Rango", "0,0 a 300 V CA rms"],
+      ["Precisión", "± (2 % de lectura + 1,0 V)"]
+    ]},
+    {"titulo": "Resistencia de tierra de protección", "filas": [
+      ["Con corriente > 200 mA CA", "0 a 2 Ω"],
+      ["Con corriente de 25 A CA", "0 a 0,2 Ω"],
+      ["Precisión", "± (2 % de lectura + 0,005 Ω)"],
+      ["Método", "2 o 4 hilos"]
+    ]},
+    {"titulo": "Corrientes de fuga", "filas": [
+      ["Rangos", "0,0–199,9 µA · 200–1999 µA · 2,00–10,00 mA"],
+      ["Precisión 1 kHz–100 kHz", "± (2 % de lectura + 1 µA)"],
+      ["Precisión 100 kHz–1 MHz", "± (5 % de lectura + 1 µA)"],
+      ["Red sobre parte aplicada (MAP)", "100 % (AAMI ES1, IEC 62353) o 110 % (IEC 60601) de la tensión de red"],
+      ["Cargas de paciente", "AAMI ES1, IEC 60601 e IEC 61010, seleccionables"]
+    ]},
+    {"titulo": "Aislamiento", "filas": [
+      ["Tensión de prueba", "250 V CC y 500 V CC"],
+      ["Pruebas", "5 pruebas de aislamiento"],
+      ["Rango 20 a 100 MΩ", "± (7,5 % de lectura + 2 cuentas)"]
+    ]},
+    {"titulo": "Partes aplicadas y simulación", "filas": [
+      ["Conexiones de partes aplicadas (ECG)", "10"],
+      ["Simulación", "ECG y formas de onda de desempeño"]
+    ]},
+    {"titulo": "Datos físicos", "filas": [
+      ["Dimensiones", "32 × 23,6 × 12,7 cm"],
+      ["Peso", "4,7 kg"],
+      ["Temperatura de operación", "10 °C a 40 °C"],
+      ["Seguridad", "IEC 61010-1 · CAT II 300 V"]
+    ]}
+  ],
+  "incluye": [
+    "Analizador Fluke ESA620",
+    "Cable de alimentación",
+    "Juego de cables y puntas de prueba",
+    "Maletín de transporte",
+    "Certificado de calibración"
+  ],
+  "fuente": "Hoja de datos y manual de Fluke Biomedical ESA620",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Número de conexiones de partes aplicadas (10)",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}
