@@ -262,8 +262,8 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <header class="top"><div class="wrap">
   <a href="/" aria-label="Sinergia Biomédica — inicio">{LOGO}</a>
   <nav>
+    <span class="modo-sw" role="group" aria-label="Sección"><a href="/#/venta">Venta</a><a class="on" href="/#/alquiler">Alquiler</a></span>
     <a href="/#/alquiler">Inicio</a>
-    <a href="/#/venta">Venta</a>
     <a href="/#/servicios">Servicios</a>
     <a href="/#/catalogo" class="on">Catálogo</a>
     <a href="/#/talleres">Talleres</a>

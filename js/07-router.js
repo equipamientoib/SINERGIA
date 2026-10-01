@@ -21,6 +21,16 @@ function route(sinMover){
     else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
   }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
+  /* Sección activa: decide qué menú se ve (venta o alquiler). Las páginas
+     comunes (servicios, clientes, contacto…) conservan la última sección
+     en la que estuvo el visitante. */
+  const enVenta = h==='#/venta' || h.startsWith('#/venta/');
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete)\//.test(h);
+  let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
+  try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
+  modo = modo || 'alquiler';
+  document.body.classList.toggle('modo-venta', modo==='venta');
+  document.body.classList.toggle('modo-alquiler', modo!=='venta');
   /* La entrada va sin el header ni el pie del sitio (css/16-entrada.css). */
   document.body.classList.toggle('en-entrada', pageId==='page-entrada');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));

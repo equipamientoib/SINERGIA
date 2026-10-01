@@ -24,3 +24,13 @@
     .mobile-menu.open{display:block}
   }
 
+
+  /* Dos secciones, dos menús: cada enlace con data-modo solo se ve en su
+     sección. El selector Venta | Alquiler cambia de sección. */
+  body.modo-venta [data-modo="alquiler"], body.modo-alquiler [data-modo="venta"]{display:none!important}
+  .modo-sw{display:inline-flex;padding:3px;border:1px solid var(--linea);border-radius:999px;background:var(--blanco);flex-shrink:0}
+  .modo-sw a{padding:6px 13px!important;border-radius:999px;border-bottom:0!important;font-size:13px;color:var(--gris)}
+  .modo-sw a:hover{color:var(--onix)}
+  body.modo-venta .modo-sw [data-sw="venta"], body.modo-alquiler .modo-sw [data-sw="alquiler"]{background:var(--onix);color:#fff}
+  .mobile-menu .modo-sw-movil{display:flex;margin:14px 24px;width:auto}
+  .mobile-menu .modo-sw-movil a{flex:1;text-align:center;border-bottom:0;padding:10px!important}

@@ -24,7 +24,13 @@ const LOGO_FOOTER = `<svg class="footer-logo logo-svg" width="250" viewBox="0 0 
 function navLinks(indent){
   /* El header muestra solo las entradas principales; el pie las muestra todas. */
   const menu=SITE.nav.filter(n=>!n.pie);
-  return menu.map(n=>`${indent}<a data-route="${n.r}" onclick="go('${n.r}')">${n.t}</a>`).join('\n');
+  return menu.map(n=>`${indent}<a data-route="${n.r}"${n.modo?` data-modo="${n.modo}"`:''} onclick="go('${n.r}')">${n.t}</a>`).join('\n');
+}
+
+/* Selector de sección: Venta | Alquiler. El activo lo marca la clase del
+   body (modo-venta / modo-alquiler) que pone 07-router.js. */
+function selectorModo(cls){
+  return `<div class="${cls}" role="group" aria-label="Sección"><a data-sw="venta" onclick="go('#/venta')">Venta</a><a data-sw="alquiler" onclick="go('#/alquiler')">Alquiler</a></div>`;
 }
 
 function renderHeader(){
@@ -33,6 +39,7 @@ function renderHeader(){
   <div class="wrap nav">
     ${LOGO_HEADER}
     <div class="menu">
+      ${selectorModo('modo-sw')}
 ${navLinks('      ')}
       <a class="btn" onclick="go('${SITE.portal.r}')">${SITE.portal.t}</a>
     </div>
@@ -41,6 +48,7 @@ ${navLinks('      ')}
     </button>
   </div>
   <div class="mobile-menu" id="mobileMenu">
+    ${selectorModo('modo-sw modo-sw-movil')}
 ${navLinks('    ')}
     <a onclick="go('${SITE.portal.r}')" style="color:var(--cobre-d)">${SITE.portal.t}</a>
   </div>
@@ -62,7 +70,7 @@ function renderFooter(){
     <div>
       <div class="tt">Navegación</div>
       <div class="fnav">
-${SITE.nav.filter(n=>n.r!=='#/').map(n=>`        <a onclick="go('${n.r}')">${n.t}</a>`).join('\n')}
+${SITE.nav.filter(n=>n.r!=='#/').map(n=>`        <a onclick="go('${n.r}')">${n.pieT||n.t}</a>`).join('\n')}
       </div>
     </div>
     <div>
