@@ -39,6 +39,7 @@ import urllib.parse
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITIO = 'https://sinergiabiomedica.pe'
 TIPOS = os.path.join(ROOT, 'data', 'seo-tipos.json')
+FICHAS = os.path.join(ROOT, 'data', 'fichas')
 CATALOGO = os.path.join(ROOT, 'data', 'catalogo.json')
 CONFIG = os.path.join(ROOT, 'js', '00-config.js')
 INDEX = os.path.join(ROOT, 'index.html')
@@ -90,6 +91,17 @@ def foto_local(url, locales, ligera=True):
         if os.path.exists(os.path.join(ROOT, cand)):
             return '/' + cand
     return None
+
+
+def leer_fichas():
+    """data/fichas/<id>.json -> {id: ficha}."""
+    out = {}
+    if os.path.isdir(FICHAS):
+        for n in sorted(os.listdir(FICHAS)):
+            if n.endswith('.json'):
+                f = leer_json(os.path.join(FICHAS, n))
+                out[f['id']] = f
+    return out
 
 
 def fotos_de(eq, locales):
@@ -242,6 +254,104 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 '''
 
 
+def pdf_ficha(eq_id):
+    return '/fichas/ficha-tecnica-%s.pdf' % eq_id
+
+
+def seccion_ficha(f):
+    """Ficha técnica en la página web (texto que Google puede leer)."""
+    grupos = ''.join('<div class="ft-grupo"><h4>%s</h4><table>%s</table></div>' % (
+        e(g['titulo']), ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas']))
+        for g in f['secciones'])
+    normas = ''.join('<span>%s</span>' % e(n) for n in f.get('normas', []))
+    incluye = ''.join('<li>%s</li>' % e(i) for i in f.get('incluye', []))
+    pdf = pdf_ficha(f['id'])
+    tiene_pdf = os.path.exists(os.path.join(ROOT, pdf.lstrip('/')))
+    return f'''
+    <section class="ficha-tec" id="ficha-{e(f['id'])}">
+      <div class="ft-cab">
+        <div><div class="k">Ficha técnica</div><h3>{e(f['titulo'])}</h3></div>
+        {f'<a class="btn fill" href="{pdf}" download>Descargar ficha técnica (PDF)</a>' if tiene_pdf else ''}
+      </div>
+      <p class="ft-resumen">{e(f.get('resumen', ''))}</p>
+      {f'<div class="ft-normas"><b>Normas</b>{normas}</div>' if normas else ''}
+      <div class="ft-grupos">{grupos}</div>
+      {f'<div class="ft-incluye"><b>Incluye en el alquiler</b><ul>{incluye}</ul></div>' if incluye else ''}
+      <p class="ft-fuente">Fuente: {e(f.get('fuente', 'fabricante'))}. Especificaciones sujetas a cambios del fabricante.</p>
+    </section>'''
+
+
+def pagina_ficha_a4(f, eq, cfg, locales):
+    """Hoja A4 imprimible: de aquí sale el PDF (scripts/generar_pdf_fichas.js)."""
+    fotos = fotos_de(eq, locales)
+    foto = fotos[0].replace('-m.webp', '.webp') if fotos else ''
+    grupos = ''.join('<div class="g"><h4>%s</h4><table>%s</table></div>' % (
+        e(g['titulo']), ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas']))
+        for g in f['secciones'])
+    normas = ' · '.join(e(n) for n in f.get('normas', []))
+    incluye = ''.join('<li>%s</li>' % e(i) for i in f.get('incluye', []))
+    hoy = datetime.date.today().strftime('%m/%Y')
+    return f'''<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha técnica — {e(f['titulo'])} | Sinergia Biomédica</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/css/00-fuentes.css">
+<style>
+  @page{{size:A4;margin:0}}
+  *{{box-sizing:border-box;margin:0;padding:0}}
+  body{{font-family:'Titillium Web',system-ui,sans-serif;color:#17191D;background:#e9e7e2;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  .hoja{{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:14mm 14mm 12mm;display:flex;flex-direction:column}}
+  @media screen{{.hoja{{margin:16px auto;box-shadow:0 10px 40px -12px rgba(0,0,0,.3)}}}}
+  header{{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #9A7F4E;padding-bottom:6mm}}
+  .logo{{height:13mm}}.logo text{{font-family:'Chakra Petch',sans-serif}}
+  .tag{{font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:3px;font-size:9pt;color:#9A7F4E;text-align:right}}
+  .tag b{{display:block;font-size:15pt;letter-spacing:1px;color:#17191D}}
+  .top{{display:grid;grid-template-columns:62mm 1fr;gap:7mm;margin-top:7mm}}
+  .foto{{border:1px solid #e3e0d8;border-radius:3mm;height:52mm;display:flex;align-items:center;justify-content:center;overflow:hidden}}
+  .foto img{{max-width:100%;max-height:100%;object-fit:contain}}
+  h1{{font-family:'Chakra Petch',sans-serif;font-size:17pt;line-height:1.15}}
+  .marca{{color:#6E727A;font-size:10pt;margin-top:1mm}}
+  .resumen{{font-size:9.5pt;line-height:1.5;margin-top:3mm}}
+  .normas{{font-size:8.5pt;margin-top:3mm;color:#7E6234}}.normas b{{color:#17191D}}
+  .grupos{{columns:2;column-gap:7mm;margin-top:6mm}}
+  .g{{break-inside:avoid;margin-bottom:4.5mm}}
+  h4{{font-family:'Chakra Petch',sans-serif;font-size:9pt;letter-spacing:1px;text-transform:uppercase;color:#fff;background:#17191D;padding:1.6mm 2.5mm;border-radius:1.5mm 1.5mm 0 0}}
+  table{{width:100%;border-collapse:collapse;font-size:8.6pt}}
+  th,td{{padding:1.5mm 2.5mm;border-bottom:1px solid #ebe8e1;vertical-align:top;text-align:left}}
+  th{{font-weight:400;color:#6E727A;width:44%}}td{{font-weight:600}}
+  tr:nth-child(even) th,tr:nth-child(even) td{{background:#FBFAF6}}
+  .incluye{{margin-top:2mm;border:1px solid #e3e0d8;border-radius:2mm;padding:3mm 4mm;font-size:9pt}}
+  .incluye b{{font-family:'Chakra Petch',sans-serif;font-size:9pt;letter-spacing:1px;text-transform:uppercase;color:#9A7F4E}}
+  .incluye ul{{columns:2;margin-top:1.5mm;padding-left:4mm}}
+  footer{{margin-top:auto;padding-top:5mm;border-top:1px solid #e3e0d8;display:flex;justify-content:space-between;gap:6mm;font-size:8pt;color:#6E727A}}
+  footer b{{color:#17191D}}
+  .boton{{position:fixed;right:20px;bottom:20px;font-family:'Chakra Petch',sans-serif;font-weight:600;background:#17191D;color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer}}
+  @media print{{.boton{{display:none}}}}
+</style></head>
+<body>
+<div class="hoja">
+  <header>{LOGO}<div class="tag">FICHA TÉCNICA<b>Alquiler de equipos</b></div></header>
+  <div class="top">
+    <div class="foto">{f'<img src="{foto}" alt="">' if foto else ''}</div>
+    <div>
+      <h1>{e(f['titulo'])}</h1>
+      <div class="marca">{e(eq.get('marca', ''))}</div>
+      <p class="resumen">{e(f.get('resumen', ''))}</p>
+      {f'<p class="normas"><b>Normas:</b> {normas}</p>' if normas else ''}
+    </div>
+  </div>
+  <div class="grupos">{grupos}</div>
+  {f'<div class="incluye"><b>Incluye en el alquiler</b><ul>{incluye}</ul></div>' if incluye else ''}
+  <footer>
+    <div><b>Sinergia Biomédica</b> · Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú · {e(cfg['email'])} · {e(cfg['telefono'])}</div>
+    <div style="text-align:right">sinergiabiomedica.pe<br>Fuente: {e(f.get('fuente', 'fabricante'))} · {hoy}</div>
+  </footer>
+</div>
+<button class="boton" onclick="print()">Guardar como PDF</button>
+</body></html>
+'''
+
+
 def tarjeta_equipo(eq, tipo, cfg, locales, primera=False):
     fotos = fotos_de(eq, locales)
     alt = e(eq['nom'] + ' — ' + eq.get('marca', ''))
@@ -313,7 +423,8 @@ def tarjeta_equipo(eq, tipo, cfg, locales, primera=False):
     </article>'''
 
 
-def pagina_tipo(t, equipos, todos, cfg, locales):
+def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
+    fichas = fichas or {}
     ruta = '/alquiler/%s/' % t['slug']
     n = len(equipos)
     usos = ''.join('<li>%s</li>' % e(u) for u in t.get('usos', []))
@@ -330,7 +441,7 @@ def pagina_tipo(t, equipos, todos, cfg, locales):
   </section>
 
   <section class="productos">
-    {''.join(tarjeta_equipo(x, t, cfg, locales, primera=(k == 0)) for k, x in enumerate(equipos))}
+    {''.join(tarjeta_equipo(x, t, cfg, locales, primera=(k == 0)) + (seccion_ficha(fichas[x['id']]) if x['id'] in fichas else '') for k, x in enumerate(equipos))}
   </section>
 
   <section class="que-es">
@@ -505,11 +616,16 @@ def main():
     todos = [t for t, _ in publicados]
 
     cambios, paginas = [], []
+    fichas = leer_fichas()
+    por_id = {x['id']: x for x in equipos}
+    for fid, f in fichas.items():
+        if fid in por_id:
+            escribir('fichas/%s/index.html' % fid, pagina_ficha_a4(f, por_id[fid], cfg, locales), cambios)
     ruta, doc = pagina_hub(seo['hub'], publicados, cfg, locales)
     escribir('alquiler/index.html', doc, cambios)
     paginas.append((ruta, 'alquiler/index.html'))
     for t, eqs in publicados:
-        ruta, doc = pagina_tipo(t, eqs, todos, cfg, locales)
+        ruta, doc = pagina_tipo(t, eqs, todos, cfg, locales, fichas)
         rel = 'alquiler/%s/index.html' % t['slug']
         escribir(rel, doc, cambios)
         paginas.append((ruta, rel))

@@ -45,14 +45,30 @@ jobs:
       - name: Generar páginas
         run: python3 scripts/generar_paginas.py --datos "${{ steps.vivo.outputs.datos }}"
 
+      - name: PDF de fichas técnicas (solo si cambió alguna ficha)
+        run: |
+          if [ -n "$(git status --porcelain fichas)" ]; then
+            npm install --no-save --silent playwright@1
+            npx playwright install --with-deps chromium
+            python3 -m http.server 8765 >/dev/null 2>&1 &
+            sleep 2
+            node scripts/generar_pdf_fichas.js
+            # con el PDF ya creado, la página muestra el botón de descarga
+            python3 scripts/generar_paginas.py --datos "${{ steps.vivo.outputs.datos }}"
+          else
+            echo "Fichas sin cambios."
+          fi
+
       - name: Publicar si algo cambió
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet; then echo "Sin cambios."; exit 0; fi
+          # git status y no git diff: también cuenta archivos nuevos (un tipo
+          # de equipo nuevo crea una carpeta alquiler/<tipo>/ que aún no existe).
+          if [ -z "$(git status --porcelain alquiler fichas sitemap.xml robots.txt index.html)" ]; then echo "Sin cambios."; exit 0; fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A alquiler sitemap.xml robots.txt index.html
+          git add -A alquiler fichas sitemap.xml robots.txt index.html
           git commit -m "Paginas de alquiler al dia con la hoja"
           git push
           # Un push hecho con GITHUB_TOKEN no siempre dispara GitHub Pages:

@@ -184,3 +184,30 @@ h2{font-size:clamp(21px,2.4vw,26px);margin-bottom:18px}
   .cta .btns{grid-template-columns:1fr}
   .garantias{grid-template-columns:1fr}
 }
+
+/* ficha técnica (data/fichas/<id>.json) */
+.ficha-tec{background:var(--blanco);border:1px solid var(--linea);border-radius:18px;padding:22px;margin:-4px 0 18px}
+.ft-cab{display:flex;justify-content:space-between;align-items:center;gap:12px 20px;flex-wrap:wrap}
+.ft-cab h3{font-size:clamp(18px,2vw,22px);margin-top:4px}
+.ft-resumen{font-size:15px;color:var(--grafito);margin-top:10px;max-width:80ch}
+.ft-normas{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;font-size:13px}
+.ft-normas b{font-family:var(--ff-d);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gris);margin-right:4px}
+.ft-normas span{padding:4px 10px;border-radius:99px;background:#F4EEE3;color:var(--cobre-d);border:1px solid var(--linea-b);font-weight:600}
+.ft-grupos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.ft-grupo{border:1px solid var(--linea);border-radius:12px;overflow:hidden}
+.ft-grupo h4{font-family:var(--ff-d);font-size:12px;letter-spacing:1.2px;text-transform:uppercase;background:var(--onix);color:var(--hueso);padding:8px 14px}
+.ft-grupo table{width:100%;border-collapse:collapse;font-size:14px}
+.ft-grupo th,.ft-grupo td{text-align:left;vertical-align:top;padding:7px 14px;border-top:1px solid var(--linea)}
+.ft-grupo tr:first-child th,.ft-grupo tr:first-child td{border-top:0}
+.ft-grupo th{font-weight:400;color:var(--gris);width:45%}
+.ft-grupo td{font-weight:600}
+.ft-grupo tr:nth-child(even){background:var(--crema)}
+.ft-incluye{margin-top:14px;border:1px dashed var(--linea-b);border-radius:12px;padding:12px 16px}
+.ft-incluye b{font-family:var(--ff-d);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--bronce)}
+.ft-incluye ul{columns:2;margin-top:6px;padding-left:18px;font-size:14px}
+.ft-fuente{font-size:12px;color:var(--gris);margin-top:12px}
+@media(max-width:700px){
+  .ft-grupos{grid-template-columns:minmax(0,1fr)}
+  .ft-incluye ul{columns:1}
+  .ficha-tec{padding:14px}
+}
