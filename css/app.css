@@ -129,7 +129,10 @@
 
   /* SERVICIOS */
   .svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px}
-  .svc .card{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);padding:30px 26px;transition:.2s}
+  .svc .card{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);padding:30px 26px;transition:.2s;display:flex;flex-direction:column}
+  /* El botón de cada servicio va al pie: las tres tarjetas quedan parejas */
+  .svc .card>.btn{margin-top:auto;align-self:flex-start}
+  .svc .card>p:not(:last-child){margin-bottom:18px}
   .svc .card:hover{border-color:var(--linea-b);box-shadow:var(--sh-card);transform:translateY(-2px)}
   .svc .ico{width:46px;height:46px;border-radius:11px;background:var(--crema-2);border:1px solid var(--linea-b);display:grid;place-items:center;margin-bottom:18px;color:var(--cobre-d)}
   .svc .tagn{font-family:var(--ff-d);font-size:11px;letter-spacing:2px;color:var(--cobre-d);margin-bottom:6px}
@@ -149,6 +152,13 @@
   .facts .row .v{font-weight:600;font-size:14px;color:var(--onix);text-align:right}
   .facts .row .v small{display:block;font-weight:400;color:var(--gris);font-size:12.5px}
   @media(max-width:880px){.cols{grid-template-columns:1fr;gap:30px}}
+  /* Contacto: datos + WhatsApp en una columna, a la altura del formulario */
+  .contact-side{display:flex;flex-direction:column;gap:18px}
+  .facts-wa{background:var(--onix);color:#fff;border-radius:var(--r-lg);padding:26px 24px}
+  .facts-wa b{font-family:var(--ff-d);font-size:18px;font-weight:600;display:block}
+  .facts-wa p{color:rgba(255,255,255,.72);font-size:14px;margin:8px 0 18px;font-weight:400}
+  .facts-wa .btn{background:#25D366;border-color:#25D366;color:#0b2b17;width:100%;display:flex;justify-content:center;text-align:center}
+  .facts-wa .btn:hover{background:#1fbd5a;border-color:#1fbd5a}
 
   /* PASOS */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--linea);border-radius:var(--r-lg);overflow:hidden;background:var(--blanco)}
@@ -191,6 +201,10 @@
   .eqcar-f.izq{left:8px}
   .eqcar-f.der{right:8px}
   .eqcar.una .eqcar-f{display:none}
+  /* En PC las flechas aparecen al pasar el mouse por la foto: la tarjeta
+     quieta se ve más limpia. En táctil (sin hover) se ven siempre. */
+  @media(hover:hover){.eqcar-f{opacity:0;transition:opacity .2s,transform .2s,background .2s}
+    .eq:hover .eqcar-f,.eqcar-f:focus-visible{opacity:1}}
   .eq .img .grid-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(23,25,29,.05) 1px,transparent 1px);background-size:16px 16px;opacity:.55}
   /* Fondo sólido: sobre fotos oscuras el semitransparente no se leía. */
   .eq .badge{position:absolute;top:13px;left:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:#EAF4EF;color:var(--ok);border:1px solid rgba(46,139,107,.35);box-shadow:0 1px 4px rgba(23,25,29,.12)}

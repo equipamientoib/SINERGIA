@@ -26,7 +26,8 @@
   @media(hover:none){ .pr-car-b{opacity:.85} }
   .pr .img svg{width:60%;height:auto;margin:14px auto 0;display:block}
   .pr .st{position:absolute;top:12px;left:12px;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px}
-  .pr .st.curso{background:rgba(46,139,107,.13);color:var(--ok);border:1px solid rgba(46,139,107,.28)}
+  /* Fondo sólido: sobre la foto, el verde translúcido no se leía */
+  .pr .st.curso{background:#E7F4EE;color:var(--ok);border:1px solid rgba(46,139,107,.35);box-shadow:0 2px 8px rgba(0,0,0,.12)}
   .pr .st.fin{background:rgba(154,127,78,.15);color:var(--cobre-d);border:1px solid var(--linea-b)}
   .pr .body{padding:20px;flex:1;display:flex;flex-direction:column}
   .pr .cli{font-family:var(--ff-d);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cobre-d);margin-bottom:7px}

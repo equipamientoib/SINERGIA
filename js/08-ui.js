@@ -19,6 +19,7 @@ addEventListener('scroll',()=>{
   if(!n)return;
   const url='https://wa.me/'+n+'?text='+encodeURIComponent('Hola Sinergia Biomédica, quiero solicitar una cotización.');
   const f=document.getElementById('waFab'); if(f){f.href=url;f.classList.add('show');}
+  const c=document.getElementById('waContacto'); if(c) c.href=url;
   const l=document.getElementById('waLink'); if(l){l.href=url;l.target='_blank';l.rel='noopener';l.removeAttribute('onclick');}
 })();
 

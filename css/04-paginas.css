@@ -9,6 +9,13 @@
   .facts .row .v{font-weight:600;font-size:14px;color:var(--onix);text-align:right}
   .facts .row .v small{display:block;font-weight:400;color:var(--gris);font-size:12.5px}
   @media(max-width:880px){.cols{grid-template-columns:1fr;gap:30px}}
+  /* Contacto: datos + WhatsApp en una columna, a la altura del formulario */
+  .contact-side{display:flex;flex-direction:column;gap:18px}
+  .facts-wa{background:var(--onix);color:#fff;border-radius:var(--r-lg);padding:26px 24px}
+  .facts-wa b{font-family:var(--ff-d);font-size:18px;font-weight:600;display:block}
+  .facts-wa p{color:rgba(255,255,255,.72);font-size:14px;margin:8px 0 18px;font-weight:400}
+  .facts-wa .btn{background:#25D366;border-color:#25D366;color:#0b2b17;width:100%;display:flex;justify-content:center;text-align:center}
+  .facts-wa .btn:hover{background:#1fbd5a;border-color:#1fbd5a}
 
   /* PASOS */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--linea);border-radius:var(--r-lg);overflow:hidden;background:var(--blanco)}
