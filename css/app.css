@@ -790,3 +790,19 @@
   .v-precio-caja b{font-family:var(--ff-d);font-size:26px;font-weight:600;color:var(--onix);letter-spacing:-.4px}
   .v-precio-caja .v-stock{margin-top:0;align-self:center}
   .v-precio-caja small{flex-basis:100%;font-size:12.5px;color:var(--gris)}
+
+  /* Tienda (#/venta/tienda): filtros como en el catálogo de alquiler */
+  .vt-barra{display:flex;gap:12px;align-items:stretch;margin-bottom:12px}
+  .vt-barra .vt-busca{flex:1;margin:0;box-shadow:none}
+  .vt-orden{font:inherit;font-size:14px;color:var(--grafito);background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-sm,10px);padding:0 14px;cursor:pointer}
+  .vt-n{margin-left:auto;color:var(--gris);font-size:12px}
+  #vtSide .opts label{display:flex;align-items:center;gap:8px}
+  .vt-activos{display:flex;flex-wrap:wrap;gap:8px}
+  .vt-activos:not(:empty){margin-bottom:12px}
+  .vt-activos button{font:inherit;font-size:12.5px;font-weight:600;color:var(--cobre-d);background:var(--crema-2,#efe8da);border:1px solid var(--linea-b,#d9cdb5);border-radius:999px;padding:5px 11px;cursor:pointer}
+  .vt-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .vt-lista .v-panel{max-width:760px;margin:0 auto}
+  .v-mas{text-align:center;margin-top:26px}
+  .v-ir-tienda{color:var(--cobre-d);font-weight:600;cursor:pointer;white-space:nowrap}
+  @media (max-width:640px){ .vt-barra{flex-direction:column} .vt-orden{padding:12px 14px} }
+  .pagehead .crumb + .k{margin-top:16px}

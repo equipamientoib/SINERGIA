@@ -48,6 +48,7 @@ const SITE = {
      pieT: el texto en el pie, donde las dos secciones salen juntas.     */
   nav: [
     { t: "Inicio",        r: "#/venta",     modo: "venta",    pieT: "Venta de equipos" },
+    { t: "Tienda",        r: "#/venta/tienda", modo: "venta", pieT: "Tienda de venta" },
     { t: "Inicio",        r: "#/alquiler",  modo: "alquiler", pieT: "Alquiler de equipos" },
     { t: "Catálogo",      r: "#/catalogo",  modo: "alquiler", pieT: "Catálogo de alquiler" },
     { t: "Servicios",     r: "#/servicios" },
@@ -875,17 +876,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=b2e76142';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=0fcbecd7';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=b2e76142';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=0fcbecd7';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=b2e76142','js/06-tablero.js?v=b2e76142'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=0fcbecd7','js/06-tablero.js?v=0fcbecd7'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=b2e76142'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=0fcbecd7'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -962,7 +963,7 @@ function route(sinMover){
   if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/paquete/')){renderPaquete(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/proyecto/')){renderProyecto(h.split('/')[2]);pageId='page-equipo';navKey='#/clientes';}
-  else if(h==='#/venta'||h.startsWith('#/venta/')){renderVenta(h.split('/').slice(2));pageId='page-venta';navKey='#/venta';}
+  else if(h==='#/venta'||h.startsWith('#/venta/')){renderVenta(h.split('/').slice(2));pageId='page-venta';navKey=h==='#/venta'?'#/venta':'#/venta/tienda';}
   else if(h.startsWith('#/catalogo/')){
     const g=h.split('/')[2]||'';pageId='page-catalogo';navKey='#/catalogo';
     if(g==='paquetes')setView('pk');
@@ -1730,6 +1731,17 @@ function vBuscador(destino, ph){
 }
 
 /* Cotizar una lista completa: el texto pegado va tal cual en el mensaje. */
+/* «Cotiza tu lista completa»: en la portada de Venta y al pie de la tienda. */
+function vListaCaja(){
+  return `    <div class="v-panel" id="cotiza-lista">
+      <div class="k">Para logística y compras</div>
+      <h3>Cotiza tu lista completa</h3>
+      <p>Pega tu listado tal como lo tienes (nombre, código y cantidad) y te respondemos con una sola cotización.</p>
+      <textarea id="vLista" rows="4" placeholder="Ej.: D-18 MONITOR DE FUNCIONES VITALES DE 5 PARAMETROS · 4 und&#10;D-88 ASPIRADOR DE SECRECIONES RODABLE · 6 und"></textarea>
+      <div class="v-lista-btns"><button type="button" class="btn btn-fill" onclick="vListaEnviar('wa')">Enviar por WhatsApp</button><button type="button" class="btn" onclick="vListaEnviar('mail')">Enviar por correo</button></div>
+    </div>`;
+}
+
 function vListaEnviar(via){
   const t = (document.getElementById('vLista')||{}).value||'';
   if(!t.trim()){ document.getElementById('vLista').focus(); return; }
@@ -1804,7 +1816,7 @@ function vPortada(){
 
   <section class="v-sec" data-sin-busqueda><div class="wrap">
     <div class="shead"><div><div class="k">Catálogo de venta</div><h2>Explora por tipo de equipo</h2></div>
-      <p>Si no ves el equipo que buscas, te lo cotizamos a pedido.</p></div>
+      <p>Si no ves el equipo que buscas, te lo cotizamos a pedido. <a class="v-ir-tienda" onclick="go('#/venta/tienda')">Ver toda la tienda →</a></p></div>
     <div class="v-cats">${VENTA.categorias.map(c => {
       const n = vDeCat(c.id).length;
       return `<a class="v-cat" onclick="go('#/venta/cat/${c.id}')">
@@ -1818,6 +1830,7 @@ function vPortada(){
   ${dest.length ? `<section class="v-sec" data-sin-busqueda><div class="wrap">
     <div class="shead"><div><div class="k">Destacados</div><h2>Los equipos más pedidos</h2></div><p>Los que más compraron hospitales y centros de salud públicos en 2024 y 2025.</p></div>
     <div class="v-grid">${dest.map(vCard).join('')}</div>
+    <div class="v-mas"><a class="btn" onclick="go('#/venta/tienda')">Ver los ${n} equipos de la tienda →</a></div>
   </div></section>` : ''}
 
   <section class="v-sec" data-sin-busqueda><div class="wrap v-dos">
@@ -1827,13 +1840,7 @@ function vPortada(){
       <p>Metrado por ambiente, especificaciones técnicas, memoria de cálculo, presupuesto y planos del componente de equipamiento.</p>
       <a class="btn btn-fill" onclick="go('#/clientes')">Ver proyectos realizados →</a>
     </div>
-    <div class="v-panel" id="cotiza-lista">
-      <div class="k">Para logística y compras</div>
-      <h3>Cotiza tu lista completa</h3>
-      <p>Pega tu listado tal como lo tienes (nombre, código y cantidad) y te respondemos con una sola cotización.</p>
-      <textarea id="vLista" rows="4" placeholder="Ej.: D-18 MONITOR DE FUNCIONES VITALES DE 5 PARAMETROS · 4 und&#10;D-88 ASPIRADOR DE SECRECIONES RODABLE · 6 und"></textarea>
-      <div class="v-lista-btns"><button type="button" class="btn btn-fill" onclick="vListaEnviar('wa')">Enviar por WhatsApp</button><button type="button" class="btn" onclick="vListaEnviar('mail')">Enviar por correo</button></div>
-    </div>
+    ${vListaCaja()}
   </div></section>
 
   <section class="v-sec" data-sin-busqueda><div class="wrap">
@@ -1876,6 +1883,117 @@ function vCategoria(id){
     <div>${vBuscador('vResCat','Buscar en todo el catálogo de venta')}<div id="vResCat"></div>
       <div data-sin-busqueda>${lista.length ? `<div class="v-cuenta">${lista.length} ${lista.length===1?'equipo':'equipos'}</div><div class="v-grid">${lista.map(vCard).join('')}</div>` : vacio}</div></div>
   </div></section>`;
+}
+
+
+/* ── Tienda: todo el catálogo de venta con filtros ─────────────────────
+   Mismo esquema que el catálogo de alquiler: filtros a la izquierda
+   (categoría, marca, procedencia, disponibilidad), buscador y orden
+   arriba. #/venta/cat/<id> abre la tienda con esa categoría marcada.
+   Filtrar solo repinta la grilla, así el buscador no pierde el foco. */
+var VT = {q:'', cat:new Set(), marca:new Set(), origen:new Set(), stock:false, orden:'dest'};
+
+function vtFaceta(titulo, clave, opciones){
+  if(!opciones.length) return '';
+  return `<details class="facet" open><summary>${titulo}</summary><div class="opts">${opciones.map(([v,txt,n]) =>
+    `<label><input type="checkbox" value="${vEsc(v)}" ${VT[clave].has(v)?'checked':''} onchange="vtMarcar('${clave}',this.value,this.checked)"> ${vEsc(txt)} <span class="vt-n">${n}</span></label>`).join('')}</div></details>`;
+}
+function vtConteo(campo){
+  const m = new Map();
+  VENTA.productos.forEach(p => { const v = p[campo]; if(v) m.set(v, (m.get(v)||0)+1); });
+  return m;
+}
+function vTienda(catInicial){
+  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.stock=false;
+  VT.cat = new Set(catInicial && vCat(catInicial) ? [catInicial] : []);
+  const cc = vtConteo('cat'), cm = vtConteo('marca'), co = vtConteo('origen');
+  const cats = VENTA.categorias.filter(c => cc.get(c.id)).map(c => [c.id, c.nombre, cc.get(c.id)]);
+  const marcas = [...cm].sort((a,b) => a[0].localeCompare(b[0])).map(([v,n]) => [v,v,n]);
+  const origenes = [...co].sort((a,b) => a[0].localeCompare(b[0])).map(([v,n]) => [v,v,n]);
+  const hayStock = VENTA.productos.some(p => p.stock !== undefined && p.stock !== null && p.stock !== '');
+  const hayPrecio = VENTA.productos.some(p => p.precio);
+  const c1 = VT.cat.size===1 ? vCat([...VT.cat][0]) : null;
+  return `
+  <div class="wrap pagehead">
+    <div class="crumb"><a onclick="go('#/venta')">Venta</a> &nbsp;/&nbsp; Tienda</div>
+    <div class="k">Tienda de equipamiento biomédico</div>
+    <h1>${c1 ? vEsc(c1.nombre) : 'Todos los equipos'}</h1>
+    <p>Filtra por categoría, marca o procedencia. Cada equipo tiene su ficha con marca, modelo y el nombre con que aparece en los expedientes técnicos.</p>
+  </div>
+  <section style="padding-top:30px"><div class="wrap">
+    <button class="filtros-btn" onclick="document.getElementById('vtSide').classList.toggle('open')">Filtros ▾</button>
+    <div class="catalog-layout">
+      <aside class="filters-side" id="vtSide">
+        ${vtFaceta('Categoría','cat',cats)}
+        ${vtFaceta('Marca','marca',marcas)}
+        ${vtFaceta('Procedencia','origen',origenes)}
+        ${hayStock ? `<details class="facet" open><summary>Disponibilidad</summary><div class="opts"><label><input type="checkbox" onchange="VT.stock=this.checked;vtPintar()"> Solo en stock</label></div></details>` : ''}
+        <div class="filters-clear"><button onclick="vtLimpiar()">Limpiar filtros</button></div>
+      </aside>
+      <div class="catalog-main">
+        <div class="vt-barra">
+          <label class="v-busca vt-busca">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" placeholder="Buscar equipo, marca, modelo o código (ej. D-18)" oninput="VT.q=this.value;vtPintar()" aria-label="Buscar en la tienda">
+          </label>
+          <select class="vt-orden" onchange="VT.orden=this.value;vtPintar()" aria-label="Ordenar">
+            <option value="dest">Más pedidos primero</option>
+            <option value="az">Nombre (A–Z)</option>
+            ${hayPrecio ? '<option value="pmen">Precio: menor a mayor</option><option value="pmay">Precio: mayor a menor</option>' : ''}
+          </select>
+        </div>
+        <div class="vt-activos" id="vtActivos"></div>
+        <div class="v-cuenta" id="vtCuenta"></div>
+        <div class="v-grid vt-grid" id="vtGrid"></div>
+      </div>
+    </div>
+  </div></section>
+  <section class="v-sec"><div class="wrap vt-lista">${vListaCaja()}</div></section>`;
+}
+function vtFiltrados(){
+  const t = vNorm(VT.q).split(/\s+/).filter(w => w.length > 1);
+  let l = VENTA.productos.filter(p => {
+    if(VT.cat.size && !VT.cat.has(p.cat)) return false;
+    if(VT.marca.size && !VT.marca.has(p.marca)) return false;
+    if(VT.origen.size && !VT.origen.has(p.origen)) return false;
+    if(VT.stock && !(Number(p.stock) > 0)) return false;
+    if(t.length){
+      const c = vCat(p.cat);
+      const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
+      if(!t.every(w => txt.includes(w))) return false;
+    }
+    return true;
+  });
+  const orden = VENTA.categorias.map(c => c.id);
+  const dest = p => p.destacado ? Number(p.destacado) : 999;
+  if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
+  else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
+  else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
+  else l.sort((a,b) => dest(a)-dest(b) || orden.indexOf(a.cat)-orden.indexOf(b.cat));
+  return l;
+}
+function vtPintar(){
+  const g = document.getElementById('vtGrid'); if(!g) return;
+  const l = vtFiltrados();
+  document.getElementById('vtCuenta').textContent = `${l.length} ${l.length===1?'equipo':'equipos'}`;
+  const chips = [];
+  VT.cat.forEach(v => { const c = vCat(v); chips.push(['cat',v,c?c.nombre:v]); });
+  VT.marca.forEach(v => chips.push(['marca',v,v]));
+  VT.origen.forEach(v => chips.push(['origen',v,v]));
+  document.getElementById('vtActivos').innerHTML = chips.map(([k,v,t]) =>
+    `<button onclick="vtMarcar('${k}','${vEsc(v)}',false,true)">${vEsc(t)} ✕</button>`).join('');
+  g.innerHTML = l.length ? l.map(vCard).join('') : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
+}
+function vtMarcar(clave, v, on, desmarcar){
+  on ? VT[clave].add(v) : VT[clave].delete(v);
+  if(desmarcar) document.querySelectorAll('#vtSide input').forEach(i => { if(i.value===v) i.checked=false; });
+  vtPintar();
+}
+function vtLimpiar(){
+  ['cat','marca','origen'].forEach(k => VT[k].clear()); VT.stock=false; VT.q='';
+  document.querySelectorAll('#vtSide input').forEach(i => i.checked=false);
+  const b = document.querySelector('.vt-busca input'); if(b) b.value='';
+  vtPintar();
 }
 
 /* ── Ficha de producto (formato B) ────────────────────────────────── */
@@ -1948,5 +2066,7 @@ function renderVenta(parte){
     cargarVenta().then(() => { if(location.hash.startsWith('#/venta')) renderVenta(parte); });
     return;
   }
-  el.innerHTML = parte[0]==='cat' ? vCategoria(parte[1]) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
+  const tienda = parte[0]==='tienda' || parte[0]==='cat';
+  el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
+  if(tienda) vtPintar();
 }

@@ -47,6 +47,7 @@ const SITE = {
      pieT: el texto en el pie, donde las dos secciones salen juntas.     */
   nav: [
     { t: "Inicio",        r: "#/venta",     modo: "venta",    pieT: "Venta de equipos" },
+    { t: "Tienda",        r: "#/venta/tienda", modo: "venta", pieT: "Tienda de venta" },
     { t: "Inicio",        r: "#/alquiler",  modo: "alquiler", pieT: "Alquiler de equipos" },
     { t: "Catálogo",      r: "#/catalogo",  modo: "alquiler", pieT: "Catálogo de alquiler" },
     { t: "Servicios",     r: "#/servicios" },
