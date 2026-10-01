@@ -149,6 +149,17 @@ GALERIA_JS = r'''
       ps.forEach(function(p,k){p.hidden=k!==i;});
     }); });
   });
+  var D=document.getElementById('docVisor');
+  if(D){
+    var DF=D.querySelector('iframe');
+    var cerrarDoc=function(){ D.hidden=true; DF.src='about:blank'; document.body.style.overflow=''; };
+    document.querySelectorAll('.doc-ver').forEach(function(b){ b.addEventListener('click',function(){
+      DF.src=b.dataset.ver; D.querySelector('.dv-tit').textContent=b.dataset.titulo;
+      D.querySelector('.dv-dl').href=b.dataset.pdf; D.hidden=false; document.body.style.overflow='hidden';
+    }); });
+    D.addEventListener('click',function(ev){ if(ev.target===D||ev.target.closest('.dv-x')) cerrarDoc(); });
+    document.addEventListener('keydown',function(ev){ if(ev.key==='Escape'&&!D.hidden) cerrarDoc(); });
+  }
   if(!V) return;
   V.addEventListener('click',function(ev){
     var b=ev.target.closest('button');
@@ -254,6 +265,12 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <a class="wafab" href="{wa}" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
   <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.6.8 5 2.3 7L4 29l7.3-2.2c1.9 1 4 1.6 6.2 1.6h.1c6.6 0 12-5.3 12-11.9 0-3.2-1.3-6.2-3.5-8.4A12 12 0 0 0 16 3zm7 16.9c-.3.8-1.7 1.6-2.4 1.7-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.8-3.6-1.5-5.9-5.1-6.1-5.4-.2-.2-1.4-1.9-1.4-3.7s.9-2.6 1.3-3c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6l1.1 2.7c.1.2.2.5 0 .7l-.4.7-.6.6c-.2.2-.4.4-.2.8.2.3 1 1.6 2.1 2.6 1.5 1.3 2.7 1.7 3 1.9.4.2.6.1.8-.1l1.2-1.4c.3-.3.5-.2.8-.1l2.6 1.2c.4.2.6.3.7.5.1.1.1.8-.2 1.6z"/></svg>
 </a>
+<div class="doc-visor" id="docVisor" hidden role="dialog" aria-modal="true" aria-label="Ficha técnica">
+  <div class="dv-caja">
+    <div class="dv-cab"><b class="dv-tit"></b><a class="btn fill dv-dl" download>Descargar PDF</a><button type="button" class="dv-x" aria-label="Cerrar">&#10005;</button></div>
+    <iframe title="Ficha técnica" loading="lazy"></iframe>
+  </div>
+</div>
 <div class="visor" id="visor" hidden><button type="button" class="v-x" aria-label="Cerrar">&#10005;</button><button type="button" class="v-f izq" aria-label="Anterior">&#8249;</button><img alt=""><button type="button" class="v-f der" aria-label="Siguiente">&#8250;</button><span class="v-n"></span></div>
 <script>{GALERIA_JS}</script>
 </body>
@@ -331,6 +348,14 @@ def pagina_ficha_a4(f, eq, cfg, locales):
   </footer>
 </div>
 <button class="boton" onclick="print()">Guardar como PDF</button>
+<script>
+  /* Dentro del visor de la web: sin botón propio (el visor trae «Descargar»)
+     y la hoja A4 se escala al ancho disponible, también en el celular. */
+  if (window.self !== window.top) document.querySelector('.boton').style.display = 'none';
+  function ajustar(){{ var w = document.documentElement.clientWidth, a4 = 210 * 96 / 25.4 + 32;
+    document.body.style.zoom = w < a4 ? (w / a4) : ''; }}
+  ajustar(); addEventListener('resize', ajustar);
+</script>
 </body></html>
 '''
 
@@ -372,9 +397,18 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
                     for k in ('Modelo', 'Marca') if specs.get(k))
     chips += '<span>Alquiler <b>por hora, día o mes</b></span>'
     pdf = pdf_ficha(eq['id'])
+    doc = ''
+    ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
+    if os.path.exists(ruta_pdf):
+        kb = max(1, round(os.path.getsize(ruta_pdf) / 1024))
+        doc = f'''
+        <div class="doc">
+          <span class="doc-ico" aria-hidden="true">PDF</span>
+          <span class="doc-txt"><b>Ficha técnica</b><small>PDF · 1 página · {kb} KB</small></span>
+          <button type="button" class="btn doc-ver" data-ver="/fichas/{e(eq['id'])}/" data-pdf="{pdf}" data-titulo="Ficha técnica — {e(eq['nom'])}">Ver</button>
+          <a class="btn fill doc-dl" href="{pdf}" download>Descargar</a>
+        </div>'''
     enl = []
-    if os.path.exists(os.path.join(ROOT, pdf.lstrip('/'))):
-        enl.append('<a href="%s" download>↓ Descargar ficha técnica (PDF)</a>' % pdf)
     if eq.get('cal_pdf'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración</a>' % e(eq['cal_pdf']))
     if eq.get('ficha'):
@@ -425,6 +459,7 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
           <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
           <a class="btn" href="{correo}">Cotizar por correo</a>
         </div>
+        {doc}
         {('<div class="prod-docs">' + ' · '.join(enl) + '</div>') if enl else ''}
       </div>
     </article>

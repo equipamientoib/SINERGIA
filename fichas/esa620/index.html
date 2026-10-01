@@ -60,4 +60,12 @@
   </footer>
 </div>
 <button class="boton" onclick="print()">Guardar como PDF</button>
+<script>
+  /* Dentro del visor de la web: sin botón propio (el visor trae «Descargar»)
+     y la hoja A4 se escala al ancho disponible, también en el celular. */
+  if (window.self !== window.top) document.querySelector('.boton').style.display = 'none';
+  function ajustar(){ var w = document.documentElement.clientWidth, a4 = 210 * 96 / 25.4 + 32;
+    document.body.style.zoom = w < a4 ? (w / a4) : ''; }
+  ajustar(); addEventListener('resize', ajustar);
+</script>
 </body></html>
