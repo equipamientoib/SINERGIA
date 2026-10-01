@@ -154,11 +154,15 @@
   @media(max-width:880px){.cols{grid-template-columns:1fr;gap:30px}}
   /* Contacto: datos + WhatsApp en una columna, a la altura del formulario */
   .contact-side{display:flex;flex-direction:column;gap:18px}
-  .facts-wa{background:var(--onix);color:#fff;border-radius:var(--r-lg);padding:26px 24px}
-  .facts-wa b{font-family:var(--ff-d);font-size:18px;font-weight:600;display:block}
-  .facts-wa p{color:rgba(255,255,255,.72);font-size:14px;margin:8px 0 18px;font-weight:400}
-  .facts-wa .btn{background:#25D366;border-color:#25D366;color:#0b2b17;width:100%;display:flex;justify-content:center;text-align:center}
-  .facts-wa .btn:hover{background:#1fbd5a;border-color:#1fbd5a}
+  /* Qué pasa después de enviar: sin otro botón de WhatsApp (ya están el del
+     formulario y el flotante). */
+  .facts-pasos{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);padding:22px 22px 8px}
+  .facts-pasos b{font-family:var(--ff-d);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gris);font-weight:500}
+  .facts-pasos ol{list-style:none;margin:14px 0 0;padding:0;counter-reset:p}
+  .facts-pasos li{counter-increment:p;position:relative;padding:0 0 16px 40px;font-size:14px;color:var(--gris);line-height:1.5}
+  .facts-pasos li::before{content:counter(p);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:8px;
+    background:var(--crema-2);border:1px solid var(--linea-b);color:var(--cobre-d);font-family:var(--ff-d);font-weight:600;font-size:13px;display:grid;place-items:center}
+  .facts-pasos li span{display:block;color:var(--onix);font-weight:600}
 
   /* PASOS */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--linea);border-radius:var(--r-lg);overflow:hidden;background:var(--blanco)}
