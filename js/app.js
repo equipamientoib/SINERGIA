@@ -41,7 +41,8 @@ const SITE = {
   /* nav: el header muestra estas entradas. Las marcadas con pie:true salen
      solo en el pie de página, para no recargar el menú de arriba. */
   nav: [
-    { t: "Inicio",        r: "#/" },
+    { t: "Inicio",        r: "#/alquiler" },
+    { t: "Venta",         r: "#/venta" },
     { t: "Servicios",     r: "#/servicios" },
     { t: "Catálogo",      r: "#/catalogo" },
     { t: "Talleres",      r: "#/talleres" },
@@ -646,6 +647,7 @@ function pintarSelectContacto(){
   const sel=document.getElementById('cEq'); if(!sel)return;
   const previo=sel.value;
   sel.innerHTML='<option value="">— Selecciona —</option>'+
+    '<option value="Venta de equipamiento biomédico">Venta de equipamiento biomédico</option>'+
     EQUIPOS.map(e=>`<option value="${e.nom}">${e.nom}</option>`).join('')+
     '<option value="Otro / no está en la lista">Otro / no está en la lista</option>';
   if(previo){
@@ -859,17 +861,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=392cbc9a';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=c2dfb110';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=392cbc9a';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=c2dfb110';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=392cbc9a','js/06-tablero.js?v=392cbc9a'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=c2dfb110','js/06-tablero.js?v=c2dfb110'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=392cbc9a'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=c2dfb110'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -932,7 +934,7 @@ function renderProyecto(){
 ;
 /* ===== js/07-router.js ===== */
 /* ---- ROUTER ---- */
-const PAGES={'':'page-home','#/':'page-home','#/nosotros':'page-nosotros','#/servicios':'page-servicios','#/talleres':'page-talleres','#/catalogo':'page-catalogo','#/clientes':'page-clientes','#/contacto':'page-contacto'};
+const PAGES={'':'page-entrada','#/':'page-entrada','#/alquiler':'page-home','#/venta':'page-venta','#/nosotros':'page-nosotros','#/servicios':'page-servicios','#/talleres':'page-talleres','#/catalogo':'page-catalogo','#/clientes':'page-clientes','#/contacto':'page-contacto'};
 function go(hash){location.hash=hash;closeMenu();}
 function route(sinMover){
   const h=location.hash||'#/';
@@ -952,7 +954,9 @@ function route(sinMover){
     else if(g==='custom')setView('custom');
     else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
   }
-  else{pageId=PAGES[h]||'page-home';navKey=h;}
+  else{pageId=PAGES[h]||'page-entrada';navKey=h;}
+  /* La entrada va sin el header ni el pie del sitio (css/16-entrada.css). */
+  document.body.classList.toggle('en-entrada', pageId==='page-entrada');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});

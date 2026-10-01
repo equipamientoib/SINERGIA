@@ -1,5 +1,5 @@
 /* ---- ROUTER ---- */
-const PAGES={'':'page-home','#/':'page-home','#/nosotros':'page-nosotros','#/servicios':'page-servicios','#/talleres':'page-talleres','#/catalogo':'page-catalogo','#/clientes':'page-clientes','#/contacto':'page-contacto'};
+const PAGES={'':'page-entrada','#/':'page-entrada','#/alquiler':'page-home','#/venta':'page-venta','#/nosotros':'page-nosotros','#/servicios':'page-servicios','#/talleres':'page-talleres','#/catalogo':'page-catalogo','#/clientes':'page-clientes','#/contacto':'page-contacto'};
 function go(hash){location.hash=hash;closeMenu();}
 function route(sinMover){
   const h=location.hash||'#/';
@@ -19,7 +19,9 @@ function route(sinMover){
     else if(g==='custom')setView('custom');
     else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
   }
-  else{pageId=PAGES[h]||'page-home';navKey=h;}
+  else{pageId=PAGES[h]||'page-entrada';navKey=h;}
+  /* La entrada va sin el header ni el pie del sitio (css/16-entrada.css). */
+  document.body.classList.toggle('en-entrada', pageId==='page-entrada');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
