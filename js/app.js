@@ -402,12 +402,18 @@ function huesoFacetas(){
   </div>`;
 }
 
+/* Las herramientas de apoyo (set de 46 piezas, destornillador) no se alquilan
+   solas: van dentro de los paquetes de Mantenimiento. Siguen en EQUIPOS para
+   los paquetes, pero no salen como tarjeta ni en los filtros del catálogo. */
+const enCatalogo = () => EQUIPOS.filter(e=>!e.apoyo);
+
 function buildFacetsEq(){
   if(!CATALOGO_LISTO){ document.getElementById('filtersSide').innerHTML=huesoFacetas(); return; }
+  const eqs=enCatalogo();
   document.getElementById('filtersSide').innerHTML=
-    facetSection('Marca','marca',uniq(EQUIPOS.map(eqBrand)).sort())+
-    facetSection('Tipo','tipo',uniq(EQUIPOS.map(e=>e.cat)).sort())+
-    facetSection('Procedencia','origen',uniq(EQUIPOS.map(eqOrigen)).sort())+
+    facetSection('Marca','marca',uniq(eqs.map(eqBrand)).sort())+
+    facetSection('Tipo','tipo',uniq(eqs.map(e=>e.cat)).sort())+
+    facetSection('Procedencia','origen',uniq(eqs.map(eqOrigen)).sort())+
     `<div class="filters-clear"><button onclick="clearF()">Limpiar filtros</button></div>`;
 }
 function buildFacetsPk(){
@@ -478,7 +484,7 @@ function pintar(){
     document.getElementById('countEq').textContent='';
     return;
   }
-  const list=EQUIPOS.filter(matchEq);
+  const list=enCatalogo().filter(matchEq);
   grid.innerHTML=list.map(cardEq).join('')||'<p style="color:var(--gris);grid-column:1/-1">No hay equipos con esos filtros.</p>';
   document.getElementById('countEq').textContent=list.length+(list.length===1?' equipo':' equipos');
 }
@@ -853,17 +859,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=48d0be61';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=ac5e755c';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=48d0be61';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=ac5e755c';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=48d0be61','js/06-tablero.js?v=48d0be61'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=ac5e755c','js/06-tablero.js?v=ac5e755c'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=48d0be61'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=ac5e755c'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
