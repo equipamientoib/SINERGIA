@@ -8,8 +8,9 @@
 
    Qué hace:
    1. Pide al Apps Script los códigos de la hoja de venta.
-   2. Usa la propia función del portal (searchProdBloque) para traer el
-      catálogo en bloques y lee de cada tarjeta:
+   2. Pide el catálogo al portal con la misma consulta de su botón «Ver más
+      productos», en bloques de 500 (≈17 consultas, una a la vez y con
+      pausa), y lee de cada tarjeta:
         addCesta('009.055','5481','1','0','1.22','')
                   código    stock            precio US$ (IGV incl.)
    3. Lee el tipo de cambio de la cabecera («TC: S/ 3.471»).
@@ -24,9 +25,9 @@
   var CFG = window.SB_ATL || {};
   /* Trato amable con el portal: pocas consultas, una a la vez y con pausa,
      como lo haría una persona. */
-  var BLOQUE = 250;           // productos por consulta si el portal pagina
-  var MAX_CONSULTAS = 8;      // tope total de consultas al portal por uso
-  var PAUSA = 4000;           // ms entre una consulta y la siguiente
+  var BLOQUES = [500, 250];   // productos por consulta (si 500 falla, 250)
+  var MAX_CONSULTAS = 36;     // tope total de consultas al portal por uso
+  var PAUSA = 3000;           // ms entre una consulta y la siguiente
   var REUSO_MIN = 60;         // si se usó hace menos de esto, pide confirmar
   var ESPERA_MAX = 45000;     // ms por bloque
 
@@ -68,27 +69,22 @@
   var TC = tcM ? Number(tcM.replace(',', '.')) : 0;
   var RX = /addCesta\(\s*'([\d.]+)'\s*,\s*'(\d+)'\s*,\s*'[^']*'\s*,\s*'[^']*'\s*,\s*'([\d.]+)'/g;
 
-  /* Pide un bloque [desde, hasta] con la función del portal en un div oculto
-     y devuelve el HTML cuando terminó de cargar. */
-  var oculto = document.createElement('div');
-  oculto.style.display = 'none';
-  document.body.appendChild(oculto);
-  var nDiv = 0;
-  function bloque(desde, hasta, pagina) {
+  /* Pide al portal los productos [desde, hasta] con la misma consulta que
+     hace su botón «Ver más productos» (controller_home.php), pero sin
+     dibujar nada ni disparar los filtros laterales: 1 consulta = 1 pedido. */
+  function bloque(desde, hasta, pagina, nrodivs) {
     return new Promise(function (ok) {
-      var id = 'sbAtlTmp' + (++nDiv);
-      var d = document.createElement('div'); d.id = id; oculto.appendChild(d);
-      try { window.searchProdBloque('', '', '', String(desde), String(hasta), id, '9999', String(pagina), '', '', '', ''); }
-      catch (e) { ok(''); return; }
-      var t0 = Date.now(), vioCarga = false;
-      (function mirar() {
-        var h = d.innerHTML, cargando = /Cargando la informaci/i.test(h);
-        if (cargando) vioCarga = true;
-        /* Listo: hay contenido sin «Cargando», o terminó de cargar y quedó vacío. */
-        var listo = !cargando && (h || vioCarga || Date.now() - t0 > 12000);
-        if (listo || Date.now() - t0 > ESPERA_MAX) { d.remove(); ok(listo ? h || '' : ''); }
-        else setTimeout(mirar, 400);
-      })();
+      var f = new FormData();
+      [['tipoAccion', 'searchProdBloque'], ['searchProd', ''], ['searchMarca', ''], ['searchCategoria', ''],
+       ['inicio', desde], ['final', hasta], ['nrodivs', nrodivs], ['idDiv', pagina],
+       ['searchPais', ''], ['searchPrecio', ''], ['searchPrecio2', ''], ['searchTipoprd', '']]
+        .forEach(function (x) { f.append(x[0], String(x[1])); });
+      var x = new XMLHttpRequest();
+      x.open('POST', '/controlador/controller_home.php', true);
+      x.timeout = 90000;
+      x.onload = function () { ok(x.status === 200 ? x.responseText : ''); };
+      x.onerror = x.ontimeout = function () { ok(''); };
+      x.send(f);
     });
   }
   function leer(html, mapa) {
@@ -169,35 +165,44 @@
       var total = Object.keys(mios).length;
       if (!total) return error('La hoja de venta no tiene códigos de proveedor.');
 
-      /* Primero se pide todo de una vez (1 consulta). Solo si el portal
-         entrega menos, se sigue por bloques, de uno en uno y con pausa,
-         hasta encontrar tus equipos o llegar al tope de consultas. */
-      var mapa = {}, consultas = 1;
+      /* Se lee el catálogo en bloques grandes, de uno en uno y con pausa.
+         Si el portal no acepta 500 por consulta, se prueba con 250. */
+      var mapa = {}, consultas = 0, completo = false;
       var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
       var hallados = function () { return Object.keys(mios).filter(function (c) { return mapa[c]; }).length; };
-      txt('Leyendo el catálogo del proveedor (1 consulta)…');
-      leer(await bloque(1, 10000, 1), mapa);
-      if (Object.keys(mapa).length < 200 && hallados() < total) {
-        var desde = Object.keys(mapa).length + 1, pag = 2;
-        while (consultas < MAX_CONSULTAS && hallados() < total) {
-          await espera(PAUSA);
-          consultas++;
-          var nuevos = leer(await bloque(desde, desde + BLOQUE - 1, pag), mapa);
-          bar(hallados() / total);
-          txt('Consulta ' + consultas + ' de máx. ' + MAX_CONSULTAS + ' · catálogo leído: <b>' + Object.keys(mapa).length +
-            '</b> · tuyos: <b>' + hallados() + ' de ' + total + '</b>');
-          if (!nuevos) break;
-          desde += BLOQUE; pag++;
-        }
+      var P = 0;
+      for (var t = 0; t < BLOQUES.length && !P; t++) {
+        if (consultas) await espera(PAUSA);
+        consultas++;
+        txt('Leyendo el catálogo del proveedor (consulta ' + consultas + ')…');
+        var n = leer(await bloque(1, BLOQUES[t], 1, Math.ceil(9000 / BLOQUES[t])), mapa);
+        if (n > 0 && n <= 25) return error('El portal entrega solo ' + n + ' productos por consulta. Para no hacer cientos de consultas, me detuve. Avísale a Claude.');
+        if (n) { P = BLOQUES[t]; if (n < P * 0.9) completo = true; }
+      }
+      if (!P) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar más tarde.');
+      var desde = P + 1, pag = 2;
+      while (!completo && consultas < MAX_CONSULTAS) {
+        bar(hallados() / total);
+        txt('Consulta ' + consultas + ' · catálogo leído: <b>' + Object.keys(mapa).length +
+          '</b> productos · tuyos encontrados: <b>' + hallados() + ' de ' + total + '</b>');
+        await espera(PAUSA);
+        consultas++;
+        var antes = Object.keys(mapa).length;
+        var html = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P));
+        var nuevos = leer(html, mapa);
+        var enBloque = (html.match(RX) || []).length;
+        if (!html) { await espera(PAUSA); consultas++; html = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P)); nuevos = leer(html, mapa); enBloque = (html.match(RX) || []).length; }
+        if (!enBloque || enBloque < P * 0.9 || Object.keys(mapa).length === antes) completo = !!html;
+        if (!html) break;
+        desde += P; pag++;
       }
       var items = Object.keys(mios).filter(function (c) { return mapa[c]; }).map(function (c) { return mapa[c]; });
       var leidos = Object.keys(mapa).length;
       bar(1);
-      if (!leidos) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar.');
 
       try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
       txt('Enviando <b>' + items.length + '</b> precios y stocks a tu hoja…');
-      await enviar(JSON.stringify({ k: CFG.k, tc: TC, completo: leidos >= 1000, items: items }));
+      await enviar(JSON.stringify({ k: CFG.k, tc: TC, completo: completo && leidos >= 1000, items: items }));
       /* La respuesta del POST es opaca (otro dominio): el resultado se pide aparte. */
       await new Promise(function (ok) { setTimeout(ok, 2500); });
       var est = {};
@@ -205,7 +210,7 @@
       var faltan = total - items.length;
       txt('<b style="color:#9be3b5">¡Listo!</b> Se actualizaron <b>' + (est.actualizados != null ? est.actualizados : items.length) + '</b> equipos' +
         (TC ? ' con TC S/ ' + TC : '') + '.<br>' +
-        (faltan ? faltan + ' código(s) de tu hoja no aparecen hoy en el portal' + (leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
+        (faltan ? faltan + ' código(s) de tu hoja no aparecen hoy en el portal' + (completo && leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
         '<span style="color:#aeb4bc">La web se actualiza sola en unos minutos.</span>');
       boton('Cerrar', cerrar);
     } catch (e) {
