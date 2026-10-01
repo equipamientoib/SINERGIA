@@ -59,7 +59,10 @@
 
   /* SERVICIOS */
   .svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px}
-  .svc .card{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);padding:30px 26px;transition:.2s}
+  .svc .card{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r-lg);padding:30px 26px;transition:.2s;display:flex;flex-direction:column}
+  /* El botón de cada servicio va al pie: las tres tarjetas quedan parejas */
+  .svc .card>.btn{margin-top:auto;align-self:flex-start}
+  .svc .card>p:not(:last-child){margin-bottom:18px}
   .svc .card:hover{border-color:var(--linea-b);box-shadow:var(--sh-card);transform:translateY(-2px)}
   .svc .ico{width:46px;height:46px;border-radius:11px;background:var(--crema-2);border:1px solid var(--linea-b);display:grid;place-items:center;margin-bottom:18px;color:var(--cobre-d)}
   .svc .tagn{font-family:var(--ff-d);font-size:11px;letter-spacing:2px;color:var(--cobre-d);margin-bottom:6px}
