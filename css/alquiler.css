@@ -193,10 +193,15 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 }
 @media(max-width:700px){
   .top nav{gap:14px;font-size:13px}
-  .top nav a:not(.on):not(:last-child){display:none}
+  .top nav > a{display:none}
   .logo{height:34px}
   .visor{padding:60px 10px}
   .v-f{top:auto;bottom:10px}
 }
 @media(max-width:520px){.tipos{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Selector de sección Venta | Alquiler (igual que en el header del sitio) */
+.top .modo-sw{display:inline-flex;padding:3px;border:1px solid var(--linea,#e2ddd3);border-radius:999px;background:#fff}
+.top .modo-sw a{padding:5px 12px;border-radius:999px;border-bottom:0;font-size:13px}
+.top .modo-sw a.on{background:#17191d;color:#fff}

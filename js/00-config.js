@@ -38,13 +38,19 @@ const SITE = {
 
   // Navegación (header, menú móvil y footer se generan de esta lista)
   /* nav: el header muestra estas entradas. Las marcadas con pie:true salen
-     solo en el pie de página, para no recargar el menú de arriba. */
+     solo en el pie de página, para no recargar el menú de arriba.
+     modo: la web tiene dos secciones, Venta y Alquiler, y cada una tiene
+     su menú. Una entrada con modo solo se ve en esa sección; sin modo se
+     ve en las dos (Servicios, Clientes, Contacto). Antes había un solo
+     menú y, estando en Venta, «Catálogo» llevaba al catálogo de alquiler.
+     El cambio de sección va en el selector Venta | Alquiler del header.
+     pieT: el texto en el pie, donde las dos secciones salen juntas.     */
   nav: [
-    { t: "Inicio",        r: "#/alquiler" },
-    { t: "Venta",         r: "#/venta" },
+    { t: "Inicio",        r: "#/venta",     modo: "venta",    pieT: "Venta de equipos" },
+    { t: "Inicio",        r: "#/alquiler",  modo: "alquiler", pieT: "Alquiler de equipos" },
+    { t: "Catálogo",      r: "#/catalogo",  modo: "alquiler", pieT: "Catálogo de alquiler" },
     { t: "Servicios",     r: "#/servicios" },
-    { t: "Catálogo",      r: "#/catalogo" },
-    { t: "Talleres",      r: "#/talleres" },
+    { t: "Talleres",      r: "#/talleres",  modo: "alquiler" },
     { t: "Clientes",      r: "#/clientes" },
     { t: "Contacto",      r: "#/contacto" },
     { t: "Quiénes somos", r: "#/nosotros",  pie: true },

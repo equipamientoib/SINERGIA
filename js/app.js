@@ -39,13 +39,19 @@ const SITE = {
 
   // Navegación (header, menú móvil y footer se generan de esta lista)
   /* nav: el header muestra estas entradas. Las marcadas con pie:true salen
-     solo en el pie de página, para no recargar el menú de arriba. */
+     solo en el pie de página, para no recargar el menú de arriba.
+     modo: la web tiene dos secciones, Venta y Alquiler, y cada una tiene
+     su menú. Una entrada con modo solo se ve en esa sección; sin modo se
+     ve en las dos (Servicios, Clientes, Contacto). Antes había un solo
+     menú y, estando en Venta, «Catálogo» llevaba al catálogo de alquiler.
+     El cambio de sección va en el selector Venta | Alquiler del header.
+     pieT: el texto en el pie, donde las dos secciones salen juntas.     */
   nav: [
-    { t: "Inicio",        r: "#/alquiler" },
-    { t: "Venta",         r: "#/venta" },
+    { t: "Inicio",        r: "#/venta",     modo: "venta",    pieT: "Venta de equipos" },
+    { t: "Inicio",        r: "#/alquiler",  modo: "alquiler", pieT: "Alquiler de equipos" },
+    { t: "Catálogo",      r: "#/catalogo",  modo: "alquiler", pieT: "Catálogo de alquiler" },
     { t: "Servicios",     r: "#/servicios" },
-    { t: "Catálogo",      r: "#/catalogo" },
-    { t: "Talleres",      r: "#/talleres" },
+    { t: "Talleres",      r: "#/talleres",  modo: "alquiler" },
     { t: "Clientes",      r: "#/clientes" },
     { t: "Contacto",      r: "#/contacto" },
     { t: "Quiénes somos", r: "#/nosotros",  pie: true },
@@ -116,7 +122,13 @@ const LOGO_FOOTER = `<svg class="footer-logo logo-svg" width="250" viewBox="0 0 
 function navLinks(indent){
   /* El header muestra solo las entradas principales; el pie las muestra todas. */
   const menu=SITE.nav.filter(n=>!n.pie);
-  return menu.map(n=>`${indent}<a data-route="${n.r}" onclick="go('${n.r}')">${n.t}</a>`).join('\n');
+  return menu.map(n=>`${indent}<a data-route="${n.r}"${n.modo?` data-modo="${n.modo}"`:''} onclick="go('${n.r}')">${n.t}</a>`).join('\n');
+}
+
+/* Selector de sección: Venta | Alquiler. El activo lo marca la clase del
+   body (modo-venta / modo-alquiler) que pone 07-router.js. */
+function selectorModo(cls){
+  return `<div class="${cls}" role="group" aria-label="Sección"><a data-sw="venta" onclick="go('#/venta')">Venta</a><a data-sw="alquiler" onclick="go('#/alquiler')">Alquiler</a></div>`;
 }
 
 function renderHeader(){
@@ -125,6 +137,7 @@ function renderHeader(){
   <div class="wrap nav">
     ${LOGO_HEADER}
     <div class="menu">
+      ${selectorModo('modo-sw')}
 ${navLinks('      ')}
       <a class="btn" onclick="go('${SITE.portal.r}')">${SITE.portal.t}</a>
     </div>
@@ -133,6 +146,7 @@ ${navLinks('      ')}
     </button>
   </div>
   <div class="mobile-menu" id="mobileMenu">
+    ${selectorModo('modo-sw modo-sw-movil')}
 ${navLinks('    ')}
     <a onclick="go('${SITE.portal.r}')" style="color:var(--cobre-d)">${SITE.portal.t}</a>
   </div>
@@ -154,7 +168,7 @@ function renderFooter(){
     <div>
       <div class="tt">Navegación</div>
       <div class="fnav">
-${SITE.nav.filter(n=>n.r!=='#/').map(n=>`        <a onclick="go('${n.r}')">${n.t}</a>`).join('\n')}
+${SITE.nav.filter(n=>n.r!=='#/').map(n=>`        <a onclick="go('${n.r}')">${n.pieT||n.t}</a>`).join('\n')}
       </div>
     </div>
     <div>
@@ -861,17 +875,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=64e352d5';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=b2e76142';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=64e352d5';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=b2e76142';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=64e352d5','js/06-tablero.js?v=64e352d5'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=b2e76142','js/06-tablero.js?v=b2e76142'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=64e352d5'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=b2e76142'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -956,6 +970,16 @@ function route(sinMover){
     else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
   }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
+  /* Sección activa: decide qué menú se ve (venta o alquiler). Las páginas
+     comunes (servicios, clientes, contacto…) conservan la última sección
+     en la que estuvo el visitante. */
+  const enVenta = h==='#/venta' || h.startsWith('#/venta/');
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete)\//.test(h);
+  let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
+  try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
+  modo = modo || 'alquiler';
+  document.body.classList.toggle('modo-venta', modo==='venta');
+  document.body.classList.toggle('modo-alquiler', modo!=='venta');
   /* La entrada va sin el header ni el pie del sitio (css/16-entrada.css). */
   document.body.classList.toggle('en-entrada', pageId==='page-entrada');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
