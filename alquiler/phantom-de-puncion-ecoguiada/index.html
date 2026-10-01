@@ -50,19 +50,19 @@
 
   
     <article class="prod" id="phantom-flujo">
-      <div class="gal" data-fotos="[&quot;/img/catalogo/phantom-flujo-01-m.webp&quot;]" data-grandes="[&quot;/img/catalogo/phantom-flujo-01.webp&quot;]">
+      <div class="gal una" data-fotos="[&quot;/img/catalogo/phantom-flujo-01-m.webp&quot;]" data-grandes="[&quot;/img/catalogo/phantom-flujo-01.webp&quot;]">
+        
         <div class="gal-main">
           <img src="/img/catalogo/phantom-flujo-01-m.webp" alt="Phantom de flujo sanguíneo para punción ecoguiada — Genérico · China" fetchpriority="high" decoding="async" width="700" height="525">
           
         </div>
-        
       </div>
       <div class="prod-info">
         <div class="k">Phantom de flujo</div>
         <h2>Phantom de flujo sanguíneo para punción ecoguiada</h2>
         <div class="marca">Genérico · China</div>
         <p class="prod-desc">Phantom de tejido blando con bomba de circulación que simula flujo sanguíneo. Permite practicar accesos vasculares guiados por ecografía y verificar la respuesta Doppler de ecógrafos. Se usa también en los talleres prácticos de Sinergia Biomédica.</p>
-        <dl class="prod-meta"><div><dt>Marca</dt><dd>Genérico</dd></div><div><dt>Origen</dt><dd>China</dd></div></dl>
+        <div class="prod-chips"><span>Marca <b>Genérico</b></span><span>Alquiler <b>por hora, día o mes</b></span></div>
         
         <div class="prod-btns">
           <a class="btn fill" href="https://wa.me/51908704131?text=Hola%20Sinergia%20Biom%C3%A9dica%2C%20quiero%20cotizar%20el%20alquiler%20del%20phantom%20de%20flujo%20sangu%C3%ADneo%20para%20punci%C3%B3n%20ecoguiada%20%28Gen%C3%A9rico%29." target="_blank" rel="noopener">Cotizar por WhatsApp</a>
@@ -71,17 +71,10 @@
         
       </div>
     </article>
-    <section class="param">
-      <h2>Parámetros técnicos · Genérico</h2>
-      <table><tr><th>Marca</th><td>Genérico</td></tr><tr><th>Origen</th><td>China</td></tr><tr><th>Uso</th><td>Punción ecoguiada · Doppler</td></tr><tr><th>Incluye</th><td>Almohadilla + bomba de circulación</td></tr></table>
-      
-    </section>
-
-  <section class="caract">
-    <h2>Características y usos</h2>
-    <p>El phantom de flujo simula tejido con vasos por los que circula líquido, de modo que en el ecógrafo se ven como vasos reales. Se usa para entrenar punciones y accesos vasculares guiados por ecografía y para demostrar equipos de ultrasonido.</p>
-    <ul><li>Entrenamiento en punción y canalización ecoguiada</li><li>Talleres y cursos de accesos vasculares</li><li>Demostración de ecógrafos y del modo Doppler</li></ul>
-  </section>
+    <div class="pest" data-tabs>
+      <div class="tabs" role="tablist"><button type="button" class="tab on" role="tab">Descripción</button><button type="button" class="tab" role="tab">Parámetros técnicos</button></div>
+      <div class="panel" role="tabpanel"><p>El phantom de flujo simula tejido con vasos por los que circula líquido, de modo que en el ecógrafo se ven como vasos reales. Se usa para entrenar punciones y accesos vasculares guiados por ecografía y para demostrar equipos de ultrasonido.</p><ul><li>Entrenamiento en punción y canalización ecoguiada</li><li>Talleres y cursos de accesos vasculares</li><li>Demostración de ecógrafos y del modo Doppler</li></ul></div><div class="panel" role="tabpanel" hidden><table><tr><th>Marca</th><td>Genérico</td></tr><tr><th>Origen</th><td>China</td></tr><tr><th>Uso</th><td>Punción ecoguiada · Doppler</td></tr><tr><th>Incluye</th><td>Almohadilla + bomba de circulación</td></tr></table></div>
+    </div>
 
   <section class="faq">
     <h2>Preguntas frecuentes</h2>
@@ -127,6 +120,13 @@
       if(b&&b.classList.contains('der')) return mostrar(g,(+g.dataset.i)+1);
       if(ev.target.closest('.gal-main')) abrir(g);
     });
+  });
+  document.querySelectorAll('[data-tabs]').forEach(function(w){
+    var bs=w.querySelectorAll('.tab'), ps=w.querySelectorAll('.panel');
+    bs.forEach(function(b,i){ b.addEventListener('click',function(){
+      bs.forEach(function(x){x.classList.toggle('on',x===b);});
+      ps.forEach(function(p,k){p.hidden=k!==i;});
+    }); });
   });
   if(!V) return;
   V.addEventListener('click',function(ev){

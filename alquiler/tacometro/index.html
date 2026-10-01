@@ -50,13 +50,13 @@
 
   
     <article class="prod" id="tacometro">
-      <div class="gal"><div class="gal-main sinfoto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div></div>
+      <div class="gal una"><div class="gal-main sinfoto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div></div>
       <div class="prod-info">
         <div class="k">Tacómetro</div>
         <h2>Tacómetro dual (contacto / óptico)</h2>
         <div class="marca">TASI TA500C · China</div>
         <p class="prod-desc">Tacómetro digital de doble modo (contacto y óptico) para medir velocidad de rotación (rpm) en centrífugas y equipos rotativos. El modo óptico mide sin contacto con cinta reflectante. Ideal para verificar la velocidad real frente al valor programado. Incluye certificado de calibración vigente.</p>
-        <dl class="prod-meta"><div><dt>Modelo</dt><dd>TA500C</dd></div><div><dt>Marca</dt><dd>TASI</dd></div><div><dt>Origen</dt><dd>China</dd></div></dl>
+        <div class="prod-chips"><span>Modelo <b>TA500C</b></span><span>Marca <b>TASI</b></span><span>Alquiler <b>por hora, día o mes</b></span></div>
         
         <div class="prod-btns">
           <a class="btn fill" href="https://wa.me/51908704131?text=Hola%20Sinergia%20Biom%C3%A9dica%2C%20quiero%20cotizar%20el%20alquiler%20del%20tac%C3%B3metro%20dual%20%28contacto%20/%20%C3%B3ptico%29%20%28TASI%20TA500C%29." target="_blank" rel="noopener">Cotizar por WhatsApp</a>
@@ -65,17 +65,10 @@
         
       </div>
     </article>
-    <section class="param">
-      <h2>Parámetros técnicos · TASI TA500C</h2>
-      <table><tr><th>Marca</th><td>TASI</td></tr><tr><th>Modelo</th><td>TA500C</td></tr><tr><th>Origen</th><td>China</td></tr><tr><th>Modo</th><td>Contacto / óptico</td></tr></table>
-      
-    </section>
-
-  <section class="caract">
-    <h2>Características y usos</h2>
-    <p>El tacómetro mide la velocidad de giro en revoluciones por minuto (rpm). Con él se comprueba que una centrífuga gira a la velocidad que muestra su panel, algo clave para la calidad de los resultados de laboratorio.</p>
-    <ul><li>Centrífugas de laboratorio y de banco de sangre</li><li>Microcentrífugas y agitadores</li><li>Motores y ventiladores de equipos</li></ul>
-  </section>
+    <div class="pest" data-tabs>
+      <div class="tabs" role="tablist"><button type="button" class="tab on" role="tab">Descripción</button><button type="button" class="tab" role="tab">Parámetros técnicos</button></div>
+      <div class="panel" role="tabpanel"><p>El tacómetro mide la velocidad de giro en revoluciones por minuto (rpm). Con él se comprueba que una centrífuga gira a la velocidad que muestra su panel, algo clave para la calidad de los resultados de laboratorio.</p><ul><li>Centrífugas de laboratorio y de banco de sangre</li><li>Microcentrífugas y agitadores</li><li>Motores y ventiladores de equipos</li></ul></div><div class="panel" role="tabpanel" hidden><table><tr><th>Marca</th><td>TASI</td></tr><tr><th>Modelo</th><td>TA500C</td></tr><tr><th>Origen</th><td>China</td></tr><tr><th>Modo</th><td>Contacto / óptico</td></tr></table></div>
+    </div>
 
   <section class="faq">
     <h2>Preguntas frecuentes</h2>
@@ -121,6 +114,13 @@
       if(b&&b.classList.contains('der')) return mostrar(g,(+g.dataset.i)+1);
       if(ev.target.closest('.gal-main')) abrir(g);
     });
+  });
+  document.querySelectorAll('[data-tabs]').forEach(function(w){
+    var bs=w.querySelectorAll('.tab'), ps=w.querySelectorAll('.panel');
+    bs.forEach(function(b,i){ b.addEventListener('click',function(){
+      bs.forEach(function(x){x.classList.toggle('on',x===b);});
+      ps.forEach(function(p,k){p.hidden=k!==i;});
+    }); });
   });
   if(!V) return;
   V.addEventListener('click',function(ev){

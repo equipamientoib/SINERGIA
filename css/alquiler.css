@@ -42,28 +42,18 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .btn.fill{background:var(--onix);border-color:var(--onix);color:var(--hueso)}
 .btn.fill:hover{background:var(--bronce);border-color:var(--bronce);color:#fff}
 
-/* bloque de producto */
-.prod{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start;
-  background:var(--blanco);border:1px solid var(--linea);border-radius:16px;padding:24px;margin-top:22px;scroll-margin-top:90px}
-.prod-info h2{font-size:clamp(22px,2.4vw,28px);margin-top:6px}
-.marca{font-size:15px;color:var(--gris);margin-top:2px}
-.prod-desc{font-size:15px;color:var(--grafito);margin-top:14px}
-.prod-meta{display:flex;flex-wrap:wrap;margin-top:18px;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
-.prod-meta div{padding:10px 22px 10px 0;margin-right:22px;border-right:1px solid var(--linea)}
-.prod-meta div:last-child{border-right:0;margin-right:0}
-.prod-meta dt{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gris)}
-.prod-meta dd{font-weight:600;font-size:15px}
-.prod-precio{margin-top:14px;font-size:15px}
-.prod-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
-.prod-docs{margin-top:14px;font-size:14px;color:var(--gris)}
-.prod-docs a{color:var(--cobre-d);font-weight:600;border-bottom:1px solid var(--linea-b)}
-.prod-docs a:hover{border-color:var(--bronce)}
-.prod-docs a[download]::before{content:"↓ "}
-
-/* galería */
-.gal-main{position:relative;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--linea);cursor:zoom-in}
-.gal-main img{width:100%;height:auto;aspect-ratio:4/3;object-fit:contain}
-.gal-main.sinfoto{display:grid;place-items:center;aspect-ratio:4/3;color:var(--bronce);background:var(--crema);cursor:default}
+/* producto, formato «tienda»: miniaturas | foto | datos, misma altura */
+.prod{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:32px;align-items:stretch;
+  background:var(--blanco);border:1px solid var(--linea);border-radius:16px;padding:22px;margin-top:22px;scroll-margin-top:90px}
+.gal{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;min-height:380px}
+.gal.una{grid-template-columns:minmax(0,1fr)}
+.gal-minis{display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.gal-minis button{flex:0 0 auto;padding:0;border:1px solid var(--linea);border-radius:8px;overflow:hidden;background:#fff;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.gal-minis button.on{border-color:var(--bronce);box-shadow:0 0 0 1px var(--bronce)}
+.gal-minis img{width:100%;aspect-ratio:1;object-fit:cover}
+.gal-main{position:relative;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--linea);cursor:zoom-in;min-height:0}
+.gal-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:12px}
+.gal-main.sinfoto{display:grid;place-items:center;color:var(--bronce);background:var(--crema);cursor:default;min-height:300px}
 .gal-main.sinfoto svg{width:64px;height:64px}
 .gal-f{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:1px solid var(--linea);
   background:rgba(255,255,255,.92);font-size:24px;line-height:1;color:var(--onix);cursor:pointer;display:grid;place-items:center;
@@ -71,26 +61,38 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .gal-main:hover .gal-f,.gal-f:focus-visible{opacity:1}
 .gal-f.izq{left:10px}.gal-f.der{right:10px}
 .gal-n{position:absolute;bottom:10px;left:10px;font-family:var(--ff-d);font-size:12px;padding:3px 9px;border-radius:99px;background:rgba(23,25,29,.65);color:#fff}
-.gal-minis{display:flex;gap:8px;margin-top:10px;overflow-x:auto}
-.gal-minis button{flex:0 0 64px;padding:0;border:1px solid var(--linea);border-radius:8px;overflow:hidden;background:#fff;cursor:pointer;transition:border-color .15s,box-shadow .15s}
-.gal-minis button.on{border-color:var(--bronce);box-shadow:0 0 0 1px var(--bronce)}
-.gal-minis img{width:100%;aspect-ratio:4/3;object-fit:cover}
 
-/* parámetros técnicos: una tabla, como la de un fabricante */
-.param table{width:100%;border-collapse:collapse;background:var(--blanco);border:1px solid var(--linea);font-size:14.5px}
-.param th,.param td{text-align:left;vertical-align:top;padding:9px 16px;border-bottom:1px solid var(--linea)}
-.param th{font-weight:400;color:var(--grafito);width:38%;background:var(--crema);border-right:1px solid var(--linea)}
-.param td{font-weight:600}
-.param tr.grupo th{background:#EFEBE2;color:var(--onix);font-family:var(--ff-d);font-weight:600;font-size:12.5px;letter-spacing:1px;text-transform:uppercase;width:auto}
-.nota-p{font-size:14px;color:var(--grafito);margin-top:10px}
+.prod-info{display:flex;flex-direction:column;justify-content:center;padding:4px 4px}
+.prod-info h2{font-size:clamp(22px,2.4vw,28px);margin-top:6px}
+.marca{font-size:15px;color:var(--gris);margin-top:2px}
+.prod-desc{font-size:15px;color:var(--grafito);margin-top:14px}
+.prod-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.prod-chips span{font-size:13px;border:1px solid var(--linea);border-radius:8px;padding:6px 10px;background:var(--crema)}
+.prod-chips b{font-weight:600}
+.prod-precio{margin-top:14px;font-size:15px}
+.prod-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.prod-docs{margin-top:12px;font-size:14px;color:var(--gris)}
+.prod-docs a{color:var(--cobre-d);font-weight:600}
+.prod-docs a:hover{text-decoration:underline}
+
+/* pestañas bajo cada producto */
+.pest{margin-top:14px;background:var(--blanco);border:1px solid var(--linea);border-radius:16px;overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--linea);background:var(--crema);overflow-x:auto}
+.tab{font-family:var(--ff-d);font-weight:600;font-size:14px;padding:14px 22px;border:0;border-bottom:2px solid transparent;background:none;cursor:pointer;color:var(--gris);white-space:nowrap}
+.tab.on{color:var(--onix);border-bottom-color:var(--bronce);background:#fff}
+.panel{padding:20px 22px;font-size:15px;color:var(--grafito)}
+.panel p{max-width:80ch}
+.panel ul{padding-left:20px;margin-top:10px;columns:2;column-gap:36px}
+.panel li{margin-bottom:4px;break-inside:avoid}
+.panel li::marker{color:var(--bronce)}
+.panel table{width:100%;border-collapse:collapse;font-size:14.5px}
+.panel th,.panel td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--linea)}
+.panel th{font-weight:400;color:var(--gris);width:40%}
+.panel td{font-weight:600;color:var(--onix)}
+.panel tr.g th{color:var(--cobre-d);font-family:var(--ff-d);font-weight:600;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;padding-top:16px;width:auto}
+.nota-p{font-size:14px;color:var(--grafito);margin-top:12px}
 .nota-p b{color:var(--onix)}
 .nota-p.fuente{font-size:12.5px;color:var(--gris)}
-
-/* características */
-.caract p{font-size:15px;color:var(--grafito);max-width:80ch}
-.caract ul{margin-top:10px;padding-left:20px;font-size:15px;columns:2;column-gap:36px}
-.caract li{margin-bottom:4px;break-inside:avoid}
-.caract li::marker{color:var(--bronce)}
 
 /* preguntas y otros */
 .faq details{background:var(--blanco);border:1px solid var(--linea);border-radius:10px;margin-bottom:8px}
@@ -147,13 +149,22 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
   .pasos ol{grid-template-columns:1fr}
   .prod{gap:24px}
 }
-@media(max-width:700px){
+@media(max-width:800px){
   .prod{grid-template-columns:minmax(0,1fr);padding:14px;gap:16px}
+  .gal{grid-template-columns:minmax(0,1fr);min-height:0}
+  .gal-minis{flex-direction:row;order:2;overflow-x:auto}
+  .gal-minis button{flex:0 0 60px}
+  .gal-main{aspect-ratio:4/3}
+  .gal-main.sinfoto{min-height:0}
   .gal-f{opacity:1}
   .prod-btns{grid-template-columns:1fr}
-  .param th{width:45%}
-  .param th,.param td{padding:8px 10px;font-size:13.5px}
-  .caract ul{columns:1}
+  .panel{padding:16px}
+  .panel ul{columns:1}
+  .panel th{width:45%}
+  .panel th,.panel td{padding:8px 8px;font-size:13.5px}
+  .tab{padding:12px 14px;font-size:13px}
+}
+@media(max-width:700px){
   .top nav{gap:14px;font-size:13px}
   .top nav a:not(.on):not(:last-child){display:none}
   .logo{height:34px}

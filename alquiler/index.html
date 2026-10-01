@@ -163,6 +163,13 @@
       if(ev.target.closest('.gal-main')) abrir(g);
     });
   });
+  document.querySelectorAll('[data-tabs]').forEach(function(w){
+    var bs=w.querySelectorAll('.tab'), ps=w.querySelectorAll('.panel');
+    bs.forEach(function(b,i){ b.addEventListener('click',function(){
+      bs.forEach(function(x){x.classList.toggle('on',x===b);});
+      ps.forEach(function(p,k){p.hidden=k!==i;});
+    }); });
+  });
   if(!V) return;
   V.addEventListener('click',function(ev){
     var b=ev.target.closest('button');

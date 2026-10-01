@@ -51,18 +51,18 @@
   
     <article class="prod" id="manometro">
       <div class="gal" data-fotos="[&quot;/img/catalogo/manometro-01-m.webp&quot;, &quot;/img/catalogo/manometro-02-m.webp&quot;]" data-grandes="[&quot;/img/catalogo/manometro-01.webp&quot;, &quot;/img/catalogo/manometro-02.webp&quot;]">
+        <div class="gal-minis"><button type="button" class="on" data-i="0" aria-label="Foto 1"><img src="/img/catalogo/manometro-01-m.webp" alt="" loading="lazy" decoding="async" width="120" height="90"></button><button type="button" class="" data-i="1" aria-label="Foto 2"><img src="/img/catalogo/manometro-02-m.webp" alt="" loading="lazy" decoding="async" width="120" height="90"></button></div>
         <div class="gal-main">
           <img src="/img/catalogo/manometro-01-m.webp" alt="Manómetro diferencial digital — AUTOOL PT520 · China" fetchpriority="high" decoding="async" width="700" height="525">
           <button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button><button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button><span class="gal-n">1 / 2</span>
         </div>
-        <div class="gal-minis"><button type="button" class="on" data-i="0" aria-label="Foto 1"><img src="/img/catalogo/manometro-01-m.webp" alt="" loading="lazy" decoding="async" width="120" height="90"></button><button type="button" class="" data-i="1" aria-label="Foto 2"><img src="/img/catalogo/manometro-02-m.webp" alt="" loading="lazy" decoding="async" width="120" height="90"></button></div>
       </div>
       <div class="prod-info">
         <div class="k">Manómetro</div>
         <h2>Manómetro diferencial digital</h2>
         <div class="marca">AUTOOL PT520 · China</div>
         <p class="prod-desc">Manómetro diferencial digital para pruebas de presión y verificación de presión no invasiva (NIBP) en monitores y equipos neumáticos. Mide presión positiva y diferencial con lectura clara, útil para comprobar canales, fugas y exactitud de manguitos. Incluye certificado de calibración vigente.</p>
-        <dl class="prod-meta"><div><dt>Modelo</dt><dd>PT520</dd></div><div><dt>Marca</dt><dd>AUTOOL</dd></div><div><dt>Origen</dt><dd>China</dd></div></dl>
+        <div class="prod-chips"><span>Modelo <b>PT520</b></span><span>Marca <b>AUTOOL</b></span><span>Alquiler <b>por hora, día o mes</b></span></div>
         
         <div class="prod-btns">
           <a class="btn fill" href="https://wa.me/51908704131?text=Hola%20Sinergia%20Biom%C3%A9dica%2C%20quiero%20cotizar%20el%20alquiler%20del%20man%C3%B3metro%20diferencial%20digital%20%28AUTOOL%20PT520%29." target="_blank" rel="noopener">Cotizar por WhatsApp</a>
@@ -71,17 +71,10 @@
         
       </div>
     </article>
-    <section class="param">
-      <h2>Parámetros técnicos · AUTOOL PT520</h2>
-      <table><tr><th>Marca</th><td>AUTOOL</td></tr><tr><th>Modelo</th><td>PT520</td></tr><tr><th>Origen</th><td>China</td></tr><tr><th>Uso</th><td>Presión / NIBP</td></tr></table>
-      
-    </section>
-
-  <section class="caract">
-    <h2>Características y usos</h2>
-    <p>El manómetro digital mide presión con exactitud y permite comparar la lectura de un equipo con un valor de referencia. En biomédica se usa sobre todo con tensiómetros y con el módulo de presión no invasiva de los monitores.</p>
-    <ul><li>Tensiómetros y módulos de presión no invasiva (NIBP)</li><li>Prueba de fugas en brazaletes y mangueras</li><li>Aspiradores de secreciones</li><li>Unidades dentales y líneas de aire</li></ul>
-  </section>
+    <div class="pest" data-tabs>
+      <div class="tabs" role="tablist"><button type="button" class="tab on" role="tab">Descripción</button><button type="button" class="tab" role="tab">Parámetros técnicos</button></div>
+      <div class="panel" role="tabpanel"><p>El manómetro digital mide presión con exactitud y permite comparar la lectura de un equipo con un valor de referencia. En biomédica se usa sobre todo con tensiómetros y con el módulo de presión no invasiva de los monitores.</p><ul><li>Tensiómetros y módulos de presión no invasiva (NIBP)</li><li>Prueba de fugas en brazaletes y mangueras</li><li>Aspiradores de secreciones</li><li>Unidades dentales y líneas de aire</li></ul></div><div class="panel" role="tabpanel" hidden><table><tr><th>Marca</th><td>AUTOOL</td></tr><tr><th>Modelo</th><td>PT520</td></tr><tr><th>Origen</th><td>China</td></tr><tr><th>Uso</th><td>Presión / NIBP</td></tr></table></div>
+    </div>
 
   <section class="faq">
     <h2>Preguntas frecuentes</h2>
@@ -127,6 +120,13 @@
       if(b&&b.classList.contains('der')) return mostrar(g,(+g.dataset.i)+1);
       if(ev.target.closest('.gal-main')) abrir(g);
     });
+  });
+  document.querySelectorAll('[data-tabs]').forEach(function(w){
+    var bs=w.querySelectorAll('.tab'), ps=w.querySelectorAll('.panel');
+    bs.forEach(function(b,i){ b.addEventListener('click',function(){
+      bs.forEach(function(x){x.classList.toggle('on',x===b);});
+      ps.forEach(function(p,k){p.hidden=k!==i;});
+    }); });
   });
   if(!V) return;
   V.addEventListener('click',function(ev){

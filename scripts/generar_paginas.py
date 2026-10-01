@@ -340,7 +340,7 @@ def galeria(eq, locales, primera=False):
     alt = e(eq['nom'] + ' — ' + eq.get('marca', ''))
     n = len(fotos)
     if not fotos:
-        return '<div class="gal"><div class="gal-main sinfoto">%s</div></div>' % ICONO
+        return '<div class="gal una"><div class="gal-main sinfoto">%s</div></div>' % ICONO
     # La foto ligera se ve en la ficha; la grande, al ampliar. Sin JavaScript
     # se ve la primera; con él, flechas, miniaturas y visor (al final de la página).
     grandes = [f.replace('-m.webp', '.webp') for f in fotos]
