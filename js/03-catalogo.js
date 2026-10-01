@@ -46,12 +46,18 @@ function huesoFacetas(){
   </div>`;
 }
 
+/* Las herramientas de apoyo (set de 46 piezas, destornillador) no se alquilan
+   solas: van dentro de los paquetes de Mantenimiento. Siguen en EQUIPOS para
+   los paquetes, pero no salen como tarjeta ni en los filtros del catálogo. */
+const enCatalogo = () => EQUIPOS.filter(e=>!e.apoyo);
+
 function buildFacetsEq(){
   if(!CATALOGO_LISTO){ document.getElementById('filtersSide').innerHTML=huesoFacetas(); return; }
+  const eqs=enCatalogo();
   document.getElementById('filtersSide').innerHTML=
-    facetSection('Marca','marca',uniq(EQUIPOS.map(eqBrand)).sort())+
-    facetSection('Tipo','tipo',uniq(EQUIPOS.map(e=>e.cat)).sort())+
-    facetSection('Procedencia','origen',uniq(EQUIPOS.map(eqOrigen)).sort())+
+    facetSection('Marca','marca',uniq(eqs.map(eqBrand)).sort())+
+    facetSection('Tipo','tipo',uniq(eqs.map(e=>e.cat)).sort())+
+    facetSection('Procedencia','origen',uniq(eqs.map(eqOrigen)).sort())+
     `<div class="filters-clear"><button onclick="clearF()">Limpiar filtros</button></div>`;
 }
 function buildFacetsPk(){
@@ -122,7 +128,7 @@ function pintar(){
     document.getElementById('countEq').textContent='';
     return;
   }
-  const list=EQUIPOS.filter(matchEq);
+  const list=enCatalogo().filter(matchEq);
   grid.innerHTML=list.map(cardEq).join('')||'<p style="color:var(--gris);grid-column:1/-1">No hay equipos con esos filtros.</p>';
   document.getElementById('countEq').textContent=list.length+(list.length===1?' equipo':' equipos');
 }
