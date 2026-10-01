@@ -84,7 +84,7 @@ const CONFIG = {
   /* VENTA_URL: Apps Script PROPIO de venta (google-apps-script/Venta.gs).
      Es un proyecto aparte del de DATA_URL para no tocar alquiler, clientes
      ni expedientes. Vacío = la venta usa solo data/venta.json.          */
-  VENTA_URL: "",
+  VENTA_URL: "https://script.google.com/macros/s/AKfycbySXJ34IsPuR98QvLbIpiSh7-N6-PG6xsbFuuDPuNv9eNAFONN3Ndh3I4jYJe9KvHFuDw/exec",
   WHATSAPP: SITE.whatsapp,
 
   /* Tiempo máximo de espera de una descarga, en milisegundos. Si Google
