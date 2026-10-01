@@ -111,6 +111,24 @@
   .v-tabla td:first-child{color:var(--gris);width:42%}
   .v-tabla tr.g th{text-align:left;background:var(--onix);color:#fff;font-family:var(--ff-d);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 12px}
 
+
+  /* Buscador, lista para cotizar y datos de expediente */
+  .v-busca{display:flex;align-items:center;gap:12px;margin-top:26px;background:var(--blanco);border:1px solid var(--linea-b);border-radius:14px;padding:0 16px;box-shadow:var(--sh-card)}
+  .v-busca svg{width:20px;height:20px;color:var(--cobre-d);flex:none}
+  .v-busca input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:16px;padding:16px 0;color:var(--onix);min-width:0}
+  .v-busca:focus-within{border-color:var(--bronce);box-shadow:0 0 0 3px rgba(154,127,78,.18)}
+  .v-lista .v-busca{margin:0 0 18px;box-shadow:none}
+  .v-marcas-hero{margin-top:14px;font-family:var(--ff-d);font-size:12.5px;letter-spacing:1px;color:var(--gris)}
+  .v-exp{margin-top:6px;font-family:var(--ff-d);font-size:11px;letter-spacing:.4px;color:var(--cobre-d);background:var(--crema);border:1px solid var(--linea);border-radius:6px;padding:3px 7px;align-self:flex-start;line-height:1.35}
+  .v-card .v-marca b{color:var(--grafito);font-weight:600}
+  .v-panel textarea{width:100%;border:1px solid var(--linea);border-radius:10px;background:var(--crema);font:inherit;font-size:14px;padding:12px;resize:vertical;margin-bottom:12px;color:var(--onix)}
+  .v-lista-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
+  .v-areas{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;font-size:12.5px;color:var(--gris)}
+  .v-areas span{margin-right:4px}
+  .v-areas i{font-style:normal;padding:4px 9px;border-radius:99px;background:rgba(46,139,107,.09);color:#2E6B57;border:1px solid rgba(46,139,107,.2)}
+  .v-nota{margin-top:14px;font-size:13.5px;color:var(--gris)}
+  .v-cats{grid-template-columns:repeat(5,1fr)}
+  @media(max-width:1100px){.v-cats{grid-template-columns:repeat(3,1fr)}}
   @media(max-width:1000px){.v-cats{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:880px){
     .v-hero-grid,.v-dos,.v-prod{grid-template-columns:1fr}
