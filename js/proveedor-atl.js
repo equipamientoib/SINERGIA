@@ -22,8 +22,12 @@
 (function () {
   'use strict';
   var CFG = window.SB_ATL || {};
-  var BLOQUE = 60;            // productos por pedido al portal
-  var PARALELO = 3;           // pedidos a la vez
+  /* Trato amable con el portal: pocas consultas, una a la vez y con pausa,
+     como lo haría una persona. */
+  var BLOQUE = 250;           // productos por consulta si el portal pagina
+  var MAX_CONSULTAS = 8;      // tope total de consultas al portal por uso
+  var PAUSA = 4000;           // ms entre una consulta y la siguiente
+  var REUSO_MIN = 60;         // si se usó hace menos de esto, pide confirmar
   var ESPERA_MAX = 45000;     // ms por bloque
 
   /* ── Panel flotante ─────────────────────────────────────────────── */
@@ -144,8 +148,19 @@
     try { await xhr('POST', CFG.u, cuerpo, 30000); } catch (e) { }
   }
 
+  /* ── Evitar usos seguidos ───────────────────────────────────────── */
+  var ultimo = 0;
+  try { ultimo = Number(localStorage.getItem('sbAtlUltimo')) || 0; } catch (e) { }
+  var hace = Math.round((Date.now() - ultimo) / 60000);
+  if (ultimo && hace < REUSO_MIN) {
+    txt('Ya actualizaste hace <b>' + hace + ' min</b>. Para no cargar al portal del proveedor, ' +
+      'conviene usarlo solo una vez por semana (o cuando cambien precios).');
+    boton('Actualizar igual', function () { document.getElementById('sbAtlBtns').innerHTML = ''; correr(); });
+    boton('Cerrar', cerrar);
+  } else correr();
+
   /* ── Flujo principal ────────────────────────────────────────────── */
-  (async function () {
+  async function correr() {
     try {
       txt('Leyendo tu lista de equipos…');
       var j = await pedirJSON(CFG.u + '?atl=codigos&k=' + encodeURIComponent(CFG.k));
@@ -154,23 +169,25 @@
       var total = Object.keys(mios).length;
       if (!total) return error('La hoja de venta no tiene códigos de proveedor.');
 
-      /* Primero se intenta todo de una vez; si el portal limita el tamaño,
-         se recorre por bloques hasta que deje de traer productos nuevos. */
-      var mapa = {};
-      txt('Leyendo el catálogo del proveedor…');
+      /* Primero se pide todo de una vez (1 consulta). Solo si el portal
+         entrega menos, se sigue por bloques, de uno en uno y con pausa,
+         hasta encontrar tus equipos o llegar al tope de consultas. */
+      var mapa = {}, consultas = 1;
+      var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
+      var hallados = function () { return Object.keys(mios).filter(function (c) { return mapa[c]; }).length; };
+      txt('Leyendo el catálogo del proveedor (1 consulta)…');
       leer(await bloque(1, 10000, 1), mapa);
-      if (Object.keys(mapa).length < 200) {
-        var pag = 1, vacios = 0, desde = 1;
-        while (vacios < 2 && pag < 600) {
-          var tareas = [];
-          for (var i = 0; i < PARALELO; i++, pag++, desde += BLOQUE) tareas.push(bloque(desde, desde + BLOQUE - 1, pag));
-          var htmls = await Promise.all(tareas);
-          var nuevos = 0; htmls.forEach(function (h) { nuevos += leer(h, mapa); });
-          vacios = nuevos ? 0 : vacios + 1;
-          var hallados = Object.keys(mios).filter(function (c) { return mapa[c]; }).length;
-          bar(hallados / total);
-          txt('Catálogo leído: <b>' + Object.keys(mapa).length + '</b> productos · tuyos encontrados: <b>' + hallados + ' de ' + total + '</b>');
-          if (hallados === total) break;
+      if (Object.keys(mapa).length < 200 && hallados() < total) {
+        var desde = Object.keys(mapa).length + 1, pag = 2;
+        while (consultas < MAX_CONSULTAS && hallados() < total) {
+          await espera(PAUSA);
+          consultas++;
+          var nuevos = leer(await bloque(desde, desde + BLOQUE - 1, pag), mapa);
+          bar(hallados() / total);
+          txt('Consulta ' + consultas + ' de máx. ' + MAX_CONSULTAS + ' · catálogo leído: <b>' + Object.keys(mapa).length +
+            '</b> · tuyos: <b>' + hallados() + ' de ' + total + '</b>');
+          if (!nuevos) break;
+          desde += BLOQUE; pag++;
         }
       }
       var items = Object.keys(mios).filter(function (c) { return mapa[c]; }).map(function (c) { return mapa[c]; });
@@ -178,6 +195,7 @@
       bar(1);
       if (!leidos) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar.');
 
+      try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
       txt('Enviando <b>' + items.length + '</b> precios y stocks a tu hoja…');
       await enviar(JSON.stringify({ k: CFG.k, tc: TC, completo: leidos >= 1000, items: items }));
       /* La respuesta del POST es opaca (otro dominio): el resultado se pide aparte. */
@@ -193,5 +211,5 @@
     } catch (e) {
       error(String(e && e.message || e));
     }
-  })();
+  }
 })();
