@@ -51,10 +51,6 @@
 
 var CATALOGO_ID = "1cwZrVZIHJFBttN1Uf1GhrYnlWsOgIWIJUn-wO_mchys";   // libro Sinergia-Web
 
-/* Hoja «Sinergia - Venta (catálogo en vivo)», en Drive > 3. Página WEB.
-   Lo que se marque publicar = SI aparece en sinergiabiomedica.pe/#/venta. */
-var VENTA_ID = "11fnh5teSU1ysJUpUiq-hYgmqVUoj4Dq9wnWWT_XybyY";
-
 var PROYECTOS = [
   {
     id: "limatambo-2026",
@@ -566,200 +562,6 @@ function valorizaciones_(ss, cfg, equipos) {
   return out;
 }
 
-// ═════════════════════ venta ═════════════════════
-/* Lee la hoja de VENTA. Arriba de los encabezados van dos parámetros:
-     A1 margen      B1 35          (% que se suma al precio del proveedor)
-     A2 actualizado B2 06/10/2026  (fecha de la última revisión, cada lunes)
-   Solo se envían a la web las filas con publicar = SI y solo las columnas
-   públicas: el precio y el stock del proveedor NO salen de aquí.        */
-function hojaVenta_(ss) {
-  return ss.getSheetByName('Venta') || ss.getSheets()[0];
-}
-
-function lista_(v, sep) {
-  return s_(v).split(sep).map(function (x) { return x.trim(); }).filter(String);
-}
-
-function venta_() {
-  if (!VENTA_ID) return null;
-  var sh = hojaVenta_(abrirLibro_(VENTA_ID));
-  var vals = sh.getDataRange().getValues();
-  var margen = 35, actualizado = '', fh = -1;
-  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
-    var et = s_(vals[k][0]).toLowerCase();
-    if (et === 'margen' && num_(vals[k][1]) !== null) margen = num_(vals[k][1]);
-    if (et === 'actualizado') actualizado = fecha_(vals[k][1]);
-    if (et === 'id') { fh = k; break; }
-  }
-  if (fh < 0) return null;
-  var heads = vals[fh].map(function (h) { return s_(h); });
-  var productos = [];
-  for (var i = fh + 1; i < vals.length; i++) {
-    var r = {};
-    for (var j = 0; j < heads.length; j++) if (heads[j]) r[heads[j]] = vals[i][j];
-    if (!s_(r.id) || !s_(r.nombre) || s_(r.publicar).toUpperCase() !== 'SI') continue;
-
-    /* Precio publicado: el de la hoja (la fórmula de la columna) o, si la
-       fórmula falta o da error, el del proveedor + margen calculado aquí. */
-    var prov = num_(r.precio_proveedor);
-    var precio = num_(r.precio_publicado);
-    if (precio === null && prov !== null) precio = Math.round(prov * (1 + margen / 100));
-    var stock = num_(r.stock_sinergia);
-    if (stock === null) stock = num_(r.stock_proveedor);
-
-    var p = {
-      id: s_(r.id), cat: s_(r.categoria), nom: s_(r.nombre),
-      marca: s_(r.marca), modelo: s_(r.modelo), origen: s_(r.origen),
-      resumen: s_(r.resumen),
-      caracteristicas: lista_(r.caracteristicas, /[|\n]+/),
-      expediente: s_(r.expediente), clave: s_(r.clave),
-      areas: lista_(r.areas, /[,;\n]+/)
-    };
-    if (num_(r.destacado)) p.destacado = num_(r.destacado);
-    if (precio) p.precio = precio;
-    if (stock !== null) p.stock = stock;
-    var fotos = fotos_(r.fotos);
-    if (fotos.length) p.fotos = fotos;
-    var fp = pdf_(r.ficha_pdf);
-    if (fp.ver) p.ficha_pdf = fp.ver;
-    productos.push(p);
-  }
-  return { actualizado: actualizado, productos: productos };
-}
-
-/* Ejecuta UNA vez desde el editor (▶) después de crear la hoja:
-   nombra la pestaña, pone las fórmulas del precio y del stock, da
-   formato a los encabezados y la lista SI/NO en «publicar».          */
-function prepararHojaVenta() {
-  var sh = hojaVenta_(SpreadsheetApp.openById(VENTA_ID));
-  sh.setName('Venta');
-  var vals = sh.getDataRange().getValues(), fh = -1;
-  for (var k = 0; k < vals.length; k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k + 1; break; }
-  if (fh < 0) throw new Error('No encuentro la fila de encabezados (la que empieza con «id»).');
-  var heads = vals[fh - 1].map(function (h) { return s_(h); });
-  function col(n) { return heads.indexOf(n) + 1; }
-  function letra(c) { return String.fromCharCode(64 + c); }
-  var ini = fh + 1, n = Math.max(sh.getMaxRows() - fh, 1);
-  var cPP = col('precio_proveedor'), cPub = col('precio_publicado');
-  var cSP = col('stock_proveedor'), cSS = col('stock_sinergia');
-  sh.getRange(ini, cPub, n, 1).clearContent();
-  sh.getRange(ini, cSS, n, 1).clearContent();
-  var I = letra(cPP), K = letra(cSP);
-  sh.getRange(ini, cPub).setFormula('=ARRAYFORMULA(IF(' + I + ini + ':' + I + '="","",ROUND(' + I + ini + ':' + I + '*(1+$B$1/100),0)))');
-  sh.getRange(ini, cSS).setFormula('=ARRAYFORMULA(IF(' + K + ini + ':' + K + '="","",' + K + ini + ':' + K + '))');
-  sh.getRange(fh, 1, 1, heads.length).setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36').setWrap(true);
-  sh.getRange(fh, cPP).setBackground('#b7791f'); sh.getRange(fh, cSP).setBackground('#b7791f');
-  sh.getRange(fh, cPub).setBackground('#2f7d4f'); sh.getRange(fh, cSS).setBackground('#2f7d4f');
-  sh.getRange(ini, cPP, n, 1).setNumberFormat('#,##0.00');
-  sh.getRange(ini, cPub, n, 1).setNumberFormat('#,##0');
-  sh.getRange(ini, col('codigo_proveedor'), n, 1).setNumberFormat('000.000');
-  sh.getRange('B2').setNumberFormat('dd/mm/yyyy');
-  sh.getRange('A1:A2').setFontWeight('bold'); sh.getRange('B1:B2').setBackground('#fce9c8');
-  sh.getRange(ini, col('publicar'), n, 1).setDataValidation(
-    SpreadsheetApp.newDataValidation().requireValueInList(['SI', 'NO'], true).build());
-  sh.setFrozenRows(fh); sh.setFrozenColumns(5);
-  Logger.log('Hoja de venta lista. Productos publicados: %s', venta_().productos.length);
-}
-
-
-// ═════════════════════ proveedor ATL (altokelite.com) ═════════════════════
-/* El portal del proveedor solo deja entrar desde Perú y con usuario, así
-   que la lectura la hace un botón en el navegador de Sinergia (js/
-   proveedor-atl.js), ya dentro del portal. El botón lee código, stock y
-   precio (US$, IGV incluido) de todo el catálogo y los manda aquí; esto
-   actualiza la hoja de venta (precio_proveedor en soles, stock_proveedor,
-   precio_proveedor_usd y la fecha de B2).
-
-   La clave del botón NO va en este archivo (el repositorio es público):
-   vive en las Propiedades del script. Créala con crearBotonProveedor().  */
-
-function claveAtl_() { return PropertiesService.getScriptProperties().getProperty('ATL_CLAVE') || ''; }
-
-/** Código del proveedor normalizado a 6 dígitos: 90.97 (número), "090.970" → "090970". */
-function codAtl_(v) {
-  if (typeof v === 'number') v = v.toFixed(3);
-  var d = s_(v).replace(/\D/g, '');
-  return d ? ('000000' + d).slice(-6) : '';
-}
-
-/* Ejecuta UNA vez (▶). Crea la clave y deja en el registro (Ver › Registros)
-   el botón listo para copiar en la barra de favoritos del navegador. */
-function crearBotonProveedor() {
-  var props = PropertiesService.getScriptProperties();
-  var k = props.getProperty('ATL_CLAVE');
-  if (!k) { k = Utilities.getUuid().replace(/-/g, ''); props.setProperty('ATL_CLAVE', k); }
-  var url = ScriptApp.getService().getUrl();
-  var boton = "javascript:(function(){window.SB_ATL={k:'" + k + "',u:'" + url + "'};" +
-    "var s=document.createElement('script');s.charset='utf-8';s.src='https://sinergiabiomedica.pe/js/proveedor-atl.js?'+Date.now();" +
-    "document.body.appendChild(s);})()";
-  Logger.log('Copia TODO lo de abajo y pégalo como dirección (URL) de un favorito llamado «Actualizar Sinergia»:\n\n' + boton);
-}
-
-/* Códigos de la hoja de venta (para que el botón sepa qué buscar). */
-function atlCodigos_() {
-  var sh = hojaVenta_(abrirLibro_(VENTA_ID));
-  var vals = sh.getDataRange().getValues(), fh = -1;
-  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
-  var c = vals[fh].map(function (h) { return s_(h); }).indexOf('codigo_proveedor');
-  var out = [];
-  for (var i = fh + 1; i < vals.length; i++) { var cd = codAtl_(vals[i][c]); if (cd) out.push(cd); }
-  return out;
-}
-
-/* Escribe en la hoja lo que mandó el botón. items: [{c:"090.970", s:12, p:850.5}] */
-function atlActualizar_(datos) {
-  var sh = hojaVenta_(SpreadsheetApp.openById(VENTA_ID));
-  var vals = sh.getDataRange().getValues(), fh = -1;
-  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
-  if (fh < 0) throw new Error('hoja de venta sin encabezados');
-  var heads = vals[fh].map(function (h) { return s_(h); });
-  if (heads.indexOf('precio_proveedor_usd') < 0) {           // columna nueva, al final
-    sh.getRange(fh + 1, heads.length + 1).setValue('precio_proveedor_usd');
-    heads.push('precio_proveedor_usd');
-  }
-  var cCod = heads.indexOf('codigo_proveedor'), cPP = heads.indexOf('precio_proveedor'),
-      cSP = heads.indexOf('stock_proveedor'), cUSD = heads.indexOf('precio_proveedor_usd');
-  var tc = Number(datos.tc) || 0;
-  var mapa = {};
-  (datos.items || []).forEach(function (it) { var cd = codAtl_(it.c); if (cd) mapa[cd] = it; });
-
-  var n = vals.length - fh - 1, act = 0, sinStock = 0;
-  var pp = sh.getRange(fh + 2, cPP + 1, n, 1).getValues();
-  var sp = sh.getRange(fh + 2, cSP + 1, n, 1).getValues();
-  var usd = sh.getRange(fh + 2, cUSD + 1, n, 1).getValues();
-  for (var i = 0; i < n; i++) {
-    var cd = codAtl_(vals[fh + 1 + i][cCod]);
-    if (!cd) continue;
-    var it = mapa[cd];
-    if (it) {
-      usd[i][0] = Number(it.p) || '';
-      if (tc && Number(it.p)) pp[i][0] = Math.round(Number(it.p) * tc * 100) / 100;
-      sp[i][0] = Number(it.s) || 0;
-      act++;
-    } else if (datos.completo) {
-      sp[i][0] = 0;                       // no está en el portal: sin stock ahora
-      sinStock++;
-    }
-  }
-  sh.getRange(fh + 2, cPP + 1, n, 1).setValues(pp);
-  sh.getRange(fh + 2, cSP + 1, n, 1).setValues(sp);
-  sh.getRange(fh + 2, cUSD + 1, n, 1).setValues(usd);
-  sh.getRange('B2').setValue(new Date());
-  if (tc) { sh.getRange('D2').setValue('Tipo de cambio usado: S/ ' + tc); }
-  limpiarCache();
-  var res = { ok: true, actualizados: act, sin_stock: sinStock, tc: tc, fecha: new Date().toISOString() };
-  PropertiesService.getScriptProperties().setProperty('ATL_ULTIMO', JSON.stringify(res));
-  return res;
-}
-
-function doPost(e) {
-  var datos;
-  try { datos = JSON.parse(e.postData.contents); } catch (err) { return json_({ ok: false, motivo: 'datos ilegibles' }); }
-  if (!claveAtl_() || datos.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
-  try { return json_(atlActualizar_(datos)); }
-  catch (err) { return json_({ ok: false, motivo: String(err) }); }
-}
-
 // ═════════════════════ salida ═════════════════════
 
 function json_(obj) {
@@ -782,10 +584,8 @@ function buildPublico_() {
       equipos = equipos_(cat); paquetes = paquetes_(cat);
     } catch (err) { /* la web usa su catálogo integrado como respaldo */ }
   }
-  var venta = null;
-  try { venta = venta_(); } catch (err) { /* la web usa data/venta.json como respaldo */ }
   return {
-    equipos: equipos, paquetes: paquetes, venta: venta,
+    equipos: equipos, paquetes: paquetes,
     proyectos: PROYECTOS.map(proyectoPublico_),
     modelo: MODELO,
     actualizado: new Date().toISOString()
@@ -799,7 +599,7 @@ function buildPublico_() {
 
 var CACHE_SEG   = 1800;     // 30 minutos
 var CACHE_TROZO = 90000;    // 90 KB por trozo
-var CACHE_LLAVE = 'publico_v4';   // v4: incluye la venta
+var CACHE_LLAVE = 'publico_v3';
 
 function cacheGuardar_(cache, llave, texto, seg) {
   try {
@@ -916,13 +716,6 @@ function doGet(e) {
      de la clave. Debe responder al instante y NO leer ninguna hoja. */
   if (p.ping) return textoJson_('{"ok":true}');
 
-  // ── Botón del proveedor (js/proveedor-atl.js): exige la clave ATL ──
-  if (p.atl) {
-    if (!claveAtl_() || p.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
-    if (p.atl === 'codigos') return json_({ ok: true, codigos: atlCodigos_() });
-    return textoJson_(PropertiesService.getScriptProperties().getProperty('ATL_ULTIMO') || '{"ok":false}');
-  }
-
   // ── Petición de DETALLE: exige clave correcta ──
   if (p.proyecto) {
     var cfg = null;
@@ -951,8 +744,6 @@ function probar() {
   var d = buildPublico_();
   Logger.log('PÚBLICO en %s ms · equipos: %s · paquetes: %s',
     new Date().getTime() - t0, d.equipos.length, d.paquetes.length);
-  Logger.log('VENTA: %s productos publicados · actualizado: %s',
-    d.venta ? d.venta.productos.length : 'sin hoja', d.venta ? d.venta.actualizado : '-');
 
   var conFoto = d.equipos.filter(function (e) { return e.photo; }).length;
   var conGal = d.equipos.filter(function (e) { return e.fotos && e.fotos.length; }).length;

@@ -46,6 +46,9 @@ function cargarVenta(){
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
       .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom)}; vMezclar(); return VENTA; });
+    /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
+    const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
+    if(vu) fetch(vu, {cache:'no-store'}).then(r => r.json()).then(d => { if(d && d.ok !== false) ventaEnVivo(d); }).catch(() => {});
   }
   return VENTA_CARGA;
 }

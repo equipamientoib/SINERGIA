@@ -116,7 +116,7 @@ Las apps web de Apps Script suelen leerse sin problema desde el navegador. Si en
 
 ## Catálogo de VENTA en vivo
 
-La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (catálogo en vivo)»** (Drive › 3. Página WEB). Su ID va en `VENTA_ID`, al inicio de `google-apps-script/Codigo.gs`. Si el Apps Script no responde, la web usa `data/venta.json` como respaldo.
+La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (catálogo en vivo)»** (Drive › 3. Página WEB) a través de un **Apps Script propio**: `google-apps-script/Venta.gs`, separado del principal para no tocar alquiler, clientes ni expedientes. Su URL `/exec` va en `VENTA_URL` (`js/00-config.js`). Si no responde, la web usa `data/venta.json` como respaldo.
 
 **Parámetros (arriba de los encabezados):**
 - `A1 margen · B1 35`: el % que se suma al precio del proveedor.
@@ -141,7 +141,7 @@ La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (c
 | `fotos`, `ficha_pdf` | enlaces de Drive (compartidos con «cualquiera con el enlace») | sí |
 | `codigo_proveedor`, `descripcion_proveedor`, `notas` | uso interno | **no** |
 
-**Primera vez:** pega el `Codigo.gs` actualizado en Apps Script, ejecuta `prepararHojaVenta` (▶) una vez (nombra la pestaña, pone las fórmulas y el formato), luego **Implementar › Gestionar implementaciones › Nueva versión** y ejecuta `limpiarCache`.
+**Primera vez:** sigue los pasos de instalación que están al inicio de `google-apps-script/Venta.gs` (proyecto nuevo, `prepararHojaVenta`, `crearBotonProveedor`, implementar como aplicación web).
 
 ### Precios y stock del proveedor (A. Jaime Rojas · altokelite.com) con un clic
 
@@ -156,7 +156,7 @@ El portal solo deja entrar desde Perú y con usuario, así que no lo puede leer 
    - `stock_proveedor`;
    - la fecha en B2.
 
-**Instalación (una vez):** pega el `Codigo.gs` actualizado, ejecuta `crearBotonProveedor` (▶) y copia lo que sale en **Ver › Registros** como dirección (URL) de un favorito nuevo. Luego publica una **Nueva versión** de la implementación.
+**Instalación (una vez):** en el proyecto de `Venta.gs` ejecuta `crearBotonProveedor` (▶) y copia lo que sale en **Registros** como dirección (URL) de un favorito nuevo.
 
 **Cada lunes:** entra a altokelite.com, ve a **Productos** y toca el favorito.
 
