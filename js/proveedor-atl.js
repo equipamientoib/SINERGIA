@@ -1,0 +1,151 @@
+/* =====================================================================
+   proveedor-atl.js — botón «Actualizar Sinergia» para altokelite.com
+   ---------------------------------------------------------------------
+   NO es parte de la web: lo carga un favorito del navegador estando
+   DENTRO del portal del proveedor (ya con usuario y clave). El portal
+   solo acepta conexiones desde Perú, por eso la lectura no puede hacerla
+   un servidor: la hace el navegador de Sinergia.
+
+   Qué hace:
+   1. Pide al Apps Script los códigos de la hoja de venta.
+   2. Usa la propia función del portal (searchProdBloque) para traer el
+      catálogo en bloques y lee de cada tarjeta:
+        addCesta('009.055','5481','1','0','1.22','')
+                  código    stock            precio US$ (IGV incl.)
+   3. Lee el tipo de cambio de la cabecera («TC: S/ 3.471»).
+   4. Manda al Apps Script solo los códigos de Sinergia; el script
+      escribe precio (en soles), stock y fecha en la hoja.
+
+   El favorito lo genera crearBotonProveedor() en Apps Script y define
+   window.SB_ATL = {k: clave, u: url del Apps Script}.
+   ===================================================================== */
+(function () {
+  'use strict';
+  var CFG = window.SB_ATL || {};
+  var BLOQUE = 60;            // productos por pedido al portal
+  var PARALELO = 3;           // pedidos a la vez
+  var ESPERA_MAX = 45000;     // ms por bloque
+
+  /* ── Panel flotante ─────────────────────────────────────────────── */
+  var caja = document.getElementById('sbAtl');
+  if (caja) caja.remove();
+  caja = document.createElement('div');
+  caja.id = 'sbAtl';
+  caja.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:2147483647;width:340px;max-width:92vw;' +
+    'background:#17191d;color:#f5f3ee;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.35);' +
+    'font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif;padding:18px 18px 16px';
+  caja.innerHTML = '<div style="font-weight:700;font-size:15px;margin-bottom:6px">Sinergia · actualizar precios y stock</div>' +
+    '<div id="sbAtlTxt">Preparando…</div>' +
+    '<div style="height:6px;background:#333;border-radius:9px;margin:12px 0 4px;overflow:hidden"><div id="sbAtlBar" style="height:100%;width:0;background:#c0a56e;transition:width .3s"></div></div>' +
+    '<div id="sbAtlBtns" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"></div>';
+  document.body.appendChild(caja);
+  function txt(t) { document.getElementById('sbAtlTxt').innerHTML = t; }
+  function bar(p) { document.getElementById('sbAtlBar').style.width = Math.round(p * 100) + '%'; }
+  function boton(t, fn) {
+    var b = document.createElement('button');
+    b.textContent = t;
+    b.style.cssText = 'font:inherit;font-weight:600;border:0;border-radius:8px;padding:7px 12px;cursor:pointer;background:#c0a56e;color:#17191d';
+    b.onclick = fn; document.getElementById('sbAtlBtns').appendChild(b);
+  }
+  function cerrar() { caja.remove(); }
+  function error(t) { txt('<b style="color:#ff9b8a">No se pudo completar.</b><br>' + t); boton('Cerrar', cerrar); }
+
+  /* ── Comprobaciones ─────────────────────────────────────────────── */
+  if (!CFG.k || !CFG.u) return error('El favorito no tiene la clave. Vuelve a crearlo con crearBotonProveedor() en Apps Script.');
+  if (!/altokelite\.com$/.test(location.hostname)) return error('Abre primero <b>altokelite.com</b> (con tu sesión iniciada) y luego toca el favorito.');
+  if (typeof window.searchProdBloque !== 'function') {
+    txt('Te llevo a la página de Productos del portal. Cuando cargue, toca el favorito otra vez.');
+    setTimeout(function () { location.href = '/view/products/?s='; }, 1500);
+    return;
+  }
+
+  var cod6 = function (c) { var d = String(c).replace(/\D/g, ''); return ('000000' + d).slice(-6); };
+  var tcM = (document.body.innerText.match(/TC:\s*S\/\s*([\d.,]+)/) || [])[1];
+  var TC = tcM ? Number(tcM.replace(',', '.')) : 0;
+  var RX = /addCesta\(\s*'([\d.]+)'\s*,\s*'(\d+)'\s*,\s*'[^']*'\s*,\s*'[^']*'\s*,\s*'([\d.]+)'/g;
+
+  /* Pide un bloque [desde, hasta] con la función del portal en un div oculto
+     y devuelve el HTML cuando terminó de cargar. */
+  var oculto = document.createElement('div');
+  oculto.style.display = 'none';
+  document.body.appendChild(oculto);
+  var nDiv = 0;
+  function bloque(desde, hasta, pagina) {
+    return new Promise(function (ok) {
+      var id = 'sbAtlTmp' + (++nDiv);
+      var d = document.createElement('div'); d.id = id; oculto.appendChild(d);
+      try { window.searchProdBloque('', '', '', String(desde), String(hasta), id, '9999', String(pagina), '', '', '', ''); }
+      catch (e) { ok(''); return; }
+      var t0 = Date.now();
+      (function mirar() {
+        var h = d.innerHTML;
+        var listo = h && !/Cargando la informaci/i.test(h);
+        if (listo || Date.now() - t0 > ESPERA_MAX) { d.remove(); ok(listo ? h : ''); }
+        else setTimeout(mirar, 400);
+      })();
+    });
+  }
+  function leer(html, mapa) {
+    var m, n = 0; RX.lastIndex = 0;
+    while ((m = RX.exec(html))) {
+      var k = cod6(m[1]);
+      if (!mapa[k]) n++;
+      mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0 };
+    }
+    return n;
+  }
+
+  /* ── Flujo principal ────────────────────────────────────────────── */
+  (async function () {
+    try {
+      txt('Leyendo tu lista de equipos…');
+      var r = await fetch(CFG.u + '?atl=codigos&k=' + encodeURIComponent(CFG.k));
+      var j = await r.json();
+      if (!j.ok) return error('El Apps Script respondió: ' + (j.motivo || 'error') + '.');
+      var mios = {}; (j.codigos || []).forEach(function (c) { mios[cod6(c)] = 1; });
+      var total = Object.keys(mios).length;
+      if (!total) return error('La hoja de venta no tiene códigos de proveedor.');
+
+      /* Primero se intenta todo de una vez; si el portal limita el tamaño,
+         se recorre por bloques hasta que deje de traer productos nuevos. */
+      var mapa = {};
+      txt('Leyendo el catálogo del proveedor…');
+      leer(await bloque(1, 10000, 1), mapa);
+      if (Object.keys(mapa).length < 200) {
+        var pag = 1, vacios = 0, desde = 1;
+        while (vacios < 2 && pag < 600) {
+          var tareas = [];
+          for (var i = 0; i < PARALELO; i++, pag++, desde += BLOQUE) tareas.push(bloque(desde, desde + BLOQUE - 1, pag));
+          var htmls = await Promise.all(tareas);
+          var nuevos = 0; htmls.forEach(function (h) { nuevos += leer(h, mapa); });
+          vacios = nuevos ? 0 : vacios + 1;
+          var hallados = Object.keys(mios).filter(function (c) { return mapa[c]; }).length;
+          bar(hallados / total);
+          txt('Catálogo leído: <b>' + Object.keys(mapa).length + '</b> productos · tuyos encontrados: <b>' + hallados + ' de ' + total + '</b>');
+          if (hallados === total) break;
+        }
+      }
+      var items = Object.keys(mios).filter(function (c) { return mapa[c]; }).map(function (c) { return mapa[c]; });
+      var leidos = Object.keys(mapa).length;
+      bar(1);
+      if (!leidos) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar.');
+
+      txt('Enviando <b>' + items.length + '</b> precios y stocks a tu hoja…');
+      await fetch(CFG.u, {
+        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ k: CFG.k, tc: TC, completo: leidos >= 1000, items: items })
+      });
+      /* La respuesta del POST es opaca (otro dominio): el resultado se pide aparte. */
+      await new Promise(function (ok) { setTimeout(ok, 2500); });
+      var est = await (await fetch(CFG.u + '?atl=estado&k=' + encodeURIComponent(CFG.k))).json();
+      var faltan = total - items.length;
+      txt('<b style="color:#9be3b5">¡Listo!</b> Se actualizaron <b>' + (est.actualizados != null ? est.actualizados : items.length) + '</b> equipos' +
+        (TC ? ' con TC S/ ' + TC : '') + '.<br>' +
+        (faltan ? faltan + ' código(s) de tu hoja no aparecen hoy en el portal' + (leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
+        '<span style="color:#aeb4bc">La web se actualiza sola en unos minutos.</span>');
+      boton('Cerrar', cerrar);
+    } catch (e) {
+      error(String(e && e.message || e));
+    }
+  })();
+})();

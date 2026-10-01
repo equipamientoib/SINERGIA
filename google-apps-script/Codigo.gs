@@ -661,6 +661,105 @@ function prepararHojaVenta() {
   Logger.log('Hoja de venta lista. Productos publicados: %s', venta_().productos.length);
 }
 
+
+// ═════════════════════ proveedor ATL (altokelite.com) ═════════════════════
+/* El portal del proveedor solo deja entrar desde Perú y con usuario, así
+   que la lectura la hace un botón en el navegador de Sinergia (js/
+   proveedor-atl.js), ya dentro del portal. El botón lee código, stock y
+   precio (US$, IGV incluido) de todo el catálogo y los manda aquí; esto
+   actualiza la hoja de venta (precio_proveedor en soles, stock_proveedor,
+   precio_proveedor_usd y la fecha de B2).
+
+   La clave del botón NO va en este archivo (el repositorio es público):
+   vive en las Propiedades del script. Créala con crearBotonProveedor().  */
+
+function claveAtl_() { return PropertiesService.getScriptProperties().getProperty('ATL_CLAVE') || ''; }
+
+/** Código del proveedor normalizado a 6 dígitos: 90.97 (número), "090.970" → "090970". */
+function codAtl_(v) {
+  if (typeof v === 'number') v = v.toFixed(3);
+  var d = s_(v).replace(/\D/g, '');
+  return d ? ('000000' + d).slice(-6) : '';
+}
+
+/* Ejecuta UNA vez (▶). Crea la clave y deja en el registro (Ver › Registros)
+   el botón listo para copiar en la barra de favoritos del navegador. */
+function crearBotonProveedor() {
+  var props = PropertiesService.getScriptProperties();
+  var k = props.getProperty('ATL_CLAVE');
+  if (!k) { k = Utilities.getUuid().replace(/-/g, ''); props.setProperty('ATL_CLAVE', k); }
+  var url = ScriptApp.getService().getUrl();
+  var boton = "javascript:(function(){window.SB_ATL={k:'" + k + "',u:'" + url + "'};" +
+    "var s=document.createElement('script');s.charset='utf-8';s.src='https://sinergiabiomedica.pe/js/proveedor-atl.js?'+Date.now();" +
+    "document.body.appendChild(s);})()";
+  Logger.log('Copia TODO lo de abajo y pégalo como dirección (URL) de un favorito llamado «Actualizar Sinergia»:\n\n' + boton);
+}
+
+/* Códigos de la hoja de venta (para que el botón sepa qué buscar). */
+function atlCodigos_() {
+  var sh = hojaVenta_(abrirLibro_(VENTA_ID));
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  var c = vals[fh].map(function (h) { return s_(h); }).indexOf('codigo_proveedor');
+  var out = [];
+  for (var i = fh + 1; i < vals.length; i++) { var cd = codAtl_(vals[i][c]); if (cd) out.push(cd); }
+  return out;
+}
+
+/* Escribe en la hoja lo que mandó el botón. items: [{c:"090.970", s:12, p:850.5}] */
+function atlActualizar_(datos) {
+  var sh = hojaVenta_(SpreadsheetApp.openById(VENTA_ID));
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  if (fh < 0) throw new Error('hoja de venta sin encabezados');
+  var heads = vals[fh].map(function (h) { return s_(h); });
+  if (heads.indexOf('precio_proveedor_usd') < 0) {           // columna nueva, al final
+    sh.getRange(fh + 1, heads.length + 1).setValue('precio_proveedor_usd');
+    heads.push('precio_proveedor_usd');
+  }
+  var cCod = heads.indexOf('codigo_proveedor'), cPP = heads.indexOf('precio_proveedor'),
+      cSP = heads.indexOf('stock_proveedor'), cUSD = heads.indexOf('precio_proveedor_usd');
+  var tc = Number(datos.tc) || 0;
+  var mapa = {};
+  (datos.items || []).forEach(function (it) { var cd = codAtl_(it.c); if (cd) mapa[cd] = it; });
+
+  var n = vals.length - fh - 1, act = 0, sinStock = 0;
+  var pp = sh.getRange(fh + 2, cPP + 1, n, 1).getValues();
+  var sp = sh.getRange(fh + 2, cSP + 1, n, 1).getValues();
+  var usd = sh.getRange(fh + 2, cUSD + 1, n, 1).getValues();
+  for (var i = 0; i < n; i++) {
+    var cd = codAtl_(vals[fh + 1 + i][cCod]);
+    if (!cd) continue;
+    var it = mapa[cd];
+    if (it) {
+      usd[i][0] = Number(it.p) || '';
+      if (tc && Number(it.p)) pp[i][0] = Math.round(Number(it.p) * tc * 100) / 100;
+      sp[i][0] = Number(it.s) || 0;
+      act++;
+    } else if (datos.completo) {
+      sp[i][0] = 0;                       // no está en el portal: sin stock ahora
+      sinStock++;
+    }
+  }
+  sh.getRange(fh + 2, cPP + 1, n, 1).setValues(pp);
+  sh.getRange(fh + 2, cSP + 1, n, 1).setValues(sp);
+  sh.getRange(fh + 2, cUSD + 1, n, 1).setValues(usd);
+  sh.getRange('B2').setValue(new Date());
+  if (tc) { sh.getRange('D2').setValue('Tipo de cambio usado: S/ ' + tc); }
+  limpiarCache();
+  var res = { ok: true, actualizados: act, sin_stock: sinStock, tc: tc, fecha: new Date().toISOString() };
+  PropertiesService.getScriptProperties().setProperty('ATL_ULTIMO', JSON.stringify(res));
+  return res;
+}
+
+function doPost(e) {
+  var datos;
+  try { datos = JSON.parse(e.postData.contents); } catch (err) { return json_({ ok: false, motivo: 'datos ilegibles' }); }
+  if (!claveAtl_() || datos.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
+  try { return json_(atlActualizar_(datos)); }
+  catch (err) { return json_({ ok: false, motivo: String(err) }); }
+}
+
 // ═════════════════════ salida ═════════════════════
 
 function json_(obj) {
@@ -816,6 +915,13 @@ function doGet(e) {
   /* Despertador: la web lo lanza cuando el cliente llega a la pantalla
      de la clave. Debe responder al instante y NO leer ninguna hoja. */
   if (p.ping) return textoJson_('{"ok":true}');
+
+  // ── Botón del proveedor (js/proveedor-atl.js): exige la clave ATL ──
+  if (p.atl) {
+    if (!claveAtl_() || p.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
+    if (p.atl === 'codigos') return json_({ ok: true, codigos: atlCodigos_() });
+    return textoJson_(PropertiesService.getScriptProperties().getProperty('ATL_ULTIMO') || '{"ok":false}');
+  }
 
   // ── Petición de DETALLE: exige clave correcta ──
   if (p.proyecto) {

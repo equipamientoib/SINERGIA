@@ -142,3 +142,22 @@ La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (c
 | `codigo_proveedor`, `descripcion_proveedor`, `notas` | uso interno | **no** |
 
 **Primera vez:** pega el `Codigo.gs` actualizado en Apps Script, ejecuta `prepararHojaVenta` (▶) una vez (nombra la pestaña, pone las fórmulas y el formato), luego **Implementar › Gestionar implementaciones › Nueva versión** y ejecuta `limpiarCache`.
+
+### Precios y stock del proveedor (A. Jaime Rojas · altokelite.com) con un clic
+
+El portal solo deja entrar desde Perú y con usuario, así que no lo puede leer ningún servidor. Por eso lo lee un **favorito del navegador** («Actualizar Sinergia»), con la sesión ya iniciada:
+
+1. Toma los códigos de la hoja de venta (`codigo_proveedor`).
+2. Lee el catálogo del portal con su propia función de búsqueda. En cada producto aparecen el código, el stock y el precio en US$ con IGV.
+3. Toma el tipo de cambio de la cabecera del portal («TC: S/ …»).
+4. Escribe en la hoja:
+   - `precio_proveedor`: el precio en soles, igual a US$ × TC;
+   - `precio_proveedor_usd`;
+   - `stock_proveedor`;
+   - la fecha en B2.
+
+**Instalación (una vez):** pega el `Codigo.gs` actualizado, ejecuta `crearBotonProveedor` (▶) y copia lo que sale en **Ver › Registros** como dirección (URL) de un favorito nuevo. Luego publica una **Nueva versión** de la implementación.
+
+**Cada lunes:** entra a altokelite.com, ve a **Productos** y toca el favorito.
+
+El código del botón está en `js/proveedor-atl.js`. La clave del favorito no está en el repositorio: vive en las Propiedades del script (`ATL_CLAVE`).
