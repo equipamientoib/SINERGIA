@@ -67,7 +67,7 @@ ${SITE.nav.filter(n=>n.r!=='#/').map(n=>`        <a onclick="go('${n.r}')">${n.t
     </div>
     <div>
       <div class="tt">Contacto</div>
-      <p>${SITE.email}<br>${SITE.web}<br>${SITE.telefono}</p>
+      <p>${SITE.email}<br>${SITE.web}<br>${SITE.telefono}<br>Lun a vie · 8:00 a.m. – 5:00 p.m.</p>
       <div class="ruc">RUC ${SITE.ruc}</div>
     </div>
   </div>

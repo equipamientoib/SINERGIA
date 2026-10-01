@@ -211,6 +211,10 @@ def negocio(cfg):
         'address': {'@type': 'PostalAddress', 'addressLocality': 'Pueblo Libre',
                     'addressRegion': 'Lima', 'addressCountry': 'PE'},
         'areaServed': 'Perú',
+        'openingHoursSpecification': [{
+            '@type': 'OpeningHoursSpecification',
+            'dayOfWeek': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+            'opens': '08:00', 'closes': '17:00'}],
     }
 
 
@@ -273,7 +277,8 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <footer class="pie"><div class="wrap">
   <div><b>Sinergia Biomédica</b><br>Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú</div>
   <div><a href="mailto:{e(cfg['email'])}">{e(cfg['email'])}</a><br>
-    <a href="{wa}" target="_blank" rel="noopener">WhatsApp {e(cfg['telefono'])}</a></div>
+    <a href="{wa}" target="_blank" rel="noopener">WhatsApp {e(cfg['telefono'])}</a><br>
+    Lunes a viernes · 8:00 a.m. – 5:00 p.m.</div>
 </div></footer>
 <a class="wafab" href="{wa}" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
   <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.6.8 5 2.3 7L4 29l7.3-2.2c1.9 1 4 1.6 6.2 1.6h.1c6.6 0 12-5.3 12-11.9 0-3.2-1.3-6.2-3.5-8.4A12 12 0 0 0 16 3zm7 16.9c-.3.8-1.7 1.6-2.4 1.7-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.8-3.6-1.5-5.9-5.1-6.1-5.4-.2-.2-1.4-1.9-1.4-3.7s.9-2.6 1.3-3c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6l1.1 2.7c.1.2.2.5 0 .7l-.4.7-.6.6c-.2.2-.4.4-.2.8.2.3 1 1.6 2.1 2.6 1.5 1.3 2.7 1.7 3 1.9.4.2.6.1.8-.1l1.2-1.4c.3-.3.5-.2.8-.1l2.6 1.2c.4.2.6.3.7.5.1.1.1.8-.2 1.6z"/></svg>
