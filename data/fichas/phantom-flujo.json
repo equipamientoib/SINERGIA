@@ -1,0 +1,53 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "phantom-flujo",
+  "titulo": "Phantom de flujo sanguíneo para acceso vascular ecoguiado",
+  "resumen": "Simulador de tejido blando con bomba de circulación que reproduce el flujo sanguíneo en vasos para prácticas de punción y canalización vascular guiadas por ecografía. Permite además demostrar el flujo con Doppler en capacitaciones de ecografía.",
+  "normas": [],
+  "secciones": [
+    {
+      "titulo": "Características generales",
+      "filas": [
+        [
+          "Composición",
+          "Almohadilla de tejido blando con vasos simulados"
+        ],
+        [
+          "Circulación",
+          "Bomba que hace circular fluido y simula el flujo sanguíneo"
+        ],
+        [
+          "Compatibilidad",
+          "Ecografía en modo B y Doppler"
+        ]
+      ]
+    },
+    {
+      "titulo": "Aplicaciones",
+      "filas": [
+        [
+          "Entrenamiento",
+          "Punción y canalización vascular ecoguiada"
+        ],
+        [
+          "Demostración",
+          "Visualización de flujo con Doppler"
+        ]
+      ]
+    }
+  ],
+  "incluye": [
+    "Almohadilla de tejido blando",
+    "Bomba de circulación"
+  ],
+  "fuente": "Descripción de Sinergia Biomédica; especificaciones a confirmar",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Fabricante y modelo",
+    "Dimensiones y peso de la almohadilla",
+    "Número, diámetros y profundidades de los vasos simulados",
+    "Bomba: tipo, caudal, alimentación eléctrica y si el flujo es pulsátil o continuo",
+    "Fluido simulador de sangre y su preparación",
+    "Vida útil de la almohadilla (número de punciones) y cuidados"
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "multimetro",
+  "titulo": "Multímetro digital Sanwa CD771",
+  "resumen": "Multímetro digital de 4000 cuentas con rango automático que mide tensión y corriente CA/CC, resistencia, capacitancia y frecuencia, además de prueba de diodos y continuidad con zumbador y LED. Herramienta básica en mantenimiento biomédico para el diagnóstico eléctrico de fuentes de alimentación, cables, fusibles y circuitos de equipos médicos.",
+  "normas": [
+    "IEC 61010-1 · CAT III 600 V / CAT II 1000 V"
+  ],
+  "secciones": [
+    {
+      "titulo": "Tensión",
+      "filas": [
+        [
+          "Rangos CC",
+          "400 mV · 4 · 40 · 400 · 1000 V"
+        ],
+        [
+          "Precisión CC",
+          "± (0,5 % de lectura + 2 dígitos)"
+        ],
+        [
+          "Rangos CA",
+          "4 · 40 · 400 · 1000 V"
+        ],
+        [
+          "Precisión CA (40 Hz a 400 Hz)",
+          "± (1,2 % de lectura + 7 dígitos)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Corriente",
+      "filas": [
+        [
+          "Rangos CC y CA",
+          "400 µA · 4000 µA · 40 mA · 400 mA · 4 A · 10 A"
+        ],
+        [
+          "Precisión CC",
+          "± (1,4 % de lectura + 3 dígitos)"
+        ],
+        [
+          "Precisión CA",
+          "± (1,8 % de lectura + 5 dígitos)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Resistencia, capacitancia y frecuencia",
+      "filas": [
+        [
+          "Resistencia",
+          "400 Ω a 40 MΩ · ± (1,2 % de lectura + 5 dígitos)"
+        ],
+        [
+          "Capacitancia",
+          "50 nF a 100 µF · ± (5 % de lectura + 10 dígitos)"
+        ],
+        [
+          "Frecuencia",
+          "5 Hz a 100 kHz · ± (0,3 % de lectura + 3 dígitos)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Continuidad, diodos y funciones",
+      "filas": [
+        [
+          "Continuidad",
+          "Zumbador y LED rojo"
+        ],
+        [
+          "Prueba de diodos",
+          "Tensión en circuito abierto aprox. 1,5 V"
+        ],
+        [
+          "Pantalla",
+          "LCD de 4000 cuentas con retroiluminación"
+        ],
+        [
+          "Funciones",
+          "Rango automático, retención de datos, medición relativa y apagado automático"
+        ]
+      ]
+    },
+    {
+      "titulo": "Datos físicos",
+      "filas": [
+        [
+          "Dimensiones",
+          "166 × 82 × 44 mm"
+        ],
+        [
+          "Peso",
+          "360 g"
+        ],
+        [
+          "Baterías",
+          "2 pilas AA (R6)"
+        ],
+        [
+          "Autonomía",
+          "Aprox. 400 h continuas en DCV"
+        ]
+      ]
+    }
+  ],
+  "incluye": [
+    "Multímetro Sanwa CD771",
+    "Puntas de prueba TL-23a",
+    "Manual de instrucciones"
+  ],
+  "fuente": "Manual de instrucciones de Sanwa CD771",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Rango máximo de tensión CA (las fuentes consultadas indican 1000 V; confirmar en el manual)",
+    "Umbral de continuidad (las fuentes indican 0 a 85 Ω ± 45 Ω)",
+    "Las cifras se obtuvieron de resúmenes del manual y de distribuidores; confirmar con el manual oficial de Sanwa",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}

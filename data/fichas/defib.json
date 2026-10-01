@@ -1,0 +1,43 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "defib",
+  "titulo": "Analizador de desfibriladores Meditech DEFI-SENSE",
+  "resumen": "Analizador portátil para verificar desfibriladores manuales y DEA con energías de hasta 600 J, en formas de onda monofásicas y bifásicas. Integra en un solo equipo compacto el probador de energía y un simulador de ECG de 3/5 derivaciones con arritmias, con alimentación por USB para pruebas en campo.",
+  "normas": [],
+  "secciones": [
+    {"titulo": "Medición de energía", "filas": [
+      ["Energía máxima", "Hasta 600 J"],
+      ["Formas de onda", "Monofásica y bifásica"],
+      ["Pruebas", "Energía de descarga y cardioversión"]
+    ]},
+    {"titulo": "Equipos compatibles", "filas": [
+      ["Desfibriladores", "Manuales y automáticos externos (DEA)"],
+      ["Monitores", "Monitores desfibriladores y multiparámetro"]
+    ]},
+    {"titulo": "Simulación de ECG", "filas": [
+      ["Derivaciones", "3 y 5 derivaciones"],
+      ["Señales", "Ritmos de ECG y arritmias"]
+    ]},
+    {"titulo": "Datos físicos", "filas": [
+      ["Pantalla", "A color"],
+      ["Alimentación", "Puerto USB (adaptador USB, power bank o cargador de auto)"],
+      ["Transporte", "Maletín rígido"]
+    ]}
+  ],
+  "incluye": [
+    "Analizador Meditech DEFI-SENSE",
+    "Maletín rígido de transporte"
+  ],
+  "fuente": "Página de producto de Meditech Equipment (meditech.com.cn) y tienda oficial MeditechShop (DefiSense)",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Rango, resolución y precisión de la medición de energía (no se encontró hoja de datos oficial del DEFI-SENSE; los valores 2 a 250 J y ± (2 % de lectura + 2 J) publicados corresponden al modelo D-Sense, no se usaron)",
+    "Resistencia de carga interna (Ω)",
+    "Lista de ritmos/arritmias simulados y frecuencias",
+    "Medición de tiempo de sincronización (cardioversión) y de carga",
+    "Dimensiones, peso y batería",
+    "Conector para DEA (opcional según MeditechShop) y paletas/electrodos de prueba",
+    "Normas que declara el fabricante",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "ms400",
+  "titulo": "Simulador de paciente multiparámetro Contec MS400",
+  "resumen": "Simulador portátil para verificar monitores de paciente y electrocardiógrafos, con ECG de 12 derivaciones, respiración, temperatura y presión invasiva de 2 o 4 canales. Ofrece 35 arritmias, señales de marcapasos y pantalla táctil de 3,5 pulgadas, con batería recargable para trabajo en campo.",
+  "normas": [],
+  "secciones": [
+    {"titulo": "ECG", "filas": [
+      ["Derivaciones", "12 derivaciones"],
+      ["Frecuencia", "15 a 350 lpm (21 valores seleccionables)"],
+      ["Amplitud", "0,5 · 1,0 · 1,5 · 2,0 mV"],
+      ["Arritmias", "35 tipos (auriculares, ventriculares, latidos prematuros y defectos de conducción)"],
+      ["Marcapasos y artefactos", "Marcapasos (asíncrono, sin captura, sin función, etc.) · artefactos de 50 y 60 Hz, muscular, línea base y respiración"]
+    ]},
+    {"titulo": "Respiración", "filas": [
+      ["Frecuencia", "0 (apnea), 15, 20, 30, 40, 60, 80, 100, 120 y 150 rpm"]
+    ]},
+    {"titulo": "Temperatura", "filas": [
+      ["Valores", "0 °C, 24 °C, 37 °C y 40 °C"]
+    ]},
+    {"titulo": "Presión invasiva (IBP)", "filas": [
+      ["Canales", "2 o 4 canales"],
+      ["Presión estática canal 1", "0, 80, 160, 240, 320 y 400 mmHg"],
+      ["Presión estática canal 2", "0, 50, 100, 150, 200 y 250 mmHg"],
+      ["Presión estática canal 3", "0, 20, 40, 60, 80 y 100 mmHg (canal 4 sigue al canal 3)"],
+      ["Formas de onda dinámicas", "Arterial 120/80, radial 120/80, ventrículo izquierdo 120/0, ventrículo derecho 25/0, entre otras"]
+    ]},
+    {"titulo": "Datos físicos", "filas": [
+      ["Pantalla", "TFT táctil de 3,5 pulgadas"],
+      ["Dimensiones", "18,86 × 12,50 × 4,32 cm"],
+      ["Peso", "1,4 kg aprox."],
+      ["Batería", "Litio-polímero recargable, 3,7 V, 3700 mAh"],
+      ["Alimentación externa", "Adaptador 9 V CC, 1000 mA"]
+    ]}
+  ],
+  "incluye": [
+    "Simulador Contec MS400",
+    "Adaptador de alimentación 9 V / 1 A",
+    "Cable de temperatura",
+    "Cable de IBP",
+    "Manual de usuario"
+  ],
+  "fuente": "Página de producto de Contec Medical Systems (contecmed.com) y manual del MS400 (Gima M54602)",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Si la unidad es de 2 o de 4 canales de IBP",
+    "Peso (las fuentes indican 1,2 kg y 1,4 kg)",
+    "Precisión de frecuencia y amplitud de ECG, impedancia/amplitud de respiración y precisión de temperatura e IBP (no publicadas en las fuentes consultadas)",
+    "Autonomía de la batería",
+    "Normas que declara el fabricante",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}

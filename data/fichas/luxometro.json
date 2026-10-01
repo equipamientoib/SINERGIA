@@ -1,0 +1,95 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "luxometro",
+  "titulo": "Luxómetro TASI TA630B",
+  "resumen": "Luxómetro digital con sensor separado por cable que mide iluminancia de 0,1 a 200 000 lx, con lectura en lux o foot-candles. Indicado para verificar la iluminancia de lámparas quirúrgicas, lámparas de examen y ambientes clínicos.",
+  "normas": [],
+  "secciones": [
+    {
+      "titulo": "Medición",
+      "filas": [
+        [
+          "Rango",
+          "0,1 a 200 000 lx · 0,01 a 20 000 fc"
+        ],
+        [
+          "Escalas",
+          "200 / 2000 / 20 000 / 200 000 lx"
+        ],
+        [
+          "Precisión",
+          "± (4 % + 10 dígitos), calibrado con lámpara incandescente a 2856 K"
+        ],
+        [
+          "Repetibilidad",
+          "± 2 %"
+        ],
+        [
+          "Resolución",
+          "0,1 lx"
+        ]
+      ]
+    },
+    {
+      "titulo": "Sensor",
+      "filas": [
+        [
+          "Tipo",
+          "Sensor digital con lente filtro, separado por cable de aprox. 1 m"
+        ],
+        [
+          "Respuesta espectral",
+          "400 a 700 nm"
+        ],
+        [
+          "Ángulo de incidencia",
+          "120°"
+        ],
+        [
+          "Frecuencia de muestreo",
+          "Aprox. 2 veces/s"
+        ]
+      ]
+    },
+    {
+      "titulo": "Funciones",
+      "filas": [
+        [
+          "Funciones",
+          "Retención de lectura, máximo/mínimo, apagado automático"
+        ],
+        [
+          "Unidades",
+          "lx y fc"
+        ]
+      ]
+    },
+    {
+      "titulo": "Datos físicos",
+      "filas": [
+        [
+          "Alimentación",
+          "2 pilas AAA de 1,5 V"
+        ],
+        [
+          "Entorno de operación",
+          "-10 °C a 50 °C, máx. 80 % HR, altitud < 2000 m"
+        ],
+        [
+          "Entorno de almacenamiento",
+          "-10 °C a 50 °C, máx. 70 % HR, sin pilas"
+        ]
+      ]
+    }
+  ],
+  "incluye": [
+    "Luxómetro TASI TA630B con sensor separado"
+  ],
+  "fuente": "Fichas de producto del TASI TA630B en Amazon y distribuidores (datos leídos a través de buscador web)",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Dimensiones y peso (un listado indica 130 × 59 × 30 mm y 150 g, no confirmado en fuente del fabricante)",
+    "Capacidad de memoria de registro (un listado indica 50 grupos)",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}

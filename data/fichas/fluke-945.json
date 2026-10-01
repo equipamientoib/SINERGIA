@@ -1,0 +1,118 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "fluke-945",
+  "titulo": "Sonómetro Fluke 945",
+  "resumen": "Sonómetro digital portátil de clase 2 para medir niveles de presión sonora con ponderación A y C, con respuesta rápida o lenta y registro de valores máximos y mínimos. Útil en mantenimiento biomédico para verificar el volumen de alarmas de equipos médicos y evaluar el ruido ambiental en áreas hospitalarias como UCI, neonatología y quirófanos.",
+  "normas": [
+    "IEC 651 Tipo 2",
+    "ANSI S1.4 Tipo 2"
+  ],
+  "secciones": [
+    {
+      "titulo": "Medición de nivel sonoro",
+      "filas": [
+        [
+          "Rango con ponderación A",
+          "30 dB a 130 dB"
+        ],
+        [
+          "Rango con ponderación C",
+          "35 dB a 130 dB"
+        ],
+        [
+          "Resolución",
+          "0,1 dB"
+        ],
+        [
+          "Precisión",
+          "± 1,5 dB (ref. 94 dB a 1 kHz)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Respuesta y ponderaciones",
+      "filas": [
+        [
+          "Respuesta en frecuencia",
+          "31,5 Hz a 8 kHz"
+        ],
+        [
+          "Ponderación de frecuencia",
+          "A y C"
+        ],
+        [
+          "Ponderación temporal",
+          "Rápida (125 ms) y lenta (1 s)"
+        ],
+        [
+          "Micrófono",
+          "Condensador electret de 0,5 pulgadas"
+        ]
+      ]
+    },
+    {
+      "titulo": "Funciones",
+      "filas": [
+        [
+          "Pantalla",
+          "LCD de 4 dígitos con retroiluminación"
+        ],
+        [
+          "Registro",
+          "MAX/MIN, retención de datos y memoria de registros"
+        ],
+        [
+          "Otras",
+          "Rango automático y apagado automático"
+        ]
+      ]
+    },
+    {
+      "titulo": "Condiciones ambientales",
+      "filas": [
+        [
+          "Operación",
+          "5 °C a 40 °C, < 80 % HR"
+        ],
+        [
+          "Almacenamiento",
+          "-10 °C a 60 °C, < 70 % HR"
+        ]
+      ]
+    },
+    {
+      "titulo": "Datos físicos",
+      "filas": [
+        [
+          "Dimensiones",
+          "200 × 56 × 32 mm"
+        ],
+        [
+          "Peso",
+          "350 g"
+        ],
+        [
+          "Batería",
+          "9 V (NEDA 1604 / IEC 6LR61)"
+        ],
+        [
+          "Autonomía",
+          "Aprox. 50 h (batería alcalina)"
+        ]
+      ]
+    }
+  ],
+  "incluye": [
+    "Sonómetro Fluke 945",
+    "Batería de 9 V",
+    "Manual de usuario"
+  ],
+  "fuente": "Hoja de datos técnicos de Fluke 945 Sound Meter",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Estuche de transporte y calibrador acústico: no confirmados como accesorio estándar",
+    "Capacidad de memoria de registros (fuentes de distribuidores indican hasta 14 000 registros; no verificado en hoja oficial de Fluke)",
+    "Las especificaciones se tomaron de copias de la hoja de datos alojadas por distribuidores; confirmar con el manual del equipo",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}
