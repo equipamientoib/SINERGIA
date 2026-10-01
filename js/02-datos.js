@@ -136,6 +136,19 @@ let FOTOS_LOCALES = {
   };
 /* MAPA-FIN */
 function fotosLocales(mapa){ if(mapa) FOTOS_LOCALES = mapa; }
+/* Fotos guardadas en el sitio para equipos sin foto en la hoja, o una foto
+   de estudio de portada (data/fotos-extra.json; generar_paginas.py las
+   escribe en index.html). Van delante de las de la hoja, sin repetirse. */
+function conFotosExtra(equipos){
+  const ex = window.FOTOS_EXTRA || {};
+  (equipos||[]).forEach(e=>{
+    const f = e && ex[e.id];
+    if(!f || !f.length) return;
+    const hoja = (e.fotos&&e.fotos.length) ? e.fotos : (e.photo ? [e.photo] : []);
+    e.fotos = f.concat(hoja.filter(u=>!f.includes(u)));
+    e.photo = e.fotos[0];
+  });
+}
 
 function fotoURL(u, ancho, ligera){
   if(!u) return u;
@@ -145,8 +158,10 @@ function fotoURL(u, ancho, ligera){
      en una décima de segundo. Google limita cuántas imágenes sirve por
      navegador, y una ficha con cinco fotos se pasa de la raya. */
   const id = (u.match(/(?:\/d\/|id=|\/file\/d\/)([A-Za-z0-9_-]{20,})/) || [])[1];
-  if(id && FOTOS_LOCALES[id]){
-    const f = FOTOS_LOCALES[id];
+  /* Las de data/fotos-extra.json ya vienen como ruta del sitio (img/…). */
+  const propia = /^\/?img\//.test(u) ? u.replace(/^\//,'') : '';
+  if(propia || (id && FOTOS_LOCALES[id])){
+    const f = propia || FOTOS_LOCALES[id];
     /* «ligera» es la de 700 px, para las tarjetas del catálogo: ahí la foto
        se ve a 347 px y la grande manda doce veces los píxeles que caben.
        La ficha y la portada siguen con la grande, que ahí sí se aprovecha. */

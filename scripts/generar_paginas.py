@@ -41,6 +41,7 @@ SITIO = 'https://sinergiabiomedica.pe'
 TIPOS = os.path.join(ROOT, 'data', 'seo-tipos.json')
 FICHAS = os.path.join(ROOT, 'data', 'fichas')
 CATALOGO = os.path.join(ROOT, 'data', 'catalogo.json')
+EXTRA = os.path.join(ROOT, 'data', 'fotos-extra.json')
 CONFIG = os.path.join(ROOT, 'js', '00-config.js')
 INDEX = os.path.join(ROOT, 'index.html')
 SITEMAP = os.path.join(ROOT, 'sitemap.xml')
@@ -82,8 +83,11 @@ def foto_local(url, locales, ligera=True):
     """La foto servida desde el sitio (WebP ligera), o None si no hay copia."""
     if not url:
         return None
-    m = RE_ID.search(url)
-    ruta = locales.get(m.group(1)) if m else None
+    if url.lstrip('/').startswith('img/'):      # foto ya guardada en el sitio
+        ruta = url.lstrip('/')
+    else:
+        m = RE_ID.search(url)
+        ruta = locales.get(m.group(1)) if m else None
     if not ruta:
         return None
     base, _ = os.path.splitext(ruta)
@@ -592,7 +596,24 @@ def fechas_previas():
     return dict(re.findall(r'<loc>([^<]+)</loc>\s*<lastmod>([^<]+)</lastmod>', txt))
 
 
-def mapa_portada(publicados, cambios):
+def fotos_extra():
+    """data/fotos-extra.json: {id_equipo: [rutas en img/catalogo/]}."""
+    d = leer_json(EXTRA) if os.path.exists(EXTRA) else {}
+    return {k: v for k, v in d.items() if not k.startswith('_') and v}
+
+
+def con_fotos_extra(equipos, extra):
+    """Pone las fotos extra delante de las de la hoja (sin repetirlas)."""
+    for x in equipos:
+        ex = extra.get(x['id'])
+        if not ex:
+            continue
+        hoja = x.get('fotos') or ([x['photo']] if x.get('photo') else [])
+        x['fotos'] = list(ex) + [u for u in hoja if u not in ex]
+        x['photo'] = x['fotos'][0]
+
+
+def mapa_portada(publicados, cambios, extra):
     """window.PAGINA_TIPO = {id_equipo: '/alquiler/<tipo>/#<id>'} en index.html:
     el catálogo lo usa para que el clic en un equipo abra su página."""
     txt = open(INDEX, encoding='utf-8').read()
@@ -604,7 +625,9 @@ def mapa_portada(publicados, cambios):
     # con varios, se salta al modelo pulsado.
     mapa = {x['id']: '/alquiler/%s/%s' % (t['slug'], '#' + x['id'] if len(eqs) > 1 else '')
             for t, eqs in publicados for x in eqs}
-    js = '<script>window.PAGINA_TIPO=%s;</script>' % json.dumps(mapa, ensure_ascii=False, sort_keys=True)
+    js = '<script>window.PAGINA_TIPO=%s;window.FOTOS_EXTRA=%s;</script>' % (
+        json.dumps(mapa, ensure_ascii=False, sort_keys=True),
+        json.dumps(extra, ensure_ascii=False, sort_keys=True))
     nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
                    lambda m: ini + js + fin, txt, flags=re.S)
     escribir('index.html', nuevo, cambios)
@@ -627,6 +650,8 @@ def main():
                if x.get('id') and x.get('nom') and not x.get('apoyo')]
     if not equipos:
         sys.exit('No hay equipos en los datos: no se genera nada.')
+    extra = fotos_extra()
+    con_fotos_extra(equipos, extra)
 
     # Cada equipo a su tipo; una categoría sin tipo definido recibe uno
     # genérico para que ningún equipo quede sin página (y se avisa).
@@ -677,7 +702,7 @@ def main():
             os.rmdir(os.path.join(base, d))
             cambios.append('alquiler/%s/ (borrada)' % d)
 
-    mapa_portada(publicados, cambios)
+    mapa_portada(publicados, cambios, extra)
 
     hoy = datetime.date.today().isoformat()
     previas = fechas_previas()
