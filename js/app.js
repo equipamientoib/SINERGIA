@@ -82,6 +82,10 @@ const CONFIG = {
      lleva las fotos de uso. Si no, la respuesta en vivo del Apps
      Script las reemplazaría a los pocos segundos.                  */
   DATA_URL: "https://script.google.com/macros/s/AKfycbyCC42QwfzqLYKo0J9ahH_m1upJ0uMIhd2hF2R7YOdNhtceXmhzRVYlydhkdjk-Xh_1Rg/exec",
+  /* VENTA_URL: Apps Script PROPIO de venta (google-apps-script/Venta.gs).
+     Es un proyecto aparte del de DATA_URL para no tocar alquiler, clientes
+     ni expedientes. Vacío = la venta usa solo data/venta.json.          */
+  VENTA_URL: "",
   WHATSAPP: SITE.whatsapp,
 
   /* Tiempo máximo de espera de una descarga, en milisegundos. Si Google
@@ -876,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=7cea67df';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=e4563bb5';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=7cea67df';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=e4563bb5';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=7cea67df','js/06-tablero.js?v=7cea67df'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=e4563bb5','js/06-tablero.js?v=e4563bb5'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=7cea67df'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=e4563bb5'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1681,6 +1685,9 @@ function cargarVenta(){
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
       .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom)}; vMezclar(); return VENTA; });
+    /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
+    const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
+    if(vu) fetch(vu, {cache:'no-store'}).then(r => r.json()).then(d => { if(d && d.ok !== false) ventaEnVivo(d); }).catch(() => {});
   }
   return VENTA_CARGA;
 }
