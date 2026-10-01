@@ -305,9 +305,9 @@ def tarjeta_equipo(eq, tipo, cfg, locales, primera=False):
           </div>
         </div>
         <ul class="garantias">
-          <li>Por hora, día, semana o mes</li>
-          <li>Técnico instrumentista opcional</li>
-          <li>Entrega en Lima y provincias</li>
+          <li>Por hora, día o mes</li>
+          <li>Técnico opcional</li>
+          <li>Lima y provincias</li>
         </ul>
       </div>
     </article>'''

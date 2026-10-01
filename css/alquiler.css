@@ -36,10 +36,10 @@ h2{font-size:clamp(21px,2.4vw,26px);margin-bottom:18px}
 
 /* ficha de equipo: galería + datos */
 .productos{padding-top:22px}
-.equipo{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:28px;align-items:start;
+.equipo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:stretch;
   background:var(--blanco);border:1px solid var(--linea);border-radius:18px;padding:18px;margin-bottom:16px;scroll-margin-top:90px}
 .gal-main{position:relative;border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--linea);cursor:zoom-in}
-.gal-main img{width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;display:block}
+.gal-main img{width:100%;height:100%;min-height:260px;object-fit:contain;display:block;position:absolute;inset:0}
 .gal-main.sinfoto{display:grid;place-items:center;aspect-ratio:4/3;color:var(--bronce);background:var(--crema);cursor:default}
 .gal-main.sinfoto svg{width:64px;height:64px}
 .gal-f{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:1px solid var(--linea);
@@ -56,7 +56,7 @@ h2{font-size:clamp(21px,2.4vw,26px);margin-bottom:18px}
 .gal-minis button.on,.gal-minis button:hover{opacity:1;border-color:var(--bronce)}
 .gal-minis img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
 
-.info{padding:2px 2px 0;min-width:0}
+.info{padding:4px 2px 0;min-width:0;display:flex;flex-direction:column}
 .chips-eq{display:flex;gap:6px;margin-bottom:8px}
 .chips-eq span{font-family:var(--ff-d);font-weight:600;font-size:11px;letter-spacing:1px;padding:5px 10px;border-radius:6px}
 .disp{background:#EAF4EF;color:#2E8B6B;border:1px solid rgba(46,139,107,.3);text-transform:uppercase}
@@ -72,7 +72,7 @@ h2{font-size:clamp(21px,2.4vw,26px);margin-bottom:18px}
 .cta{margin-top:14px;border:1px solid var(--linea-b);background:linear-gradient(180deg,#FBF8F2,#fff);border-radius:12px;padding:12px 14px;
   display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
 .tarifa b{display:block;font-family:var(--ff-d);font-size:17px;font-weight:600;line-height:1.2}
-.tarifa small{font-size:12.5px;color:var(--gris)}
+.tarifa small{font-size:12px;color:var(--gris)}
 .btns{display:flex;flex-wrap:wrap;gap:8px}
 .garantias{list-style:none;display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font-size:12.5px;color:var(--gris)}
 .garantias li{position:relative;padding-left:20px}
@@ -165,3 +165,22 @@ h2{font-size:clamp(21px,2.4vw,26px);margin-bottom:18px}
 
 /* con varios modelos, un poco de aire entre fichas */
 .productos .equipo + .equipo{margin-top:4px}
+
+/* simetría: las dos columnas miden lo mismo; la foto crece hasta igualar
+   la columna de datos y ambas terminan abajo a la misma altura */
+.gal{display:flex;flex-direction:column;height:100%}
+.gal-main{flex:1;min-height:260px}
+.gal-main.sinfoto{aspect-ratio:auto}
+.info .specs{margin-bottom:14px}
+.cta{margin-top:auto;display:block}
+.cta .tarifa{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cta .tarifa b{display:inline}
+.cta .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.cta .btns .btn{justify-content:center;padding:10px 8px}
+.garantias{display:grid;grid-template-columns:repeat(3,auto);justify-content:space-between;gap:4px 10px}
+@media(max-width:700px){
+  .gal-main{flex:none;aspect-ratio:4/3;min-height:0}
+  .gal-main img{min-height:0}
+  .cta .btns{grid-template-columns:1fr}
+  .garantias{grid-template-columns:1fr}
+}
