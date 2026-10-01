@@ -1,0 +1,102 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "tacometro",
+  "titulo": "Tacómetro digital TASI TA500C",
+  "resumen": "Tacómetro digital de doble modo, óptico sin contacto y por contacto, que mide velocidad de rotación en rpm y velocidad lineal. Útil para verificar la velocidad de centrífugas, agitadores y otros equipos rotativos de laboratorio clínico.",
+  "normas": [],
+  "secciones": [
+    {
+      "titulo": "Modo óptico (sin contacto)",
+      "filas": [
+        [
+          "Rango",
+          "3 a 100 000 rpm"
+        ],
+        [
+          "Precisión",
+          "± (0,05 % FE + 1 rpm)"
+        ],
+        [
+          "Distancia de medición",
+          "50 a 500 mm"
+        ]
+      ]
+    },
+    {
+      "titulo": "Modo de contacto",
+      "filas": [
+        [
+          "Rango de rotación",
+          "3 a 19 999 rpm"
+        ],
+        [
+          "Velocidad lineal",
+          "0 a 1999,9 m/min · 0 a 9999,9 ft/min"
+        ],
+        [
+          "Longitud",
+          "0 a 99 999 m"
+        ],
+        [
+          "Precisión",
+          "± (0,1 % FE + 1 rpm)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Lectura",
+      "filas": [
+        [
+          "Resolución",
+          "0,1 rpm (< 10 000 rpm) · 1 rpm (≥ 10 000 rpm)"
+        ],
+        [
+          "Tiempo de muestreo",
+          "0,8 s (por encima de 60 rpm)"
+        ],
+        [
+          "Funciones",
+          "Retención de valor máximo, mínimo y actual"
+        ],
+        [
+          "Pantalla",
+          "LCD retroiluminada"
+        ]
+      ]
+    },
+    {
+      "titulo": "Datos físicos",
+      "filas": [
+        [
+          "Dimensiones",
+          "146 × 59 × 29 mm"
+        ],
+        [
+          "Peso",
+          "Aprox. 120 g"
+        ],
+        [
+          "Alimentación",
+          "2 pilas AAA de 1,5 V"
+        ],
+        [
+          "Temperatura de operación",
+          "-20 °C a 50 °C, hasta 80 % HR"
+        ]
+      ]
+    }
+  ],
+  "incluye": [
+    "Tacómetro TASI TA500C",
+    "2 cintas reflectivas",
+    "Manual de instrucciones"
+  ],
+  "fuente": "Fichas de producto del TASI TA500C en Alibaba (tienda TASI), Amazon y distribuidores (datos leídos a través de buscador web)",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Puntas/rueda de contacto: la lista de empaque publicada no las menciona, aunque se requieren para el modo de contacto",
+    "Límite superior del modo óptico (100 000 rpm según listados; la pantalla muestra hasta 99 999)",
+    "Grado de protección IP65 (mencionado en un solo listado)",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}

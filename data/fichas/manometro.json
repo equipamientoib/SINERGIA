@@ -1,0 +1,88 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "manometro",
+  "titulo": "Manómetro diferencial digital AUTOOL PT520",
+  "resumen": "Manómetro digital de doble puerto que mide presión manométrica y diferencial de -100 a 200 kPa con lectura en 10 unidades, incluida mmHg. Útil para verificar presiones y fugas en tensiómetros y monitores de presión no invasiva (NIBP), sistemas de vacío y gases.",
+  "normas": [],
+  "secciones": [
+    {
+      "titulo": "Medición",
+      "filas": [
+        [
+          "Rango",
+          "-100 a 200 kPa (-1000 a 2000 hPa)"
+        ],
+        [
+          "Precisión",
+          "± 0,3 % FE"
+        ],
+        [
+          "Resolución",
+          "0,01 kPa · 0,1 hPa"
+        ],
+        [
+          "Tipo",
+          "Diferencial, doble puerto"
+        ]
+      ]
+    },
+    {
+      "titulo": "Unidades",
+      "filas": [
+        [
+          "Unidades seleccionables",
+          "kPa, hPa, mbar, mmHg, Torr, inHg, mmH₂O, inH₂O, psi, kg/cm²"
+        ]
+      ]
+    },
+    {
+      "titulo": "Funciones",
+      "filas": [
+        [
+          "Ajuste de cero",
+          "Sí (P = 0)"
+        ],
+        [
+          "Registro",
+          "Máximo/mínimo, modo registro y almacenamiento de datos"
+        ],
+        [
+          "Pantalla",
+          "LCD con retroiluminación"
+        ]
+      ]
+    },
+    {
+      "titulo": "Datos físicos",
+      "filas": [
+        [
+          "Alimentación",
+          "4 pilas AAA de 1,5 V"
+        ],
+        [
+          "Temperatura de operación",
+          "-10 °C a 60 °C"
+        ],
+        [
+          "Temperatura de almacenamiento",
+          "-20 °C a 65 °C"
+        ]
+      ]
+    }
+  ],
+  "incluye": [
+    "Manómetro digital AUTOOL PT520",
+    "7 conectores adaptadores",
+    "Manguera de 1,5 m (59\")",
+    "4 mangueras cortas de 25 cm (9,8\")",
+    "Manual de usuario"
+  ],
+  "fuente": "Manual de usuario AUTOOL PT520 y fichas de producto de distribuidores (datos leídos a través de buscador web)",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Dimensiones y peso del equipo (los listados indican 2,9 × 1,29 × 6,49 pulg y 1,1 lb, sin aclarar si es con empaque)",
+    "Si la precisión ± 0,3 % FE se mantiene en todo el rango, en especial en el rango de NIBP (0 a 300 mmHg)",
+    "Capacidad de almacenamiento de datos y apagado automático",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}

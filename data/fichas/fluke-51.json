@@ -1,0 +1,120 @@
+{
+  "_nota": "Ficha técnica de un equipo. scripts/generar_paginas.py la muestra en la página del tipo y genera la versión A4 (fichas/<id>/) de la que sale el PDF. «revisar» lista lo que Sinergia debe confirmar antes de darla por final.",
+  "id": "fluke-51",
+  "titulo": "Termómetro digital Fluke 51 II",
+  "resumen": "Termómetro digital de una entrada para termopares tipo J, K, T y E, con precisión de laboratorio y lectura rápida en pantalla retroiluminada. Ideal en mantenimiento biomédico para verificar temperaturas en incubadoras, esterilizadores, autoclaves, baños termostáticos y refrigeradores de laboratorio o banco de sangre.",
+  "normas": [
+    "EN 61010-1",
+    "CSA C22.2 No. 1010.1"
+  ],
+  "secciones": [
+    {
+      "titulo": "Rangos de medición",
+      "filas": [
+        [
+          "Termopar tipo J",
+          "-210 °C a 1200 °C"
+        ],
+        [
+          "Termopar tipo K",
+          "-200 °C a 1372 °C"
+        ],
+        [
+          "Termopar tipo T",
+          "-250 °C a 400 °C"
+        ],
+        [
+          "Termopar tipo E",
+          "-150 °C a 1000 °C"
+        ]
+      ]
+    },
+    {
+      "titulo": "Precisión",
+      "filas": [
+        [
+          "Por encima de -100 °C (J, K, T, E)",
+          "± (0,05 % de lectura + 0,3 °C)"
+        ],
+        [
+          "Por debajo de -100 °C (J, K, E)",
+          "± (0,20 % de lectura + 0,3 °C)"
+        ],
+        [
+          "Por debajo de -100 °C (T)",
+          "± (0,50 % de lectura + 0,3 °C)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Pantalla y funciones",
+      "filas": [
+        [
+          "Resolución",
+          "0,1 °C (< 1000 °C) · 1 °C (≥ 1000 °C)"
+        ],
+        [
+          "Pantalla",
+          "Grande, con retroiluminación"
+        ],
+        [
+          "Funciones",
+          "MIN, MAX y promedio (AVG) con reloj de tiempo relativo"
+        ],
+        [
+          "Escala de temperatura",
+          "ITS-90"
+        ]
+      ]
+    },
+    {
+      "titulo": "Condiciones ambientales",
+      "filas": [
+        [
+          "Operación",
+          "-10 °C a 50 °C"
+        ],
+        [
+          "Almacenamiento",
+          "-40 °C a 60 °C"
+        ]
+      ]
+    },
+    {
+      "titulo": "Datos físicos",
+      "filas": [
+        [
+          "Dimensiones",
+          "173 × 86 × 38 mm"
+        ],
+        [
+          "Peso",
+          "400 g"
+        ],
+        [
+          "Baterías",
+          "3 pilas AA"
+        ],
+        [
+          "Autonomía",
+          "Típica de 1000 h"
+        ]
+      ]
+    }
+  ],
+  "incluye": [
+    "Termómetro Fluke 51 II",
+    "Sonda de termopar de perla tipo K 80PK-1",
+    "Funda protectora antigolpes",
+    "3 pilas AA",
+    "Manual de usuario"
+  ],
+  "fuente": "Hoja de datos técnicos y manual de usuario de Fluke 51 & 52 Series II",
+  "revisar": [
+    "Lo que incluye el alquiler (accesorios reales del equipo)",
+    "Sondas adicionales tipo J u otras: el equipo estándar solo trae la sonda tipo K 80PK-1",
+    "Precisión para termopar tipo N (lo indica la hoja de datos, pero el 51 II solo lista J, K, T y E como tipos seleccionables)",
+    "Normas de seguridad: confirmar versión vigente indicada en el manual del equipo",
+    "Certificado de calibración: fecha y laboratorio"
+  ]
+}
