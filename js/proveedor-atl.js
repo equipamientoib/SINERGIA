@@ -72,12 +72,28 @@
   /* Pide al portal los productos [desde, hasta] con la misma consulta que
      hace su botón «Ver más productos» (controller_home.php), pero sin
      dibujar nada ni disparar los filtros laterales: 1 consulta = 1 pedido. */
+  /* Filtros que la persona dejó puestos en el portal (p. ej. «EQUIPOS»).
+     Se toman tal cual del botón «Ver más productos» de la página, que ya
+     trae los valores en el formato del portal; si no hay botón, de la URL. */
+  var FIL = (function () {
+    var el = document.querySelector('[onclick*="searchProdBloque("]');
+    var m = el && el.getAttribute('onclick').match(/searchProdBloque\(([^)]*)\)/);
+    if (m) {
+      var a = m[1].split(',').map(function (x) { return x.trim().replace(/^'|'$/g, ''); });
+      if (a.length >= 12) return { s: a[0], m: a[1], c: a[2], p: a[8], u: a[9], u2: a[10], tp: a[11] };
+    }
+    var q = new URLSearchParams(location.search), r = {};
+    ['s', 'm', 'c', 'p', 'u', 'u2', 'tp'].forEach(function (k) { r[k] = q.get(k) || ''; });
+    return r;
+  })();
+  var FILTRADO = !!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp);
+
   function bloque(desde, hasta, pagina, nrodivs) {
     return new Promise(function (ok) {
       var f = new FormData();
-      [['tipoAccion', 'searchProdBloque'], ['searchProd', ''], ['searchMarca', ''], ['searchCategoria', ''],
+      [['tipoAccion', 'searchProdBloque'], ['searchProd', FIL.s], ['searchMarca', FIL.m], ['searchCategoria', FIL.c],
        ['inicio', desde], ['final', hasta], ['nrodivs', nrodivs], ['idDiv', pagina],
-       ['searchPais', ''], ['searchPrecio', ''], ['searchPrecio2', ''], ['searchTipoprd', '']]
+       ['searchPais', FIL.p], ['searchPrecio', FIL.u], ['searchPrecio2', FIL.u2], ['searchTipoprd', FIL.tp]]
         .forEach(function (x) { f.append(x[0], String(x[1])); });
       var x = new XMLHttpRequest();
       x.open('POST', '/controlador/controller_home.php', true);
@@ -174,9 +190,9 @@
       for (var t = 0; t < BLOQUES.length && !P; t++) {
         if (consultas) await espera(PAUSA);
         consultas++;
-        txt('Leyendo el catálogo del proveedor (consulta ' + consultas + ')…');
+        txt('Leyendo el catálogo del proveedor' + (FILTRADO ? ' <b>con tu filtro</b>' : '') + ' (consulta ' + consultas + ')…');
         var n = leer(await bloque(1, BLOQUES[t], 1, Math.ceil(9000 / BLOQUES[t])), mapa);
-        if (n > 0 && n <= 25) return error('El portal entrega solo ' + n + ' productos por consulta. Para no hacer cientos de consultas, me detuve. Avísale a Claude.');
+        if (n === 20) return error('El portal entrega solo ' + n + ' productos por consulta. Para no hacer cientos de consultas, me detuve. Avísale a Claude.');
         if (n) { P = BLOQUES[t]; if (n < P * 0.9) completo = true; }
       }
       if (!P) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar más tarde.');
@@ -200,9 +216,11 @@
       var leidos = Object.keys(mapa).length;
       bar(1);
 
+      if (!items.length) return error('Se leyeron ' + leidos + ' productos del portal, pero ninguno coincide con los códigos de tu hoja' +
+        (FILTRADO ? ' (prueba quitando el filtro del portal).' : '.'));
       try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
       txt('Enviando <b>' + items.length + '</b> precios y stocks a tu hoja…');
-      await enviar(JSON.stringify({ k: CFG.k, tc: TC, completo: completo && leidos >= 1000, items: items }));
+      await enviar(JSON.stringify({ k: CFG.k, tc: TC, completo: completo && !FILTRADO && leidos >= 1000, items: items }));
       /* La respuesta del POST es opaca (otro dominio): el resultado se pide aparte. */
       await new Promise(function (ok) { setTimeout(ok, 2500); });
       var est = {};
@@ -210,7 +228,7 @@
       var faltan = total - items.length;
       txt('<b style="color:#9be3b5">¡Listo!</b> Se actualizaron <b>' + (est.actualizados != null ? est.actualizados : items.length) + '</b> equipos' +
         (TC ? ' con TC S/ ' + TC : '') + '.<br>' +
-        (faltan ? faltan + ' código(s) de tu hoja no aparecen hoy en el portal' + (completo && leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
+        (faltan ? faltan + ' código(s) de tu hoja no aparecen ' + (FILTRADO ? 'con el filtro que tienes puesto (quedan como estaban)' : 'hoy en el portal') + (completo && !FILTRADO && leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
         '<span style="color:#aeb4bc">La web se actualiza sola en unos minutos.</span>');
       boton('Cerrar', cerrar);
     } catch (e) {
