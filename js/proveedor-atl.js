@@ -60,7 +60,7 @@
   if (!/altokelite\.com$/.test(location.hostname)) return error('Abre primero <b>altokelite.com</b> (con tu sesión iniciada) y luego toca el favorito.');
   if (typeof window.searchProdBloque !== 'function') {
     txt('Te llevo a la página de Productos del portal. Cuando cargue, toca el favorito otra vez.');
-    setTimeout(function () { location.href = '/view/products/?s='; }, 1500);
+    setTimeout(function () { location.href = '/view/products/?s=&m=&c=&p=&u=&u2=&tp=2'; }, 1500);
     return;
   }
 
@@ -86,7 +86,9 @@
     ['s', 'm', 'c', 'p', 'u', 'u2', 'tp'].forEach(function (k) { r[k] = q.get(k) || ''; });
     return r;
   })();
-  var FILTRADO = !!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp);
+  /* Sin filtro puesto, se usa Tipo = EQUIPOS (tp=2, ≈789 productos): 2 consultas. */
+  if (!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp)) FIL.tp = '2';
+  var FILTRADO = true;
 
   function bloque(desde, hasta, pagina, nrodivs) {
     return new Promise(function (ok) {
@@ -190,7 +192,7 @@
       for (var t = 0; t < BLOQUES.length && !P; t++) {
         if (consultas) await espera(PAUSA);
         consultas++;
-        txt('Leyendo el catálogo del proveedor' + (FILTRADO ? ' <b>con tu filtro</b>' : '') + ' (consulta ' + consultas + ')…');
+        txt('Leyendo el catálogo del proveedor' + (FILTRADO ? (FIL.tp === '2' && !(FIL.s || FIL.m || FIL.c) ? ' (EQUIPOS)' : ' <b>con tu filtro</b>') : '') + ' (consulta ' + consultas + ')…');
         var n = leer(await bloque(1, BLOQUES[t], 1, Math.ceil(9000 / BLOQUES[t])), mapa);
         if (n === 20) return error('El portal entrega solo ' + n + ' productos por consulta. Para no hacer cientos de consultas, me detuve. Avísale a Claude.');
         if (n) { P = BLOQUES[t]; if (n < P * 0.9) completo = true; }
@@ -217,7 +219,7 @@
       bar(1);
 
       if (!items.length) return error('Se leyeron ' + leidos + ' productos del portal, pero ninguno coincide con los códigos de tu hoja' +
-        (FILTRADO ? ' (prueba quitando el filtro del portal).' : '.'));
+        '.');
       try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
       txt('Enviando <b>' + items.length + '</b> precios y stocks a tu hoja…');
       await enviar(JSON.stringify({ k: CFG.k, tc: TC, completo: completo && !FILTRADO && leidos >= 1000, items: items }));
@@ -228,7 +230,7 @@
       var faltan = total - items.length;
       txt('<b style="color:#9be3b5">¡Listo!</b> Se actualizaron <b>' + (est.actualizados != null ? est.actualizados : items.length) + '</b> equipos' +
         (TC ? ' con TC S/ ' + TC : '') + '.<br>' +
-        (faltan ? faltan + ' código(s) de tu hoja no aparecen ' + (FILTRADO ? 'con el filtro que tienes puesto (quedan como estaban)' : 'hoy en el portal') + (completo && !FILTRADO && leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
+        (faltan ? faltan + ' código(s) de tu hoja no aparecen ' + 'en la sección EQUIPOS del portal (quedan como estaban)' + (completo && !FILTRADO && leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
         '<span style="color:#aeb4bc">La web se actualiza sola en unos minutos.</span>');
       boton('Cerrar', cerrar);
     } catch (e) {
