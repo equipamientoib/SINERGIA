@@ -278,9 +278,12 @@ function cotEnviar(via){
     enviarAlEndpoint({tipo: 'cotizador', equipo: c.sel.map(e => e.nom).join(' + '), modalidad: c.mod,
                       total: 'S/ ' + c.total.toFixed(2), nombre: nom, correo: mail, telefono: tel});
   avisar('cotAviso', via === 'correo'
-    ? 'Abriendo tu correo con la solicitud lista para enviar…'
-    : 'Abriendo WhatsApp con la solicitud lista para enviar…', 'ok');
+    ? 'Abriendo tu correo y descargando la cotización…'
+    : 'Abriendo WhatsApp y descargando la cotización…', 'ok');
+  /* Se manda el mensaje y, además, se abre la cotización para guardarla:
+     así el cliente se queda con el documento sin tener que pedirlo. */
   abrirCanal(via, texto, 'Solicitud de alquiler');
+  setTimeout(() => cotImprimir(doc), 600);
 }
 
 /* ── Cotización formal ───────────────────────────────────────────────
@@ -324,6 +327,10 @@ function cotMontoLetras(v){
 
 /* Las condiciones comerciales del alquiler, en el mismo formato de pares
    etiqueta : texto que usa la cotización de la empresa. */
+/* El logo va incrustado en la hoja: se abre en una ventana aparte, que no
+   puede pedir archivos del sitio. */
+const COT_LOGO = `<svg xmlns="http://www.w3.org/2000/svg" class="logo" viewBox="0 0 880 240" role="img" aria-label="Sinergia Biomédica">  <text x="40" y="208" font-weight="700" font-size="212" textLength="252" lengthAdjust="spacingAndGlyphs"><tspan fill="#9A7F4E">S</tspan><tspan fill="#2A2D33">B</tspan></text>  <text x="342" y="158" font-weight="700" font-size="100" fill="#17191D" textLength="498" lengthAdjust="spacingAndGlyphs">SINERGIA</text>  <text x="342" y="212" font-weight="600" font-size="52" fill="#2A2D33" textLength="498" lengthAdjust="spacingAndGlyphs">BIOMÉDICA</text>  <rect x="342" y="228" width="498" height="3" fill="#9A7F4E"/></svg>`;
+
 /* Documento congelado: lleva todo lo que necesita la cotización, para que
    el enlace que se comparte siga valiendo aunque mañana cambien las tarifas. */
 function cotDoc(c, nom, mail, tel, numero){
@@ -331,11 +338,20 @@ function cotDoc(c, nom, mail, tel, numero){
     num: numero, fecha: new Date().toLocaleDateString('es-PE'),
     nom: nom, mail: mail, tel: tel,
     mod: c.mod, qty: c.qty, d1: COT.d1, d2: COT.d2,
-    items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia})),
+    items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia, f: cotFotoAbs(e)})),
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
     tec: c.tecnico, gar: c.garantia, total: c.total,
     inc: (c.conTecnico ? incluidos('') : []).map(x => x.nom)
   };
+}
+
+/* Foto del equipo, en dirección absoluta: la hoja se abre en una ventana
+   nueva, donde las rutas relativas no resuelven. */
+function cotFotoAbs(e){
+  const u = (typeof fotoURL === 'function') ? fotoURL(e.photo || (e.fotos || [])[0] || '', 160, true) : '';
+  if(!u) return '';
+  if(/^https?:/.test(u)) return u;
+  return location.origin + '/' + String(u).replace(/^\//, '');
 }
 
 /* El documento viaja dentro del enlace, en base64 seguro para URL. */
@@ -393,19 +409,23 @@ function cotHTML(d){
     return `<tr>
       <td class="c">${i + 1}</td><td class="c">${d.qty}</td><td class="c">${und}</td>
       <td><b>${cotEsc(e.n.toUpperCase())}</b><br>- MARCA: ${cotEsc((pr[0] || '—').trim().toUpperCase())}<br>- PROCEDENCIA: ${cotEsc((pr[1] || '—').trim().toUpperCase())}<br>- CON CERTIFICADO DE CALIBRACIÓN VIGENTE</td>
+      <td class="img">${e.f ? `<img src="${cotEsc(e.f)}" alt="">` : ''}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${st.toFixed(2)}</td></tr>`;
   }).join('') + (d.tec ? `<tr>
       <td class="c">${d.items.length + 1}</td><td class="c">${d.qty}</td><td class="c">${und}</td>
       <td><b>INSTRUMENTISTA METROLÓGICO</b><br>- MANEJO DEL INSTRUMENTO Y REGISTRO DE MEDICIONES<br>- MÍNIMO MEDIO DÍA</td>
+      <td class="img"></td>
       <td class="d">${(d.tec / d.qty).toFixed(2)}</td><td class="d">${d.tec.toFixed(2)}</td></tr>` : '');
   const cond = cotCondiciones(d).map(([k, v]) =>
     `<tr><th>${cotEsc(k)}</th><td class="dp">:</td><td>${cotEsc(v)}</td></tr>`).join('');
   return `<!doctype html><html lang="es"><head><meta charset="utf-8">
   <title>Cotización ${cotEsc(d.num)}</title><style>
     *{box-sizing:border-box}
-    body{margin:0;padding:16mm 14mm;font:11px/1.45 Arial,Helvetica,sans-serif;color:#000;background:#fff}
+    @page{size:A4 portrait;margin:11mm}
+    body{margin:0 auto;padding:14mm 12mm;max-width:210mm;font:11px/1.45 Arial,Helvetica,sans-serif;color:#000;background:#fff}
     .mem{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
       border-bottom:3px solid #1F3864;padding-bottom:8px;margin-bottom:10px}
+    .mem .logo{height:34px;width:auto;display:block;margin-bottom:4px}
     .mem b{font-size:15px;letter-spacing:-.2px}
     .mem small{display:block;color:#444;font-size:10px;line-height:1.5}
     h1{margin:10px 0 2px;text-align:center;font-size:15px;letter-spacing:.5px}
@@ -423,6 +443,8 @@ function cotHTML(d){
     table.it td{border:1px solid #9aa4b8;padding:5px;vertical-align:top}
     table.it td.c{text-align:center;white-space:nowrap}
     table.it td.d{text-align:right;white-space:nowrap}
+    table.it td.img{text-align:center;padding:4px}
+    table.it td.img img{max-width:64px;max-height:52px;object-fit:contain}
     table.tt{width:100%;border-collapse:collapse;font-size:11px;margin-top:-1px}
     table.tt td{border:1px solid #9aa4b8;padding:5px}
     table.tt td.k{text-align:right;font-weight:bold;width:82%}
@@ -431,10 +453,10 @@ function cotHTML(d){
     .sec{margin:16px 0 5px;font-weight:bold;letter-spacing:.5px}
     .firma{margin-top:22px;font-size:11px}
     .pie{margin-top:14px;border-top:3px solid #1F3864;padding-top:6px;font-size:9.5px;color:#444;text-align:center}
-    @media print{body{padding:12mm}}
+    @media print{body{padding:0;max-width:none}}
   </style></head><body>
     <div class="mem">
-      <div><b>${cotEsc(S.nombre || 'Sinergia Biomédica')}</b>
+      <div>${COT_LOGO}
         <small>${cotEsc(S.razonSocial || '')}<br>RUC ${cotEsc(S.ruc || '')}<br>${cotEsc(S.direccion || '')}</small></div>
       <div style="text-align:right"><small>${cotEsc(S.telefono || '')}<br>${cotEsc(S.email || '')}<br>${cotEsc(S.web || '')}</small></div>
     </div>
@@ -454,8 +476,9 @@ function cotHTML(d){
     <p class="cuadro">CUADRO Nº 1</p>
     <table class="it">
       <tr><th style="width:36px">ÍTEM</th><th style="width:42px">CANT</th><th style="width:72px">UND</th>
-        <th>DESCRIPCIÓN</th><th style="width:88px">PRECIO UNITARIO<br>INCLUIDO IGV</th>
-        <th style="width:88px">SUB TOTAL<br>INCLUIDO IGV</th></tr>
+        <th>DESCRIPCIÓN</th><th style="width:76px">IMAGEN</th>
+        <th style="width:80px">PRECIO UNITARIO<br>INCLUIDO IGV</th>
+        <th style="width:80px">SUB TOTAL<br>INCLUIDO IGV</th></tr>
       ${filas}
     </table>
     <table class="tt">
