@@ -5,20 +5,20 @@
    ===================================================================== */
 
 /* título del equipo (en venta es el h1 de la página) */
-.prod-h1{font-size:clamp(24px,2.6vw,31px);margin-top:6px;line-height:1.15}
+.prod-h1{font-size:clamp(23px,2.3vw,28px);margin-top:6px;line-height:1.2}
+.prod.venta .prod-desc{margin-top:8px;font-size:15px;color:var(--gris)}
 
 /* marca · modelo · origen: franja de ficha técnica */
-.ft{display:flex;flex-wrap:wrap;gap:8px 34px;margin:14px 0 0;padding:12px 0;
-  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
+.ft{display:flex;flex-wrap:wrap;gap:8px 30px;margin:18px 0 0;padding:14px 0 0;border-top:1px solid var(--linea)}
 .ft dt{font-family:var(--ff-d);font-size:10.5px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--gris)}
-.ft dd{margin:2px 0 0;font-size:17px;font-weight:600;color:var(--onix);line-height:1.25}
+.ft dd{margin:2px 0 0;font-size:16px;font-weight:600;color:var(--onix);line-height:1.25}
 .ft .ft-marca dd{font-family:var(--ff-d);letter-spacing:.8px;text-transform:uppercase;color:var(--cobre-d)}
 .ft .ft-origen dd{font-weight:500;color:var(--grafito)}
 
 /* precio con vigencia y stock */
-.precio-caja{margin-top:16px;padding:14px 18px;border:1px solid var(--linea);border-radius:12px;background:var(--crema)}
+.precio{margin-top:20px}
 .pc-fila{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px}
-.pc-monto{font-family:var(--ff-d);font-size:28px;font-weight:600;letter-spacing:-.4px;color:var(--onix)}
+.pc-monto{font-family:var(--ff-d);font-size:30px;font-weight:600;letter-spacing:-.4px;color:var(--onix)}
 .pc-monto.consulta{font-size:19px;color:var(--grafito)}
 .st{font-family:var(--ff-d);font-size:12px;font-weight:600;letter-spacing:.4px;padding:4px 10px;border-radius:99px}
 .st.si{color:#1D6B43;background:#E6F3EA;border:1px solid #BFE0CB}
@@ -26,10 +26,11 @@
 .pc-nota{display:block;margin-top:6px;font-size:13px;color:var(--gris)}
 .pc-nota b{color:var(--grafito);font-weight:600}
 
-/* ficha técnica aún sin PDF: el espacio queda listo */
-.doc.pend{grid-template-columns:auto 1fr auto}
-.doc.pend .doc-ico{background:#C9BFA9}
-.doc-pedir{padding:9px 16px;font-size:13.5px;background:#fff}
+/* ficha técnica aún sin PDF: una línea discreta (cuando hay PDF, la caja .doc) */
+.prod.venta .prod-btns{margin-top:20px}
+.doc-linea{margin-top:14px;font-size:13.5px;line-height:1.6;color:var(--gris)}
+.doc-linea a{color:var(--cobre-d);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.doc-mini{display:inline-block;margin-right:7px;vertical-align:1px;font-family:var(--ff-d);font-size:9.5px;font-weight:700;color:#fff;background:#B9AE96;border-radius:4px;padding:3px 5px;letter-spacing:.5px}
 
 /* parámetros: características como lista dentro de la tabla */
 .panel td.car{font-weight:500;color:var(--grafito);padding-left:30px;position:relative}
