@@ -10,7 +10,17 @@ function route(sinMover){
   if(h.startsWith('#/equipo/') && (window.PAGINA_TIPO||{})[h.split('/')[2]]){
     location.replace(window.PAGINA_TIPO[h.split('/')[2]]); return;
   }
-  if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
+  /* #/cotizar/<id>: abre el cotizador de ese equipo. Es la ruta de los
+     botones «Calcular mi alquiler» de las páginas propias; no se redirige,
+     porque si no volvería a la página de donde vino. */
+  if(h.startsWith('#/cotizar/')){
+    pageId='page-catalogo'; navKey='#/catalogo'; setView('eq');
+    /* Diferido: route() puede correr mientras el paquete aún se evalúa y
+       10-modal.js todavía no existe. */
+    const idc = h.split('/')[2];
+    setTimeout(() => { if(typeof abrirCotizador === 'function') abrirCotizador(idc); }, 0);
+  }
+  else if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/paquete/')){renderPaquete(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/proyecto/')){renderProyecto(h.split('/')[2]);pageId='page-equipo';navKey='#/clientes';}
   else if(h==='#/venta'||h.startsWith('#/venta/')){renderVenta(h.split('/').slice(2));pageId='page-venta';navKey=h==='#/venta'?'#/venta':'#/venta/tienda';}
@@ -25,7 +35,7 @@ function route(sinMover){
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */
   const enVenta = h==='#/venta' || h.startsWith('#/venta/');
-  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete)\//.test(h);
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar)\//.test(h);
   let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
   try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
   modo = modo || 'alquiler';
