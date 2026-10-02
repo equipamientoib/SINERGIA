@@ -437,6 +437,10 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración</a>' % e(eq['cal_pdf']))
     if eq.get('ficha'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
+    # Con los precios encendidos, un botón lleva al cotizador (calcula el total
+    # con el instrumentista y el IGV). Sin precios no se muestra.
+    cotiza = ('<a class="btn fill calc-link" href="/#/equipo/%s">Calcular mi alquiler</a>' % eq['id']
+              if cfg['precios'] and eq.get('dia') else '')
     precio = ''
     if cfg['precios'] and eq.get('dia'):
         # Medio día (un turno de 4 h) = 60 % del día, solo desde MEDIO_DIA_MIN:
@@ -497,6 +501,7 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         <div class="prod-chips">{chips}</div>
         {precio}
         <div class="prod-btns">
+          {cotiza}
           <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
           <a class="btn" href="{correo}">Cotizar por correo</a>
         </div>

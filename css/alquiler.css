@@ -207,3 +207,9 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .top .modo-sw{display:inline-flex;padding:3px;border:1px solid var(--linea,#e2ddd3);border-radius:999px;background:#fff}
 .top .modo-sw a{padding:5px 12px;border-radius:999px;border-bottom:0;font-size:13px}
 .top .modo-sw a.on{background:#17191d;color:#fff}
+
+/* botón que lleva al cotizador (solo con los precios encendidos) */
+.prod-btns:has(.calc-link){grid-template-columns:1fr 1fr 1fr}
+.calc-link{background:var(--cobre-d);border-color:var(--cobre-d);color:#fff}
+.calc-link:hover{filter:brightness(1.08)}
+@media(max-width:560px){.prod-btns:has(.calc-link){grid-template-columns:1fr}}
