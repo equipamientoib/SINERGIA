@@ -71,3 +71,9 @@
   .ft dd{font-size:15.5px}
   .pc-monto{font-size:24px}
 }
+
+/* página /venta/codigos-nts/ */
+.panel.nts{display:block;margin-top:22px;background:var(--blanco);border:1px solid var(--linea);border-radius:14px}
+.panel.nts th{width:90px;font-family:var(--ff-d);font-size:16px;color:var(--cobre-d);vertical-align:top;scroll-margin-top:90px}
+.nts-eq{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+.nts-eq a{font-size:14px;color:var(--grafito);text-decoration:underline;text-underline-offset:3px}

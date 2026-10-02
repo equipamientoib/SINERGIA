@@ -33,8 +33,12 @@
  *     la imagen redimensionada en vez del original (las fotos de los
  *     equipos pesan cerca de 2 MB).
  *
- * ⚠ ESTE ARCHIVO CONTIENE LA CLAVE DEL CLIENTE.
- *   Va SOLO dentro de Apps Script. NUNCA lo subas a GitHub.
+ * CLAVES DE LOS CLIENTES: no van escritas en este archivo (el repositorio
+ *   es público). Se guardan en Apps Script > Configuración del proyecto >
+ *   Propiedades del script, p. ej.  CLAVE_LIMATAMBO = <clave del cliente>.
+ *   La web pública solo recibe clave_verif = SHA-256('sinergia-verif:' +
+ *   clave): sirve para comprobar lo que escribe el cliente, pero NO abre
+ *   el detalle (el detalle pide el SHA-256 de la clave, que no se publica).
  *
  * INSTALACIÓN
  *  1) Apps Script > selecciona todo el Code.gs > pega esto > Guardar.
@@ -60,7 +64,7 @@ var PROYECTOS = [
     servicio: "Contrato COT-SB-0726-01",
     fecha: "2026",
     foto: "",
-    clave: "limatambo26-sb",   // la que entregas al cliente
+    clave: clave_('CLAVE_LIMATAMBO'),   // Propiedades del script (no se escribe aquí)
     desc: "Programa anual de mantenimiento preventivo sobre 90 equipos biomédicos " +
           "en 15 áreas, con informe individual por intervención y trazabilidad por equipo.",
     hojaResumen: "RESUMEN",
@@ -317,11 +321,16 @@ function resumenPreventivos_(ss, cfg) {
   };
 }
 
+/* Clave de un cliente guardada en Propiedades del script. */
+function clave_(nombre) {
+  return String(PropertiesService.getScriptProperties().getProperty(nombre) || '').trim();
+}
+
 function proyectoPublico_(cfg) {
   var base = {
     id: cfg.id, cliente: cfg.cliente, titulo: cfg.titulo, servicio: cfg.servicio,
     fecha: cfg.fecha, foto: foto_(cfg.foto), desc: cfg.desc,
-    clave_hash: cfg.clave ? sha256_(cfg.clave) : '',
+    clave_verif: cfg.clave ? sha256_('sinergia-verif:' + cfg.clave) : '',
     detalle: true
   };
   var ss;

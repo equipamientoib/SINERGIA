@@ -75,6 +75,21 @@ def vigencia(actualizado):
     return d + datetime.timedelta(days=VIGENCIA_DIAS)
 
 
+def ajustar(p, repo):
+    """Stock visible (30 % del proveedor, mínimo 1, máximo 10) y código NTS
+    con su nombre oficial si la hoja aún no lo tiene (data/venta.json)."""
+    q = dict(p)
+    sv = repo.get('stockVisible') or {}
+    st = q.get('stock')
+    if isinstance(st, (int, float)) and st > 0:
+        q['stock'] = min(sv.get('maximo', 10), max(1, int(st * sv.get('porcentaje', 30) // 100)))
+    if not q.get('clave'):
+        q['clave'] = (repo.get('codigosNTS') or {}).get(q['id'], '')
+    if q.get('clave') and not q.get('expediente'):
+        q['expediente'] = (repo.get('nombresNTS') or {}).get(q['clave'], '')
+    return q
+
+
 def fotos(p, base, fijas):
     """[(ligera, grande)] en orden de prioridad: fija › hoja/proveedor › antigua."""
     urls = fijas.get(p['id']) or p.get('fotos') or (base.get(p['id']) or {}).get('fotosSitio') or []
@@ -154,12 +169,12 @@ def galeria(p, fts, primera=True):
 
 
 def franja(p):
-    d = [(k, p.get(c)) for k, c in (('Marca', 'marca'), ('Modelo', 'modelo'), ('Origen', 'origen'),
-                                    ('Expediente', 'clave')) if p.get(c)]
+    d = [(k, c, p.get(c)) for k, c in (('Marca', 'marca'), ('Modelo', 'modelo'), ('Origen', 'origen'),
+                                       ('Código NTS', 'clave')) if p.get(c)]
     if not d:
         return ''
     return '<dl class="ft">%s</dl>' % ''.join(
-        '<div class="ft-%s"><dt>%s</dt><dd>%s</dd></div>' % (k.lower(), k, e(v)) for k, v in d)
+        '<div class="ft-%s"><dt>%s</dt><dd>%s</dd></div>' % (c, k, e(v)) for k, c, v in d)
 
 
 def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
@@ -174,8 +189,8 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
     badge = ('<span class="st si">En stock · %d %s</span>' % (stock, 'unidad' if stock == 1 else 'unidades')
              if isinstance(stock, (int, float)) and stock > 0 else '')
     if p.get('precio'):
-        nota = ('Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización'
-                % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Precio referencial, se confirma en la cotización'
+        nota = ('Incluye IGV · <span>Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización</span>'
+                % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial, se confirma en la cotización'
         caja = f'''<div class="precio"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{badge}</div>
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
@@ -197,7 +212,7 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
         doc = f'''<p class="doc-linea"><span class="doc-mini" aria-hidden="true">PDF</span>
           Ficha técnica en preparación · <a href="{wa_f}" target="_blank" rel="noopener">pídela por WhatsApp</a></p>'''
 
-    # Pestañas: Descripción · Parámetros técnicos · Para expedientes técnicos
+    # Pestañas: Descripción · Parámetros técnicos · Código NTS
     areas = ''.join('<li>%s</li>' % e(a) for a in p.get('areas') or [])
     desc = '<p>%s</p>' % e(p.get('resumen') or '')
     if areas:
@@ -224,14 +239,15 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
     pest = [('Descripción', desc), ('Parámetros técnicos', '<table>%s</table>%s' % (filas, pie))]
     if p.get('expediente') or p.get('clave'):
         exp = '<table>'
-        if p.get('expediente'):
-            exp += '<tr><th>Nombre en el expediente</th><td>%s</td></tr>' % e(p['expediente'])
         if p.get('clave'):
-            exp += '<tr><th>Código de referencia</th><td>%s (según NTS 113-MINSA)</td></tr>' % e(p['clave'])
+            exp += ('<tr><th>Código NTS</th><td><b>%s</b> (NTS 113-MINSA) · <a href="/venta/codigos-nts/#%s">otros equipos con este código</a></td></tr>'
+                    % (e(p['clave']), e(p['clave'])))
+        if p.get('expediente'):
+            exp += '<tr><th>Nombre oficial</th><td>%s</td></tr>' % e(p['expediente'])
         exp += '<tr><th>Modelo ofertado</th><td>%s</td></tr></table>' % e(' '.join(x for x in (p.get('marca'), p.get('modelo')) if x))
         exp += ('<p class="nota-p">Envíanos la ficha técnica de tu expediente y te devolvemos el cuadro de '
                 'cumplimiento, punto por punto, con el modelo ofertado.</p>')
-        pest.append(('Para expedientes técnicos', exp))
+        pest.append(('Código NTS', exp))
     tabs = ''.join('<button type="button" class="tab%s" role="tab">%s</button>' % (' on' if k == 0 else '', e(n))
                    for k, (n, _) in enumerate(pest))
     panels = ''.join('<div class="panel" role="tabpanel"%s>%s</div>' % ('' if k == 0 else ' hidden', c)
@@ -273,7 +289,7 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
 VIG_JS = '''<script>
   /* Si la página se generó hace tiempo y la vigencia ya pasó, no se muestra vencida. */
   document.querySelectorAll('[data-vig]').forEach(function(b){
-    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.closest('.pc-nota').textContent = 'Precio referencial, por confirmar en la cotización';
+    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial, por confirmar en la cotización';
   });
 </script>'''
 
@@ -283,9 +299,11 @@ def pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos):
     fts = fotos(p, base, fijas)
     ruta = '/venta/%s/' % p['id']
     nombre = ' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)
-    title = '%s | Venta en Lima — Sinergia Biomédica' % nombre
-    descripcion = '%s %s Venta con ficha técnica, entrega en Lima y provincias y mantenimiento.' % (
-        nombre + '.', (p.get('resumen') or '').rstrip('.') + '.' if p.get('resumen') else '')
+    nts = ('Código NTS %s' % p['clave']) if p.get('clave') else ''
+    title = '%s%s | Venta en Lima — Sinergia Biomédica' % (nombre, ' · ' + nts if nts else '')
+    descripcion = '%s %s%s Venta con ficha técnica, entrega en Lima y provincias y mantenimiento.' % (
+        nombre + '.', (p.get('resumen') or '').rstrip('.') + '. ' if p.get('resumen') else '',
+        ('%s (%s, NTS 113-MINSA).' % (nts, p['expediente'])) if nts and p.get('expediente') else (nts + '.' if nts else ''))
     cuerpo = producto(p, cat, cfg, fts, vig, prev, sig, mismos) + VIG_JS
     oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
               'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/PreOrder',
@@ -295,6 +313,9 @@ def pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos):
         if vig:
             oferta['priceValidUntil'] = vig.isoformat()
     jsonld = [{'@type': 'Product', 'name': nombre, 'description': p.get('resumen') or nombre,
+               **({'additionalProperty': [{'@type': 'PropertyValue', 'name': 'Código NTS 113-MINSA',
+                                                             'value': '%s %s' % (p['clave'], p.get('expediente') or '')}]}
+                  if p.get('clave') else {}),
                'brand': {'@type': 'Brand', 'name': p.get('marca') or 'Sinergia Biomédica'},
                'model': p.get('modelo') or '', 'category': cat,
                'image': [SITIO + a if a.startswith('/') else a for a, _ in fts][:3],
@@ -326,8 +347,8 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas):
   <section class="cabeza">
     <div class="eyebrow">Venta · Equipamiento biomédico · Lima y provincias</div>
     <h1>Venta de equipos médicos</h1>
-    <p class="lead">{len(productos)} equipos con stock para hospitales, clínicas y obras de equipamiento: ficha técnica, código de expediente y mantenimiento después de la venta.</p>
-    <p><a class="btn fill" href="/#/venta/tienda">Abrir la tienda con filtros →</a></p>
+    <p class="lead">{len(productos)} equipos con stock para hospitales, clínicas y obras de equipamiento: ficha técnica, código NTS y mantenimiento después de la venta.</p>
+    <p><a class="btn fill" href="/#/venta/tienda">Abrir la tienda con filtros →</a> <a class="btn" href="/venta/codigos-nts/">Buscar por código NTS</a></p>
   </section>
   {''.join(secciones)}'''
     jsonld = [{'@type': 'ItemList', 'name': 'Venta de equipos médicos',
@@ -337,6 +358,39 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas):
                         descripcion='Equipos médicos con stock: monitores, electrocardiógrafos, autoclaves, desfibriladores, '
                                     'ecógrafos y más, con ficha técnica y mantenimiento. Lima y provincias.',
                         migas=[('Inicio', '/'), ('Venta', ruta)], cuerpo=cuerpo, jsonld=jsonld)
+
+
+def pagina_nts(productos, cfg):
+    """/venta/codigos-nts/: cada código NTS 113-MINSA con los equipos que lo cumplen."""
+    ruta = '/venta/codigos-nts/'
+    grupos = {}
+    for p in productos:
+        if p.get('clave'):
+            grupos.setdefault(p['clave'], []).append(p)
+    clave = lambda c: (c.split('-')[0], int(re.sub(r'\D', '', c) or 0))
+    filas = ''.join(
+        '<tr id="%s"><th>%s</th><td><b>%s</b><div class="nts-eq">%s</div></td></tr>' % (
+            e(c), e(c), e(ps[0].get('expediente') or ''),
+            ''.join('<a href="/venta/%s/">%s</a>' % (p['id'], e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))
+                    for p in ps))
+        for c, ps in sorted(grupos.items(), key=lambda kv: clave(kv[0])))
+    cuerpo = f'''
+  <section class="cabeza">
+    <div class="eyebrow">Venta · Expedientes técnicos</div>
+    <h1>Equipos por código NTS 113-MINSA</h1>
+    <p class="lead">Busca el código del equipo que pide tu expediente técnico (por ejemplo D-1 o D-18) y mira los modelos que tenemos con stock. Te enviamos la ficha técnica y el cuadro de cumplimiento.</p>
+  </section>
+  <div class="panel nts"><table>{filas}</table></div>
+  <p class="volver"><a class="btn" href="/venta/">← Todos los equipos de venta</a></p>'''
+    jsonld = [{'@type': 'ItemList', 'name': 'Equipos por código NTS 113-MINSA',
+               'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': '%s %s' % (c, ps[0].get('expediente') or ''),
+                                    'url': SITIO + ruta + '#' + c}
+                                   for i, (c, ps) in enumerate(sorted(grupos.items(), key=lambda kv: clave(kv[0])))]}]
+    return ruta, pagina(cfg, ruta=ruta, title='Equipos médicos por código NTS 113-MINSA (D-1, D-18…) | Sinergia Biomédica',
+                        descripcion='Lista de códigos NTS 113-MINSA de equipamiento (%s y más) con los modelos en venta, '
+                                    'ficha técnica y cuadro de cumplimiento para expedientes técnicos.'
+                                    % ', '.join(sorted(grupos, key=clave)[:6]),
+                        migas=[('Inicio', '/'), ('Venta', '/venta/'), ('Códigos NTS', ruta)], cuerpo=cuerpo, jsonld=jsonld)
 
 
 # ─────────────────────────── escritura ───────────────────────────
@@ -377,7 +431,7 @@ def main():
     cfg = gp.config_sitio()
     vivo = gp.leer_json(args.datos)
     repo = gp.leer_json(VENTA)
-    productos = [p for p in vivo.get('productos', []) if p.get('id') and p.get('nom')]
+    productos = [ajustar(p, repo) for p in vivo.get('productos', []) if p.get('id') and p.get('nom')]
     if not productos:
         sys.exit('No hay equipos en los datos: no se genera nada.')
     cats = {c['id']: c['nombre'] for c in repo.get('categorias', [])}
@@ -391,6 +445,9 @@ def main():
     ruta, doc = pagina_hub(orden, cats_orden, cats, cfg, base, fijas)
     gp.escribir('venta/index.html', doc, cambios)
     paginas.append((ruta, 'venta/index.html'))
+    ruta, doc = pagina_nts(orden, cfg)
+    gp.escribir('venta/codigos-nts/index.html', doc, cambios)
+    paginas.append((ruta, 'venta/codigos-nts/index.html'))
     for i, p in enumerate(orden):
         prev = orden[i - 1] if i > 0 else None
         sig = orden[i + 1] if i + 1 < len(orden) else None
@@ -401,7 +458,7 @@ def main():
         paginas.append((ruta, rel))
 
     # Equipos que ya no se publican (sin stock o despublicados): su página se borra.
-    vigentes = {p['id'] for p in productos}
+    vigentes = {p['id'] for p in productos} | {'codigos-nts'}
     carpeta = os.path.join(ROOT, 'venta')
     for d in sorted(os.listdir(carpeta)):
         if os.path.isdir(os.path.join(carpeta, d)) and d not in vigentes:

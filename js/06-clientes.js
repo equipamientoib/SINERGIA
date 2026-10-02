@@ -752,7 +752,10 @@ async function tryUnlock(id){
   if(!v){if(err)err.classList.add('show');return;}
   const h=await sha256(v);
   const p=PROYECTOS.find(x=>x.id===id);
-  if(p&&h===p.clave_hash){PR_OPEN.add(id);PR_KEY[id]=h;PR_PASS[id]=v;renderProyecto(id);}
+  /* clave_verif (nuevo) no sirve para pedir el detalle; clave_hash queda
+     solo mientras el Apps Script publicado no se actualice. */
+  const ok=p&&(p.clave_verif ? (await sha256('sinergia-verif:'+v))===p.clave_verif : (p.clave_hash&&h===p.clave_hash));
+  if(ok){PR_OPEN.add(id);PR_KEY[id]=h;PR_PASS[id]=v;renderProyecto(id);}
   else{if(err)err.classList.add('show');if(inp){inp.value='';inp.focus();}}
 }
 

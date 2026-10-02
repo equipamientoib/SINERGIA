@@ -104,7 +104,7 @@ Las apps web de Apps Script suelen leerse sin problema desde el navegador. Si en
 | `foto` | ruta de la imagen en `img/` (opcional; si va vacía se usa una ilustración) |
 | `estado` | `En curso` o `Completado` |
 | `avance` | número de 0 a 100 |
-| `clave` | la clave que le entregas a tu cliente. **Nunca se publica**: la web solo recibe su versión cifrada (SHA-256) |
+| `clave` | la clave que le entregas a tu cliente. **Nunca se publica ni se escribe en el código**: va en Apps Script > Propiedades del script (`CLAVE_LIMATAMBO`, etc.). La web solo recibe `clave_verif`, un hash que sirve para comprobar lo que escribe el cliente pero no abre el detalle |
 | `descripcion` | resumen público del proyecto |
 | `hitos` | hitos separados por `\|`; los completados empiezan con `✓`. Ej: `✓ Levantamiento \| Informe final` |
 
