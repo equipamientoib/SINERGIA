@@ -45,6 +45,23 @@ FICHAS = os.path.join(ROOT, 'data', 'fichas')
 MEDIO_DIA_MIN = 100
 # Instrumentos sin instrumentista: retiro en oficina con DNI y garantía (S/).
 SIN_TECNICO = {'manometro': 100, 'luxometro': 100, 'tacometro': 100}
+TARIFAS = os.path.join(ROOT, 'data', 'tarifas-alquiler.json')
+
+
+def tarifas_acordadas():
+    """S/ por día acordados (data/tarifas-alquiler.json): mandan sobre la hoja."""
+    if not os.path.exists(TARIFAS):
+        return {}
+    return (leer_json(TARIFAS) or {}).get('dia') or {}
+
+
+def aplicar_tarifas(equipos):
+    t = tarifas_acordadas()
+    for e in equipos:
+        d = t.get(e.get('id'))
+        if d:
+            e['dia'], e['sem'], e['mes'] = d, d * 4, d * 12
+    return equipos
 CATALOGO = os.path.join(ROOT, 'data', 'catalogo.json')
 EXTRA = os.path.join(ROOT, 'data', 'fotos-extra.json')
 CONFIG = os.path.join(ROOT, 'js', '00-config.js')
@@ -419,7 +436,7 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         'Cotización: ' + eq['nom']), urllib.parse.quote(texto))
     chips = ''.join('<span>%s <b>%s</b></span>' % (e(k), e(str(specs[k])))
                     for k in ('Modelo', 'Marca') if specs.get(k))
-    chips += '<span>Alquiler <b>por hora, día o mes</b></span>'
+    chips += '<span>Alquiler <b>por medio día, día, semana o mes</b></span>'
     pdf = pdf_ficha(eq['id'])
     doc = ''
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
@@ -529,7 +546,7 @@ def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
     cuerpo = f'''
   <section class="cabeza">
     <h1>{e(t['h1'])}</h1>
-    <p class="cuantos">{n} {"modelo disponible" if n == 1 else "modelos disponibles"} · por hora, día, semana o mes · Lima y provincias</p>
+    <p class="cuantos">{n} {"modelo disponible" if n == 1 else "modelos disponibles"} · por medio día, día, semana o mes · Lima y provincias</p>
   </section>
 
   {bloques}
@@ -683,6 +700,7 @@ def main():
                if x.get('id') and x.get('nom') and not x.get('apoyo')]
     if not equipos:
         sys.exit('No hay equipos en los datos: no se genera nada.')
+    aplicar_tarifas(equipos)
     extra = fotos_extra()
     con_fotos_extra(equipos, extra)
 
@@ -698,7 +716,7 @@ def main():
             t = {'slug': slugify(cat), 'categorias': [cat], 'nombre': cat,
                  'title': 'Alquiler de %s en Lima | Sinergia Biomédica' % cat.lower(),
                  'h1': 'Alquiler de %s' % cat.lower(),
-                 'descripcion': 'Alquila %s por hora, día o semana para mantenimiento biomédico. Lima y provincias.' % cat.lower(),
+                 'descripcion': 'Alquila %s por medio día, día o semana para mantenimiento biomédico. Lima y provincias.' % cat.lower(),
                  'intro': 'Alquiler de %s para mantenimiento y verificación de equipos médicos.' % cat.lower()}
             tipos.append(t)
             por_cat[cat.lower()] = t

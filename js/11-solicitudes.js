@@ -106,7 +106,7 @@ function enviar(via){
   if(error){ avisar('mAviso', error, 'err'); return; }
 
   const leer = id => { const el = document.getElementById(id); return el ? el.textContent : '—'; };
-  const modLbl = { equipo:'por equipo', hora:'por hora', dia:'por día', semana:'por semana', mes:'por mes' }[actual.mod] || actual.mod;
+  const modLbl = { medio:'por medio día', dia:'por día', semana:'por semana', mes:'por mes' }[actual.mod] || actual.mod;
 
   const lineas = [
     'Solicitud de reserva — ' + ((typeof SITE !== 'undefined' && SITE.nombre) || 'Sinergia Biomédica'),

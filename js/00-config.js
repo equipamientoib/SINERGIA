@@ -67,7 +67,7 @@ const CONFIG = {
      │            «Solicitar cotización» y llevan a Contacto.           │
      │ Cambia solo esta palabra cuando termines de definir tus costos.  │
      └──────────────────────────────────────────────────────────────────┘ */
-  MOSTRAR_PRECIOS: false,
+  MOSTRAR_PRECIOS: true,
 
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
