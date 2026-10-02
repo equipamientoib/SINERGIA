@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=245a9181';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2eef36d6';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=245a9181';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2eef36d6';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=245a9181','js/06-tablero.js?v=245a9181'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=2eef36d6','js/06-tablero.js?v=2eef36d6'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=245a9181'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=2eef36d6'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1827,10 +1827,16 @@ function vNotaPrecio(larga){
   return larga ? 'Precio referencial, sujeto a confirmación en la cotización' : 'sujeto a confirmación';
 }
 
+/* Cada equipo tiene su página propia (venta/<id>/, la genera
+   scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
+   Si un equipo es nuevo y aún no tiene página, se abre la ficha interna. */
+function vPagina(id){ return (window.PAGINA_VENTA || {})[id] || ''; }
+function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/venta/p/' + id); }
+
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
-  const url = `#/venta/p/${p.id}`;
+  const url = `#/venta/p/${p.id}`;   // referencia; los clics van por vAbrir()
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const tag = p._top ? '<span class="tier">Más pedido</span>' : '';
@@ -1838,13 +1844,13 @@ function vCard(p){
     ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>${vNotaPrecio(false)}</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
   return `<div class="eq v-eq">
-    <div class="img${foto?' has-photo':''}" onclick="go('${url}')">
+    <div class="img${foto?' has-photo':''}" onclick="vAbrir('${p.id}')">
       ${foto?'':'<span class="grid-bg"></span>'}${st}${tag}
       ${foto?`<img class="photo" src="${foto}" alt="${vEsc(p.nom)} ${vEsc(p.marca||'')} ${vEsc(p.modelo||'')}" loading="lazy" decoding="async">`:`<span class="v-sinfoto">${vIco(p.cat,'v-ico-xl')}</span>`}
     </div>
     <div class="body">
       <div class="cat">${vEsc(c?c.nombre:'')}</div>
-      <h3><a onclick="go('${url}')">${vEsc(p.nom)}</a></h3>
+      <h3><a onclick="vAbrir('${p.id}')">${vEsc(p.nom)}</a></h3>
       ${vMarcaModelo(p)}
       ${p.clave?`<div class="v-exp" title="Código en expedientes técnicos (NTS 113-MINSA)">Expediente ${vEsc(p.clave)}</div>`:''}
       <div class="desc">${vEsc(p.resumen||'')}</div>
@@ -1913,7 +1919,7 @@ function vPortada(){
       </div>
     </div>
     <div class="hero-stage v-mosaico">
-      <div class="v-mos">${mosaico.map(p => `<a onclick="go('#/venta/p/${p.id}')" title="${vEsc(p.nom)}"><img src="${vFoto(p,0,true)}" alt="${vEsc(p.nom)}"></a>`).join('')}</div>
+      <div class="v-mos">${mosaico.map(p => `<a onclick="vAbrir('${p.id}')" title="${vEsc(p.nom)}"><img src="${vFoto(p,0,true)}" alt="${vEsc(p.nom)}"></a>`).join('')}</div>
       <div class="cap"><span>Los más comprados por hospitales en 2024 y 2025</span><span><b>VENTA</b></span></div>
     </div>
   </div>
@@ -2177,6 +2183,7 @@ function renderVenta(parte){
     return;
   }
   const tienda = parte[0]==='tienda' || parte[0]==='cat';
+  if(parte[0]==='p' && vPagina(parte[1])){ location.replace(vPagina(parte[1])); return; }   // enlaces viejos → página propia
   el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
   if(tienda) vtPintar();
 }
