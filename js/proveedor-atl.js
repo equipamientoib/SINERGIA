@@ -65,8 +65,15 @@
   }
 
   var cod6 = function (c) { var d = String(c).replace(/\D/g, ''); return ('000000' + d).slice(-6); };
-  var tcM = (document.body.innerText.match(/TC:\s*S\/\s*([\d.,]+)/) || [])[1];
+  /* Tipo de cambio de la cabecera («TC: S/ 3.471»). Se busca en todo el HTML
+     (en pantallas angostas la cabecera puede estar oculta) y se recuerda el
+     último leído por si un día no aparece. */
+  var tcM = (document.documentElement.innerHTML.replace(/<[^>]+>/g, ' ').match(/TC:?\s*S\/\.?\s*([\d]+[.,]\d+)/) || [])[1];
   var TC = tcM ? Number(tcM.replace(',', '.')) : 0;
+  try {
+    if (TC > 1 && TC < 10) localStorage.setItem('sbAtlTC', String(TC));
+    else TC = Number(localStorage.getItem('sbAtlTC')) || 0;
+  } catch (e) { }
   var RX = /addCesta\(\s*'([\d.]+)'\s*,\s*'(\d+)'\s*,\s*'[^']*'\s*,\s*'[^']*'\s*,\s*'([\d.]+)'/g;
 
   /* Pide al portal los productos [desde, hasta] con la misma consulta que
@@ -105,36 +112,28 @@
       x.send(f);
     });
   }
-  /* Lee las tarjetas de producto: código, stock y precio (de addCesta), más
-     la descripción completa, el modelo del proveedor y la foto. */
+  /* Lee las tarjetas de producto del HTML tal como llega del portal (sin
+     pasar por el DOM: el portal no escapa las comillas del título y el DOM
+     lo corta en «5"»). De cada tarjeta: código, stock y precio (addCesta),
+     descripción completa, modelo del proveedor y foto.
+     Devuelve {nuevos, tarjetas}; las tarjetas sin botón de compra (sin
+     stock) cuentan para avanzar de página pero no se guardan. */
+  var DEC = document.createElement('textarea');
+  function texto(t) { DEC.innerHTML = String(t || '').replace(/<[^>]*>/g, ' '); return DEC.value.replace(/\s+/g, ' ').trim(); }
   function leer(html, mapa) {
-    var n = 0, doc = null;
-    try { doc = new DOMParser().parseFromString(html, 'text/html'); } catch (e) { }
-    var cards = doc ? doc.querySelectorAll('.card-product') : [];
-    if (!cards.length) {                       // sin tarjetas reconocibles: solo addCesta
-      var m; RX.lastIndex = 0;
-      while ((m = RX.exec(html))) {
-        var k0 = cod6(m[1]); if (!mapa[k0]) n++;
-        mapa[k0] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0 };
-      }
-      return n;
-    }
-    Array.prototype.forEach.call(cards, function (card) {
+    var trozos = String(html || '').split(/class="card card-product/).slice(1), nuevos = 0;
+    if (!trozos.length) trozos = [String(html || '')];
+    trozos.forEach(function (t) {
       RX.lastIndex = 0;
-      var m = RX.exec(card.innerHTML); if (!m) return;
-      var h3 = card.querySelector('h3'), tit = h3 ? (h3.getAttribute('title') || '') : '';
-      var vis = h3 ? h3.textContent.replace(/\.{3}\s*$/, '').trim() : '';
-      var al = card.querySelector('.alert'), im = card.querySelector('img');
-      var src = im ? (im.getAttribute('src') || '') : '';
+      var m = RX.exec(t); if (!m) return;
+      var tit = (t.match(/<h3[^>]*?title="([\s\S]*?)">/) || [])[1] || (t.match(/<h3[^>]*>([\s\S]*?)<\/h3>/) || [])[1] || '';
+      var al = (t.match(/class="alert[^"]*"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '';
+      var src = (t.match(/<img[^>]*src="([^"]+)"/) || [])[1] || '';
       try { src = src && !/img_default/.test(src) ? new URL(src, location.href).href : ''; } catch (e) { src = ''; }
-      var k = cod6(m[1]); if (!mapa[k]) n++;
-      mapa[k] = {
-        c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0,
-        d: (tit.length >= vis.length ? tit : vis).replace(/\s+/g, ' ').trim(),
-        mo: al ? al.textContent.trim() : '', img: src
-      };
+      var k = cod6(m[1]); if (!mapa[k]) nuevos++;
+      mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src };
     });
-    return n;
+    return { nuevos: nuevos, tarjetas: /card card-product/.test(html || '') ? trozos.length : nuevos };
   }
 
   /* ── Conexión con el Apps Script ────────────────────────────────────
@@ -209,31 +208,32 @@
       var mapa = {}, consultas = 0, completo = false;
       var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
       var hallados = function () { return Object.keys(mios).filter(function (c) { return mapa[c]; }).length; };
-      var P = 0;
+      /* 1.ª consulta: bloque grande. Luego se sigue desde donde terminó lo
+         recibido hasta que el portal devuelva un bloque vacío (fin de la
+         lista). Así sirve tanto si el portal respeta el rango pedido como
+         si recorta cada respuesta. */
+      var P = 0, r = null;
       for (var t = 0; t < BLOQUES.length && !P; t++) {
         if (consultas) await espera(PAUSA);
         consultas++;
-        txt('Leyendo el catálogo del proveedor' + (FILTRADO ? (FIL.tp === '2' && !(FIL.s || FIL.m || FIL.c) ? ' (EQUIPOS)' : ' <b>con tu filtro</b>') : '') + ' (consulta ' + consultas + ')…');
-        var n = leer(await bloque(1, BLOQUES[t], 1, Math.ceil(9000 / BLOQUES[t])), mapa);
-        if (n === 20) return error('El portal entrega solo ' + n + ' productos por consulta. Para no hacer cientos de consultas, me detuve. Avísale a Claude.');
-        if (n) { P = BLOQUES[t]; if (n < P * 0.9) completo = true; }
+        txt('Leyendo los equipos del proveedor (consulta ' + consultas + ')…');
+        r = leer(await bloque(1, BLOQUES[t], 1, Math.ceil(9000 / BLOQUES[t])), mapa);
+        if (r.tarjetas === 20) return error('El portal entrega solo 20 productos por consulta. Para no hacer cientos de consultas, me detuve. Avísale a Claude.');
+        if (r.tarjetas) P = BLOQUES[t];
       }
       if (!P) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar más tarde.');
-      var desde = P + 1, pag = 2;
-      while (!completo && consultas < MAX_CONSULTAS) {
-        bar(total ? hallados() / total : 0.5);
-        txt('Consulta ' + consultas + ' · catálogo leído: <b>' + Object.keys(mapa).length +
-          '</b> productos · tuyos encontrados: <b>' + hallados() + ' de ' + total + '</b>');
+      var desde = 1 + r.tarjetas, pag = 2;
+      while (consultas < MAX_CONSULTAS) {
+        bar(Math.min(0.9, desde / 900));
+        txt('Consulta ' + consultas + ' · equipos leídos: <b>' + Object.keys(mapa).length + '</b>…');
         await espera(PAUSA);
         consultas++;
-        var antes = Object.keys(mapa).length;
         var html = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P));
-        var nuevos = leer(html, mapa);
-        var enBloque = (html.match(RX) || []).length;
-        if (!html) { await espera(PAUSA); consultas++; html = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P)); nuevos = leer(html, mapa); enBloque = (html.match(RX) || []).length; }
-        if (!enBloque || enBloque < P * 0.9 || Object.keys(mapa).length === antes) completo = !!html;
-        if (!html) break;
-        desde += P; pag++;
+        if (!html) { await espera(PAUSA); consultas++; html = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P)); }
+        if (!html) break;                                   // sin respuesta: se envía lo leído
+        r = leer(html, mapa);
+        if (!r.tarjetas || !r.nuevos) { completo = true; break; }   // fin de la lista
+        desde += r.tarjetas; pag++;
       }
       /* Se manda la lista completa: la hoja guarda la base del proveedor
          (pestaña «Proveedor») y hace el match por código y por marca+modelo. */
@@ -241,6 +241,7 @@
       var leidos = items.length;
       bar(1);
       if (!leidos) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta.');
+      if (!TC) return error('No encontré el tipo de cambio («TC: S/ …») en la página. Abre Productos del portal, espera que cargue completa y vuelve a tocar el favorito.');
       try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
       var id = String(Date.now());
       txt('Enviando <b>' + leidos + '</b> equipos del proveedor a tu hoja…');
