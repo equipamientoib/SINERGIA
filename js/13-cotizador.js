@@ -109,11 +109,17 @@ function cotResumen(){
   const caja = document.getElementById('cotRes');
   if(!caja) return;
   const c = cotCalcular();
-  if(!c.sel.length){
-    caja.innerHTML = `<div class="cot-rh">Tu alquiler</div>
-      <p class="cot-vacio">Marca los instrumentos que necesitas. El precio se calcula solo, con el IGV incluido.</p>`;
+  const n = c.sel.length;
+  document.getElementById('cotCuenta').textContent =
+    n ? (n + (n === 1 ? ' instrumento elegido' : ' instrumentos elegidos')) : '';
+  if(!n){
+    caja.innerHTML = `<div class="cot-paso"><b>2</b> ¿Por cuánto tiempo?</div>
+      <p class="cot-vacio">Marca al menos un instrumento de la lista y aquí aparece el precio,
+      con el IGV incluido y el descuento si combinas varios.</p>`;
     return;
   }
+  /* Modalidades: medio día solo si todos lo tienen; si no, se dice por qué. */
+  const sinMedio = c.sel.filter(e => !tieneMedio(e.dia));
   const mods = COT_MOD.filter(([m]) => m !== 'medio' || c.hayMedio);
   const seg = mods.map(([m, t]) =>
     `<button type="button" class="${c.mod === m ? 'on' : ''}" onclick="cotMod('${m}')">${t}</button>`).join('');
@@ -121,37 +127,41 @@ function cotResumen(){
     ? `<div class="cot-f2">
          <label>Desde<input type="date" id="cotD1" value="${COT.d1}" oninput="cotFechas()" onchange="cotFechas()"></label>
          <label>Hasta<input type="date" id="cotD2" value="${COT.d2}" oninput="cotFechas()" onchange="cotFechas()"></label>
-       </div>`
+       </div>
+       <p class="cot-ayuda">${COT.d1 && COT.d2
+          ? `Son <b>${c.qty} ${c.qty === 1 ? 'día' : 'días'}</b>.`
+          : 'Elige las fechas. Mientras tanto se calcula <b>1 día</b>.'}</p>`
     : `<label class="cot-f1">${COT_CANT[c.mod]}<input type="number" min="1" step="1" value="${c.qty}"
          oninput="cotCantidad(this.value)" onchange="cotCantidad(this.value)"></label>`;
   const inc = c.conTecnico ? incluidos('') : [];
   const sub = c.alquiler / 1.18;
+  const unidad = COT_UNI[c.mod];
   caja.innerHTML = `
-    <div class="cot-rh">Tu alquiler</div>
-    <ul class="cot-sel">${c.sel.map(e => `<li>${cotEsc(e.nom)}<span>S/ ${fmt(e.dia)}/día</span></li>`).join('')}</ul>
+    <div class="cot-paso"><b>2</b> ¿Por cuánto tiempo?</div>
     <div class="cot-seg">${seg}</div>
-    ${c.mod === 'medio' ? `<p class="cot-nota">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.</p>` : ''}
+    ${c.mod === 'medio'
+      ? `<p class="cot-ayuda">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.</p>`
+      : (sinMedio.length ? `<p class="cot-ayuda">No hay medio día porque ${sinMedio.length === 1
+            ? 'el ' + cotEsc(sinMedio[0].nom.toLowerCase()) + ' se alquila' : 'algunos se alquilan'} desde un día completo.</p>` : '')}
     ${cant}
+
+    <div class="cot-paso"><b>3</b> Tu cuenta</div>
+    <ul class="cot-sel">${c.sel.map(e =>
+      `<li><span>${cotEsc(e.nom)}</span><span>S/ ${fmt(e.dia)}</span></li>`).join('')}
+      ${c.desc ? `<li class="des"><span>Descuento por combinar ${n} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></li>` : ''}
+    </ul>
     <div class="cot-cuenta">
-      <div><span>${c.sel.length > 1 ? 'Suma de instrumentos' : 'Instrumento'}</span><span>S/ ${fmt(c.base)}/día</span></div>
-      ${c.desc ? `<div class="des"><span>Descuento por combinar ${c.sel.length} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></div>` : ''}
-      <div><span>Precio por ${COT_UNI[c.mod]}</span><span>S/ ${fmt(c.unit)}</span></div>
-      <div><span>${COT_CANT[c.mod]}</span><span>${c.qty}</span></div>
-      <div><span>Subtotal (sin IGV)</span><span>S/ ${sub.toFixed(2)}</span></div>
-      <div><span>IGV 18 % (incluido)</span><span>S/ ${(c.alquiler - sub).toFixed(2)}</span></div>
-      <div class="tot"><span>Total alquiler</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
+      <div><span>Precio por ${unidad}</span><span>S/ ${fmt(c.unit)}</span></div>
+      <div><span>× ${c.qty} ${c.qty === 1 ? unidad : (unidad === 'mes' ? 'meses' : unidad + 's')}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
+      ${c.conTecnico ? `<div><span>Instrumentista (mínimo medio día)</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
+      <div class="fino"><span>Incluye IGV 18 %</span><span>S/ ${(c.alquiler - sub).toFixed(2)}</span></div>
     </div>
-    ${inc.length ? `<p class="cot-inc"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
-    ${c.conTecnico ? `<div class="cot-cuenta">
-        <div class="cab">Personal técnico · instrumentista <i>se cobra aparte</i></div>
-        <div><span>Mínimo medio día</span><span>S/ ${fmt(TEC_MIN)}</span></div>
-        <div class="tot"><span>Total instrumentista</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>
-      </div>` : `<div class="cot-cuenta gar">
-        <div class="cab">Garantía en depósito <i>se devuelve</i></div>
-        <div><span>Recoges y devuelves en nuestra oficina, con tu DNI</span><span>S/ ${fmt(c.garantia)}</span></div>
-      </div>`}
-    <div class="cot-grand"><span>Total general (IGV incluido)</span><span>S/ ${c.total.toFixed(2)}</span></div>
-    <p class="cot-nota">Entrega y devolución en nuestra oficina de Lima. A provincias se envía por agencia; el envío lo paga el cliente.</p>
+    <div class="cot-grand"><span>Total a pagar</span><span>S/ ${c.total.toFixed(2)}</span></div>
+    ${c.garantia ? `<p class="cot-aviso"><b>Además dejas S/ ${fmt(c.garantia)} de garantía.</b>
+      No es un cobro: se te devuelve cuando regreses el equipo. Lo recoges en nuestra oficina con tu DNI.</p>` : ''}
+    ${inc.length ? `<p class="cot-aviso ok"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
+
+    <div class="cot-paso"><b>4</b> Tus datos y te respondemos</div>
     <div class="cot-form">
       <label>Nombre o institución<input id="cotNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></label>
       <div class="cot-f2">
@@ -164,6 +174,7 @@ function cotResumen(){
         <button class="btn" onclick="cotEnviar('correo')">Enviar por correo</button>
       </div>
     </div>
+    <p class="cot-nota">Entrega y devolución en nuestra oficina de Lima. A provincias se envía por agencia; el envío lo paga el cliente.</p>
     <button type="button" class="cot-limpiar" onclick="cotLimpiar()">Empezar de nuevo</button>`;
 }
 
