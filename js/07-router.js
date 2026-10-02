@@ -146,6 +146,7 @@ function aplicarDatos(d, enVivo){
       if(m.mostrar_precios!=null) VER_PRECIOS = !!m.mostrar_precios;
       if(m.medio_dia_min!=null) MEDIO_MIN=m.medio_dia_min;
       if(m.pedido_min!=null) PEDIDO_MIN=m.pedido_min;
+      if(m.sin_tecnico) SIN_TECNICO=m.sin_tecnico;
     }
   }
 
