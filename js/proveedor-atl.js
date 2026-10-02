@@ -105,13 +105,35 @@
       x.send(f);
     });
   }
+  /* Lee las tarjetas de producto: código, stock y precio (de addCesta), más
+     la descripción completa, el modelo del proveedor y la foto. */
   function leer(html, mapa) {
-    var m, n = 0; RX.lastIndex = 0;
-    while ((m = RX.exec(html))) {
-      var k = cod6(m[1]);
-      if (!mapa[k]) n++;
-      mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0 };
+    var n = 0, doc = null;
+    try { doc = new DOMParser().parseFromString(html, 'text/html'); } catch (e) { }
+    var cards = doc ? doc.querySelectorAll('.card-product') : [];
+    if (!cards.length) {                       // sin tarjetas reconocibles: solo addCesta
+      var m; RX.lastIndex = 0;
+      while ((m = RX.exec(html))) {
+        var k0 = cod6(m[1]); if (!mapa[k0]) n++;
+        mapa[k0] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0 };
+      }
+      return n;
     }
+    Array.prototype.forEach.call(cards, function (card) {
+      RX.lastIndex = 0;
+      var m = RX.exec(card.innerHTML); if (!m) return;
+      var h3 = card.querySelector('h3'), tit = h3 ? (h3.getAttribute('title') || '') : '';
+      var vis = h3 ? h3.textContent.replace(/\.{3}\s*$/, '').trim() : '';
+      var al = card.querySelector('.alert'), im = card.querySelector('img');
+      var src = im ? (im.getAttribute('src') || '') : '';
+      try { src = src && !/img_default/.test(src) ? new URL(src, location.href).href : ''; } catch (e) { src = ''; }
+      var k = cod6(m[1]); if (!mapa[k]) n++;
+      mapa[k] = {
+        c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0,
+        d: (tit.length >= vis.length ? tit : vis).replace(/\s+/g, ' ').trim(),
+        mo: al ? al.textContent.trim() : '', img: src
+      };
+    });
     return n;
   }
 
@@ -181,7 +203,6 @@
       if (!j.ok) return error('El Apps Script respondió: ' + (j.motivo || 'error') + '.');
       var mios = {}; (j.codigos || []).forEach(function (c) { mios[cod6(c)] = 1; });
       var total = Object.keys(mios).length;
-      if (!total) return error('La hoja de venta no tiene códigos de proveedor.');
 
       /* Se lee el catálogo en bloques grandes, de uno en uno y con pausa.
          Si el portal no acepta 500 por consulta, se prueba con 250. */
@@ -200,7 +221,7 @@
       if (!P) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar más tarde.');
       var desde = P + 1, pag = 2;
       while (!completo && consultas < MAX_CONSULTAS) {
-        bar(hallados() / total);
+        bar(total ? hallados() / total : 0.5);
         txt('Consulta ' + consultas + ' · catálogo leído: <b>' + Object.keys(mapa).length +
           '</b> productos · tuyos encontrados: <b>' + hallados() + ' de ' + total + '</b>');
         await espera(PAUSA);
@@ -214,24 +235,31 @@
         if (!html) break;
         desde += P; pag++;
       }
-      var items = Object.keys(mios).filter(function (c) { return mapa[c]; }).map(function (c) { return mapa[c]; });
-      var leidos = Object.keys(mapa).length;
+      /* Se manda la lista completa: la hoja guarda la base del proveedor
+         (pestaña «Proveedor») y hace el match por código y por marca+modelo. */
+      var items = Object.keys(mapa).map(function (c) { return mapa[c]; });
+      var leidos = items.length;
       bar(1);
-
-      if (!items.length) return error('Se leyeron ' + leidos + ' productos del portal, pero ninguno coincide con los códigos de tu hoja' +
-        '.');
+      if (!leidos) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta.');
       try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
-      txt('Enviando <b>' + items.length + '</b> precios y stocks a tu hoja…');
-      await enviar(JSON.stringify({ k: CFG.k, tc: TC, completo: completo && !FILTRADO && leidos >= 1000, items: items }));
-      /* La respuesta del POST es opaca (otro dominio): el resultado se pide aparte. */
-      await new Promise(function (ok) { setTimeout(ok, 2500); });
+      var id = String(Date.now());
+      txt('Enviando <b>' + leidos + '</b> equipos del proveedor a tu hoja…');
+      await enviar(JSON.stringify({ k: CFG.k, id: id, tc: TC, todos: true, completo: completo && !FILTRADO && leidos >= 1000, items: items }));
+      /* La respuesta del POST es opaca (otro dominio): se consulta el resultado
+         hasta que la hoja termine de procesar este envío. */
       var est = {};
-      try { est = await pedirJSON(CFG.u + '?atl=estado&k=' + encodeURIComponent(CFG.k)); } catch (e) { }
-      var faltan = total - items.length;
-      txt('<b style="color:#9be3b5">¡Listo!</b> Se actualizaron <b>' + (est.actualizados != null ? est.actualizados : items.length) + '</b> equipos' +
-        (TC ? ' con TC S/ ' + TC : '') + '.<br>' +
-        (faltan ? faltan + ' código(s) de tu hoja no aparecen ' + 'en la sección EQUIPOS del portal (quedan como estaban)' + (completo && !FILTRADO && leidos >= 1000 ? ' (quedan con stock 0 = «A pedido»)' : '') + '.<br>' : '') +
-        '<span style="color:#aeb4bc">La web se actualiza sola en unos minutos.</span>');
+      for (var t2 = 0; t2 < 30; t2++) {
+        await espera(2000);
+        try { est = await pedirJSON(CFG.u + '?atl=estado&k=' + encodeURIComponent(CFG.k)); } catch (e) { est = {}; }
+        if (est.id === id) break;
+      }
+      if (est.id !== id) return error('Los datos se enviaron, pero tu hoja no confirmó. Revisa en unos minutos si cambió la fecha (celda B2).');
+      if (!est.ok) return error('Tu hoja respondió: ' + (est.motivo || 'error') + '.');
+      txt('<b style="color:#9be3b5">¡Listo!</b> Se leyeron <b>' + leidos + '</b> equipos del proveedor' + (TC ? ' (TC S/ ' + TC + ')' : '') + '.<br>' +
+        'Tus equipos con precio y stock: <b>' + est.actualizados + '</b>' +
+        (est.por_modelo ? ' (' + est.por_modelo + ' encontrados por marca y modelo)' : '') + '.<br>' +
+        (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal: mira la columna «coincidencia».<br>' : '') +
+        '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
       boton('Cerrar', cerrar);
     } catch (e) {
       error(String(e && e.message || e));
