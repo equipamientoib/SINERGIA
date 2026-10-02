@@ -434,8 +434,14 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
     correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote(
         'Cotización: ' + eq['nom']), urllib.parse.quote(texto))
-    chips = ''.join('<span>%s <b>%s</b></span>' % (e(k), e(str(specs[k])))
-                    for k in ('Modelo', 'Marca') if specs.get(k))
+    # Con el cotizador, el botón principal es calcular; WhatsApp está dentro.
+    # Sin precios, se cotiza como antes, por WhatsApp o correo.
+    if cfg['precios'] and eq.get('dia'):
+        botones = ('<a class="btn fill calc-link" href="/#/equipo/%s">Calcular mi alquiler</a>'
+                   '<a class="btn" href="%s">Cotizar por correo</a>') % (eq['id'], correo)
+    else:
+        botones = ('<a class="btn fill" href="%s" target="_blank" rel="noopener">Cotizar por WhatsApp</a>'
+                   '<a class="btn" href="%s">Cotizar por correo</a>') % (wa, correo)
     pdf = pdf_ficha(eq['id'])
     doc = ''
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
@@ -453,10 +459,6 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración</a>' % e(eq['cal_pdf']))
     if eq.get('ficha'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
-    # Con los precios encendidos, un botón lleva al cotizador (calcula el total
-    # con el instrumentista y el IGV). Sin precios no se muestra.
-    cotiza = ('<a class="btn fill calc-link" href="/#/equipo/%s">Calcular mi alquiler</a>' % eq['id']
-              if cfg['precios'] and eq.get('dia') else '')
     precio = ''
     if cfg['precios'] and eq.get('dia'):
         # Precio grande y una sola línea de tarifas. El detalle de turnos, el
@@ -511,13 +513,8 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         <h2>{e(eq['nom'])}</h2>
         <div class="marca">{e(eq.get('marca', ''))}</div>
         <p class="prod-desc">{e(resumen)}</p>
-        <div class="prod-chips">{chips}</div>
         {precio}
-        <div class="prod-btns">
-          {cotiza}
-          <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-          <a class="btn" href="{correo}">Cotizar por correo</a>
-        </div>
+        <div class="prod-btns">{botones}</div>
         {doc}
         {('<div class="prod-docs">' + ' · '.join(enl) + '</div>') if enl else ''}
       </div>
@@ -542,7 +539,7 @@ def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
     cuerpo = f'''
   <section class="cabeza">
     <h1>{e(t['h1'])}</h1>
-    <p class="cuantos">{n} {"modelo disponible" if n == 1 else "modelos disponibles"} · por medio día, día, semana o mes · Lima y provincias</p>
+    <p class="cuantos">{n} {"modelo disponible" if n == 1 else "modelos disponibles"} · Lima y provincias</p>
   </section>
 
   {bloques}
