@@ -239,12 +239,14 @@ let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
 
 const byId=id=>EQUIPOS.find(e=>e.id===id);
-/* Divisores de modalidad para equipos individuales (única fuente de la verdad) */
-const DIV_EQUIPO=8, DIV_HORA=6;
+/* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
+   día, no la mitad: llevar, recoger y revisar el instrumento cuesta igual.
+   Es el mínimo de alquiler; por eso ya no se alquila por hora ni por equipo. */
+const MEDIO_PCT=0.6, HORARIO_MANANA='9:00 a 13:00', HORARIO_TARDE='14:00 a 18:00';
+const precioMedio=d=>Math.round(d*MEDIO_PCT);
 /* Interruptor general de precios (js/00-config.js -> CONFIG.MOSTRAR_PRECIOS).
    La hoja de Google puede sobrescribirlo con modelo.mostrar_precios. */
 let VER_PRECIOS = (typeof CONFIG!=='undefined' && CONFIG.MOSTRAR_PRECIOS!==undefined) ? !!CONFIG.MOSTRAR_PRECIOS : true;
-const precioEquipo=d=>Math.round(d/DIV_EQUIPO), precioHora=d=>Math.round(d/DIV_HORA);
 const sumItems=p=>p.items.reduce((s,id)=>s+byId(id).dia,0);
 const fmt=n=>Number(n).toLocaleString('es-PE');
 
@@ -468,7 +470,7 @@ function cardEq(e){
   const foot=e.apoyo
     ?`<div class="foot"><div class="price" style="font-size:14px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Complementaria<small style="font-weight:400">incluida en Mantenimiento</small></div><button class="btn" onclick="go('#/equipo/${e.id}')">Ver detalle</button></div>`
     :(VER_PRECIOS
-      ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${precioHora(e.dia)}<span>/hora · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`
+      ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${fmt(precioMedio(e.dia))}<span>/medio día · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`
       :`<div class="foot"><div class="price" style="font-size:15px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Consultar tarifa<small style="font-weight:400">te respondemos con precio y disponibilidad</small></div><button class="btn" onclick="go('#/contacto')">Cotizar</button></div>`);
   /* Varias fotos: se ve la primera y las flechas pasan a las demás. La primera suele ser la de
      estudio y las siguientes, el instrumento midiendo en un equipo real:
@@ -654,7 +656,7 @@ function reservarCustom(){
   const c=customCalc(); if(c.dia<=0)return;
   const n=CUSTOM.sel.size;
   const nom='Paquete personalizado ('+n+' instrumento'+(n!==1?'s':'')+(CUSTOM.kit?' + kit':'')+')';
-  openModal(nom,'Paquete personalizado · IGV incluido',{equipo:precioEquipo(c.dia),hora:precioHora(c.dia),dia:c.dia,semana:c.dia*4,mes:c.dia*12},eqConds(),techRates(8),true,'dia');
+  openModal(nom,'Paquete personalizado · IGV incluido',{medio:precioMedio(c.dia),dia:c.dia,semana:c.dia*4,mes:c.dia*12},eqConds(),techRates(),true,'dia');
 }
 
 /* Selector de equipos del formulario de contacto.
@@ -692,7 +694,7 @@ function renderEquipo(id){
   const priceHTML=isA
     ?`<div class="pricebox"><span class="pp" style="font-size:19px">Complementaria</span><span class="pu">· incluida en paquetes de Mantenimiento</span></div>`
     :(VER_PRECIOS
-      ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${precioHora(e.dia)}</span><span class="pu">/ hora · IGV incluido</span><span class="tag">${e.tier}</span></div>`
+      ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${fmt(precioMedio(e.dia))}</span><span class="pu">/ medio día · IGV incluido</span><span class="tag">${e.tier}</span></div>`
       :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span><span class="tag">${e.tier}</span></div>`);
   const btnsHTML=isA
     ?`<div class="dbtns"><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
@@ -705,7 +707,7 @@ function renderEquipo(id){
     +(e.cal_fin?`<div class="row"><span class="l">Vigente hasta</span><span class="v">${e.cal_fin}</span></div>`:'')
     +(e.cal_pdf?`<div class="row"><span class="l">Documento</span><span class="v"><a href="${e.cal_pdf}" target="_blank" rel="noopener">Ver certificado</a></span></div>`:'')
     +`</div>`:'';
-  const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
+  const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div><div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
     <div class="detail">
@@ -720,7 +722,7 @@ function renderEquipo(id){
         <h1>${e.nom}</h1>
         <div class="dmarca">${e.marca}</div>
         ${priceHTML}
-        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): &nbsp;por equipo S/ ${precioEquipo(e.dia)} &nbsp;·&nbsp; por hora S/ ${precioHora(e.dia)} &nbsp;·&nbsp; por día S/ ${e.dia} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">Van de menor a mayor; el precio principal es por día. Elige la modalidad al reservar.</div>`}
+        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): &nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp; día S/ ${fmt(e.dia)} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">El mínimo es medio día: un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}). El día completo son los dos turnos. El personal técnico se cobra aparte.</div>`}
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
@@ -759,13 +761,13 @@ function renderPaquete(id){
         <h1>${p.nom}</h1>
         <div class="dmarca">${items.length} instrumentos${p.kit.length?' + kit de intervención':''}</div>
         ${VER_PRECIOS?`<div class="pricebox"><span class="pp">S/ ${p.dia}</span><span class="pu">/ día · IGV incluido</span></div>
-        <div class="pmodbig">Modalidades (IGV incluido): &nbsp;por equipo S/ ${p.pe} &nbsp;·&nbsp; por hora S/ ${p.ph} &nbsp;·&nbsp; por día S/ ${p.dia} &nbsp;·&nbsp; semana S/ ${fmt(p.psem)} &nbsp;·&nbsp; mes S/ ${fmt(p.pmes)}</div>`
+        <div class="pmodbig">Modalidades (IGV incluido): &nbsp;medio día S/ ${fmt(precioMedio(p.dia))} &nbsp;·&nbsp; día S/ ${fmt(p.dia)} &nbsp;·&nbsp; semana S/ ${fmt(p.psem)} &nbsp;·&nbsp; mes S/ ${fmt(p.pmes)}</div>`
         :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span></div>`}
-        <div class="modnote">Van de menor a mayor: a más tiempo, menor precio por equipo. En 1 h se atienden ~${p.eqh} equipos; en un día (7 h efectivas) hasta ~${p.eqd}. Elige la modalidad al reservar.</div>
+        <div class="modnote">Van de menor a mayor: a más tiempo, menor precio por día. En un día completo (dos turnos de 4 h) se atienden hasta ~${p.eqd} equipos. El mínimo es medio día.</div>
         <div class="ddesc">${p.desc}</div>
         <div class="dbtns">${VER_PRECIOS?`<button class="btn btn-fill btn-lg" onclick="abrirPaq('${p.id}')">Reservar paquete</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a>`:`<a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a>`}</div>
         <div class="dnote">Cada instrumento del paquete se entrega con su certificado de calibración vigente.</div>
-        ${VER_PRECIOS?`<div class="spec"><div class="sh">Tarifas del paquete</div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(p.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(p.psem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(p.pmes)}</span></div></div>`:''}<div class="pkinc"><div class="sh">Instrumentos (${items.length})</div>${rows}</div>${kitBlock}
+        ${VER_PRECIOS?`<div class="spec"><div class="sh">Tarifas del paquete</div><div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(p.dia))}</span></div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(p.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(p.psem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(p.pmes)}</span></div></div>`:''}<div class="pkinc"><div class="sh">Instrumentos (${items.length})</div>${rows}</div>${kitBlock}
       </div>
     </div>`;
   window._pkItems=items; window._pkGal=pkGal;
@@ -880,17 +882,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=09506041';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=d62671f5';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=09506041';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=d62671f5';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=09506041','js/06-tablero.js?v=09506041'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=d62671f5','js/06-tablero.js?v=d62671f5'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=09506041'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=d62671f5'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1095,6 +1097,9 @@ function aplicarDatos(d, enVivo){
       if(m.instrumentista_min!=null) TEC_MIN=m.instrumentista_min;
       if(m.kit_dia!=null) KIT_DIA=m.kit_dia;
       if(m.descuento_combinar) DESC_COMB=m.descuento_combinar;
+      /* La hoja manda sobre el interruptor de precios (modelo.mostrar_precios):
+         así se encienden o apagan sin tocar el código. */
+      if(m.mostrar_precios!=null) VER_PRECIOS = !!m.mostrar_precios;
     }
   }
 
@@ -1414,10 +1419,11 @@ function closeMenu(){document.getElementById('mobileMenu').classList.remove('ope
 /* ===== js/10-modal.js ===== */
 /* ---- MODAL RESERVA ---- */
 let actual=null;
-function techRates(eqd){return {equipo:TEC_DIA/(eqd||8), hora:TEC_DIA/7, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
-const MODLBL={equipo:['Precio por equipo','Equipos','Cantidad de equipos a atender'],hora:['Precio por hora','Horas','Cantidad de horas'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
-function pkgConds(p){return {equipo:'Pagas por cada equipo atendido. Ideal para 1–2 equipos.',hora:`Por hora de servicio. En 1 h se atienden ~${p.eqh} equipos.`,dia:`Jornada de 7 h efectivas (8 h − 1 h de almuerzo). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
-function eqConds(){return {equipo:'Pagas por cada equipo que atiendas con el instrumento.',hora:'Por hora de uso del instrumento.',dia:'Jornada de 7 h efectivas (8 h − 1 h de almuerzo).',semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
+function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
+const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
+const TURNOS = `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
+function pkgConds(p){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
+function eqConds(){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}).`,semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
 function openModal(nom,marca,prices,conds,tec,igvInc,mod0){
   if(!VER_PRECIOS){ go('#/contacto'); return; }   // precios ocultos: se cotiza por contacto
   actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia'};
@@ -1425,7 +1431,7 @@ function openModal(nom,marca,prices,conds,tec,igvInc,mod0){
   document.getElementById('mMarca').textContent=marca;
   document.getElementById('d1').value='';document.getElementById('d2').value='';
   document.getElementById('nQty').value='1';
-  setMod(mod0||'hora');
+  setMod(mod0||'medio');
   _lastFocus=document.activeElement;
   document.body.classList.add('lock');
   document.getElementById('ov').classList.add('open');
@@ -1442,17 +1448,17 @@ function setMod(m){
   document.getElementById('qtyLabel').textContent=L[2];
   document.getElementById('cUnitLbl').textContent=L[0];
   document.getElementById('cQtyLbl').textContent=L[1];
-  document.getElementById('cTecUnitLbl').textContent={equipo:'Por equipo',hora:'Por hora',dia:'Por día',semana:'Por semana',mes:'Por mes'}[m];
+  document.getElementById('cTecUnitLbl').textContent={medio:'Por medio día',dia:'Por día',semana:'Por semana',mes:'Por mes'}[m];
   document.getElementById('cTecQtyLbl').textContent=L[1];
   document.getElementById('cDia').textContent='S/ '+actual.prices[m];
   document.getElementById('modCond').textContent=actual.conds[m]||'';
   calc();
 }
 function clearCalc(){['cDias','cSub','cIgv','cTot','cTecUnit','cTecQty','cTec','cGrand'].forEach(id=>document.getElementById(id).textContent='—');}
-function abrirPaq(id){const p=PAQUETES.find(x=>x.id===id);openModal(p.nom,'Paquete '+p.nivel+' · IGV incluido',{equipo:p.pe,hora:p.ph,dia:p.dia,semana:p.psem,mes:p.pmes},pkgConds(p),techRates(p.eqd),true,'dia');}
+function abrirPaq(id){const p=PAQUETES.find(x=>x.id===id);openModal(p.nom,'Paquete '+p.nivel+' · IGV incluido',{medio:precioMedio(p.dia),dia:p.dia,semana:p.psem,mes:p.pmes},pkgConds(p),techRates(),true,'dia');}
 function abrir(idx){
   const e=EQUIPOS[idx];
-  openModal(e.nom, e.marca, {equipo:precioEquipo(e.dia), hora:precioHora(e.dia), dia:e.dia, semana:e.dia*4, mes:e.dia*12}, eqConds(), techRates(8), true, 'hora');
+  openModal(e.nom, e.marca, {medio:precioMedio(e.dia), dia:e.dia, semana:e.dia*4, mes:e.dia*12}, eqConds(), techRates(), true, 'medio');
 }
 function cerrar(){
   document.getElementById('ov').classList.remove('open');

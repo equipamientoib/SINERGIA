@@ -44,7 +44,7 @@ function reservarCustom(){
   const c=customCalc(); if(c.dia<=0)return;
   const n=CUSTOM.sel.size;
   const nom='Paquete personalizado ('+n+' instrumento'+(n!==1?'s':'')+(CUSTOM.kit?' + kit':'')+')';
-  openModal(nom,'Paquete personalizado · IGV incluido',{equipo:precioEquipo(c.dia),hora:precioHora(c.dia),dia:c.dia,semana:c.dia*4,mes:c.dia*12},eqConds(),techRates(8),true,'dia');
+  openModal(nom,'Paquete personalizado · IGV incluido',{medio:precioMedio(c.dia),dia:c.dia,semana:c.dia*4,mes:c.dia*12},eqConds(),techRates(),true,'dia');
 }
 
 /* Selector de equipos del formulario de contacto.

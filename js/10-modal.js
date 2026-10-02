@@ -1,9 +1,10 @@
 /* ---- MODAL RESERVA ---- */
 let actual=null;
-function techRates(eqd){return {equipo:TEC_DIA/(eqd||8), hora:TEC_DIA/7, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
-const MODLBL={equipo:['Precio por equipo','Equipos','Cantidad de equipos a atender'],hora:['Precio por hora','Horas','Cantidad de horas'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
-function pkgConds(p){return {equipo:'Pagas por cada equipo atendido. Ideal para 1–2 equipos.',hora:`Por hora de servicio. En 1 h se atienden ~${p.eqh} equipos.`,dia:`Jornada de 7 h efectivas (8 h − 1 h de almuerzo). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
-function eqConds(){return {equipo:'Pagas por cada equipo que atiendas con el instrumento.',hora:'Por hora de uso del instrumento.',dia:'Jornada de 7 h efectivas (8 h − 1 h de almuerzo).',semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
+function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
+const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
+const TURNOS = `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
+function pkgConds(p){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
+function eqConds(){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}).`,semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
 function openModal(nom,marca,prices,conds,tec,igvInc,mod0){
   if(!VER_PRECIOS){ go('#/contacto'); return; }   // precios ocultos: se cotiza por contacto
   actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia'};
@@ -11,7 +12,7 @@ function openModal(nom,marca,prices,conds,tec,igvInc,mod0){
   document.getElementById('mMarca').textContent=marca;
   document.getElementById('d1').value='';document.getElementById('d2').value='';
   document.getElementById('nQty').value='1';
-  setMod(mod0||'hora');
+  setMod(mod0||'medio');
   _lastFocus=document.activeElement;
   document.body.classList.add('lock');
   document.getElementById('ov').classList.add('open');
@@ -28,17 +29,17 @@ function setMod(m){
   document.getElementById('qtyLabel').textContent=L[2];
   document.getElementById('cUnitLbl').textContent=L[0];
   document.getElementById('cQtyLbl').textContent=L[1];
-  document.getElementById('cTecUnitLbl').textContent={equipo:'Por equipo',hora:'Por hora',dia:'Por día',semana:'Por semana',mes:'Por mes'}[m];
+  document.getElementById('cTecUnitLbl').textContent={medio:'Por medio día',dia:'Por día',semana:'Por semana',mes:'Por mes'}[m];
   document.getElementById('cTecQtyLbl').textContent=L[1];
   document.getElementById('cDia').textContent='S/ '+actual.prices[m];
   document.getElementById('modCond').textContent=actual.conds[m]||'';
   calc();
 }
 function clearCalc(){['cDias','cSub','cIgv','cTot','cTecUnit','cTecQty','cTec','cGrand'].forEach(id=>document.getElementById(id).textContent='—');}
-function abrirPaq(id){const p=PAQUETES.find(x=>x.id===id);openModal(p.nom,'Paquete '+p.nivel+' · IGV incluido',{equipo:p.pe,hora:p.ph,dia:p.dia,semana:p.psem,mes:p.pmes},pkgConds(p),techRates(p.eqd),true,'dia');}
+function abrirPaq(id){const p=PAQUETES.find(x=>x.id===id);openModal(p.nom,'Paquete '+p.nivel+' · IGV incluido',{medio:precioMedio(p.dia),dia:p.dia,semana:p.psem,mes:p.pmes},pkgConds(p),techRates(),true,'dia');}
 function abrir(idx){
   const e=EQUIPOS[idx];
-  openModal(e.nom, e.marca, {equipo:precioEquipo(e.dia), hora:precioHora(e.dia), dia:e.dia, semana:e.dia*4, mes:e.dia*12}, eqConds(), techRates(8), true, 'hora');
+  openModal(e.nom, e.marca, {medio:precioMedio(e.dia), dia:e.dia, semana:e.dia*4, mes:e.dia*12}, eqConds(), techRates(), true, 'medio');
 }
 function cerrar(){
   document.getElementById('ov').classList.remove('open');

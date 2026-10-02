@@ -47,12 +47,14 @@ let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
 
 const byId=id=>EQUIPOS.find(e=>e.id===id);
-/* Divisores de modalidad para equipos individuales (única fuente de la verdad) */
-const DIV_EQUIPO=8, DIV_HORA=6;
+/* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
+   día, no la mitad: llevar, recoger y revisar el instrumento cuesta igual.
+   Es el mínimo de alquiler; por eso ya no se alquila por hora ni por equipo. */
+const MEDIO_PCT=0.6, HORARIO_MANANA='9:00 a 13:00', HORARIO_TARDE='14:00 a 18:00';
+const precioMedio=d=>Math.round(d*MEDIO_PCT);
 /* Interruptor general de precios (js/00-config.js -> CONFIG.MOSTRAR_PRECIOS).
    La hoja de Google puede sobrescribirlo con modelo.mostrar_precios. */
 let VER_PRECIOS = (typeof CONFIG!=='undefined' && CONFIG.MOSTRAR_PRECIOS!==undefined) ? !!CONFIG.MOSTRAR_PRECIOS : true;
-const precioEquipo=d=>Math.round(d/DIV_EQUIPO), precioHora=d=>Math.round(d/DIV_HORA);
 const sumItems=p=>p.items.reduce((s,id)=>s+byId(id).dia,0);
 const fmt=n=>Number(n).toLocaleString('es-PE');
 

@@ -12,7 +12,7 @@ function renderEquipo(id){
   const priceHTML=isA
     ?`<div class="pricebox"><span class="pp" style="font-size:19px">Complementaria</span><span class="pu">· incluida en paquetes de Mantenimiento</span></div>`
     :(VER_PRECIOS
-      ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${precioHora(e.dia)}</span><span class="pu">/ hora · IGV incluido</span><span class="tag">${e.tier}</span></div>`
+      ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${fmt(precioMedio(e.dia))}</span><span class="pu">/ medio día · IGV incluido</span><span class="tag">${e.tier}</span></div>`
       :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span><span class="tag">${e.tier}</span></div>`);
   const btnsHTML=isA
     ?`<div class="dbtns"><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
@@ -25,7 +25,7 @@ function renderEquipo(id){
     +(e.cal_fin?`<div class="row"><span class="l">Vigente hasta</span><span class="v">${e.cal_fin}</span></div>`:'')
     +(e.cal_pdf?`<div class="row"><span class="l">Documento</span><span class="v"><a href="${e.cal_pdf}" target="_blank" rel="noopener">Ver certificado</a></span></div>`:'')
     +`</div>`:'';
-  const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
+  const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div><div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
     <div class="detail">
@@ -40,7 +40,7 @@ function renderEquipo(id){
         <h1>${e.nom}</h1>
         <div class="dmarca">${e.marca}</div>
         ${priceHTML}
-        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): &nbsp;por equipo S/ ${precioEquipo(e.dia)} &nbsp;·&nbsp; por hora S/ ${precioHora(e.dia)} &nbsp;·&nbsp; por día S/ ${e.dia} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">Van de menor a mayor; el precio principal es por día. Elige la modalidad al reservar.</div>`}
+        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): &nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp; día S/ ${fmt(e.dia)} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">El mínimo es medio día: un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}). El día completo son los dos turnos. El personal técnico se cobra aparte.</div>`}
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
@@ -79,13 +79,13 @@ function renderPaquete(id){
         <h1>${p.nom}</h1>
         <div class="dmarca">${items.length} instrumentos${p.kit.length?' + kit de intervención':''}</div>
         ${VER_PRECIOS?`<div class="pricebox"><span class="pp">S/ ${p.dia}</span><span class="pu">/ día · IGV incluido</span></div>
-        <div class="pmodbig">Modalidades (IGV incluido): &nbsp;por equipo S/ ${p.pe} &nbsp;·&nbsp; por hora S/ ${p.ph} &nbsp;·&nbsp; por día S/ ${p.dia} &nbsp;·&nbsp; semana S/ ${fmt(p.psem)} &nbsp;·&nbsp; mes S/ ${fmt(p.pmes)}</div>`
+        <div class="pmodbig">Modalidades (IGV incluido): &nbsp;medio día S/ ${fmt(precioMedio(p.dia))} &nbsp;·&nbsp; día S/ ${fmt(p.dia)} &nbsp;·&nbsp; semana S/ ${fmt(p.psem)} &nbsp;·&nbsp; mes S/ ${fmt(p.pmes)}</div>`
         :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span></div>`}
-        <div class="modnote">Van de menor a mayor: a más tiempo, menor precio por equipo. En 1 h se atienden ~${p.eqh} equipos; en un día (7 h efectivas) hasta ~${p.eqd}. Elige la modalidad al reservar.</div>
+        <div class="modnote">Van de menor a mayor: a más tiempo, menor precio por día. En un día completo (dos turnos de 4 h) se atienden hasta ~${p.eqd} equipos. El mínimo es medio día.</div>
         <div class="ddesc">${p.desc}</div>
         <div class="dbtns">${VER_PRECIOS?`<button class="btn btn-fill btn-lg" onclick="abrirPaq('${p.id}')">Reservar paquete</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a>`:`<a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a>`}</div>
         <div class="dnote">Cada instrumento del paquete se entrega con su certificado de calibración vigente.</div>
-        ${VER_PRECIOS?`<div class="spec"><div class="sh">Tarifas del paquete</div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(p.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(p.psem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(p.pmes)}</span></div></div>`:''}<div class="pkinc"><div class="sh">Instrumentos (${items.length})</div>${rows}</div>${kitBlock}
+        ${VER_PRECIOS?`<div class="spec"><div class="sh">Tarifas del paquete</div><div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(p.dia))}</span></div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(p.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(p.psem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(p.pmes)}</span></div></div>`:''}<div class="pkinc"><div class="sh">Instrumentos (${items.length})</div>${rows}</div>${kitBlock}
       </div>
     </div>`;
   window._pkItems=items; window._pkGal=pkGal;

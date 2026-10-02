@@ -70,6 +70,8 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .prod-chips span{font-size:13px;border:1px solid var(--linea);border-radius:8px;padding:6px 10px;background:var(--crema)}
 .prod-chips b{font-weight:600}
 .prod-precio{margin-top:14px;font-size:15px}
+.prod-tarifas{margin-top:5px;font-size:13.5px;color:var(--gris);line-height:1.6}
+.prod-tarifas span{font-size:12.5px}
 .prod-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
 .prod-docs{margin-top:12px;font-size:14px;color:var(--gris)}
 .prod-docs a{color:var(--cobre-d);font-weight:600}
