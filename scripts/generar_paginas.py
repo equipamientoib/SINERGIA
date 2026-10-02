@@ -436,7 +436,6 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         'Cotización: ' + eq['nom']), urllib.parse.quote(texto))
     chips = ''.join('<span>%s <b>%s</b></span>' % (e(k), e(str(specs[k])))
                     for k in ('Modelo', 'Marca') if specs.get(k))
-    chips += '<span>Alquiler <b>por medio día, día, semana o mes</b></span>'
     pdf = pdf_ficha(eq['id'])
     doc = ''
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
@@ -460,24 +459,20 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
               if cfg['precios'] and eq.get('dia') else '')
     precio = ''
     if cfg['precios'] and eq.get('dia'):
-        # Medio día (un turno de 4 h) = 60 % del día, solo desde MEDIO_DIA_MIN:
-        # por debajo, la entrega y el recojo cuestan más que el alquiler.
+        # Precio grande y una sola línea de tarifas. El detalle de turnos, el
+        # instrumentista y la garantía se explican en el cotizador, no aquí.
         d = eq['dia']
         hay_medio = d >= MEDIO_DIA_MIN
         medio = round(d * 0.6)
-        tarifas = (('Medio día S/ {:,.0f} · '.format(medio) if hay_medio else '')
-                   + 'día S/ {:,.0f} · semana S/ {:,.0f} · mes S/ {:,.0f}'.format(d, d * 4, d * 12))
-        nota = ('Medio día = un turno de 4 h (9:00 a 13:00 o 14:00 a 18:00); el día completo son los dos turnos.'
-                if hay_medio else
-                'Este instrumento se alquila desde un día completo (9:00 a 13:00 y 14:00 a 18:00).')
+        otras = (['Día S/ {:,.0f}'.format(d)] if hay_medio else []) + [
+            'Semana S/ {:,.0f}'.format(d * 4), 'Mes S/ {:,.0f}'.format(d * 12)]
         gar = SIN_TECNICO.get(eq['id'])
-        modo = ('Lo recoges en nuestra oficina: sin instrumentista, con DNI y S/ {:,.0f} de '
-                'garantía que se te devuelve con el equipo.'.format(gar) if gar else
-                'Va con nuestro instrumentista, que se cobra aparte.')
-        precio = ('<p class="prod-precio">Desde <b>S/ {:,.0f}</b> por {} · IGV incluido</p>'
-                  '<p class="prod-tarifas">{}<br><span>{} {}</span></p>').format(
+        modo = ('Retiro en oficina · garantía S/ {:,.0f}'.format(gar) if gar else '')
+        precio = ('<div class="pprecio"><b>S/ {:,.0f}</b><span>por {}</span>'
+                  '<em>IGV incluido</em></div>'
+                  '<p class="ptarifas">{}{}</p>').format(
                       medio if hay_medio else d, 'medio día' if hay_medio else 'día',
-                      tarifas, nota, modo)
+                      ' · '.join(otras), ('  ·  ' + modo) if modo else '')
     resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
 
     # pestaña Descripción: el equipo + para qué sirve el tipo
