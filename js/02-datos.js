@@ -55,7 +55,11 @@ function aplicarTarifas(){
     if(d > 0){ e.dia = d; e.sem = d*4; e.mes = d*12; } });
 }
 fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null)
-  .then(d => { if(d && d.dia){ TARIFAS = d.dia; aplicarTarifas();
+  .then(d => { if(!d) return;
+    if(d.medioDiaDesde) MEDIO_MIN = d.medioDiaDesde;
+    if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
+    if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
+    if(d.dia){ TARIFAS = d.dia; aplicarTarifas();
     if(typeof repintarTodo === 'function') repintarTodo(); } }).catch(() => {});
 /* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
    día, no la mitad: llevar, recoger y revisar el instrumento cuesta igual.
@@ -64,7 +68,7 @@ const MEDIO_PCT=0.6, HORARIO_MANANA='9:00 a 13:00', HORARIO_TARDE='14:00 a 18:00
 /* Medio día solo en los instrumentos de S/ 100 el día a más: por debajo, el
    viaje de entrega y recojo cuesta más que el alquiler. Y ningún pedido baja
    de PEDIDO_MIN, venga un instrumento o varios. */
-let MEDIO_MIN=100, PEDIDO_MIN=0;
+let MEDIO_MIN=60, MEDIO_PISO=50, PEDIDO_MIN=0;
 /* Instrumentos que se alquilan SIN instrumentista: el cliente los recoge en
    oficina y deja garantía (en soles) + DNI. El resto va con instrumentista.
    La hoja puede cambiar la lista (modelo.sin_tecnico = {"id": garantía}). */
@@ -78,7 +82,9 @@ const esComplemento = e => !!e.apoyo || COMPLEMENTOS.indexOf(e.id) >= 0;
 let INCLUIDOS = ['multimetro', 'set-46', 'destornillador-elec'];
 const incluidos = id => EQUIPOS.filter(e => e.id !== id && INCLUIDOS.indexOf(e.id) >= 0);
 const garantiaDe = id => SIN_TECNICO[id] || 0;
-const precioMedio=d=>Math.round(d*MEDIO_PCT);
+/* Medio día: el 60 % del día, pero nunca menos de MEDIO_PISO: por debajo,
+   preparar, entregar y revisar el instrumento cuesta más que el alquiler. */
+const precioMedio=d=>Math.max(MEDIO_PISO, Math.round(d*MEDIO_PCT));
 const tieneMedio=d=>Number(d) >= MEDIO_MIN;
 /* Precio de partida de un instrumento: medio día si lo tiene, si no el día. */
 const precioDesde=d=>tieneMedio(d) ? precioMedio(d) : Number(d);
