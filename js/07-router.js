@@ -141,6 +141,9 @@ function aplicarDatos(d, enVivo){
       if(m.instrumentista_min!=null) TEC_MIN=m.instrumentista_min;
       if(m.kit_dia!=null) KIT_DIA=m.kit_dia;
       if(m.descuento_combinar) DESC_COMB=m.descuento_combinar;
+      /* La hoja manda sobre el interruptor de precios (modelo.mostrar_precios):
+         así se encienden o apagan sin tocar el código. */
+      if(m.mostrar_precios!=null) VER_PRECIOS = !!m.mostrar_precios;
     }
   }
 

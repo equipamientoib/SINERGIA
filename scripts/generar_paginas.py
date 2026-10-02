@@ -434,7 +434,13 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
     precio = ''
     if cfg['precios'] and eq.get('dia'):
-        precio = '<p class="prod-precio">Desde <b>S/ %s</b> por día · IGV incluido</p>' % eq['dia']
+        # Mínimo de alquiler: medio día (un turno de 4 h) = 60 % del día.
+        medio = round(eq['dia'] * 0.6)
+        precio = ('<p class="prod-precio">Desde <b>S/ {:,.0f}</b> por medio día · IGV incluido</p>'
+                  '<p class="prod-tarifas">Día S/ {:,.0f} · semana S/ {:,.0f} · mes S/ {:,.0f}<br>'
+                  '<span>Medio día = un turno de 4 h (9:00 a 13:00 o 14:00 a 18:00); es el mínimo. '
+                  'El personal técnico se cobra aparte.</span></p>').format(
+                      medio, eq['dia'], eq['dia'] * 4, eq['dia'] * 12)
     resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
 
     # pestaña Descripción: el equipo + para qué sirve el tipo
