@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=516bd940';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=09506041';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=516bd940';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=09506041';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=516bd940','js/06-tablero.js?v=516bd940'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=09506041','js/06-tablero.js?v=09506041'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=516bd940'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=09506041'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1926,14 +1926,9 @@ function vOrden(lista){
   });
 }
 
-/* Inicio: igual que la tienda, por tramo de precio; de cada tramo los 3
-   más pedidos y el acceso a la tienda filtrada por ese tramo. */
+/* Inicio: exactamente el mismo orden que la tienda, los 12 primeros. */
 function vPortadaTramos(){
-  /* Mismo orden que la tienda (tramos de precio de menor a mayor y, dentro,
-     más pedidos), sin mostrar los tramos: 2 equipos de cada tramo. */
-  const l = vOrdenTienda(VENTA.productos), sel = [];
-  [...V_TRAMOS.keys(), V_TRAMOS.length].forEach(i => sel.push(...l.filter(p => vTramo(p) === i).slice(0, 2)));
-  return `<div class="grid">${sel.map(vCard).join('')}</div>`;
+  return `<div class="grid">${vOrdenTienda(VENTA.productos).slice(0, 12).map(vCard).join('')}</div>`;
 }
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
