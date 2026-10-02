@@ -110,8 +110,9 @@ def build():
                 "estado": r.get("estado", "En curso"),
                 "avance": int(num(r.get("avance")) or 0),
                 "desc": r.get("descripcion", ""), "hitos": hitos,
-                # La clave nunca se publica: solo su hash SHA-256
-                "clave_hash": hashlib.sha256(clave.encode("utf-8")).hexdigest() if clave else "",
+                # La clave nunca se publica: solo un hash de verificación que
+                # no sirve para pedir el detalle al Apps Script
+                "clave_verif": hashlib.sha256(("sinergia-verif:" + clave).encode("utf-8")).hexdigest() if clave else "",
             })
 
     cat = {"equipos": equipos, "paquetes": paquetes, "proyectos": proyectos, "modelo": MODELO}
