@@ -1192,6 +1192,96 @@
     ],
     "edan-se301": [
       "img/venta/edan-se301-real.jpg"
+    ],
+    "cardioline-touchecg-tab7": [
+      "img/venta/web-cardioline-touchecg-tab7.jpg"
+    ],
+    "diagnostico-c6a": [
+      "img/venta/web-diagnostico-c6a.jpg"
+    ],
+    "esterilizacion-tiva2-h": [
+      "img/venta/web-esterilizacion-tiva2-h.jpg"
+    ],
+    "heine-beta-200-led-2": [
+      "img/venta/web-heine-beta-200-led-2.jpg"
+    ],
+    "heine-beta-200-led-4": [
+      "img/venta/web-heine-beta-200-led-4.jpg"
+    ],
+    "heine-beta-200s-led-2": [
+      "img/venta/web-heine-beta-200s-led-2.jpg"
+    ],
+    "hettich-haematokrit-200": [
+      "img/venta/web-hettich-haematokrit-200.jpg"
+    ],
+    "hettich-rotofix-32a": [
+      "img/venta/web-hettich-rotofix-32a.jpg"
+    ],
+    "hugemed-097345": [
+      "img/venta/web-hugemed-097345.jpg"
+    ],
+    "imagenes-hs40": [
+      "img/venta/web-imagenes-hs40.jpg"
+    ],
+    "imagenes-v5": [
+      "img/venta/web-imagenes-v5.jpg"
+    ],
+    "imagenes-v8": [
+      "img/venta/web-imagenes-v8.jpg"
+    ],
+    "keewell-ft2800": [
+      "img/venta/web-keewell-ft2800.jpg"
+    ],
+    "laboratorio-bc-60": [
+      "img/venta/web-laboratorio-bc-60.jpg"
+    ],
+    "laboratorio-h100-plus": [
+      "img/venta/web-laboratorio-h100-plus.jpg"
+    ],
+    "laboratorio-h60s": [
+      "img/venta/web-laboratorio-h60s.jpg"
+    ],
+    "meling-dw-hl530": [
+      "img/venta/web-meling-dw-hl530.jpg"
+    ],
+    "mindray-a7": [
+      "img/venta/web-mindray-a7.jpg"
+    ],
+    "mindray-bc-30s": [
+      "img/venta/web-mindray-bc-30s.jpg"
+    ],
+    "mindray-bs-240-pro": [
+      "img/venta/web-mindray-bs-240-pro.jpg"
+    ],
+    "mindray-c3510": [
+      "img/venta/web-mindray-c3510.jpg"
+    ],
+    "mindray-cl-900i": [
+      "img/venta/web-mindray-cl-900i.jpg"
+    ],
+    "mindray-hybase-6100-plus": [
+      "img/venta/web-mindray-hybase-6100-plus.jpg"
+    ],
+    "mindray-hyled-200m": [
+      "img/venta/web-mindray-hyled-200m.jpg"
+    ],
+    "mindray-tv50": [
+      "img/venta/web-mindray-tv50.jpg"
+    ],
+    "optika-b-290tb": [
+      "img/venta/web-optika-b-290tb.jpg"
+    ],
+    "optika-b-382pli-alc": [
+      "img/venta/web-optika-b-382pli-alc.jpg"
+    ],
+    "sonoscape-096501": [
+      "img/venta/web-sonoscape-096501.jpg"
+    ],
+    "tuttnauer-101144": [
+      "img/venta/web-tuttnauer-101144.jpg"
+    ],
+    "ugaiya-099169": [
+      "img/venta/web-ugaiya-099169.jpg"
     ]
   },
   "primerosWeb": [
@@ -1311,5 +1401,55 @@
     "D-96": "DETECTOR DE LATIDOS FETALES DE SOBREMESA",
     "D-97": "DETECTOR DE LATIDOS FETALES PORTATIL",
     "E-208": "LAVADOR DESINFECTOR"
+  },
+  "datosFijos": {
+    "_nota": "Marca u origen que la hoja no trae (buscados en la web del fabricante). Solo se usan si la hoja está vacía.",
+    "diagnostico-c6a": {
+      "marca": "Edan",
+      "origen": "China"
+    },
+    "esterilizacion-tiva2-h": {
+      "marca": "Tuttnauer",
+      "origen": "Italia"
+    },
+    "imagenes-hs40": {
+      "marca": "Samsung",
+      "origen": "Corea del Sur"
+    },
+    "imagenes-v5": {
+      "marca": "Samsung",
+      "origen": "Corea del Sur"
+    },
+    "imagenes-v8": {
+      "marca": "Samsung",
+      "origen": "Corea del Sur"
+    },
+    "keewell-ft2800": {
+      "origen": "China"
+    },
+    "laboratorio-bc-60": {
+      "marca": "Autobio",
+      "origen": "China"
+    },
+    "laboratorio-h100-plus": {
+      "marca": "Lifotronic",
+      "origen": "China"
+    },
+    "laboratorio-h60s": {
+      "marca": "Edan",
+      "origen": "China"
+    },
+    "monitoreo-cx10": {
+      "marca": "Edan",
+      "origen": "China"
+    },
+    "monitoreo-cx12": {
+      "marca": "Edan",
+      "origen": "China"
+    },
+    "monitoreo-cx15": {
+      "marca": "Edan",
+      "origen": "China"
+    }
   }
 }

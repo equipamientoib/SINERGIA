@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=afd01de0';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=dcd979fa';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=afd01de0';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=dcd979fa';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=afd01de0','js/06-tablero.js?v=afd01de0'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=dcd979fa','js/06-tablero.js?v=dcd979fa'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=afd01de0'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=dcd979fa'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1677,6 +1677,9 @@ function vAjustar(p){
   const n = Number(q.stock);
   if(q.stock !== '' && q.stock != null && n > 0)
     q.stock = Math.min(sv.maximo || 10, Math.max(1, Math.floor(n * (sv.porcentaje || 30) / 100)));
+  const fx = ((VENTA && VENTA.fijos) || {})[q.id] || {};   // marca/origen que la hoja no trae
+  if(!q.marca && fx.marca) q.marca = fx.marca;
+  if(!q.origen && fx.origen) q.origen = fx.origen;
   if(!q.clave) q.clave = ((VENTA && VENTA.nts) || {})[q.id] || '';
   if(q.clave && !q.expediente) q.expediente = ((VENTA && VENTA.ntsNom) || {})[q.clave] || '';
   return q;
@@ -1707,7 +1710,7 @@ function cargarVenta(){
       .catch(() => ({categorias:[], productos:[]}))
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
-                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}};
+                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
         VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */

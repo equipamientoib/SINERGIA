@@ -38,6 +38,9 @@ function vAjustar(p){
   const n = Number(q.stock);
   if(q.stock !== '' && q.stock != null && n > 0)
     q.stock = Math.min(sv.maximo || 10, Math.max(1, Math.floor(n * (sv.porcentaje || 30) / 100)));
+  const fx = ((VENTA && VENTA.fijos) || {})[q.id] || {};   // marca/origen que la hoja no trae
+  if(!q.marca && fx.marca) q.marca = fx.marca;
+  if(!q.origen && fx.origen) q.origen = fx.origen;
   if(!q.clave) q.clave = ((VENTA && VENTA.nts) || {})[q.id] || '';
   if(q.clave && !q.expediente) q.expediente = ((VENTA && VENTA.ntsNom) || {})[q.clave] || '';
   return q;
@@ -68,7 +71,7 @@ function cargarVenta(){
       .catch(() => ({categorias:[], productos:[]}))
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
-                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}};
+                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
         VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
