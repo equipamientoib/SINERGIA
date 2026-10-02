@@ -66,9 +66,15 @@ function vMezclar(){
 
 function cargarVenta(){
   if(!VENTA_CARGA){
+    /* data/venta-vivo.json: copia diaria de la hoja (la deja el robot de
+       «Páginas de venta»). Así, aunque Google tarde o falle —pasa seguido
+       en el celular—, la tienda abre con los 150 equipos y sus precios,
+       no con la lista antigua de venta.json. */
+    const copia = fetch('data/venta-vivo.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null);
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
+      .then(d => copia.then(c => { if(c && !VENTA_VIVO) ventaEnVivo(c); return d; }))
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};

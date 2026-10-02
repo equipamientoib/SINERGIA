@@ -45,10 +45,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "$(git status --porcelain venta sitemap.xml index.html)" ]; then echo "Sin cambios."; exit 0; fi
+          if [ -z "$(git status --porcelain venta sitemap.xml index.html data/venta-vivo.json)" ]; then echo "Sin cambios."; exit 0; fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A venta sitemap.xml index.html
+          git add -A venta sitemap.xml index.html data/venta-vivo.json
           git commit -m "Paginas de venta al dia con la hoja"
           git pull --rebase origin "${GITHUB_REF_NAME}" || true
           git push
