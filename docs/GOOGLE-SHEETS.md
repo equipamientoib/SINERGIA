@@ -134,7 +134,7 @@ La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (c
 | `precio_proveedor` | lo que cobra el proveedor | **no** |
 | `precio_publicado` | fórmula = proveedor × (1 + B1/100); si falta, el Apps Script la calcula | sí |
 | `stock_proveedor` | stock del proveedor | **no** |
-| `stock_sinergia` | fórmula = stock del proveedor; 0 o vacío = «A pedido» | sí |
+| `stock_sinergia` | fórmula = el % de B3 («stock %», 30 por defecto) del stock del proveedor, redondeado hacia abajo (mínimo 1 si el proveedor tiene); 0 o vacío = «A pedido» | sí |
 | `caracteristicas` | separadas con `\|` | sí |
 | `expediente`, `clave` | nombre y código en expedientes técnicos (NTS 113) | sí |
 | `areas` | separadas con coma | sí |
