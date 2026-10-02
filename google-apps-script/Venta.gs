@@ -112,6 +112,7 @@ function json_(obj) {
 /* Arriba de los encabezados van dos parámetros:
      A1 margen      B1 35          (% que se suma al precio del proveedor)
      A2 actualizado B2 06/10/2026  (fecha de la última revisión, cada lunes)
+     A3 stock %     B3 30          (% del stock del proveedor que se muestra)
    Solo se envían a la web las filas con publicar = SI y solo las columnas
    públicas: el precio y el stock del proveedor NO salen de aquí.        */
 function hojaVenta_(ss) {
@@ -188,7 +189,13 @@ function prepararHojaVenta() {
   sh.getRange(ini, cSS, n, 1).clearContent();
   var I = letra(cPP), K = letra(cSP);
   sh.getRange(ini, cPub).setFormula('=ARRAYFORMULA(IF(' + I + ini + ':' + I + '="","",ROUND(' + I + ini + ':' + I + '*(1+$B$1/100),0)))');
-  sh.getRange(ini, cSS).setFormula('=ARRAYFORMULA(IF(' + K + ini + ':' + K + '="","",' + K + ini + ':' + K + '))');
+  /* Stock mostrado = % del stock del proveedor (B3), redondeado hacia abajo;
+     mínimo 1 si el proveedor tiene, 0 si no tiene. */
+  if (s_(sh.getRange('A3').getValue()) === '') {
+    sh.getRange('A3:C3').setValues([['stock %', 30, '← % del stock del proveedor que se muestra en la web']]);
+  }
+  var KK = K + ini + ':' + K, Kp = KK + '*$B$3/100';
+  sh.getRange(ini, cSS).setFormula('=ARRAYFORMULA(IF(' + KK + '="","",IF(' + KK + '<=0,0,IF(' + Kp + '<1,1,ROUNDDOWN(' + Kp + ',0)))))');
   sh.getRange(fh, 1, 1, heads.length).setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36').setWrap(true);
   sh.getRange(fh, cPP).setBackground('#b7791f'); sh.getRange(fh, cSP).setBackground('#b7791f');
   sh.getRange(fh, cPub).setBackground('#2f7d4f'); sh.getRange(fh, cSS).setBackground('#2f7d4f');
@@ -196,7 +203,7 @@ function prepararHojaVenta() {
   sh.getRange(ini, cPub, n, 1).setNumberFormat('#,##0');
   sh.getRange(ini, col('codigo_proveedor'), n, 1).setNumberFormat('000.000');
   sh.getRange('B2').setNumberFormat('dd/mm/yyyy');
-  sh.getRange('A1:A2').setFontWeight('bold'); sh.getRange('B1:B2').setBackground('#fce9c8');
+  sh.getRange('A1:A3').setFontWeight('bold'); sh.getRange('B1:B3').setBackground('#fce9c8');
   sh.getRange(ini, col('publicar'), n, 1).setDataValidation(
     SpreadsheetApp.newDataValidation().requireValueInList(['SI', 'NO'], true).build());
   sh.setFrozenRows(fh); sh.setFrozenColumns(5);
