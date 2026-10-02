@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=30bacfac';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=cfedfb2d';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=30bacfac';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=cfedfb2d';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=30bacfac','js/06-tablero.js?v=30bacfac'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=cfedfb2d','js/06-tablero.js?v=cfedfb2d'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=30bacfac'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=cfedfb2d'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1676,6 +1676,8 @@ function vMezclar(){
     VENTA.base = VENTA.base || VENTA.productos;
     /* Las fotos propias del sitio ganan a la foto genérica del proveedor (fotoProv). */
     VENTA.productos = VENTA_VIVO.productos.map(p => {
+      const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
+      if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
       const b = base.get(p.id);
       const propias = b && b.fotos && b.fotos.length;
       return propias && (!(p.fotos && p.fotos.length) || p.fotoProv) ? Object.assign({}, p, {fotos: b.fotos}) : p;
@@ -1689,7 +1691,7 @@ function cargarVenta(){
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
-      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom)}; vMezclar(); return VENTA; });
+      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom), fijas: d.fotosFijas||{}}; vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
     if(vu) fetch(vu, {cache:'no-store'}).then(r => r.json()).then(d => { if(d && d.ok !== false) ventaEnVivo(d); }).catch(() => {});
