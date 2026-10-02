@@ -68,7 +68,7 @@ const CONFIG = {
      │            «Solicitar cotización» y llevan a Contacto.           │
      │ Cambia solo esta palabra cuando termines de definir tus costos.  │
      └──────────────────────────────────────────────────────────────────┘ */
-  MOSTRAR_PRECIOS: false,
+  MOSTRAR_PRECIOS: true,
 
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
@@ -239,6 +239,16 @@ let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
 
 const byId=id=>EQUIPOS.find(e=>e.id===id);
+/* Tarifas acordadas (data/tarifas-alquiler.json). Mandan sobre la hoja para
+   poder publicarlas sin esperar a que la hoja se actualice. */
+let TARIFAS = {};
+function aplicarTarifas(){
+  EQUIPOS.forEach(e => { const d = TARIFAS[e.id];
+    if(d > 0){ e.dia = d; e.sem = d*4; e.mes = d*12; } });
+}
+fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null)
+  .then(d => { if(d && d.dia){ TARIFAS = d.dia; aplicarTarifas();
+    if(typeof repintarTodo === 'function') repintarTodo(); } }).catch(() => {});
 /* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
    día, no la mitad: llevar, recoger y revisar el instrumento cuesta igual.
    Es el mínimo de alquiler; por eso ya no se alquila por hora ni por equipo. */
@@ -559,7 +569,7 @@ function pintarPaquetes(){
       <ul class="inc">${items.map(e=>`<li>${e.nom}</li>`).join('')}${kitLine}</ul>
       ${VER_PRECIOS?`<div class="pfoot">
         <div class="pprice">S/ ${p.dia}<span>/día · IGV incluido</span></div>
-        <div class="pmod">Otras modalidades: por equipo S/ ${p.pe} · por hora S/ ${p.ph} · semana S/ ${fmt(p.psem)} · mes S/ ${fmt(p.pmes)}</div>
+        <div class="pmod">Otras modalidades: medio día S/ ${fmt(precioMedio(p.dia))} · semana S/ ${fmt(p.psem)} · mes S/ ${fmt(p.pmes)}</div>
       </div>`:`<div class="pfoot"><div class="pprice" style="font-size:17px;color:var(--gris)">Consultar tarifa<span style="display:block">te respondemos con precio y disponibilidad</span></div></div>`}
       <div class="pbtns">${VER_PRECIOS?`<button class="btn btn-fill" onclick="abrirPaq('${p.id}')">Reservar paquete</button>`:`<button class="btn btn-fill" onclick="go('#/contacto')">Solicitar cotización</button>`}<a class="btn" onclick="go('#/paquete/${p.id}')">Ver detalle</a></div>
     </div>`;
@@ -907,17 +917,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=b9d36183';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=a75f5195';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=b9d36183';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=a75f5195';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=b9d36183','js/06-tablero.js?v=b9d36183'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=a75f5195','js/06-tablero.js?v=a75f5195'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=b9d36183'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=a75f5195'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1114,7 +1124,7 @@ function aplicarDatos(d, enVivo){
        quedarse con lo que ya había.                                     */
     const validos = a => Array.isArray(a) ? a.filter(x => x && x.id && x.nom) : [];
     const eqOk = validos(d.equipos), pkOk = validos(d.paquetes);
-    if(eqOk.length) EQUIPOS  = eqOk;
+    if(eqOk.length){ EQUIPOS = eqOk; aplicarTarifas(); }
     if(pkOk.length) PAQUETES = pkOk;
     if(d.modelo){
       const m=d.modelo;
@@ -1668,7 +1678,7 @@ function enviar(via){
   if(error){ avisar('mAviso', error, 'err'); return; }
 
   const leer = id => { const el = document.getElementById(id); return el ? el.textContent : '—'; };
-  const modLbl = { equipo:'por equipo', hora:'por hora', dia:'por día', semana:'por semana', mes:'por mes' }[actual.mod] || actual.mod;
+  const modLbl = { medio:'por medio día', dia:'por día', semana:'por semana', mes:'por mes' }[actual.mod] || actual.mod;
 
   const lineas = [
     'Solicitud de reserva — ' + ((typeof SITE !== 'undefined' && SITE.nombre) || 'Sinergia Biomédica'),

@@ -1,22 +1,23 @@
 {
   "_nota": "Una página por TIPO de herramienta, no por modelo: la gente busca «alquiler de analizador de seguridad eléctrica», no «ESA620». Cada tipo agrupa los equipos cuya columna «categoria» de la hoja Equipos esté en «categorias». Si compras otro equipo del mismo tipo, basta con ponerle la misma categoría y aparece solo en la misma página. Lo genera scripts/generar_paginas.py.",
-
   "hub": {
     "slug": "alquiler",
     "title": "Alquiler de analizadores y simuladores biomédicos en Lima | Sinergia Biomédica",
     "h1": "Alquiler de analizadores y simuladores biomédicos",
     "descripcion": "Alquiler de analizadores de seguridad eléctrica y de desfibriladores, simuladores de signos vitales y SpO2 e instrumentos de medición biomédica. Lima y provincias.",
-    "intro": "Instrumentos de metrología biomédica por hora, día, semana o mes, para mantenimiento preventivo, validaciones posteriores al mantenimiento y auditorías. Elige el tipo de equipo que necesitas; en cada página ves los modelos disponibles y puedes cotizar al momento."
+    "intro": "Instrumentos de metrología biomédica por medio día, día, semana o mes, para mantenimiento preventivo, validaciones posteriores al mantenimiento y auditorías. Elige el tipo de equipo que necesitas; en cada página ves los modelos disponibles y puedes cotizar al momento."
   },
-
   "tipos": [
     {
       "slug": "analizador-de-seguridad-electrica",
-      "categorias": ["Analizador eléctrico", "Analizador de seguridad eléctrica"],
+      "categorias": [
+        "Analizador eléctrico",
+        "Analizador de seguridad eléctrica"
+      ],
       "nombre": "Analizador de seguridad eléctrica",
       "title": "Alquiler de analizador de seguridad eléctrica en Lima | Sinergia Biomédica",
       "h1": "Alquiler de analizador de seguridad eléctrica",
-      "descripcion": "Alquila un analizador de seguridad eléctrica para equipos médicos (IEC 62353 / 60601-1) por hora, día o semana: fugas, tierra y aislamiento. Lima y provincias.",
+      "descripcion": "Alquila un analizador de seguridad eléctrica para equipos médicos (IEC 62353 / 60601-1) por medio día, día o semana: fugas, tierra y aislamiento. Lima y provincias.",
       "intro": "El analizador de seguridad eléctrica verifica que un equipo médico no represente un riesgo eléctrico para el paciente ni para el operador. Es la prueba que se exige después de cada mantenimiento o reparación y en las auditorías de tecnovigilancia.",
       "usos": [
         "Corrientes de fuga a tierra, de envolvente y de paciente",
@@ -26,14 +27,26 @@
         "Monitores, bombas de infusión, electrobisturíes, desfibriladores, camas eléctricas y más"
       ],
       "faq": [
-        ["¿Qué norma aplica a los equipos médicos en uso?", "La IEC 62353 define los ensayos recurrentes y posteriores a la reparación de equipos electromédicos. La IEC 60601-1 es la norma general de seguridad del diseño."],
-        ["¿Puedo alquilarlo solo por unas horas?", "Sí. Puedes alquilarlo por hora, por día, por semana o por mes, según el volumen de equipos que tengas que verificar."],
-        ["¿Incluye un técnico que lo opere?", "Si lo necesitas, el equipo va con un técnico instrumentista. Se cobra aparte, con un mínimo de medio día."]
+        [
+          "¿Qué norma aplica a los equipos médicos en uso?",
+          "La IEC 62353 define los ensayos recurrentes y posteriores a la reparación de equipos electromédicos. La IEC 60601-1 es la norma general de seguridad del diseño."
+        ],
+        [
+          "¿Puedo alquilarlo solo medio día?",
+          "Sí. El mínimo es medio día: un turno de 4 h (9:00 a 13:00 o 14:00 a 18:00). También va por día, semana o mes, según el volumen de equipos que tengas que verificar."
+        ],
+        [
+          "¿Incluye un técnico que lo opere?",
+          "Si lo necesitas, el equipo va con un técnico instrumentista. Se cobra aparte, con un mínimo de medio día."
+        ]
       ]
     },
     {
       "slug": "analizador-de-desfibriladores",
-      "categorias": ["Analizador de desfibrilador", "Analizador de desfibriladores"],
+      "categorias": [
+        "Analizador de desfibrilador",
+        "Analizador de desfibriladores"
+      ],
       "nombre": "Analizador de desfibriladores",
       "title": "Alquiler de analizador de desfibriladores en Lima | Sinergia Biomédica",
       "h1": "Alquiler de analizador de desfibriladores",
@@ -47,14 +60,27 @@
         "Verificación después del mantenimiento o de un cambio de batería"
       ],
       "faq": [
-        ["¿Qué se mide en un desfibrilador?", "Principalmente la energía entregada frente a la seleccionada, el tiempo de carga y, en modo sincronizado, el retardo de la descarga respecto al complejo QRS."],
-        ["¿Sirve para desfibriladores externos automáticos (DEA)?", "Sí. El analizador mide la descarga del DEA igual que la de un desfibrilador manual."],
-        ["¿Puedo combinarlo con el analizador de seguridad eléctrica?", "Sí. El paquete para desfibriladores incluye los dos equipos con descuento por combinar."]
+        [
+          "¿Qué se mide en un desfibrilador?",
+          "Principalmente la energía entregada frente a la seleccionada, el tiempo de carga y, en modo sincronizado, el retardo de la descarga respecto al complejo QRS."
+        ],
+        [
+          "¿Sirve para desfibriladores externos automáticos (DEA)?",
+          "Sí. El analizador mide la descarga del DEA igual que la de un desfibrilador manual."
+        ],
+        [
+          "¿Puedo combinarlo con el analizador de seguridad eléctrica?",
+          "Sí. El paquete para desfibriladores incluye los dos equipos con descuento por combinar."
+        ]
       ]
     },
     {
       "slug": "simulador-de-signos-vitales",
-      "categorias": ["Simulador de paciente", "Simulador de signos vitales", "Simulador ECG"],
+      "categorias": [
+        "Simulador de paciente",
+        "Simulador de signos vitales",
+        "Simulador ECG"
+      ],
       "nombre": "Simulador de signos vitales (ECG)",
       "title": "Alquiler de simulador de signos vitales y ECG en Lima | Sinergia Biomédica",
       "h1": "Alquiler de simulador de signos vitales (simulador de paciente ECG)",
@@ -68,14 +94,26 @@
         "Prueba de alarmas después del mantenimiento"
       ],
       "faq": [
-        ["¿Es lo mismo simulador de paciente que simulador de signos vitales?", "Sí, son dos nombres para el mismo tipo de equipo: genera las señales fisiológicas que un monitor espera recibir de un paciente."],
-        ["¿Qué parámetros simula el equipo disponible?", "Revisa la ficha de cada modelo más abajo: ahí están los parámetros exactos que genera."],
-        ["¿Sirve para verificar un monitor completo?", "Para un monitor multiparámetro conviene combinarlo con el simulador de SpO2 y el manómetro; el paquete para monitores de paciente los incluye."]
+        [
+          "¿Es lo mismo simulador de paciente que simulador de signos vitales?",
+          "Sí, son dos nombres para el mismo tipo de equipo: genera las señales fisiológicas que un monitor espera recibir de un paciente."
+        ],
+        [
+          "¿Qué parámetros simula el equipo disponible?",
+          "Revisa la ficha de cada modelo más abajo: ahí están los parámetros exactos que genera."
+        ],
+        [
+          "¿Sirve para verificar un monitor completo?",
+          "Para un monitor multiparámetro conviene combinarlo con el simulador de SpO2 y el manómetro; el paquete para monitores de paciente los incluye."
+        ]
       ]
     },
     {
       "slug": "simulador-de-spo2",
-      "categorias": ["Simulador SpO2", "Simulador de SpO2"],
+      "categorias": [
+        "Simulador SpO2",
+        "Simulador de SpO2"
+      ],
       "nombre": "Simulador de SpO2",
       "title": "Alquiler de simulador de SpO2 para pulsioxímetros en Lima | Sinergia Biomédica",
       "h1": "Alquiler de simulador de SpO2 para pulsioxímetros",
@@ -89,14 +127,26 @@
         "Módulos de SpO2 de monitores multiparámetro"
       ],
       "faq": [
-        ["¿Funciona con pulsioxímetros de cualquier marca?", "Los simuladores de SpO2 usan curvas de calibración (curvas R) por fabricante; revisa en la ficha del modelo las marcas compatibles."],
-        ["¿Qué verifica exactamente?", "Que la lectura de saturación y de pulso del equipo coincida con el valor simulado, dentro de la tolerancia del fabricante."],
-        ["¿Lo puedo alquilar junto con el simulador de ECG?", "Sí. El paquete para monitores de paciente incluye ambos."]
+        [
+          "¿Funciona con pulsioxímetros de cualquier marca?",
+          "Los simuladores de SpO2 usan curvas de calibración (curvas R) por fabricante; revisa en la ficha del modelo las marcas compatibles."
+        ],
+        [
+          "¿Qué verifica exactamente?",
+          "Que la lectura de saturación y de pulso del equipo coincida con el valor simulado, dentro de la tolerancia del fabricante."
+        ],
+        [
+          "¿Lo puedo alquilar junto con el simulador de ECG?",
+          "Sí. El paquete para monitores de paciente incluye ambos."
+        ]
       ]
     },
     {
       "slug": "phantom-de-puncion-ecoguiada",
-      "categorias": ["Phantom de flujo", "Phantom"],
+      "categorias": [
+        "Phantom de flujo",
+        "Phantom"
+      ],
       "nombre": "Phantom de punción ecoguiada",
       "title": "Alquiler de phantom de flujo para punción ecoguiada en Lima | Sinergia Biomédica",
       "h1": "Alquiler de phantom de flujo para punción ecoguiada",
@@ -108,13 +158,21 @@
         "Demostración de ecógrafos y del modo Doppler"
       ],
       "faq": [
-        ["¿Para quién es útil?", "Para centros de formación, servicios de anestesiología, emergencias y cuidados intensivos, y para quienes demuestran ecógrafos."],
-        ["¿Se puede alquilar para un taller de un día?", "Sí, el alquiler es por días y lo coordinamos con las fechas de tu curso."]
+        [
+          "¿Para quién es útil?",
+          "Para centros de formación, servicios de anestesiología, emergencias y cuidados intensivos, y para quienes demuestran ecógrafos."
+        ],
+        [
+          "¿Se puede alquilar para un taller de un día?",
+          "Sí, el alquiler es por días y lo coordinamos con las fechas de tu curso."
+        ]
       ]
     },
     {
       "slug": "sonometro",
-      "categorias": ["Sonómetro"],
+      "categorias": [
+        "Sonómetro"
+      ],
       "nombre": "Sonómetro",
       "title": "Alquiler de sonómetro en Lima | Sinergia Biomédica",
       "h1": "Alquiler de sonómetro",
@@ -127,13 +185,21 @@
         "Mediciones para salud ocupacional"
       ],
       "faq": [
-        ["¿En qué unidades mide?", "En decibelios (dB), normalmente con ponderación A (dBA), que es la que se usa para ruido ambiental y ocupacional."],
-        ["¿Viene con otros instrumentos para unidades dentales?", "Sí. El paquete para unidades dentales incluye sonómetro, manómetro y analizador de seguridad eléctrica."]
+        [
+          "¿En qué unidades mide?",
+          "En decibelios (dB), normalmente con ponderación A (dBA), que es la que se usa para ruido ambiental y ocupacional."
+        ],
+        [
+          "¿Viene con otros instrumentos para unidades dentales?",
+          "Sí. El paquete para unidades dentales incluye sonómetro, manómetro y analizador de seguridad eléctrica."
+        ]
       ]
     },
     {
       "slug": "termometro-digital",
-      "categorias": ["Termómetro"],
+      "categorias": [
+        "Termómetro"
+      ],
       "nombre": "Termómetro digital de termocupla",
       "title": "Alquiler de termómetro digital de termocupla en Lima | Sinergia Biomédica",
       "h1": "Alquiler de termómetro digital (termocupla)",
@@ -146,13 +212,21 @@
         "Baños maría y estufas"
       ],
       "faq": [
-        ["¿Qué ventaja tiene la termocupla?", "Responde rápido y la sonda llega a lugares donde un termómetro común no entra, como el interior de una cámara o de un baño."],
-        ["¿Se puede usar en refrigeradoras de vacunas?", "Sí, mide tanto temperaturas bajas como altas; revisa el rango en la ficha del modelo."]
+        [
+          "¿Qué ventaja tiene la termocupla?",
+          "Responde rápido y la sonda llega a lugares donde un termómetro común no entra, como el interior de una cámara o de un baño."
+        ],
+        [
+          "¿Se puede usar en refrigeradoras de vacunas?",
+          "Sí, mide tanto temperaturas bajas como altas; revisa el rango en la ficha del modelo."
+        ]
       ]
     },
     {
       "slug": "manometro-digital",
-      "categorias": ["Manómetro"],
+      "categorias": [
+        "Manómetro"
+      ],
       "nombre": "Manómetro digital",
       "title": "Alquiler de manómetro digital diferencial en Lima | Sinergia Biomédica",
       "h1": "Alquiler de manómetro digital diferencial",
@@ -165,13 +239,21 @@
         "Unidades dentales y líneas de aire"
       ],
       "faq": [
-        ["¿Por qué diferencial?", "Mide la diferencia de presión entre dos puntos, lo que permite verificar tanto presiones positivas como el vacío de un aspirador."],
-        ["¿Sirve para calibrar monitores?", "Verifica el módulo de presión no invasiva; para el resto de parámetros se combina con los simuladores de ECG y SpO2."]
+        [
+          "¿Por qué diferencial?",
+          "Mide la diferencia de presión entre dos puntos, lo que permite verificar tanto presiones positivas como el vacío de un aspirador."
+        ],
+        [
+          "¿Sirve para calibrar monitores?",
+          "Verifica el módulo de presión no invasiva; para el resto de parámetros se combina con los simuladores de ECG y SpO2."
+        ]
       ]
     },
     {
       "slug": "luxometro",
-      "categorias": ["Luxómetro"],
+      "categorias": [
+        "Luxómetro"
+      ],
       "nombre": "Luxómetro",
       "title": "Alquiler de luxómetro en Lima | Sinergia Biomédica",
       "h1": "Alquiler de luxómetro",
@@ -184,13 +266,21 @@
         "Mediciones para salud ocupacional"
       ],
       "faq": [
-        ["¿Cómo se mide una lámpara cialítica?", "Se mide la iluminancia en el centro del campo a la distancia que indica el fabricante y se compara con su especificación."],
-        ["¿Hay un paquete para lámparas cialíticas?", "Sí, incluye luxómetro y analizador de seguridad eléctrica con descuento por combinar."]
+        [
+          "¿Cómo se mide una lámpara cialítica?",
+          "Se mide la iluminancia en el centro del campo a la distancia que indica el fabricante y se compara con su especificación."
+        ],
+        [
+          "¿Hay un paquete para lámparas cialíticas?",
+          "Sí, incluye luxómetro y analizador de seguridad eléctrica con descuento por combinar."
+        ]
       ]
     },
     {
       "slug": "tacometro",
-      "categorias": ["Tacómetro"],
+      "categorias": [
+        "Tacómetro"
+      ],
       "nombre": "Tacómetro",
       "title": "Alquiler de tacómetro digital en Lima | Sinergia Biomédica",
       "h1": "Alquiler de tacómetro digital (contacto y óptico)",
@@ -202,13 +292,21 @@
         "Motores y ventiladores de equipos"
       ],
       "faq": [
-        ["¿Óptico o de contacto?", "El óptico mide sin tocar, con una marca reflectante en el rotor; el de contacto se apoya en el eje. El equipo disponible hace las dos cosas."],
-        ["¿Hay un paquete para centrífugas?", "Sí, incluye tacómetro y analizador de seguridad eléctrica."]
+        [
+          "¿Óptico o de contacto?",
+          "El óptico mide sin tocar, con una marca reflectante en el rotor; el de contacto se apoya en el eje. El equipo disponible hace las dos cosas."
+        ],
+        [
+          "¿Hay un paquete para centrífugas?",
+          "Sí, incluye tacómetro y analizador de seguridad eléctrica."
+        ]
       ]
     },
     {
       "slug": "multimetro",
-      "categorias": ["Multímetro"],
+      "categorias": [
+        "Multímetro"
+      ],
       "nombre": "Multímetro digital",
       "title": "Alquiler de multímetro digital en Lima | Sinergia Biomédica",
       "h1": "Alquiler de multímetro digital",
@@ -220,7 +318,10 @@
         "Diagnóstico de fuentes de alimentación y baterías"
       ],
       "faq": [
-        ["¿Viene en los paquetes de mantenimiento?", "Sí, todos los paquetes de nivel Mantenimiento incluyen multímetro y herramientas de apoyo."]
+        [
+          "¿Viene en los paquetes de mantenimiento?",
+          "Sí, todos los paquetes de nivel Mantenimiento incluyen multímetro y herramientas de apoyo."
+        ]
       ]
     }
   ]

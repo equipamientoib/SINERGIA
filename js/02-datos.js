@@ -47,6 +47,16 @@ let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
 
 const byId=id=>EQUIPOS.find(e=>e.id===id);
+/* Tarifas acordadas (data/tarifas-alquiler.json). Mandan sobre la hoja para
+   poder publicarlas sin esperar a que la hoja se actualice. */
+let TARIFAS = {};
+function aplicarTarifas(){
+  EQUIPOS.forEach(e => { const d = TARIFAS[e.id];
+    if(d > 0){ e.dia = d; e.sem = d*4; e.mes = d*12; } });
+}
+fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null)
+  .then(d => { if(d && d.dia){ TARIFAS = d.dia; aplicarTarifas();
+    if(typeof repintarTodo === 'function') repintarTodo(); } }).catch(() => {});
 /* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
    día, no la mitad: llevar, recoger y revisar el instrumento cuesta igual.
    Es el mínimo de alquiler; por eso ya no se alquila por hora ni por equipo. */

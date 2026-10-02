@@ -1,0 +1,16 @@
+{
+  "_nota": "Tarifas de alquiler acordadas (S/ por día, IGV incluido). Mandan sobre lo que venga de la hoja: así se publican sin esperar a que la hoja se actualice. Cuando la hoja tenga estos mismos números, este archivo se puede vaciar y la hoja vuelve a mandar.",
+  "dia": {
+    "esa620": 180,
+    "defib": 150,
+    "sp-sim": 150,
+    "ms400": 120,
+    "fluke-945": 80,
+    "fluke-51": 70,
+    "multimetro": 60,
+    "manometro": 45,
+    "luxometro": 45,
+    "tacometro": 45,
+    "phantom-flujo": 50
+  }
+}

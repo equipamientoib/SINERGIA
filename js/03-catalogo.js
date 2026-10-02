@@ -156,7 +156,7 @@ function pintarPaquetes(){
       <ul class="inc">${items.map(e=>`<li>${e.nom}</li>`).join('')}${kitLine}</ul>
       ${VER_PRECIOS?`<div class="pfoot">
         <div class="pprice">S/ ${p.dia}<span>/día · IGV incluido</span></div>
-        <div class="pmod">Otras modalidades: por equipo S/ ${p.pe} · por hora S/ ${p.ph} · semana S/ ${fmt(p.psem)} · mes S/ ${fmt(p.pmes)}</div>
+        <div class="pmod">Otras modalidades: medio día S/ ${fmt(precioMedio(p.dia))} · semana S/ ${fmt(p.psem)} · mes S/ ${fmt(p.pmes)}</div>
       </div>`:`<div class="pfoot"><div class="pprice" style="font-size:17px;color:var(--gris)">Consultar tarifa<span style="display:block">te respondemos con precio y disponibilidad</span></div></div>`}
       <div class="pbtns">${VER_PRECIOS?`<button class="btn btn-fill" onclick="abrirPaq('${p.id}')">Reservar paquete</button>`:`<button class="btn btn-fill" onclick="go('#/contacto')">Solicitar cotización</button>`}<a class="btn" onclick="go('#/paquete/${p.id}')">Ver detalle</a></div>
     </div>`;

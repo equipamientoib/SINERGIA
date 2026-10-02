@@ -133,7 +133,7 @@ function aplicarDatos(d, enVivo){
        quedarse con lo que ya había.                                     */
     const validos = a => Array.isArray(a) ? a.filter(x => x && x.id && x.nom) : [];
     const eqOk = validos(d.equipos), pkOk = validos(d.paquetes);
-    if(eqOk.length) EQUIPOS  = eqOk;
+    if(eqOk.length){ EQUIPOS = eqOk; aplicarTarifas(); }
     if(pkOk.length) PAQUETES = pkOk;
     if(d.modelo){
       const m=d.modelo;
