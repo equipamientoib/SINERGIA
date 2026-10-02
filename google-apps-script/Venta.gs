@@ -14,7 +14,13 @@
  *       · pone precio y stock a cada fila de la hoja de venta: por su
  *         codigo_proveedor y, si no tiene, por marca + modelo (y escribe
  *         el código encontrado);
- *       · deja en la columna «coincidencia» cómo se encontró cada fila.
+ *       · deja en la columna «coincidencia» cómo se encontró cada fila;
+ *       · al final ofrece copiar a Drive las fotos de los equipos
+ *         publicados que no tienen (carpeta «Sinergia - Fotos venta»).
+ *  3) La web solo muestra equipos con stock (fila «solo con stock» | NO
+ *     arriba de los encabezados para mostrar todos).
+ *  4) agregarEquiposNuevos (▶, una vez): publica los equipos con stock
+ *     preparados en data/venta-nuevos.json.
  *
  * INSTALACIÓN (una vez)
  *  1) script.google.com › Nuevo proyecto › pega este archivo › Guardar.
@@ -131,10 +137,11 @@ function venta_() {
   if (!VENTA_ID) return null;
   var sh = hojaVenta_(abrirLibro_(VENTA_ID));
   var vals = sh.getDataRange().getValues();
-  var margen = 35, actualizado = '', fh = -1;
+  var margen = 35, actualizado = '', fh = -1, soloStock = true;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
     var et = s_(vals[k][0]).toLowerCase();
     if (et === 'margen' && num_(vals[k][1]) !== null) margen = num_(vals[k][1]);
+    if (et === 'solo con stock' && s_(vals[k][1]).toUpperCase() === 'NO') soloStock = false;
     if (et === 'actualizado') actualizado = fecha_(vals[k][1]);
     if (et === 'id') { fh = k; break; }
   }
@@ -153,6 +160,9 @@ function venta_() {
     if (precio === null && prov !== null) precio = Math.round(prov * (1 + margen / 100));
     var stock = num_(r.stock_sinergia);
     if (stock === null) stock = num_(r.stock_proveedor);
+    /* Sin stock no se muestra (vuelve sola cuando el proveedor repone).
+       Para mostrar todo: en las filas de arriba, «solo con stock» | NO. */
+    if (soloStock && !(stock > 0)) continue;
 
     var p = {
       id: s_(r.id), cat: s_(r.categoria), nom: s_(r.nombre),
@@ -383,6 +393,143 @@ function atlActualizar_(datos) {
 }
 
 
+/* ── Agregar equipos con stock (una vez) ───────────────────────────
+   Ejecuta agregarEquiposNuevos (▶) en el editor. Lee la lista preparada
+   en el sitio (data/venta-nuevos.json) y, por cada equipo:
+     · si ya hay una fila con ese código: la publica (SI) y le pone
+       nombre, categoría, resumen y características limpios;
+     · si no: agrega una fila nueva publicada;
+     · las entradas con «fila» solo ponen el código a esa fila.
+   Luego copia precio y stock desde la pestaña «Proveedor». */
+var URL_NUEVOS = 'https://sinergiabiomedica.pe/data/venta-nuevos.json';
+
+function agregarEquiposNuevos() {
+  var lista = JSON.parse(UrlFetchApp.fetch(URL_NUEVOS + '?t=' + Date.now()).getContentText()).equipos || [];
+  var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss);
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  if (fh < 0) throw new Error('hoja de venta sin encabezados');
+  var heads = vals[fh].map(function (h) { return s_(h); });
+  var col = function (n) { return heads.indexOf(n); };
+  var porCod = {}, porId = {};
+  for (var i = fh + 1; i < vals.length; i++) {
+    if (!s_(vals[i][0])) continue;
+    porId[s_(vals[i][0])] = i;
+    var cd = codAtl_(vals[i][col('codigo_proveedor')]);
+    if (cd && porCod[cd] === undefined) porCod[cd] = i;
+  }
+  var CAMPOS = ['categoria', 'nombre', 'marca', 'modelo', 'origen', 'resumen', 'caracteristicas', 'areas'];
+  /* Se escribe columna por columna y nunca en precio_publicado ni
+     stock_sinergia: son fórmulas ARRAYFORMULA y un valor encima las rompe. */
+  var ESCRIBIR = ['id', 'publicar', 'codigo_proveedor'].concat(CAMPOS);
+  var nFil = vals.length - fh - 1;
+  var colVals = {};
+  ESCRIBIR.forEach(function (c) { if (col(c) >= 0) colVals[c] = vals.slice(fh + 1).map(function (r) { return [r[col(c)]]; }); });
+  var nuevos = [], act = 0, cods = 0;
+  lista.forEach(function (e) {
+    var cd = codAtl_(e.codigo);
+    if (e.fila) {                                         // solo poner el código
+      var f = porId[e.fila];
+      if (f !== undefined && !codAtl_(vals[f][col('codigo_proveedor')])) { colVals.codigo_proveedor[f - fh - 1][0] = "'" + e.codigo; cods++; }
+      return;
+    }
+    if (porCod[cd] !== undefined) {                       // fila existente: publicar y limpiar
+      var j = porCod[cd] - fh - 1;
+      colVals.publicar[j][0] = 'SI';
+      CAMPOS.forEach(function (c) { if (colVals[c] && e[c]) colVals[c][j][0] = e[c]; });
+      act++;
+    } else {
+      var nf = {}; nf.id = e.id; nf.publicar = 'SI'; nf.codigo_proveedor = "'" + e.codigo;
+      CAMPOS.forEach(function (c) { nf[c] = e[c] || ''; });
+      nuevos.push(nf);
+    }
+  });
+  /* Filas nuevas: debajo de la última fila con id. */
+  var ultima = fh;
+  for (var u = fh + 1; u < vals.length; u++) if (s_(vals[u][0])) ultima = u;
+  var j0 = ultima - fh;                                  // índice (0 = primera fila de datos) donde empiezan
+  var total = Math.max(nFil, j0 + nuevos.length);
+  ESCRIBIR.forEach(function (c) {
+    if (!colVals[c]) return;
+    while (colVals[c].length < total) colVals[c].push(['']);
+    nuevos.forEach(function (nf, q) { colVals[c][j0 + q][0] = nf[c] || ''; });
+    sh.getRange(fh + 2, col(c) + 1, total, 1).setValues(colVals[c]);
+  });
+  /* Las columnas con fórmula (precio_publicado, stock_sinergia) no se tocan:
+     al escribir filas completas se respetan porque las fórmulas están en la
+     primera fila de datos (ARRAYFORMULA). */
+  var res = precioDesdeProveedor_();
+  Logger.log('Publicados (filas existentes): %s · nuevos: %s · códigos puestos: %s · con precio: %s',
+    act, nuevos.length, cods, res);
+}
+
+/* Copia precio y stock de la pestaña «Proveedor» a la hoja de venta, por
+   código (sin volver a consultar el portal). Devuelve cuántas filas. */
+function precioDesdeProveedor_() {
+  var ss = SpreadsheetApp.openById(VENTA_ID), pv = ss.getSheetByName('Proveedor');
+  if (!pv) return 0;
+  var pvals = pv.getDataRange().getValues().slice(1);
+  var items = pvals.map(function (r) { return { c: s_(r[0]).replace(/^'/, ''), d: r[1], mo: r[2], s: r[3], p: r[4], img: r[6] }; });
+  var tc = 0;
+  pvals.some(function (r) { if (Number(r[4]) && Number(r[5])) { tc = Number(r[5]) / Number(r[4]); return true; } });
+  return atlActualizar_({ items: items, tc: Math.round(tc * 1000) / 1000, todos: false, id: 'manual' }).actualizados;
+}
+
+/* ── Fotos del proveedor → Drive (una vez por equipo) ───────────────
+   El botón pide la lista (atl=fotos), baja cada foto en el navegador
+   (el portal solo abre desde Perú) y la manda aquí; se guarda en la
+   carpeta «Sinergia - Fotos venta» y su enlace va a la columna «fotos».
+   No se tocan los equipos que ya tienen foto en la hoja ni en el sitio. */
+function carpetaFotos_() {
+  var pr = PropertiesService.getScriptProperties(), id = pr.getProperty('FOTOS_CARPETA');
+  if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
+  var dest = DriveApp.getFileById(VENTA_ID).getParents();
+  var base = dest.hasNext() ? dest.next() : DriveApp.getRootFolder();
+  var f = base.createFolder('Sinergia - Fotos venta');
+  pr.setProperty('FOTOS_CARPETA', f.getId());
+  return f;
+}
+
+function atlFotosPendientes_() {
+  var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss), pv = ss.getSheetByName('Proveedor');
+  if (!pv) return [];
+  var img = {};
+  pv.getDataRange().getValues().slice(1).forEach(function (r) { if (s_(r[6])) img[codAtl_(r[0])] = s_(r[6]); });
+  var conFotoSitio = {};
+  try {
+    (JSON.parse(UrlFetchApp.fetch('https://sinergiabiomedica.pe/data/venta.json').getContentText()).productos || [])
+      .forEach(function (p) { if (p.fotos && p.fotos.length) conFotoSitio[p.id] = 1; });
+  } catch (e) {}
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  var heads = vals[fh].map(function (h) { return s_(h); }), col = function (n) { return heads.indexOf(n); };
+  var out = [];
+  for (var i = fh + 1; i < vals.length; i++) {
+    var r = vals[i], id = s_(r[0]), cd = codAtl_(r[col('codigo_proveedor')]);
+    if (!id || s_(r[col('publicar')]).toUpperCase() !== 'SI' || s_(r[col('fotos')]) || conFotoSitio[id]) continue;
+    if (!(num_(r[col('stock_proveedor')]) > 0) || !img[cd]) continue;
+    out.push({ id: id, c: cd, img: img[cd] });
+  }
+  return out;
+}
+
+function atlGuardarFoto_(f) {
+  var bytes = Utilities.base64Decode(f.b64);
+  var ext = /png/.test(f.mime) ? 'png' : /webp/.test(f.mime) ? 'webp' : 'jpg';
+  var file = carpetaFotos_().createFile(Utilities.newBlob(bytes, f.mime || 'image/png', f.id + '.' + ext));
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  var sh = hojaVenta_(SpreadsheetApp.openById(VENTA_ID));
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  var cF = vals[fh].map(function (h) { return s_(h); }).indexOf('fotos');
+  for (var i = fh + 1; i < vals.length; i++) {
+    if (s_(vals[i][0]) === f.id) { sh.getRange(i + 1, cF + 1).setValue('https://drive.google.com/file/d/' + file.getId() + '/view'); break; }
+  }
+  limpiarCache();
+  return { ok: true };
+}
+
+
 // ═════════════════════ web ═════════════════════
 
 function doGet(e) {
@@ -392,6 +539,7 @@ function doGet(e) {
   if (p.atl) {                                   // botón del proveedor
     if (!claveAtl_() || p.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
     if (p.atl === 'codigos') return json_({ ok: true, codigos: atlCodigos_() });
+    if (p.atl === 'fotos') return json_({ ok: true, fotos: atlFotosPendientes_() });
     return ContentService.createTextOutput(PropertiesService.getScriptProperties().getProperty('ATL_ULTIMO') || '{"ok":false}')
       .setMimeType(ContentService.MimeType.JSON);
   }
@@ -413,6 +561,9 @@ function doPost(e) {
   var datos;
   try { datos = JSON.parse(e.postData.contents); } catch (err) { return json_({ ok: false, motivo: 'datos ilegibles' }); }
   if (!claveAtl_() || datos.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
+  if (datos.foto) {
+    try { return json_(atlGuardarFoto_(datos.foto)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
+  }
   try { return json_(atlActualizar_(datos)); }
   catch (err) {
     var res = { ok: false, id: datos.id || '', motivo: String(err) };

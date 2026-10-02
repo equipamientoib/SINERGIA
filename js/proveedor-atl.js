@@ -52,7 +52,7 @@
     b.style.cssText = 'font:inherit;font-weight:600;border:0;border-radius:8px;padding:7px 12px;cursor:pointer;background:#c0a56e;color:#17191d';
     b.onclick = fn; document.getElementById('sbAtlBtns').appendChild(b);
   }
-  function cerrar() { caja.remove(); }
+  function cerrar() { parar = true; caja.remove(); }
   function error(t) { txt('<b style="color:#ff9b8a">No se pudo completar.</b><br>' + t); boton('Cerrar', cerrar); }
 
   /* ── Comprobaciones ─────────────────────────────────────────────── */
@@ -194,6 +194,57 @@
     boton('Cerrar', cerrar);
   } else correr();
 
+  /* ── Fotos: copia a Drive las de tus equipos publicados que no tienen ──
+     Una descarga por foto, de una en una y con pausa; solo se hace una vez
+     por equipo (después ya tienen foto y no vuelven a la lista). */
+  var parar = false;
+  function aBase64(blob) {
+    return new Promise(function (ok, no) {
+      var r = new FileReader();
+      r.onload = function () { ok(String(r.result).split(',')[1] || ''); };
+      r.onerror = no; r.readAsDataURL(blob);
+    });
+  }
+  async function ofrecerFotos() {
+    var fp = {};
+    try { fp = await pedirJSON(CFG.u + '?atl=fotos&k=' + encodeURIComponent(CFG.k)); } catch (e) { return; }
+    var lista = (fp && fp.fotos) || [];
+    if (!lista.length) return;
+    var p = document.createElement('div');
+    p.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #333';
+    p.innerHTML = '📷 <b>' + lista.length + '</b> equipos publicados no tienen foto. Puedo copiar la del proveedor a tu Drive ' +
+      '(una descarga por foto, una sola vez, ~' + Math.ceil(lista.length * 2.5 / 60) + ' min).';
+    document.getElementById('sbAtlTxt').appendChild(p);
+    boton('Copiar ' + lista.length + ' fotos', function () { this.remove(); copiarFotos(lista); });
+  }
+  async function copiarFotos(lista) {
+    var hechas = 0, fallas = 0;
+    for (var i = 0; i < lista.length && !parar; i++) {
+      var f = lista[i];
+      txt('Copiando fotos a tu Drive: <b>' + (i + 1) + ' de ' + lista.length + '</b>…<br><span style="color:#aeb4bc">Puedes seguir usando la computadora; no cierres esta pestaña.</span>');
+      bar(i / lista.length);
+      try {
+        var u = new URL(f.img, location.href);
+        if (u.hostname !== location.hostname) throw new Error('otro sitio');
+        var r = await fetch(u.href, { credentials: 'include' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var b = await r.blob();
+        if (!/^image\//.test(b.type) || b.size > 8e6) throw new Error('no es imagen');
+        await enviar(JSON.stringify({ k: CFG.k, foto: { id: f.id, mime: b.type, b64: await aBase64(b) } }));
+        hechas++;
+      } catch (e) { fallas++; }
+      await espera(1500);
+    }
+    bar(1);
+    var quedan = '';
+    try { var fp = await pedirJSON(CFG.u + '?atl=fotos&k=' + encodeURIComponent(CFG.k)); quedan = (fp.fotos || []).length; } catch (e) { }
+    txt('<b style="color:#9be3b5">Fotos listas.</b> Se enviaron <b>' + hechas + '</b> a tu Drive (carpeta «Sinergia - Fotos venta»)' +
+      (fallas ? '; ' + fallas + ' no se pudieron bajar' : '') + '.' +
+      (quedan ? '<br>Quedan ' + quedan + ' sin foto: vuelve a tocar el favorito más tarde para reintentar.' : '') +
+      '<br><span style="color:#aeb4bc">La web las muestra en unos minutos.</span>');
+  }
+  var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
+
   /* ── Flujo principal ────────────────────────────────────────────── */
   async function correr() {
     try {
@@ -261,6 +312,7 @@
         (est.por_modelo ? ' (' + est.por_modelo + ' encontrados por marca y modelo)' : '') + '.<br>' +
         (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal: mira la columna «coincidencia».<br>' : '') +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
+      await ofrecerFotos();
       boton('Cerrar', cerrar);
     } catch (e) {
       error(String(e && e.message || e));
