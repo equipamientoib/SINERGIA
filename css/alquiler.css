@@ -211,5 +211,6 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .top .modo-sw a.on{background:#17191d;color:#fff}
 
 /* botón que lleva al cotizador (solo con los precios encendidos) */
+.prod-btns:has(.uno){grid-template-columns:1fr}
 .calc-link{background:var(--cobre-d);border-color:var(--cobre-d);color:#fff}
 .calc-link:hover{filter:brightness(1.08)}
