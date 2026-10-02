@@ -22,6 +22,10 @@ const SITE = {
   nombre: "Sinergia Biomédica",
   razonSocial: "Servicios Integrales Sinergia S.A.C.",
   ruc: "20615862682",
+  /* Datos de pago: salen en la cotización que genera el cotizador. */
+  banco: "Banco Internacional del Perú S.A.A. (INTERBANK)",
+  cuenta: "7023008608425",
+  cci: "00370200300860842585",
   lema: "Herramientas de metrología que distinguen su servicio",
   direccion: "Pueblo Libre, Lima — Perú",
 

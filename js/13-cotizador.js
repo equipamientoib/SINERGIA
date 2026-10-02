@@ -249,9 +249,11 @@ function cotTexto(c, nom, mail, tel){
 /* Número correlativo visible, para que el cliente y nosotros hablemos del
    mismo documento: COT-AAMMDD-HHMM. */
 function cotNumero(){
+  /* Mismo correlativo que usa la empresa: COT-SB-MMAA-NN. El NN sale de la
+     hora, para que dos cotizaciones del mismo día no se repitan. */
   const d = new Date(), p = n => String(n).padStart(2, '0');
-  return 'COT-' + String(d.getFullYear()).slice(2) + p(d.getMonth() + 1) + p(d.getDate())
-         + '-' + p(d.getHours()) + p(d.getMinutes());
+  return 'COT-SB-' + p(d.getMonth() + 1) + String(d.getFullYear()).slice(2)
+         + '-' + p(d.getDate()) + p(d.getHours()) + p(d.getMinutes());
 }
 
 function cotDatos(){
@@ -372,134 +374,142 @@ function cotEnlace(doc){
   return base + '#/cotizacion/' + cotCodificar(doc);
 }
 
-function cotCondiciones(c){
+/* Términos y condiciones, numerados como en las cotizaciones de la empresa. */
+function cotTerminos(c){
   const u = COT_UNI[c.mod], uq = c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
-  const conTec = !!c.tec, gar = c.gar || c.garantia || 0;
-  const L = [
-    ['PRECIO DE LA OFERTA', 'COTIZACIÓN EN SOLES (PEN), CON IGV INCLUIDO. COMPRENDE EL ALQUILER DE LOS INSTRUMENTOS POR ' +
-      (c.qty + ' ' + uq).toUpperCase() + (conTec ? ' Y EL SERVICIO DE INSTRUMENTISTA METROLÓGICO.' : '.')],
-    ['VIGENCIA DE LA OFERTA', '15 DÍAS CALENDARIO CONTADOS DESDE LA RECEPCIÓN DE NUESTRA COTIZACIÓN.'],
-    ['CALIBRACIÓN', 'TODOS LOS INSTRUMENTOS SE ENTREGAN CON SU CERTIFICADO DE CALIBRACIÓN VIGENTE, EMITIDO POR LABORATORIO ACREDITADO.'],
-    ['MODALIDAD', c.mod === 'medio'
-      ? ('MEDIO DÍA ES UN TURNO DE 4 HORAS (' + HORARIO_MANANA + ' O ' + HORARIO_TARDE + ').').toUpperCase()
-      : ('EL DÍA COMPLETO COMPRENDE LOS DOS TURNOS (' + HORARIO_MANANA + ' Y ' + HORARIO_TARDE + ').').toUpperCase()],
-    ['LUGAR DE ENTREGA', 'ENTREGA Y DEVOLUCIÓN EN NUESTRA OFICINA DE LIMA. A PROVINCIAS SE ENVÍA POR AGENCIA; EL ENVÍO LO ASUME EL CLIENTE.']
-  ];
-  if(conTec)
-    L.push(['INSTRUMENTISTA METROLÓGICO', 'SE COBRA APARTE, CON UN MÍNIMO DE MEDIO DÍA. INCLUYE EL MANEJO DEL INSTRUMENTO Y EL REGISTRO DE LAS MEDICIONES.']);
-  else
-    L.push(['GARANTÍA EN DEPÓSITO', 'S/ ' + fmt(gar) + '. NO ES UN COBRO: SE DEVUELVE AL RETORNAR LOS INSTRUMENTOS EN BUEN ESTADO. SE ENTREGAN CONTRA PRESENTACIÓN DE DNI.']);
+  const conTec = !!c.tec, gar = c.gar || 0;
+  const T = [];
+  T.push(['1. Precio de la oferta.', 'Importes en Soles (S/), con IGV incluido. Comprenden el alquiler de los instrumentos por ' +
+    c.qty + ' ' + uq + (conTec ? ' y el servicio de instrumentista metrológico.' : '.')]);
+  T.push(['2. Vigencia de la oferta.', 'Quince (15) días calendario contados desde la emisión de esta cotización.']);
+  T.push(['3. Calibración.', 'Todos los instrumentos se entregan con su certificado de calibración vigente, emitido por laboratorio acreditado, y se devuelven con el mismo certificado.']);
+  T.push(['4. Modalidad y horario.', c.mod === 'medio'
+    ? ('Medio día corresponde a un turno de cuatro (4) horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.')
+    : ('El día completo comprende los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.')]);
+  T.push(['5. Entrega y devolución.', 'En nuestra oficina de Lima, en el horario indicado. Para provincias el envío se realiza por agencia de transporte y su costo lo asume el cliente.']);
+  if(conTec) T.push(['6. Instrumentista metrológico.',
+    'Se factura aparte, con un mínimo de medio día. Comprende el manejo del instrumento y el registro de las mediciones. No incluye la emisión de informes ni la ejecución de mantenimientos.']);
+  else T.push(['6. Garantía en depósito.',
+    'S/ ' + fmt(gar) + ' al retiro de los instrumentos, contra presentación del documento de identidad. No constituye un cobro: se devuelve íntegramente al retornar los instrumentos en buen estado y dentro del plazo.']);
   const inc = c.inc || [];
-  if(inc.length) L.push(['INCLUIDO SIN COSTO', inc.join(' · ').toUpperCase() + '.']);
-  L.push(['FORMA DE PAGO', 'ÍNTEGRO A LA ENTREGA DE LOS INSTRUMENTOS, SALVO ACUERDO DISTINTO POR ESCRITO.']);
-  L.push(['OBSERVACIONES', 'NO INCLUYE TRASLADOS FUERA DE LIMA METROPOLITANA NI CONSUMIBLES DEL CLIENTE.']);
-  return L;
+  if(inc.length) T.push(['7. Incluido sin costo.', inc.join(', ') + '. Se entregan y se devuelven junto con los instrumentos alquilados.']);
+  T.push([(inc.length ? '8' : '7') + '. Responsabilidad del cliente.',
+    'La pérdida o el daño de un instrumento durante el alquiler obliga a su reposición, así como a la recalibración cuando el equipo se devuelva fuera de rango.']);
+  T.push([(inc.length ? '9' : '8') + '. Forma de pago.',
+    'Íntegro a la entrega de los instrumentos, salvo acuerdo distinto por escrito.']);
+  T.push([(inc.length ? '10' : '9') + '. Ampliación del plazo.',
+    'La extensión del alquiler se cotiza por separado antes de ejecutarse y se factura a la tarifa vigente.']);
+  return T;
 }
 
 function cotHTML(d){
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const u = COT_UNI[d.mod], uq = d.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
-  /* El precio unitario del cuadro es el de cada instrumento prorrateado:
-     así la suma del cuadro cuadra exactamente con el total. */
+  const org = location.origin;
+  const neto = d.total / 1.18, igv = d.total - neto;
+  /* Precio unitario de cada instrumento, prorrateado sobre el total: así la
+     suma del cuadro cuadra exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   const filas = d.items.map((e, i) => {
-    const pu = e.d * factor, st = pu * d.qty;
-    const pr = (e.m || '').split('·');
+    const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
     return `<tr>
-      <td class="c">${i + 1}</td><td class="c">${d.qty}</td><td class="c">${und}</td>
-      <td><b>${cotEsc(e.n.toUpperCase())}</b><br>- MARCA: ${cotEsc((pr[0] || '—').trim().toUpperCase())}<br>- PROCEDENCIA: ${cotEsc((pr[1] || '—').trim().toUpperCase())}<br>- CON CERTIFICADO DE CALIBRACIÓN VIGENTE</td>
-      <td class="img">${e.f ? `<img src="${cotEsc(e.f)}" alt="">` : ''}</td>
-      <td class="d">${pu.toFixed(2)}</td><td class="d">${st.toFixed(2)}</td></tr>`;
+      <td class="c">${i + 1}</td>
+      <td><b>${cotEsc(e.n.toUpperCase())}</b>
+        ${e.f ? `<img class="mini" src="${cotEsc(e.f)}" alt="">` : ''}
+        <span class="det">Marca: ${cotEsc((pr[0] || '—').trim())}<br>
+        Procedencia: ${cotEsc((pr[1] || '—').trim())}<br>
+        Con certificado de calibración vigente.</span></td>
+      <td class="c">${und}</td><td class="c">${d.qty}.00</td>
+      <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
   }).join('') + (d.tec ? `<tr>
-      <td class="c">${d.items.length + 1}</td><td class="c">${d.qty}</td><td class="c">${und}</td>
-      <td><b>INSTRUMENTISTA METROLÓGICO</b><br>- MANEJO DEL INSTRUMENTO Y REGISTRO DE MEDICIONES<br>- MÍNIMO MEDIO DÍA</td>
-      <td class="img"></td>
-      <td class="d">${(d.tec / d.qty).toFixed(2)}</td><td class="d">${d.tec.toFixed(2)}</td></tr>` : '');
-  const cond = cotCondiciones(d).map(([k, v]) =>
-    `<tr><th>${cotEsc(k)}</th><td class="dp">:</td><td>${cotEsc(v)}</td></tr>`).join('');
+      <td class="c">${d.items.length + 1}</td>
+      <td><b>INSTRUMENTISTA METROLÓGICO</b>
+        <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
+      <td class="c">${und}</td><td class="c">${d.qty}.00</td>
+      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '');
+  const term = cotTerminos(d).map(([k, v]) =>
+    `<p class="term"><b>${cotEsc(k)}</b> ${cotEsc(v)}</p>`).join('');
+  const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+                 'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre'];
+  const hoy = new Date();
+  const fechaLarga = 'Lima, ' + String(hoy.getDate()).padStart(2, '0') + ' de ' +
+    meses[hoy.getMonth()] + ' de ' + hoy.getFullYear();
   return `<!doctype html><html lang="es"><head><meta charset="utf-8">
   <title>Cotización ${cotEsc(d.num)}</title><style>
+    @page{size:A4 portrait;margin:14mm 16mm}
     *{box-sizing:border-box}
-    @page{size:A4 portrait;margin:11mm}
-    body{margin:0 auto;padding:14mm 12mm;max-width:210mm;font:11px/1.45 Arial,Helvetica,sans-serif;color:#000;background:#fff}
-    .mem{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
-      border-bottom:3px solid #1F3864;padding-bottom:8px;margin-bottom:10px}
-    .mem .logo{height:34px;width:auto;display:block;margin-bottom:4px}
-    .mem b{font-size:15px;letter-spacing:-.2px}
-    .mem small{display:block;color:#444;font-size:10px;line-height:1.5}
-    h1{margin:10px 0 2px;text-align:center;font-size:15px;letter-spacing:.5px}
-    .fecha{text-align:right;font-size:11px;margin-bottom:10px}
-    table.dat{border-collapse:collapse;font-size:11px;margin-bottom:10px}
-    table.dat th{text-align:left;font-weight:bold;width:150px;vertical-align:top;padding:1px 0}
-    table.dat td{vertical-align:top;padding:1px 0}
-    table.dat td.dp{width:14px;text-align:center}
-    .salu{margin:10px 0 4px;font-weight:bold}
-    .parr{margin:0 0 12px;text-align:justify}
-    .cuadro{margin:14px 0 4px;font-weight:bold;text-align:center;letter-spacing:.5px}
-    table.it{width:100%;border-collapse:collapse;font-size:10px}
-    table.it th{background:#1F3864;color:#fff;border:1px solid #1F3864;padding:5px 4px;font-size:9.5px;
-      text-align:center;line-height:1.25}
-    table.it td{border:1px solid #9aa4b8;padding:5px;vertical-align:top}
-    table.it td.c{text-align:center;white-space:nowrap}
-    table.it td.d{text-align:right;white-space:nowrap}
-    table.it td.img{text-align:center;padding:4px}
-    table.it td.img img{max-width:64px;max-height:52px;object-fit:contain}
-    table.tt{width:100%;border-collapse:collapse;font-size:11px;margin-top:-1px}
-    table.tt td{border:1px solid #9aa4b8;padding:5px}
-    table.tt td.k{text-align:right;font-weight:bold;width:82%}
-    table.tt td.v{text-align:right;white-space:nowrap}
-    .letras{margin:7px 0 0;font-weight:bold;font-size:10.5px}
-    .sec{margin:16px 0 5px;font-weight:bold;letter-spacing:.5px}
-    .firma{margin-top:22px;font-size:11px}
-    .pie{margin-top:14px;border-top:3px solid #1F3864;padding-top:6px;font-size:9.5px;color:#444;text-align:center}
-    @media print{body{padding:0;max-width:none}}
+    body{margin:0 auto;padding:12mm 14mm;max-width:210mm;background:#fff;color:#1a1a1a;
+      font:11px/1.5 "Segoe UI",Calibri,Arial,Helvetica,sans-serif}
+    .membrete{width:100%;display:block;margin-bottom:14px}
+    h1{margin:0;text-align:center;font-size:13.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;
+      text-transform:uppercase;line-height:1.35}
+    .lin{height:2px;background:#9A7F4E;margin:7px 0 12px}
+    .nf{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:14px}
+    .cli{margin:0 0 12px;line-height:1.55}
+    .cli b{font-weight:700}
+    .campo{margin:0 0 8px;text-align:justify}
+    .campo b{color:#9A7F4E}
+    .intro{margin:12px 0 16px;text-align:justify}
+    h2{margin:18px 0 6px;font-size:11.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;text-transform:uppercase}
+    table{width:100%;border-collapse:collapse;font-size:10px}
+    th{background:#9A7F4E;color:#fff;border:1px solid #9A7F4E;padding:6px 5px;font-size:9.5px;
+      font-weight:700;text-align:center;letter-spacing:.3px}
+    td{border:1px solid #c9c2b4;padding:6px;vertical-align:top}
+    td.c{text-align:center;white-space:nowrap}
+    td.d{text-align:right;white-space:nowrap}
+    td b{font-size:10.5px}
+    td .det{display:block;margin-top:3px;color:#555;font-size:9.5px;line-height:1.45}
+    td .mini{float:right;max-width:70px;max-height:56px;object-fit:contain;margin:0 0 4px 8px}
+    tr.tot td{background:#f5f2ec;font-weight:700}
+    tr.tot td.k{text-align:right}
+    tr.gran td{background:#9A7F4E;color:#fff;font-weight:700}
+    .nota{margin:7px 0 0;font-size:9.5px;color:#7A7A7A;text-align:justify}
+    .term{margin:0 0 6px;text-align:justify;font-size:10.5px}
+    .term b{color:#1a1a1a}
+    .dpag{margin-top:6px;font-size:10.5px}
+    .dpag div{display:flex;gap:8px;padding:1px 0}
+    .dpag span{min-width:160px;color:#555}
+    .cierre{margin:14px 0 0;text-align:justify}
+    .firma{margin-top:10px}
+    .firma img{width:170px;display:block}
+    @media print{body{padding:0;max-width:none}.term,tr{break-inside:avoid}}
   </style></head><body>
-    <div class="mem">
-      <div>${COT_LOGO}
-        <small>${cotEsc(S.razonSocial || '')}<br>RUC ${cotEsc(S.ruc || '')}<br>${cotEsc(S.direccion || '')}</small></div>
-      <div style="text-align:right"><small>${cotEsc(S.telefono || '')}<br>${cotEsc(S.email || '')}<br>${cotEsc(S.web || '')}</small></div>
-    </div>
-    <h1>COTIZACIÓN Nº ${cotEsc(d.num)}</h1>
-    <div class="fecha">FECHA: ${cotEsc(d.fecha)}</div>
-    <table class="dat">
-      <tr><th>ATENCIÓN</th><td class="dp">:</td><td>${cotEsc((d.nom || '—').toUpperCase())}</td></tr>
-      <tr><th>SEÑOR(ES)</th><td class="dp">:</td><td>${cotEsc((d.nom || '—').toUpperCase())}</td></tr>
-      ${d.mail ? `<tr><th>CORREO</th><td class="dp">:</td><td>${cotEsc(d.mail)}</td></tr>` : ''}
-      ${d.tel ? `<tr><th>TELÉFONO</th><td class="dp">:</td><td>${cotEsc(d.tel)}</td></tr>` : ''}
-      <tr><th>ASUNTO</th><td class="dp">:</td><td>ALQUILER DE INSTRUMENTOS DE METROLOGÍA BIOMÉDICA</td></tr>
-      <tr><th>PERIODO</th><td class="dp">:</td><td>${cotEsc((d.qty + ' ' + uq).toUpperCase())}${d.mod === 'dia' && d.d1 && d.d2 ? ' (DEL ' + cotEsc(d.d1) + ' AL ' + cotEsc(d.d2) + ')' : ''}</td></tr>
-    </table>
-    <p class="salu">DE NUESTRA CONSIDERACIÓN</p>
-    <p class="parr">SIRVA LA PRESENTE PARA SALUDARLO Y A LA VEZ HACER PROPICIA LA OPORTUNIDAD, PARA REMITIR CON
-      LA PRESENTE NUESTRA COTIZACIÓN DETALLADA EN EL &quot;CUADRO N° 01&quot;.</p>
-    <p class="cuadro">CUADRO Nº 1</p>
-    <table class="it">
-      <tr><th style="width:36px">ÍTEM</th><th style="width:42px">CANT</th><th style="width:72px">UND</th>
-        <th>DESCRIPCIÓN</th><th style="width:76px">IMAGEN</th>
-        <th style="width:80px">PRECIO UNITARIO<br>INCLUIDO IGV</th>
-        <th style="width:80px">SUB TOTAL<br>INCLUIDO IGV</th></tr>
+    <img class="membrete" src="${org}/img/cotizacion/membrete.png" alt="${cotEsc(S.razonSocial || '')}">
+    <h1>Cotización de alquiler de instrumentos de metrología biomédica</h1>
+    <div class="lin"></div>
+    <div class="nf"><span>N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
+    <p class="cli">Señores:<br><b>${cotEsc((d.nom || '[RAZÓN SOCIAL DEL CLIENTE]').toUpperCase())}</b><br>
+      ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
+    <p class="campo"><b>Asunto:</b> Alquiler de instrumentos de metrología biomédica con certificado de calibración vigente,
+      por ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}.</p>
+    <p class="intro">Es grato dirigirnos a ustedes para saludarlos cordialmente y, en atención a su requerimiento,
+      alcanzarles nuestra propuesta económica por el alquiler de los instrumentos detallados en el Cuadro N° 1.</p>
+    <h2>Cuadro N° 1 — Detalle del alquiler</h2>
+    <table>
+      <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
+        <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
       ${filas}
+      <tr class="tot"><td class="k" colspan="5">SUBTOTAL (S/)</td><td class="d">${neto.toFixed(2)}</td></tr>
+      <tr class="tot"><td class="k" colspan="5">IGV (18%) (S/)</td><td class="d">${igv.toFixed(2)}</td></tr>
+      <tr class="gran"><td class="k" colspan="5">TOTAL CON IGV (S/)</td><td class="d">${d.total.toFixed(2)}</td></tr>
     </table>
-    <table class="tt">
-      <tr><td class="k">SUBTOTAL</td><td class="v">${(d.total / 1.18).toFixed(2)}</td></tr>
-      <tr><td class="k">IGV (18 %)</td><td class="v">${(d.total - d.total / 1.18).toFixed(2)}</td></tr>
-      <tr><td class="k">TOTAL</td><td class="v">${d.total.toFixed(2)}</td></tr>
-    </table>
-    <p class="letras">${cotMontoLetras(d.total)}</p>
-    <p class="sec">CONDICIONES COMERCIALES</p>
-    <table class="dat">${cond}</table>
-    <p class="sec">DATOS GENERALES</p>
-    <table class="dat">
-      <tr><th>RUC</th><td class="dp">:</td><td>${cotEsc(S.ruc || '')}</td></tr>
-      <tr><th>RAZÓN SOCIAL</th><td class="dp">:</td><td>${cotEsc((S.razonSocial || '').toUpperCase())}</td></tr>
-      ${S.banco ? `<tr><th>ENTIDAD BANCARIA</th><td class="dp">:</td><td>${cotEsc(S.banco)}</td></tr>` : ''}
-      ${S.cuenta ? `<tr><th>NRO CUENTA</th><td class="dp">:</td><td>${cotEsc(S.cuenta)}</td></tr>` : ''}
-      ${S.cci ? `<tr><th>CCI</th><td class="dp">:</td><td>${cotEsc(S.cci)}</td></tr>` : ''}
-    </table>
-    <p class="firma">ATENTAMENTE,<br><br><br>_______________________________<br>
-      ${cotEsc(S.nombre || '')}<br><small>${cotEsc(S.razonSocial || '')}</small></p>
-    <div class="pie">${cotEsc(S.web || '')} · ${cotEsc(S.email || '')} · ${cotEsc(S.telefono || '')}</div>
+    <p class="nota">Importes en Soles (S/). El valor de venta asciende a S/ ${neto.toFixed(2)} sin IGV;
+      el total con IGV (18%) es de S/ ${d.total.toFixed(2)}. ${cotMontoLetras(d.total)}
+      ${d.gar ? ' Adicionalmente se deja una garantía en depósito de S/ ' + fmt(d.gar) + ', que se devuelve al retornar los instrumentos.' : ''}</p>
+    <h2>Términos y condiciones</h2>
+    ${term}
+    <h2>Datos generales para facturación y pago</h2>
+    <div class="dpag">
+      <div><span>Razón social:</span> ${cotEsc(S.razonSocial || '')}</div>
+      <div><span>RUC:</span> ${cotEsc(S.ruc || '')}</div>
+      ${S.banco ? `<div><span>Entidad bancaria:</span> ${cotEsc(S.banco)}</div>` : ''}
+      ${S.cuenta ? `<div><span>N° cuenta corriente (S/):</span> ${cotEsc(S.cuenta)}</div>` : ''}
+      ${S.cci ? `<div><span>CCI:</span> ${cotEsc(S.cci)}</div>` : ''}
+    </div>
+    <p class="cierre">Sin otro particular y a la espera de su gentil aceptación, quedamos a su disposición
+      para cualquier consulta adicional.</p>
+    <div class="firma">Atentamente,<br><img src="${org}/img/cotizacion/firma.png" alt="Firma"></div>
   </body></html>`;
 }
 
