@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=6dfde20e';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=516bd940';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=6dfde20e';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=516bd940';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=6dfde20e','js/06-tablero.js?v=6dfde20e'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=516bd940','js/06-tablero.js?v=516bd940'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=6dfde20e'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=516bd940'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1071,7 +1071,10 @@ function aplicarDatos(d, enVivo){
   }
 
   conFotosExtra(d.equipos);
-  if(d.venta) ventaEnVivo(d.venta);   // catálogo de venta en vivo (12-venta.js)
+  /* Venta: manda el Apps Script propio de venta (CONFIG.VENTA_URL). El
+     bloque «venta» del script principal es una lista antigua (51 equipos,
+     sin precio) y, si se usaba, pisaba a la buena al llegar después. */
+  if(d.venta && !(typeof CONFIG!=='undefined' && CONFIG.VENTA_URL)) ventaEnVivo(d.venta);
   const primeraVez = !CATALOGO_LISTO;
   const fCat = firmaCatalogo(d);
   const cambioCat = (fCat !== HUELLA_CAT);
@@ -1660,6 +1663,8 @@ function ventaEnVivo(v){
   if(!v || !Array.isArray(v.productos)) return;
   const ok = v.productos.filter(p => p && p.id && p.nom);
   if(!ok.length) return;              // hoja vacía o mal leída: se queda lo publicado
+  /* Nunca cambiar una lista con precios por otra sin precios (datos viejos). */
+  if(VENTA_VIVO && VENTA_VIVO.productos.some(p => p.precio) && !ok.some(p => p.precio)) return;
   const firma = JSON.stringify([ok, v.actualizado]);
   if(firma === VENTA_FIRMA) return;   // nada cambió: no se repinta (ni se borra la búsqueda)
   VENTA_FIRMA = firma;
@@ -1709,7 +1714,8 @@ function cargarVenta(){
        «Páginas de venta»). Así, aunque Google tarde o falle —pasa seguido
        en el celular—, la tienda abre con los 150 equipos y sus precios,
        no con la lista antigua de venta.json. */
-    const copia = fetch('data/venta-vivo.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null);
+    const leerCopia = () => fetch('data/venta-vivo.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : Promise.reject(r.status));
+    const copia = leerCopia().catch(() => new Promise(ok => setTimeout(ok, 800)).then(leerCopia)).catch(() => null);  // 2.º intento si la red falla
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))

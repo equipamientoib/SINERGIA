@@ -117,7 +117,10 @@ function aplicarDatos(d, enVivo){
   }
 
   conFotosExtra(d.equipos);
-  if(d.venta) ventaEnVivo(d.venta);   // catálogo de venta en vivo (12-venta.js)
+  /* Venta: manda el Apps Script propio de venta (CONFIG.VENTA_URL). El
+     bloque «venta» del script principal es una lista antigua (51 equipos,
+     sin precio) y, si se usaba, pisaba a la buena al llegar después. */
+  if(d.venta && !(typeof CONFIG!=='undefined' && CONFIG.VENTA_URL)) ventaEnVivo(d.venta);
   const primeraVez = !CATALOGO_LISTO;
   const fCat = firmaCatalogo(d);
   const cambioCat = (fCat !== HUELLA_CAT);

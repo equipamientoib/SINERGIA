@@ -21,6 +21,8 @@ function ventaEnVivo(v){
   if(!v || !Array.isArray(v.productos)) return;
   const ok = v.productos.filter(p => p && p.id && p.nom);
   if(!ok.length) return;              // hoja vacía o mal leída: se queda lo publicado
+  /* Nunca cambiar una lista con precios por otra sin precios (datos viejos). */
+  if(VENTA_VIVO && VENTA_VIVO.productos.some(p => p.precio) && !ok.some(p => p.precio)) return;
   const firma = JSON.stringify([ok, v.actualizado]);
   if(firma === VENTA_FIRMA) return;   // nada cambió: no se repinta (ni se borra la búsqueda)
   VENTA_FIRMA = firma;
@@ -70,7 +72,8 @@ function cargarVenta(){
        «Páginas de venta»). Así, aunque Google tarde o falle —pasa seguido
        en el celular—, la tienda abre con los 150 equipos y sus precios,
        no con la lista antigua de venta.json. */
-    const copia = fetch('data/venta-vivo.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null);
+    const leerCopia = () => fetch('data/venta-vivo.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : Promise.reject(r.status));
+    const copia = leerCopia().catch(() => new Promise(ok => setTimeout(ok, 800)).then(leerCopia)).catch(() => null);  // 2.º intento si la red falla
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
