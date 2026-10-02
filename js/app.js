@@ -923,17 +923,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=c406282f';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=3ae584b5';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=c406282f';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=3ae584b5';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=c406282f','js/06-tablero.js?v=c406282f'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=3ae584b5','js/06-tablero.js?v=3ae584b5'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=c406282f'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=3ae584b5'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2460,12 +2460,11 @@ function cotResumen(){
   document.getElementById('cotCuenta').textContent =
     n ? (n + (n === 1 ? ' instrumento elegido' : ' instrumentos elegidos')) : '';
   if(!n){
-    caja.innerHTML = `<div class="cot-paso"><b>2</b> ¿Por cuánto tiempo?</div>
-      <p class="cot-vacio">Marca al menos un instrumento de la lista y aquí aparece el precio,
-      con el IGV incluido y el descuento si combinas varios.</p>`;
+    caja.innerHTML = `<div class="cot-top vacio"><span>Tu cotización</span><b>— —</b></div>
+      <p class="cot-vacio">Marca al menos un instrumento de la lista. Aquí aparece el total,
+      y con un clic te llevas la cotización en PDF o nos escribes por WhatsApp.</p>`;
     return;
   }
-  /* Modalidades: medio día solo si todos lo tienen; si no, se dice por qué. */
   const sinMedio = c.sel.filter(e => !tieneMedio(e.dia));
   const mods = COT_MOD.filter(([m]) => m !== 'medio' || c.hayMedio);
   const seg = mods.map(([m, t]) =>
@@ -2481,9 +2480,20 @@ function cotResumen(){
     : `<label class="cot-f1">${COT_CANT[c.mod]}<input type="number" min="1" step="1" value="${c.qty}"
          oninput="cotCantidad(this.value)" onchange="cotCantidad(this.value)"></label>`;
   const inc = c.conTecnico ? incluidos('') : [];
-  const sub = c.alquiler / 1.18;
-  const unidad = COT_UNI[c.mod];
+  const u = COT_UNI[c.mod];
+  /* Lo primero que se ve: el total y los dos botones. El detalle queda
+     debajo, para quien quiera revisarlo. */
   caja.innerHTML = `
+    <div class="cot-top">
+      <span>Tu cotización · ${c.qty} ${c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's')}</span>
+      <b>S/ ${c.total.toFixed(2)}</b>
+      <small>IGV incluido${c.garantia ? ' · + S/ ' + fmt(c.garantia) + ' de garantía que se devuelve' : ''}</small>
+      <div class="cot-acc">
+        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Pedirla por WhatsApp</button>
+        <button class="btn" onclick="cotPDF()">Ver / descargar PDF</button>
+      </div>
+    </div>
+
     <div class="cot-paso"><b>2</b> ¿Por cuánto tiempo?</div>
     <div class="cot-seg">${seg}</div>
     ${c.mod === 'medio'
@@ -2492,24 +2502,23 @@ function cotResumen(){
             ? 'el ' + cotEsc(sinMedio[0].nom.toLowerCase()) + ' se alquila' : 'algunos se alquilan'} desde un día completo.</p>` : '')}
     ${cant}
 
-    <div class="cot-paso"><b>3</b> Tu cuenta</div>
+    <div class="cot-paso"><b>3</b> El detalle</div>
     <ul class="cot-sel">${c.sel.map(e =>
       `<li><span>${cotEsc(e.nom)}</span><span>S/ ${fmt(e.dia)}</span></li>`).join('')}
       ${c.desc ? `<li class="des"><span>Descuento por combinar ${n} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></li>` : ''}
     </ul>
     <div class="cot-cuenta">
-      <div><span>Precio por ${unidad}</span><span>S/ ${fmt(c.unit)}</span></div>
-      <div><span>× ${c.qty} ${c.qty === 1 ? unidad : (unidad === 'mes' ? 'meses' : unidad + 's')}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
+      <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
+      <div><span>× ${c.qty} ${c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's')}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
       ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
-      <div class="fino"><span>Incluye IGV 18 %</span><span>S/ ${(c.alquiler - sub).toFixed(2)}</span></div>
+      <div class="fino"><span>Incluye IGV 18 %</span><span>S/ ${(c.alquiler / 1.18 * 0.18).toFixed(2)}</span></div>
     </div>
-    <div class="cot-grand"><span>Total a pagar</span><span>S/ ${c.total.toFixed(2)}</span></div>
     ${c.garantia ? `<p class="cot-aviso"><b>Además dejas S/ ${fmt(c.garantia)} de garantía.</b>
       No es un cobro: se te devuelve cuando regreses el equipo. Lo recoges en nuestra oficina con tu DNI.</p>` : ''}
     ${inc.length ? `<p class="cot-aviso ok"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
 
-    <div class="cot-paso"><b>4</b> Tus datos y te respondemos</div>
-    <div class="cot-form">
+    <div class="cot-paso"><b>4</b> Tus datos</div>
+    <div class="cot-form" id="cotForm">
       <label>Nombre o institución<input id="cotNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></label>
       <div class="cot-f2">
         <label>Correo<input id="cotMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
@@ -2520,10 +2529,22 @@ function cotResumen(){
         <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar por WhatsApp</button>
         <button class="btn" onclick="cotEnviar('correo')">Enviar por correo</button>
       </div>
-      <button type="button" class="btn cot-pdf" onclick="cotPDF()">Descargar mi cotización en PDF</button>
     </div>
     <p class="cot-nota">Entrega y devolución en nuestra oficina de Lima. A provincias se envía por agencia; el envío lo paga el cliente.</p>
     <button type="button" class="cot-limpiar" onclick="cotLimpiar()">Empezar de nuevo</button>`;
+  cotRestaurar();
+}
+
+/* El resumen se repinta entero en cada cambio; sin esto, lo que el cliente
+   ya escribió en el formulario se borraría al marcar otro instrumento. */
+var COT_DATOS = {nom: '', mail: '', tel: ''};
+function cotRestaurar(){
+  [['cotNom', 'nom'], ['cotMail', 'mail'], ['cotTel', 'tel']].forEach(([id, k]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.value = COT_DATOS[k] || '';
+    el.oninput = () => { COT_DATOS[k] = el.value; };
+  });
 }
 
 /* Mensaje de la solicitud: numerado y con el detalle de cada instrumento,
@@ -2573,7 +2594,7 @@ function cotNumero(){
 
 function cotDatos(){
   const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
-  return {nom: v('cotNom'), mail: v('cotMail'), tel: v('cotTel')};
+  return {nom: v('cotNom') || COT_DATOS.nom, mail: v('cotMail') || COT_DATOS.mail, tel: v('cotTel') || COT_DATOS.tel};
 }
 
 function cotEnviar(via){
@@ -2581,7 +2602,13 @@ function cotEnviar(via){
   if(!c.sel.length) return;
   const {nom, mail, tel} = cotDatos();
   const error = (typeof validarContacto === 'function') ? validarContacto(nom, mail, tel) : '';
-  if(error){ avisar('cotAviso', error, 'err'); return; }
+  if(error){
+    const f = document.getElementById('cotForm');
+    if(f) f.scrollIntoView({behavior: 'smooth', block: 'center'});
+    avisar('cotAviso', error, 'err');
+    const el = document.getElementById('cotNom'); if(el && !nom) setTimeout(() => el.focus(), 350);
+    return;
+  }
   const texto = cotTexto(c, nom, mail, tel);
   if(typeof enviarAlEndpoint === 'function')
     enviarAlEndpoint({tipo: 'cotizador', equipo: c.sel.map(e => e.nom).join(' + '), modalidad: c.mod,
@@ -2592,89 +2619,179 @@ function cotEnviar(via){
   abrirCanal(via, texto, 'Solicitud de alquiler');
 }
 
-/* ── Cotización en PDF ───────────────────────────────────────────────
-   Se arma una hoja con el membrete y se manda a imprimir: el navegador
-   ofrece «Guardar como PDF». Sin librerías ni servidor. */
+/* ── Cotización formal ───────────────────────────────────────────────
+   Mismo formato que las cotizaciones que ya emite la empresa (el modelo
+   de COTIZADOR_SALCEDO): cabecera con número y fecha, bloque de datos,
+   saludo, CUADRO N° 1, subtotal/IGV/total, monto en letras, condiciones
+   comerciales y datos generales. Se arma en una ventana y se manda a
+   imprimir: el navegador ofrece «Guardar como PDF». */
+
+/* Monto en letras, como lo pide el formato: SON: ... CON xx/100 SOLES. */
+const COT_UNI_L = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE', 'DIEZ',
+  'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISEIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
+const COT_DEC_L = ['', '', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+const COT_CEN_L = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS',
+  'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
+function cotLetras(n){
+  n = Math.floor(n);
+  if(n === 0) return 'CERO';
+  if(n === 100) return 'CIEN';
+  if(n < 20) return COT_UNI_L[n];
+  if(n < 100){
+    const d = Math.floor(n / 10), u = n % 10;
+    if(d === 2) return u ? 'VEINTI' + COT_UNI_L[u].toLowerCase().toUpperCase() : 'VEINTE';
+    return COT_DEC_L[d] + (u ? ' Y ' + COT_UNI_L[u] : '');
+  }
+  if(n < 1000){
+    const c = Math.floor(n / 100), r = n % 100;
+    return COT_CEN_L[c] + (r ? ' ' + cotLetras(r) : '');
+  }
+  if(n < 1000000){
+    const m = Math.floor(n / 1000), r = n % 1000;
+    return (m === 1 ? 'MIL' : cotLetras(m) + ' MIL') + (r ? ' ' + cotLetras(r) : '');
+  }
+  const m = Math.floor(n / 1000000), r = n % 1000000;
+  return (m === 1 ? 'UN MILLON' : cotLetras(m) + ' MILLONES') + (r ? ' ' + cotLetras(r) : '');
+}
+function cotMontoLetras(v){
+  const ent = Math.floor(v + 1e-9), cts = Math.round((v - ent) * 100);
+  return 'SON: ' + cotLetras(ent) + ' CON ' + String(cts).padStart(2, '0') + '/100 SOLES';
+}
+
+/* Las condiciones comerciales del alquiler, en el mismo formato de pares
+   etiqueta : texto que usa la cotización de la empresa. */
+function cotCondiciones(c){
+  const u = COT_UNI[c.mod], uq = c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
+  const L = [
+    ['PRECIO DE LA OFERTA', 'COTIZACIÓN EN SOLES (PEN), CON IGV INCLUIDO. COMPRENDE EL ALQUILER DE LOS INSTRUMENTOS POR ' +
+      (c.qty + ' ' + uq).toUpperCase() + (c.conTecnico ? ' Y EL SERVICIO DE INSTRUMENTISTA METROLÓGICO.' : '.')],
+    ['VIGENCIA DE LA OFERTA', '15 DÍAS CALENDARIO CONTADOS DESDE LA RECEPCIÓN DE NUESTRA COTIZACIÓN.'],
+    ['CALIBRACIÓN', 'TODOS LOS INSTRUMENTOS SE ENTREGAN CON SU CERTIFICADO DE CALIBRACIÓN VIGENTE, EMITIDO POR LABORATORIO ACREDITADO.'],
+    ['MODALIDAD', c.mod === 'medio'
+      ? ('MEDIO DÍA ES UN TURNO DE 4 HORAS (' + HORARIO_MANANA + ' O ' + HORARIO_TARDE + ').').toUpperCase()
+      : ('EL DÍA COMPLETO COMPRENDE LOS DOS TURNOS (' + HORARIO_MANANA + ' Y ' + HORARIO_TARDE + ').').toUpperCase()],
+    ['LUGAR DE ENTREGA', 'ENTREGA Y DEVOLUCIÓN EN NUESTRA OFICINA DE LIMA. A PROVINCIAS SE ENVÍA POR AGENCIA; EL ENVÍO LO ASUME EL CLIENTE.']
+  ];
+  if(c.conTecnico)
+    L.push(['INSTRUMENTISTA METROLÓGICO', 'SE COBRA APARTE, CON UN MÍNIMO DE MEDIO DÍA. INCLUYE EL MANEJO DEL INSTRUMENTO Y EL REGISTRO DE LAS MEDICIONES.']);
+  else
+    L.push(['GARANTÍA EN DEPÓSITO', 'S/ ' + fmt(c.garantia) + '. NO ES UN COBRO: SE DEVUELVE AL RETORNAR LOS INSTRUMENTOS EN BUEN ESTADO. SE ENTREGAN CONTRA PRESENTACIÓN DE DNI.']);
+  const inc = c.conTecnico ? incluidos('') : [];
+  if(inc.length) L.push(['INCLUIDO SIN COSTO', inc.map(x => x.nom).join(' · ').toUpperCase() + '.']);
+  L.push(['FORMA DE PAGO', 'ÍNTEGRO A LA ENTREGA DE LOS INSTRUMENTOS, SALVO ACUERDO DISTINTO POR ESCRITO.']);
+  L.push(['OBSERVACIONES', 'NO INCLUYE TRASLADOS FUERA DE LIMA METROPOLITANA NI CONSUMIBLES DEL CLIENTE.']);
+  return L;
+}
+
+function cotHTML(c, nom, mail, tel, numero){
+  const S = (typeof SITE !== 'undefined') ? SITE : {};
+  const u = COT_UNI[c.mod], uq = c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
+  const und = (c.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
+  const hoy = new Date().toLocaleDateString('es-PE');
+  /* El precio unitario del cuadro es el de cada instrumento prorrateado:
+     así la suma del cuadro cuadra exactamente con el total. */
+  const factor = c.base ? c.unit / c.base : 0;
+  const filas = c.sel.map((e, i) => {
+    const pu = e.dia * factor, st = pu * c.qty;
+    return `<tr>
+      <td class="c">${i + 1}</td><td class="c">${c.qty}</td><td class="c">${und}</td>
+      <td><b>${cotEsc(e.nom.toUpperCase())}</b><br>- MARCA: ${cotEsc((e.marca || '—').split('·')[0].trim().toUpperCase())}<br>- PROCEDENCIA: ${cotEsc(((e.marca || '').split('·')[1] || '—').trim().toUpperCase())}<br>- CON CERTIFICADO DE CALIBRACIÓN VIGENTE</td>
+      <td class="d">${pu.toFixed(2)}</td><td class="d">${st.toFixed(2)}</td></tr>`;
+  }).join('') + (c.conTecnico ? `<tr>
+      <td class="c">${c.sel.length + 1}</td><td class="c">${c.qty}</td><td class="c">${und}</td>
+      <td><b>INSTRUMENTISTA METROLÓGICO</b><br>- MANEJO DEL INSTRUMENTO Y REGISTRO DE MEDICIONES<br>- MÍNIMO MEDIO DÍA</td>
+      <td class="d">${(c.tecnico / c.qty).toFixed(2)}</td><td class="d">${c.tecnico.toFixed(2)}</td></tr>` : '');
+  const cond = cotCondiciones(c).map(([k, v]) =>
+    `<tr><th>${cotEsc(k)}</th><td class="dp">:</td><td>${cotEsc(v).replace(/\n/g, '<br>')}</td></tr>`).join('');
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8">
+  <title>Cotización ${numero}</title><style>
+    *{box-sizing:border-box}
+    body{margin:0;padding:16mm 14mm;font:11px/1.45 Arial,Helvetica,sans-serif;color:#000}
+    .mem{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+      border-bottom:3px solid #1F3864;padding-bottom:8px;margin-bottom:10px}
+    .mem b{font-size:15px;letter-spacing:-.2px}
+    .mem small{display:block;color:#444;font-size:10px;line-height:1.5}
+    h1{margin:10px 0 2px;text-align:center;font-size:15px;letter-spacing:.5px}
+    .fecha{text-align:right;font-size:11px;margin-bottom:10px}
+    table.dat{border-collapse:collapse;font-size:11px;margin-bottom:10px}
+    table.dat th{text-align:left;font-weight:bold;width:150px;vertical-align:top;padding:1px 0}
+    table.dat td{vertical-align:top;padding:1px 0}
+    table.dat td.dp{width:14px;text-align:center}
+    .salu{margin:10px 0 4px;font-weight:bold}
+    .parr{margin:0 0 12px;text-align:justify}
+    .cuadro{margin:14px 0 4px;font-weight:bold;text-align:center;letter-spacing:.5px}
+    table.it{width:100%;border-collapse:collapse;font-size:10px}
+    table.it th{background:#1F3864;color:#fff;border:1px solid #1F3864;padding:5px 4px;font-size:9.5px;
+      text-align:center;line-height:1.25}
+    table.it td{border:1px solid #9aa4b8;padding:5px;vertical-align:top}
+    table.it td.c{text-align:center;white-space:nowrap}
+    table.it td.d{text-align:right;white-space:nowrap}
+    table.tt{width:100%;border-collapse:collapse;font-size:11px;margin-top:-1px}
+    table.tt td{border:1px solid #9aa4b8;padding:5px}
+    table.tt td.k{text-align:right;font-weight:bold;width:82%}
+    table.tt td.v{text-align:right;white-space:nowrap}
+    .letras{margin:7px 0 0;font-weight:bold;font-size:10.5px}
+    .sec{margin:16px 0 5px;font-weight:bold;letter-spacing:.5px}
+    .firma{margin-top:22px;font-size:11px}
+    .pie{margin-top:14px;border-top:3px solid #1F3864;padding-top:6px;font-size:9.5px;color:#444;text-align:center}
+    @media print{body{padding:12mm 12mm}}
+  </style></head><body>
+    <div class="mem">
+      <div><b>${cotEsc(S.nombre || 'Sinergia Biomédica')}</b>
+        <small>${cotEsc(S.razonSocial || '')}<br>RUC ${cotEsc(S.ruc || '')}<br>${cotEsc(S.direccion || '')}</small></div>
+      <div style="text-align:right"><small>${cotEsc(S.telefono || '')}<br>${cotEsc(S.email || '')}<br>${cotEsc(S.web || '')}</small></div>
+    </div>
+    <h1>COTIZACIÓN Nº ${numero}</h1>
+    <div class="fecha">FECHA: ${hoy}</div>
+    <table class="dat">
+      <tr><th>ATENCIÓN</th><td class="dp">:</td><td>${cotEsc((nom || '—').toUpperCase())}</td></tr>
+      <tr><th>SEÑOR(ES)</th><td class="dp">:</td><td>${cotEsc((nom || '—').toUpperCase())}</td></tr>
+      ${mail ? `<tr><th>CORREO</th><td class="dp">:</td><td>${cotEsc(mail)}</td></tr>` : ''}
+      ${tel ? `<tr><th>TELÉFONO</th><td class="dp">:</td><td>${cotEsc(tel)}</td></tr>` : ''}
+      <tr><th>ASUNTO</th><td class="dp">:</td><td>ALQUILER DE INSTRUMENTOS DE METROLOGÍA BIOMÉDICA</td></tr>
+      <tr><th>PERIODO</th><td class="dp">:</td><td>${cotEsc((c.qty + ' ' + uq).toUpperCase())}${c.mod === 'dia' && COT.d1 && COT.d2 ? ' (DEL ' + COT.d1 + ' AL ' + COT.d2 + ')' : ''}</td></tr>
+    </table>
+    <p class="salu">DE NUESTRA CONSIDERACIÓN</p>
+    <p class="parr">SIRVA LA PRESENTE PARA SALUDARLO Y A LA VEZ HACER PROPICIA LA OPORTUNIDAD, PARA REMITIR CON
+      LA PRESENTE NUESTRA COTIZACIÓN DETALLADA EN EL &quot;CUADRO N° 01&quot;.</p>
+    <p class="cuadro">CUADRO Nº 1</p>
+    <table class="it">
+      <tr><th style="width:36px">ÍTEM</th><th style="width:42px">CANT</th><th style="width:72px">UND</th>
+        <th>DESCRIPCIÓN</th><th style="width:88px">PRECIO UNITARIO<br>INCLUIDO IGV</th>
+        <th style="width:88px">SUB TOTAL<br>INCLUIDO IGV</th></tr>
+      ${filas}
+    </table>
+    <table class="tt">
+      <tr><td class="k">SUBTOTAL</td><td class="v">${(c.total / 1.18).toFixed(2)}</td></tr>
+      <tr><td class="k">IGV (18 %)</td><td class="v">${(c.total - c.total / 1.18).toFixed(2)}</td></tr>
+      <tr><td class="k">TOTAL</td><td class="v">${c.total.toFixed(2)}</td></tr>
+    </table>
+    <p class="letras">${cotMontoLetras(c.total)}</p>
+    <p class="sec">CONDICIONES COMERCIALES</p>
+    <table class="dat">${cond}</table>
+    <p class="sec">DATOS GENERALES</p>
+    <table class="dat">
+      <tr><th>RUC</th><td class="dp">:</td><td>${cotEsc(S.ruc || '')}</td></tr>
+      <tr><th>RAZÓN SOCIAL</th><td class="dp">:</td><td>${cotEsc((S.razonSocial || '').toUpperCase())}</td></tr>
+      ${S.banco ? `<tr><th>ENTIDAD BANCARIA</th><td class="dp">:</td><td>${cotEsc(S.banco)}</td></tr>` : ''}
+      ${S.cuenta ? `<tr><th>NRO CUENTA</th><td class="dp">:</td><td>${cotEsc(S.cuenta)}</td></tr>` : ''}
+      ${S.cci ? `<tr><th>CCI</th><td class="dp">:</td><td>${cotEsc(S.cci)}</td></tr>` : ''}
+    </table>
+    <p class="firma">ATENTAMENTE,<br><br><br>_______________________________<br>
+      ${cotEsc(S.nombre || '')}<br><small>${cotEsc(S.razonSocial || '')}</small></p>
+    <div class="pie">${cotEsc(S.web || '')} · ${cotEsc(S.email || '')} · ${cotEsc(S.telefono || '')}</div>
+  </body></html>`;
+}
+
 function cotPDF(){
   const c = cotCalcular();
   if(!c.sel.length) return;
   const {nom, mail, tel} = cotDatos();
-  const u = COT_UNI[c.mod], uq = c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
-  const S = (typeof SITE !== 'undefined') ? SITE : {};
-  const filas = c.sel.map((e, i) => `<tr>
-      <td class="c">${i + 1}</td>
-      <td><b>${cotEsc(e.nom)}</b><br><small>${cotEsc(e.marca || '')}</small></td>
-      <td class="c">${c.qty} ${uq}</td>
-      <td class="d">S/ ${fmt(e.dia)}</td>
-    </tr>`).join('');
-  const inc = c.conTecnico ? incluidos('') : [];
-  const hoy = new Date().toLocaleDateString('es-PE', {day: '2-digit', month: 'long', year: 'numeric'});
-  const html = `<!doctype html><html lang="es"><head><meta charset="utf-8">
-  <title>Cotización ${cotNumero()}</title><style>
-    *{box-sizing:border-box}
-    body{margin:0;padding:26mm 18mm;font:12px/1.5 Arial,Helvetica,sans-serif;color:#1a1c20}
-    h1{margin:0;font-size:19px;letter-spacing:-.2px}
-    .cab{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;
-      border-bottom:2px solid #9A7F4E;padding-bottom:12px}
-    .cab small{display:block;color:#666;font-size:11px;line-height:1.5}
-    .num{text-align:right;font-size:12px}
-    .num b{display:block;font-size:15px;color:#9A7F4E}
-    .dat{margin:16px 0 4px;font-size:12px}
-    .dat span{display:inline-block;min-width:92px;color:#666}
-    table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
-    th{background:#f3f1ec;text-align:left;padding:8px;border-bottom:1px solid #d9d4c8;font-size:11px;
-      letter-spacing:.4px;text-transform:uppercase;color:#555}
-    td{padding:8px;border-bottom:1px solid #eceae4;vertical-align:top}
-    td small{color:#777}
-    .c{text-align:center;white-space:nowrap}
-    .d{text-align:right;white-space:nowrap}
-    .tot{margin-top:14px;margin-left:auto;width:62%;font-size:12.5px}
-    .tot div{display:flex;justify-content:space-between;padding:4px 8px}
-    .tot .g{margin-top:5px;background:#1a1c20;color:#fff;font-size:14px;font-weight:bold;border-radius:4px}
-    .nota{margin-top:16px;padding:10px 12px;background:#f7f6f2;border:1px solid #e4e0d6;border-radius:5px;font-size:11.5px}
-    .cond{margin-top:14px;font-size:11px;color:#555;line-height:1.7}
-    .pie{margin-top:26px;border-top:1px solid #d9d4c8;padding-top:10px;font-size:10.5px;color:#777}
-    @media print{body{padding:14mm 12mm}}
-  </style></head><body>
-    <div class="cab">
-      <div><h1>${cotEsc(S.nombre || 'Sinergia Biomédica')}</h1>
-        <small>${cotEsc(S.razonSocial || 'Servicios Integrales Sinergia S.A.C.')}${S.ruc ? ' · RUC ' + cotEsc(S.ruc) : ''}<br>
-        ${cotEsc(S.email || '')}${S.telefono ? ' · ' + cotEsc(S.telefono) : ''}</small></div>
-      <div class="num">COTIZACIÓN<b>${cotNumero()}</b>${hoy}</div>
-    </div>
-    <p class="dat"><span>Señor(es):</span> ${cotEsc(nom || '—')}<br>
-      ${mail ? '<span>Correo:</span> ' + cotEsc(mail) + '<br>' : ''}
-      ${tel ? '<span>Teléfono:</span> ' + cotEsc(tel) + '<br>' : ''}
-      <span>Asunto:</span> Alquiler de instrumentos de metrología biomédica</p>
-    <table>
-      <tr><th>Ítem</th><th>Descripción</th><th class="c">Periodo</th><th class="d">S/ por día</th></tr>
-      ${filas}
-    </table>
-    <div class="tot">
-      ${c.desc ? `<div><span>Suma por día</span><span>S/ ${fmt(c.base)}</span></div>
-        <div><span>Descuento por combinar ${c.sel.length} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></div>` : ''}
-      <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
-      <div><span>Alquiler · ${c.qty} ${uq}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
-      ${c.conTecnico ? `<div><span>Instrumentista metrológico</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
-      <div><span>Incluye IGV 18 %</span><span>S/ ${(c.alquiler / 1.18 * 0.18).toFixed(2)}</span></div>
-      <div class="g"><span>TOTAL</span><span>S/ ${c.total.toFixed(2)}</span></div>
-    </div>
-    ${c.garantia ? `<p class="nota"><b>Garantía en depósito: S/ ${fmt(c.garantia)}.</b> No es un cobro.
-      Se devuelve al retornar los instrumentos. Se recogen en nuestra oficina presentando DNI.</p>` : ''}
-    ${inc.length ? `<p class="nota"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
-    <div class="cond"><b>Condiciones</b><br>
-      · Precios en soles, con IGV incluido.<br>
-      · Todos los instrumentos se entregan con su certificado de calibración vigente.<br>
-      · Medio día es un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}); el día completo son los dos turnos.<br>
-      · Entrega y devolución en nuestra oficina de Lima. A provincias, envío por agencia a cargo del cliente.<br>
-      · Vigencia de esta cotización: 15 días calendario.</div>
-    <div class="pie">${cotEsc(S.nombre || 'Sinergia Biomédica')} · ${cotEsc(S.web || 'sinergiabiomedica.pe')}
-      · Documento generado automáticamente desde el cotizador en línea.</div>
-    <script>window.onload=function(){window.print()}<\/script>
-  </body></html>`;
   const w = window.open('', '_blank');
   if(!w){ avisar('cotAviso', 'Tu navegador bloqueó la ventana. Permite las ventanas emergentes y vuelve a intentarlo.', 'err'); return; }
-  w.document.write(html); w.document.close();
+  w.document.write(cotHTML(c, nom, mail, tel, cotNumero()).replace('</body>',
+    '<script>window.onload=function(){window.print()}<\/script></body>'));
+  w.document.close();
 }
 
 /* Entrada desde las páginas de cada equipo: #/cotizar/<id>. Los datos del
