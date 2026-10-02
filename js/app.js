@@ -917,17 +917,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4d097cc7';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=040c45a1';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4d097cc7';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=040c45a1';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=4d097cc7','js/06-tablero.js?v=4d097cc7'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=040c45a1','js/06-tablero.js?v=040c45a1'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=4d097cc7'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=040c45a1'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1545,7 +1545,9 @@ function abrir(idx){
 function abrirCotizador(id, intento){
   const i = EQUIPOS.findIndex(e => e.id === id);
   if(i >= 0){ abrir(i); return; }
-  if((intento||0) < 40) setTimeout(() => abrirCotizador(id, (intento||0)+1), 250);
+  /* El catálogo llega del Apps Script y puede tardar; se reintenta hasta
+     60 s antes de rendirse. */
+  if((intento||0) < 240) setTimeout(() => abrirCotizador(id, (intento||0)+1), 250);
 }
 
 function cerrar(){
