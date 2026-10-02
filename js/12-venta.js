@@ -168,6 +168,26 @@ function vMarcaModelo(p, grande){
     `<div class="v-ft-${c}"><dt>${k}</dt><dd>${vEsc(v)}</dd></div>`).join('')}</dl>`;
 }
 
+/* Vigencia del precio: 14 días desde la última actualización con el
+   portal del proveedor (fecha «actualizado» de la hoja, dd/mm/aaaa).
+   Devuelve '15/10/2026' o '' si no hay fecha; vencida → 'vencido'. */
+const V_VIGENCIA_DIAS = 14;
+function vVigencia(){
+  const m = String((VENTA && VENTA.actualizado) || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(!m) return '';
+  const f = new Date(+m[3], +m[2]-1, +m[1] + V_VIGENCIA_DIAS);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  if(f < hoy) return 'vencido';
+  const d2 = n => String(n).padStart(2,'0');
+  return `${d2(f.getDate())}/${d2(f.getMonth()+1)}/${f.getFullYear()}`;
+}
+function vNotaPrecio(larga){
+  const v = vVigencia();
+  if(v === 'vencido') return larga ? 'Precio referencial, por confirmar en la cotización' : 'por confirmar';
+  if(v) return larga ? `Precio vigente hasta el ${v} · se confirma en la cotización` : `vigente hasta el ${v}`;
+  return larga ? 'Precio referencial, sujeto a confirmación en la cotización' : 'sujeto a confirmación';
+}
+
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
@@ -176,7 +196,7 @@ function vCard(p){
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const tag = p._top ? '<span class="tier">Más pedido</span>' : '';
   const pie = p.precio
-    ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>sujeto a confirmación</small></div>`
+    ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>${vNotaPrecio(false)}</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
   return `<div class="eq v-eq">
     <div class="img${foto?' has-photo':''}" onclick="go('${url}')">
@@ -479,7 +499,7 @@ function vProducto(id){
         <h1>${vEsc(p.nom)}</h1>
         ${vMarcaModelo(p, true)}
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
-        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?'Precio referencial, sujeto a confirmación en la cotización':'Consulta precio y plazo de entrega'}${VENTA.actualizado?' · Precios y stock al '+vEsc(VENTA.actualizado):''}</small></div>`:''}
+        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?vNotaPrecio(true):'Consulta precio y plazo de entrega'}</small></div>`:''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
