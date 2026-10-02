@@ -464,15 +464,16 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         d = eq['dia']
         hay_medio = d >= MEDIO_DIA_MIN
         medio = round(d * 0.6)
-        otras = (['Día S/ {:,.0f}'.format(d)] if hay_medio else []) + [
-            'Semana S/ {:,.0f}'.format(d * 4), 'Mes S/ {:,.0f}'.format(d * 12)]
+        # Solo medio día y día: la semana y el mes se ven en el cotizador.
+        otras = ['Día S/ {:,.0f}'.format(d)] if hay_medio else []
         gar = SIN_TECNICO.get(eq['id'])
         modo = ('Retiro en oficina · garantía S/ {:,.0f}'.format(gar) if gar else '')
         precio = ('<div class="pprecio"><b>S/ {:,.0f}</b><span>por {}</span>'
                   '<em>IGV incluido</em></div>'
-                  '<p class="ptarifas">{}{}</p>').format(
+                  '{}').format(
                       medio if hay_medio else d, 'medio día' if hay_medio else 'día',
-                      ' · '.join(otras), ('  ·  ' + modo) if modo else '')
+                      ('<p class="ptarifas">%s</p>' % '  ·  '.join([x for x in [' · '.join(otras), modo] if x]))
+                      if (otras or modo) else '')
     resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
 
     # pestaña Descripción: el equipo + para qué sirve el tipo
