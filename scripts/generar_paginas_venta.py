@@ -154,7 +154,8 @@ def galeria(p, fts, primera=True):
 
 
 def franja(p):
-    d = [(k, p.get(c)) for k, c in (('Marca', 'marca'), ('Modelo', 'modelo'), ('Origen', 'origen')) if p.get(c)]
+    d = [(k, p.get(c)) for k, c in (('Marca', 'marca'), ('Modelo', 'modelo'), ('Origen', 'origen'),
+                                    ('Expediente', 'clave')) if p.get(c)]
     if not d:
         return ''
     return '<dl class="ft">%s</dl>' % ''.join(
@@ -175,14 +176,10 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
     if p.get('precio'):
         nota = ('Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización'
                 % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Precio referencial, se confirma en la cotización'
-        caja = f'''<div class="precio-caja"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{badge}</div>
+        caja = f'''<div class="precio"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{badge}</div>
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
-        caja = '<div class="precio-caja"><div class="pc-fila"><b class="pc-monto consulta">Consultar precio</b>%s</div></div>' % badge
-    chips = ''
-    if p.get('clave'):
-        chips += '<span>Expediente <b>%s</b></span>' % e(p['clave'])
-    chips += '<span>Garantía y <b>mantenimiento</b></span>'
+        caja = '<div class="precio"><div class="pc-fila"><b class="pc-monto consulta">Consultar precio</b>%s</div></div>' % badge
     # Ficha técnica: activa si ya existe el PDF; si no, el espacio listo
     pdf = pdf_venta(p['id'])
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
@@ -197,11 +194,8 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
     else:
         wa_f = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(
             'Hola Sinergia Biomédica, me envían la ficha técnica de: %s %s %s' % (p['nom'], p.get('marca', ''), p.get('modelo', ''))))
-        doc = f'''<div class="doc pend">
-          <span class="doc-ico" aria-hidden="true">PDF</span>
-          <span class="doc-txt"><b>Ficha técnica</b><small>En preparación · te la enviamos con la cotización</small></span>
-          <a class="btn doc-pedir" href="{wa_f}" target="_blank" rel="noopener">Pedir ficha</a>
-        </div>'''
+        doc = f'''<p class="doc-linea"><span class="doc-mini" aria-hidden="true">PDF</span>
+          Ficha técnica en preparación · <a href="{wa_f}" target="_blank" rel="noopener">pídela por WhatsApp</a></p>'''
 
     # Pestañas: Descripción · Parámetros técnicos · Para expedientes técnicos
     areas = ''.join('<li>%s</li>' % e(a) for a in p.get('areas') or [])
@@ -254,10 +248,9 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
       <div class="prod-info">
         <div class="k">{e(cat)}</div>
         <h1 class="prod-h1">{e(p['nom'])}</h1>
-        {franja(p)}
         <p class="prod-desc">{e(p.get('resumen') or '')}</p>
+        {franja(p)}
         {caja}
-        <div class="prod-chips">{chips}</div>
         <div class="prod-btns">
           <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
           <a class="btn" href="{correo}">Cotizar por correo</a>
