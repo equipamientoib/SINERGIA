@@ -76,7 +76,9 @@ function abrir(idx){
 function abrirCotizador(id, intento){
   const i = EQUIPOS.findIndex(e => e.id === id);
   if(i >= 0){ abrir(i); return; }
-  if((intento||0) < 40) setTimeout(() => abrirCotizador(id, (intento||0)+1), 250);
+  /* El catálogo llega del Apps Script y puede tardar; se reintenta hasta
+     60 s antes de rendirse. */
+  if((intento||0) < 240) setTimeout(() => abrirCotizador(id, (intento||0)+1), 250);
 }
 
 function cerrar(){
