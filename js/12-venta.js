@@ -258,15 +258,11 @@ function vOrden(lista){
 /* Inicio: igual que la tienda, por tramo de precio; de cada tramo los 3
    más pedidos y el acceso a la tienda filtrada por ese tramo. */
 function vPortadaTramos(){
-  const l = vOrdenTienda(VENTA.productos);
-  const out = [];
-  [...V_TRAMOS.keys(), V_TRAMOS.length].forEach(i => {
-    const g = l.filter(p => vTramo(p) === i);
-    if(!g.length) return;
-    out.push(`<div class="v-tramo"><b>${vTramoNombre(i)}</b><a onclick="go('#/venta/precio/${i}')">Ver ${g.length===1?'el equipo':'los '+g.length+' equipos'} →</a></div>
-      <div class="grid v-tramo-grid">${g.slice(0,3).map(vCard).join('')}</div>`);
-  });
-  return out.join('');
+  /* Mismo orden que la tienda (tramos de precio de menor a mayor y, dentro,
+     más pedidos), sin mostrar los tramos: 2 equipos de cada tramo. */
+  const l = vOrdenTienda(VENTA.productos), sel = [];
+  [...V_TRAMOS.keys(), V_TRAMOS.length].forEach(i => sel.push(...l.filter(p => vTramo(p) === i).slice(0, 2)));
+  return `<div class="grid">${sel.map(vCard).join('')}</div>`;
 }
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
@@ -309,7 +305,7 @@ function vPortada(){
     <div id="vResPortada"></div>
     <div data-sin-busqueda>
       <div class="shead">
-        <div><div class="k">Tienda de venta</div><h2>Equipos más pedidos, por rango de precio</h2></div>
+        <div><div class="k">Tienda de venta</div><h2>Equipos más pedidos</h2></div>
         <a class="btn btn-fill" onclick="go('#/venta/tienda')">Ver toda la tienda →</a>
       </div>
       ${vPortadaTramos()}
@@ -477,17 +473,7 @@ function vtPintar(){
   VT.precio.forEach(v => chips.push(['precio',v,vTramoNombre(Number(v))]));
   document.getElementById('vtActivos').innerHTML = chips.map(([k,v,t]) =>
     `<button onclick="vtMarcar('${k}','${vEsc(v)}',false,true)">${vEsc(t)} ✕</button>`).join('');
-  /* En el orden por defecto, un título por cada tramo de precio. */
-  let html = '';
-  if(VT.orden === 'dest'){
-    let t = -1;
-    l.forEach(p => {
-      const tp = vTramo(p);
-      if(tp !== t){ t = tp; const n = l.filter(x => vTramo(x) === tp).length;
-        html += `<div class="v-tramo"><b>${vTramoNombre(tp)}</b><span>${n} ${n===1?'equipo':'equipos'}</span></div>`; }
-      html += vCard(p);
-    });
-  } else html = l.map(vCard).join('');
+  const html = l.map(vCard).join('');
   g.innerHTML = l.length ? html : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
 }
 function vtMarcar(clave, v, on, desmarcar){
