@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=dcd979fa';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=6dfde20e';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=dcd979fa';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=6dfde20e';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=dcd979fa','js/06-tablero.js?v=dcd979fa'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=6dfde20e','js/06-tablero.js?v=6dfde20e'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=dcd979fa'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=6dfde20e'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1705,9 +1705,15 @@ function vMezclar(){
 
 function cargarVenta(){
   if(!VENTA_CARGA){
+    /* data/venta-vivo.json: copia diaria de la hoja (la deja el robot de
+       «Páginas de venta»). Así, aunque Google tarde o falle —pasa seguido
+       en el celular—, la tienda abre con los 150 equipos y sus precios,
+       no con la lista antigua de venta.json. */
+    const copia = fetch('data/venta-vivo.json', {cache:'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null);
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
+      .then(d => copia.then(c => { if(c && !VENTA_VIVO) ventaEnVivo(c); return d; }))
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};

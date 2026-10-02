@@ -469,6 +469,11 @@ def main():
             os.rmdir(os.path.join(carpeta, d))
             cambios.append('venta/%s/ (borrada)' % d)
 
+    # Copia de los datos en vivo para la tienda: abre con esto si Google tarda.
+    copia = {'actualizado': vivo.get('actualizado', ''),
+             'productos': [p for p in vivo.get('productos', []) if p.get('id') and p.get('nom')]}
+    gp.escribir('data/venta-vivo.json', json.dumps(copia, ensure_ascii=False, separators=(',', ':')) + '\n', cambios)
+
     mapa_portada(productos, cambios)
     sitemap(paginas, cambios)
     print('%d equipos de venta con página.' % len(productos))
