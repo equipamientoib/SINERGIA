@@ -13,7 +13,12 @@ function route(sinMover){
   /* #/cotizar/<id>: abre el cotizador de ese equipo. Es la ruta de los
      botones «Calcular mi alquiler» de las páginas propias; no se redirige,
      porque si no volvería a la página de donde vino. */
-  if(h==='#/cotizar' || h.startsWith('#/cotizar/')){
+  if(h.startsWith('#/cotizacion/')){
+    pageId='page-cotizacion'; navKey='#/catalogo';
+    const cod = h.slice('#/cotizacion/'.length);
+    setTimeout(() => { if(typeof cotVer === 'function') cotVer(cod); }, 0);
+  }
+  else if(h==='#/cotizar' || h.startsWith('#/cotizar/')){
     pageId='page-cotizador'; navKey='#/catalogo';
     /* Diferido: route() puede correr mientras el paquete aún se evalúa. */
     const idc = h.split('/')[2] || '';
@@ -34,7 +39,7 @@ function route(sinMover){
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */
   const enVenta = h==='#/venta' || h.startsWith('#/venta/');
-  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar)\//.test(h) || h==='#/cotizar';
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar|cotizacion)\//.test(h) || h==='#/cotizar';
   let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
   try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
   modo = modo || 'alquiler';
