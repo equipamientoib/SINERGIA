@@ -111,3 +111,18 @@
 .cot-acc .btn:not(.btn-fill){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28);color:#fff}
 .cot-acc .btn:not(.btn-fill):hover{background:rgba(255,255,255,.18)}
 @media(max-width:560px){.cot-acc{grid-template-columns:1fr}}
+
+/* página de la cotización compartida (#/cotizacion/…) */
+.cotv-cab{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;padding-top:30px}
+.cotv-cab .k{font-family:var(--ff-d);font-size:11.5px;font-weight:600;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--gris)}
+.cotv-cab h1{margin:3px 0 4px;font-size:clamp(24px,2.4vw,30px)}
+.cotv-cab p{margin:0;font-size:14px;color:var(--gris)}
+.cotv-cab p b{color:var(--onix)}
+.cotv-btns{display:flex;gap:9px;flex-wrap:wrap}
+.cotv-hoja{margin:18px 0 40px;background:#fff;border:1px solid var(--linea);border-radius:14px;
+  box-shadow:0 14px 40px -24px rgba(0,0,0,.35);overflow:hidden}
+.cotv-hoja iframe{display:block;width:100%;height:1180px;border:0}
+.cotv-mal{margin:40px 0;font-size:15px;color:var(--gris);line-height:1.7}
+.cotv-mal a{color:var(--cobre-d);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:560px){.cotv-btns .btn{flex:1}}
