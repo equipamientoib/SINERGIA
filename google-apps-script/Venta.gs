@@ -15,8 +15,9 @@
  *         codigo_proveedor y, si no tiene, por marca + modelo (y escribe
  *         el código encontrado);
  *       · deja en la columna «coincidencia» cómo se encontró cada fila;
- *       · al final ofrece copiar a Drive las fotos de los equipos
- *         publicados que no tienen (carpeta «Sinergia - Fotos venta»).
+ *       · al final ofrece copiar a Drive las fotos de todos los equipos
+ *         del portal, por código (carpeta «Sinergia - Fotos venta» y
+ *         pestaña «Fotos»), de 100 en 100.
  *  3) La web solo muestra equipos con stock (fila «solo con stock» | NO
  *     arriba de los encabezados para mostrar todos).
  *  4) agregarEquiposNuevos (▶, una vez): publica los equipos con stock
@@ -135,7 +136,8 @@ function lista_(v, sep) {
 
 function venta_() {
   if (!VENTA_ID) return null;
-  var sh = hojaVenta_(abrirLibro_(VENTA_ID));
+  var libro = abrirLibro_(VENTA_ID), sh = hojaVenta_(libro);
+  var fotoCod = fotosPorCodigo_(libro);
   var vals = sh.getDataRange().getValues();
   var margen = 35, actualizado = '', fh = -1, soloStock = true;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
@@ -177,6 +179,8 @@ function venta_() {
     if (precio) p.precio = precio;
     if (stock !== null) p.stock = stock;
     var fotos = fotos_(r.fotos);
+    var fc = fotoCod[codAtl_(r.codigo_proveedor)];
+    if (!fotos.length && fc) { fotos = [foto_(fc)]; p.fotoProv = 1; }   // foto del proveedor (pestaña «Fotos»)
     if (fotos.length) p.fotos = fotos;
     var fp = pdf_(r.ficha_pdf);
     if (fp.ver) p.ficha_pdf = fp.ver;
@@ -526,11 +530,14 @@ function precioDesdeProveedor_() {
   return atlActualizar_({ items: items, tc: Math.round(tc * 1000) / 1000, todos: false, id: 'manual' }).actualizados;
 }
 
-/* ── Fotos del proveedor → Drive (una vez por equipo) ───────────────
-   El botón pide la lista (atl=fotos), baja cada foto en el navegador
-   (el portal solo abre desde Perú) y la manda aquí; se guarda en la
-   carpeta «Sinergia - Fotos venta» y su enlace va a la columna «fotos».
-   No se tocan los equipos que ya tienen foto en la hoja ni en el sitio. */
+/* ── Fotos del proveedor → Drive (una vez por código) ──────────────
+   Se guardan las fotos de TODOS los equipos del portal (con y sin stock),
+   así un equipo ya tiene foto el día que se publica o vuelve el stock.
+   El botón pide la lista (atl=fotos), baja cada foto en el navegador (el
+   portal solo abre desde Perú) y la manda aquí: va a la carpeta
+   «Sinergia - Fotos venta» con el código como nombre y se anota en la
+   pestaña «Fotos» (codigo | enlace | fecha). La web usa esa foto cuando
+   la fila no tiene una propia en «fotos» ni en el sitio (img/venta/). */
 function carpetaFotos_() {
   var pr = PropertiesService.getScriptProperties(), id = pr.getProperty('FOTOS_CARPETA');
   if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
@@ -541,41 +548,62 @@ function carpetaFotos_() {
   return f;
 }
 
+function hojaFotos_(ss) {
+  var sh = ss.getSheetByName('Fotos');
+  if (!sh) {
+    sh = ss.insertSheet('Fotos');
+    sh.getRange(1, 1, 1, 3).setValues([['codigo', 'enlace', 'fecha']]).setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36');
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+/* codigo (6 dígitos) → enlace de Drive de su foto. */
+function fotosPorCodigo_(ss) {
+  var sh = ss.getSheetByName('Fotos'), m = {};
+  if (sh) sh.getDataRange().getValues().slice(1).forEach(function (r) { var c = codAtl_(r[0]); if (c && s_(r[1])) m[c] = s_(r[1]); });
+  return m;
+}
+
 function atlFotosPendientes_() {
   var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss), pv = ss.getSheetByName('Proveedor');
   if (!pv) return [];
-  var img = {};
-  pv.getDataRange().getValues().slice(1).forEach(function (r) { if (s_(r[6])) img[codAtl_(r[0])] = s_(r[6]); });
+  var hechas = fotosPorCodigo_(ss);
   var conFotoSitio = {};
   try {
     (JSON.parse(UrlFetchApp.fetch('https://sinergiabiomedica.pe/data/venta.json').getContentText()).productos || [])
       .forEach(function (p) { if (p.fotos && p.fotos.length) conFotoSitio[p.id] = 1; });
   } catch (e) {}
-  var vals = sh.getDataRange().getValues(), fh = -1;
+  /* Prioridad: 1 publicados, 2 con stock, 3 el resto. Se saltan los que ya
+     tienen foto propia (columna fotos o img/venta/ del sitio). */
+  var vals = sh.getDataRange().getValues(), fh = -1, prio = {}, propia = {};
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
   var heads = vals[fh].map(function (h) { return s_(h); }), col = function (n) { return heads.indexOf(n); };
-  var out = [];
   for (var i = fh + 1; i < vals.length; i++) {
-    var r = vals[i], id = s_(r[0]), cd = codAtl_(r[col('codigo_proveedor')]);
-    if (!id || s_(r[col('publicar')]).toUpperCase() !== 'SI' || s_(r[col('fotos')]) || conFotoSitio[id]) continue;
-    if (!(num_(r[col('stock_proveedor')]) > 0) || !img[cd]) continue;
-    out.push({ id: id, c: cd, img: img[cd] });
+    var cd = codAtl_(vals[i][col('codigo_proveedor')]); if (!cd) continue;
+    if (s_(vals[i][col('fotos')]) || conFotoSitio[s_(vals[i][0])]) propia[cd] = 1;
+    if (s_(vals[i][col('publicar')]).toUpperCase() === 'SI') prio[cd] = 1;
   }
+  var out = [];
+  pv.getDataRange().getValues().slice(1).forEach(function (r) {
+    var cd = codAtl_(r[0]), img = s_(r[6]);
+    if (!cd || !img || hechas[cd] || propia[cd]) return;
+    out.push({ c: cd, img: img, p: prio[cd] || (Number(r[3]) > 0 ? 2 : 3) });
+  });
+  out.sort(function (a, b) { return a.p - b.p; });
   return out;
 }
 
 function atlGuardarFoto_(f) {
-  var bytes = Utilities.base64Decode(f.b64);
+  var cd = codAtl_(f.c);
+  if (!cd) return { ok: false, motivo: 'sin código' };
+  var ss = SpreadsheetApp.openById(VENTA_ID);
+  if (fotosPorCodigo_(ss)[cd]) return { ok: true, repetida: true };
   var ext = /png/.test(f.mime) ? 'png' : /webp/.test(f.mime) ? 'webp' : 'jpg';
-  var file = carpetaFotos_().createFile(Utilities.newBlob(bytes, f.mime || 'image/png', f.id + '.' + ext));
+  var nombre = cd.slice(0, 3) + '.' + cd.slice(3) + '.' + ext;
+  var file = carpetaFotos_().createFile(Utilities.newBlob(Utilities.base64Decode(f.b64), f.mime || 'image/png', nombre));
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  var sh = hojaVenta_(SpreadsheetApp.openById(VENTA_ID));
-  var vals = sh.getDataRange().getValues(), fh = -1;
-  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
-  var cF = vals[fh].map(function (h) { return s_(h); }).indexOf('fotos');
-  for (var i = fh + 1; i < vals.length; i++) {
-    if (s_(vals[i][0]) === f.id) { sh.getRange(i + 1, cF + 1).setValue('https://drive.google.com/file/d/' + file.getId() + '/view'); break; }
-  }
+  hojaFotos_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), 'https://drive.google.com/file/d/' + file.getId() + '/view', new Date()]);
   limpiarCache();
   return { ok: true };
 }

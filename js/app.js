@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=f71b2940';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=ae76289c';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=f71b2940';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=ae76289c';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=f71b2940','js/06-tablero.js?v=f71b2940'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=ae76289c','js/06-tablero.js?v=ae76289c'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=f71b2940'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=ae76289c'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1674,7 +1674,12 @@ function vMezclar(){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    VENTA.productos = VENTA_VIVO.productos.map(p => (p.fotos && p.fotos.length) || !base.get(p.id) ? p : Object.assign({}, p, {fotos: base.get(p.id).fotos}));
+    /* Las fotos propias del sitio ganan a la foto genérica del proveedor (fotoProv). */
+    VENTA.productos = VENTA_VIVO.productos.map(p => {
+      const b = base.get(p.id);
+      const propias = b && b.fotos && b.fotos.length;
+      return propias && (!(p.fotos && p.fotos.length) || p.fotoProv) ? Object.assign({}, p, {fotos: b.fotos}) : p;
+    });
     VENTA.actualizado = VENTA_VIVO.actualizado;
   }
 }

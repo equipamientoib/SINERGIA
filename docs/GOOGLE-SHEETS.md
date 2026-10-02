@@ -164,7 +164,9 @@ Qué hace en cada uso: lee los productos **EQUIPOS** del portal (filtro `tp=2`, 
 
 **Solo con stock:** la web muestra únicamente los equipos con stock mayor a 0 (vuelven solos cuando el proveedor repone). Para mostrar todos, agrega arriba de los encabezados una fila `solo con stock | NO`.
 
-**Fotos:** al terminar, el botón ofrece copiar a Drive (carpeta «Sinergia - Fotos venta») la foto del proveedor de cada equipo publicado que no tiene foto ni en la hoja ni en `img/venta/`. Una descarga por foto, una sola vez; el enlace queda en la columna `fotos`.
+**Fotos:** al terminar, el botón ofrece copiar a Drive (carpeta «Sinergia - Fotos venta») las fotos de **todos** los equipos del portal (también los agotados), de 100 en 100 y primero las de los publicados. Cada foto se guarda una sola vez por código en la pestaña **Fotos** (`codigo | enlace | fecha`); la web la usa cuando la fila no tiene foto propia en `fotos` ni en `img/venta/`. Si el botón se usó hace menos de 1 hora, ofrece «Solo copiar fotos» sin volver a leer el portal.
+
+**Agotados:** las tarjetas «Agotado» (sin botón de compra) también se guardan en «Proveedor» con stock 0 (código tomado del nombre de la foto).
 
 **Ampliar el catálogo:** `data/venta-nuevos.json` tiene equipos con stock ya redactados, elegidos según el estudio de compras públicas 2024-2025 (OECE): todos los tipos del ranking con stock en el proveedor y 18 complementarios. `agregarEquiposNuevos()` se ejecuta dos veces: la 1.ª crea la pestaña **Para revisar** (puesto en el estudio, stock y precio aproximado; publicar SI/NO); la 2.ª publica los SI, pone `ranking` (puesto del tipo en el estudio) a todas las filas, renueva los **más pedidos** (`destacado`, un equipo con stock por tipo) y copia precio y stock desde «Proveedor». La tienda se ordena por más pedidos y luego por `ranking`.
 

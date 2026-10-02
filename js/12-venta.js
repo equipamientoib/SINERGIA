@@ -35,7 +35,12 @@ function vMezclar(){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    VENTA.productos = VENTA_VIVO.productos.map(p => (p.fotos && p.fotos.length) || !base.get(p.id) ? p : Object.assign({}, p, {fotos: base.get(p.id).fotos}));
+    /* Las fotos propias del sitio ganan a la foto genérica del proveedor (fotoProv). */
+    VENTA.productos = VENTA_VIVO.productos.map(p => {
+      const b = base.get(p.id);
+      const propias = b && b.fotos && b.fotos.length;
+      return propias && (!(p.fotos && p.fotos.length) || p.fotoProv) ? Object.assign({}, p, {fotos: b.fotos}) : p;
+    });
     VENTA.actualizado = VENTA_VIVO.actualizado;
   }
 }

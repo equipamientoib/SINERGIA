@@ -29,6 +29,7 @@
   var MAX_CONSULTAS = 36;     // tope total de consultas al portal por uso
   var PAUSA = 3000;           // ms entre una consulta y la siguiente
   var REUSO_MIN = 60;         // si se usó hace menos de esto, pide confirmar
+  var LOTE_FOTOS = 100;       // fotos por clic (una descarga cada ~3 s)
   var ESPERA_MAX = 45000;     // ms por bloque
 
   /* ── Panel flotante ─────────────────────────────────────────────── */
@@ -125,7 +126,15 @@
     if (!trozos.length) trozos = [String(html || '')];
     trozos.forEach(function (t) {
       RX.lastIndex = 0;
-      var m = RX.exec(t); if (!m) return;
+      var m = RX.exec(t);
+      if (!m) {
+        /* «Agotado»: sin botón de compra. El código sale del nombre de la
+           foto (products/080.741.png) o de algún onclick; stock 0. */
+        var cm = t.match(/products\/(\d{3}\.\d{3})\.\w+/) || t.match(/onclick="[^"]*'(\d{3}\.\d{3})'/);
+        if (!cm) return;
+        var pm = t.match(/US\$\s*([\d,]+(?:\.\d+)?)/);
+        m = [null, cm[1], '0', pm ? pm[1].replace(/,/g, '') : '0'];
+      }
       var tit = (t.match(/<h3[^>]*?title="([\s\S]*?)">/) || [])[1] || (t.match(/<h3[^>]*>([\s\S]*?)<\/h3>/) || [])[1] || '';
       var al = (t.match(/class="alert[^"]*"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '';
       var src = (t.match(/<img[^>]*src="([^"]+)"/) || [])[1] || '';
@@ -190,6 +199,7 @@
   if (ultimo && hace < REUSO_MIN) {
     txt('Ya actualizaste hace <b>' + hace + ' min</b>. Para no cargar al portal del proveedor, ' +
       'conviene usarlo solo una vez por semana (o cuando cambien precios).');
+    boton('Solo copiar fotos', function () { document.getElementById('sbAtlBtns').innerHTML = ''; txt('Buscando fotos pendientes…'); ofrecerFotos(true).then(function () { boton('Cerrar', cerrar); }); });
     boton('Actualizar igual', function () { document.getElementById('sbAtlBtns').innerHTML = ''; correr(); });
     boton('Cerrar', cerrar);
   } else correr();
@@ -205,17 +215,20 @@
       r.onerror = no; r.readAsDataURL(blob);
     });
   }
-  async function ofrecerFotos() {
+  async function ofrecerFotos(solo) {
     var fp = {};
-    try { fp = await pedirJSON(CFG.u + '?atl=fotos&k=' + encodeURIComponent(CFG.k)); } catch (e) { return; }
+    try { fp = await pedirJSON(CFG.u + '?atl=fotos&k=' + encodeURIComponent(CFG.k)); } catch (e) { if (solo) txt('No pude consultar tu hoja. Intenta de nuevo.'); return; }
     var lista = (fp && fp.fotos) || [];
-    if (!lista.length) return;
+    if (!lista.length) { if (solo) txt('No hay fotos pendientes: las del proveedor ya están en tu Drive.'); return; }
+    if (solo) txt('');
     var p = document.createElement('div');
     p.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #333';
-    p.innerHTML = '📷 <b>' + lista.length + '</b> equipos publicados no tienen foto. Puedo copiar la del proveedor a tu Drive ' +
-      '(una descarga por foto, una sola vez, ~' + Math.ceil(lista.length * 2.5 / 60) + ' min).';
+    p.innerHTML = '📷 Hay <b>' + lista.length + '</b> fotos del proveedor que aún no están en tu Drive. Se guardan una sola vez ' +
+      '(primero las de tus equipos publicados) y quedan listas para cuando publiques o haya stock.';
     document.getElementById('sbAtlTxt').appendChild(p);
-    boton('Copiar ' + lista.length + ' fotos', function () { this.remove(); copiarFotos(lista); });
+    var lote = lista.slice(0, LOTE_FOTOS);
+    if (lista.length > LOTE_FOTOS) p.innerHTML += '<br>Se copian de ' + LOTE_FOTOS + ' en ' + LOTE_FOTOS + ': vuelve a tocar el favorito otro día para seguir.';
+    boton('Copiar ' + lote.length + ' fotos', function () { this.remove(); copiarFotos(lote); });
   }
   async function copiarFotos(lista) {
     var hechas = 0, fallas = 0;
@@ -230,17 +243,17 @@
         if (!r.ok) throw new Error('HTTP ' + r.status);
         var b = await r.blob();
         if (!/^image\//.test(b.type) || b.size > 8e6) throw new Error('no es imagen');
-        await enviar(JSON.stringify({ k: CFG.k, foto: { id: f.id, mime: b.type, b64: await aBase64(b) } }));
+        await enviar(JSON.stringify({ k: CFG.k, foto: { c: f.c, mime: b.type, b64: await aBase64(b) } }));
         hechas++;
       } catch (e) { fallas++; }
-      await espera(1500);
+      await espera(2000);
     }
     bar(1);
     var quedan = '';
     try { var fp = await pedirJSON(CFG.u + '?atl=fotos&k=' + encodeURIComponent(CFG.k)); quedan = (fp.fotos || []).length; } catch (e) { }
     txt('<b style="color:#9be3b5">Fotos listas.</b> Se enviaron <b>' + hechas + '</b> a tu Drive (carpeta «Sinergia - Fotos venta»)' +
       (fallas ? '; ' + fallas + ' no se pudieron bajar' : '') + '.' +
-      (quedan ? '<br>Quedan ' + quedan + ' sin foto: vuelve a tocar el favorito más tarde para reintentar.' : '') +
+      (quedan ? '<br>Quedan <b>' + quedan + '</b> por copiar: vuelve a tocar el favorito otro día para seguir.' : '') +
       '<br><span style="color:#aeb4bc">La web las muestra en unos minutos.</span>');
   }
   var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
