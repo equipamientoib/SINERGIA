@@ -252,6 +252,13 @@ let MEDIO_MIN=100, PEDIDO_MIN=0;
    La hoja puede cambiar la lista (modelo.sin_tecnico = {"id": garantía}). */
 let SIN_TECNICO = {manometro:100, luxometro:100, tacometro:100};
 const soloEquipo = id => Object.prototype.hasOwnProperty.call(SIN_TECNICO, id);
+/* Complementarias: no se alquilan solas (herramientas de apoyo). */
+let COMPLEMENTOS = ['set-46', 'destornillador-elec'];
+const esComplemento = e => !!e.apoyo || COMPLEMENTOS.indexOf(e.id) >= 0;
+/* Lo que va SIN COSTO en todo alquiler con instrumentista. El multímetro sí
+   se alquila solo, pero si ya viene el instrumentista, se incluye. */
+let INCLUIDOS = ['multimetro', 'set-46', 'destornillador-elec'];
+const incluidos = id => EQUIPOS.filter(e => e.id !== id && INCLUIDOS.indexOf(e.id) >= 0);
 const garantiaDe = id => SIN_TECNICO[id] || 0;
 const precioMedio=d=>Math.round(d*MEDIO_PCT);
 const tieneMedio=d=>Number(d) >= MEDIO_MIN;
@@ -261,6 +268,10 @@ const unidadDesde=d=>tieneMedio(d) ? 'medio día' : 'día';
 /* Interruptor general de precios (js/00-config.js -> CONFIG.MOSTRAR_PRECIOS).
    La hoja de Google puede sobrescribirlo con modelo.mostrar_precios. */
 let VER_PRECIOS = (typeof CONFIG!=='undefined' && CONFIG.MOSTRAR_PRECIOS!==undefined) ? !!CONFIG.MOSTRAR_PRECIOS : true;
+/* Vista previa: ?precios=1 enciende los precios solo para quien abra ese
+   enlace, para probar el cotizador antes de publicarlos. */
+let PRECIOS_PRUEBA = false;
+try{ if(location.search.indexOf('precios=1') >= 0){ VER_PRECIOS = true; PRECIOS_PRUEBA = true; } }catch(e){}
 const sumItems=p=>p.items.reduce((s,id)=>s+byId(id).dia,0);
 const fmt=n=>Number(n).toLocaleString('es-PE');
 
@@ -441,7 +452,7 @@ function huesoFacetas(){
 /* Las herramientas de apoyo (set de 46 piezas, destornillador) no se alquilan
    solas: van dentro de los paquetes de Mantenimiento. Siguen en EQUIPOS para
    los paquetes, pero no salen como tarjeta ni en los filtros del catálogo. */
-const enCatalogo = () => EQUIPOS.filter(e=>!e.apoyo);
+const enCatalogo = () => EQUIPOS.filter(e=>!esComplemento(e));
 
 function buildFacetsEq(){
   if(!CATALOGO_LISTO){ document.getElementById('filtersSide').innerHTML=huesoFacetas(); return; }
@@ -480,9 +491,9 @@ function irEquipo(id){
 }
 function cardEq(e){
   const idx=EQUIPOS.indexOf(e);
-  const badge=e.apoyo?`<span class="badge" style="background:rgba(154,127,78,.13);color:var(--cobre-d);border-color:var(--linea-b)">COMPLEMENTARIA</span>`:`<span class="badge">DISPONIBLE</span>`;
-  const foot=e.apoyo
-    ?`<div class="foot"><div class="price" style="font-size:14px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Complementaria<small style="font-weight:400">incluida en Mantenimiento</small></div><button class="btn" onclick="go('#/equipo/${e.id}')">Ver detalle</button></div>`
+  const badge=esComplemento(e)?`<span class="badge" style="background:rgba(154,127,78,.13);color:var(--cobre-d);border-color:var(--linea-b)">COMPLEMENTARIA</span>`:`<span class="badge">DISPONIBLE</span>`;
+  const foot=esComplemento(e)
+    ?`<div class="foot"><div class="price" style="font-size:14px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Sin costo<small style="font-weight:400">va incluida con tu alquiler</small></div><button class="btn" onclick="go('#/equipo/${e.id}')">Ver detalle</button></div>`
     :(VER_PRECIOS
       ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${fmt(precioDesde(e.dia))}<span>/${unidadDesde(e.dia)} · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`
       :`<div class="foot"><div class="price" style="font-size:15px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Consultar tarifa<small style="font-weight:400">te respondemos con precio y disponibilidad</small></div><button class="btn" onclick="go('#/contacto')">Cotizar</button></div>`);
@@ -632,7 +643,7 @@ function buildCustom(){
   const pz = txt => VER_PRECIOS ? `<span class="cp">${txt}</span>` : '';
   const groups=[['ansim','Analizadores y simuladores'],['med','Instrumentos de medición'],['elec','Medidores eléctricos']];
   let html=groups.map(([g,label])=>{
-    const items=EQUIPOS.filter(e=>e.g===g&&!e.apoyo);
+    const items=EQUIPOS.filter(e=>e.g===g&&!esComplemento(e));
     if(!items.length)return '';
     return `<div class="cgroup"><div class="cgh">${label}</div>`+items.map(e=>`<label class="citem"><input type="checkbox" value="${e.id}" ${CUSTOM.sel.has(e.id)?'checked':''} onchange="toggleCustom('${e.id}',this.checked)"><span class="cn">${e.nom}</span>${pz('S/ '+e.dia+'/día')}</label>`).join('')+`</div>`;
   }).join('');
@@ -704,9 +715,9 @@ function renderEquipo(id){
   const idx=EQUIPOS.indexOf(e);
   /* Un equipo nuevo de la hoja puede venir sin ficha: no debe romper la página. */
   const specRows=Object.entries(e.specs||{}).map(([k,v])=>`<div class="row"><span class="l">${k}</span><span class="v">${v}</span></div>`).join('');
-  const isA=e.apoyo;
+  const isA=esComplemento(e);
   const priceHTML=isA
-    ?`<div class="pricebox"><span class="pp" style="font-size:19px">Complementaria</span><span class="pu">· incluida en paquetes de Mantenimiento</span></div>`
+    ?`<div class="pricebox"><span class="pp" style="font-size:19px">Sin costo</span><span class="pu">· se incluye en todo alquiler con instrumentista</span></div>`
     :(VER_PRECIOS
       ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${fmt(precioDesde(e.dia))}</span><span class="pu">/ ${unidadDesde(e.dia)} · IGV incluido</span><span class="tag">${e.tier}</span></div>`
       :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span><span class="tag">${e.tier}</span></div>`);
@@ -740,7 +751,7 @@ function renderEquipo(id){
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
-        <div class="dnote">${isA?'Complementaria. Se entrega dentro de los paquetes de Mantenimiento.':'Se entrega con su certificado de calibración vigente.'}</div>
+        <div class="dnote">${isA?'Complementaria: no se alquila sola. Va sin costo con cualquier equipo que lleve instrumentista.':'Se entrega con su certificado de calibración vigente.'}</div>
         ${calHTML}${tarifasHTML}${specRows?`<div class="spec"><div class="sh">Ficha técnica</div>${specRows}</div>`:''}
       </div>
     </div>`;
@@ -896,17 +907,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=19e4ee73';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=b9d36183';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=19e4ee73';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=b9d36183';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=19e4ee73','js/06-tablero.js?v=19e4ee73'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=b9d36183','js/06-tablero.js?v=b9d36183'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=19e4ee73'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=b9d36183'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1113,10 +1124,12 @@ function aplicarDatos(d, enVivo){
       if(m.descuento_combinar) DESC_COMB=m.descuento_combinar;
       /* La hoja manda sobre el interruptor de precios (modelo.mostrar_precios):
          así se encienden o apagan sin tocar el código. */
-      if(m.mostrar_precios!=null) VER_PRECIOS = !!m.mostrar_precios;
+      if(m.mostrar_precios!=null && !PRECIOS_PRUEBA) VER_PRECIOS = !!m.mostrar_precios;
       if(m.medio_dia_min!=null) MEDIO_MIN=m.medio_dia_min;
       if(m.pedido_min!=null) PEDIDO_MIN=m.pedido_min;
       if(m.sin_tecnico) SIN_TECNICO=m.sin_tecnico;
+      if(Array.isArray(m.complementos)) COMPLEMENTOS=m.complementos;
+      if(Array.isArray(m.incluidos)) INCLUIDOS=m.incluidos;
     }
   }
 
@@ -1435,6 +1448,7 @@ function closeMenu(){document.getElementById('mobileMenu').classList.remove('ope
 ;
 /* ===== js/10-modal.js ===== */
 /* ---- MODAL RESERVA ---- */
+const vEscT = t => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let actual=null;
 function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
@@ -1450,12 +1464,17 @@ function eqConds(dia, id){
   semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
 function openModal(nom,marca,prices,conds,tec,igvInc,mod0,garantia){
   if(!VER_PRECIOS){ go('#/contacto'); return; }   // precios ocultos: se cotiza por contacto
-  actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia',gar:garantia||0};
+  actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia',gar:garantia||0,id:arguments[8]||''};
   /* Sin instrumentista: en vez de la caja del técnico va la de la garantía. */
   document.getElementById('cajaTec').hidden = !!actual.gar;
   const cg = document.getElementById('cajaGar');
   cg.hidden = !actual.gar;
   if(actual.gar) document.getElementById('cGar').textContent = 'S/ ' + fmt(actual.gar);
+  /* Herramientas complementarias: van sin costo cuando va el instrumentista. */
+  const extra = document.getElementById('mIncluye');
+  const comp = actual.gar ? [] : incluidos(actual.id);
+  extra.hidden = !comp.length;
+  if(comp.length) extra.innerHTML = `<b>Incluido sin costo:</b> ${comp.map(c => vEscT(c.nom)).join(' · ')}.`;
   /* Sin medio día (instrumentos económicos), se oculta ese botón. */
   const hayMedio = prices.medio != null;
   const bMedio = document.querySelector('#modSeg [data-m="medio"]');
@@ -1499,7 +1518,7 @@ function abrir(idx){
   const e=EQUIPOS[idx];
   const pr={dia:e.dia, semana:e.dia*4, mes:e.dia*12};
   if(tieneMedio(e.dia)) pr.medio=precioMedio(e.dia);
-  openModal(e.nom, e.marca, pr, eqConds(e.dia, e.id), techRates(), true, 'medio', garantiaDe(e.id));
+  openModal(e.nom, e.marca, pr, eqConds(e.dia, e.id), techRates(), true, 'medio', garantiaDe(e.id), e.id);
 }
 function cerrar(){
   document.getElementById('ov').classList.remove('open');

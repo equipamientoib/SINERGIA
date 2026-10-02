@@ -1,4 +1,5 @@
 /* ---- MODAL RESERVA ---- */
+const vEscT = t => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let actual=null;
 function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
@@ -14,12 +15,17 @@ function eqConds(dia, id){
   semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
 function openModal(nom,marca,prices,conds,tec,igvInc,mod0,garantia){
   if(!VER_PRECIOS){ go('#/contacto'); return; }   // precios ocultos: se cotiza por contacto
-  actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia',gar:garantia||0};
+  actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia',gar:garantia||0,id:arguments[8]||''};
   /* Sin instrumentista: en vez de la caja del técnico va la de la garantía. */
   document.getElementById('cajaTec').hidden = !!actual.gar;
   const cg = document.getElementById('cajaGar');
   cg.hidden = !actual.gar;
   if(actual.gar) document.getElementById('cGar').textContent = 'S/ ' + fmt(actual.gar);
+  /* Herramientas complementarias: van sin costo cuando va el instrumentista. */
+  const extra = document.getElementById('mIncluye');
+  const comp = actual.gar ? [] : incluidos(actual.id);
+  extra.hidden = !comp.length;
+  if(comp.length) extra.innerHTML = `<b>Incluido sin costo:</b> ${comp.map(c => vEscT(c.nom)).join(' · ')}.`;
   /* Sin medio día (instrumentos económicos), se oculta ese botón. */
   const hayMedio = prices.medio != null;
   const bMedio = document.querySelector('#modSeg [data-m="medio"]');
@@ -63,7 +69,7 @@ function abrir(idx){
   const e=EQUIPOS[idx];
   const pr={dia:e.dia, semana:e.dia*4, mes:e.dia*12};
   if(tieneMedio(e.dia)) pr.medio=precioMedio(e.dia);
-  openModal(e.nom, e.marca, pr, eqConds(e.dia, e.id), techRates(), true, 'medio', garantiaDe(e.id));
+  openModal(e.nom, e.marca, pr, eqConds(e.dia, e.id), techRates(), true, 'medio', garantiaDe(e.id), e.id);
 }
 function cerrar(){
   document.getElementById('ov').classList.remove('open');

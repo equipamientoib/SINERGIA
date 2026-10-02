@@ -8,9 +8,9 @@ function renderEquipo(id){
   const idx=EQUIPOS.indexOf(e);
   /* Un equipo nuevo de la hoja puede venir sin ficha: no debe romper la página. */
   const specRows=Object.entries(e.specs||{}).map(([k,v])=>`<div class="row"><span class="l">${k}</span><span class="v">${v}</span></div>`).join('');
-  const isA=e.apoyo;
+  const isA=esComplemento(e);
   const priceHTML=isA
-    ?`<div class="pricebox"><span class="pp" style="font-size:19px">Complementaria</span><span class="pu">· incluida en paquetes de Mantenimiento</span></div>`
+    ?`<div class="pricebox"><span class="pp" style="font-size:19px">Sin costo</span><span class="pu">· se incluye en todo alquiler con instrumentista</span></div>`
     :(VER_PRECIOS
       ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${fmt(precioDesde(e.dia))}</span><span class="pu">/ ${unidadDesde(e.dia)} · IGV incluido</span><span class="tag">${e.tier}</span></div>`
       :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span><span class="tag">${e.tier}</span></div>`);
@@ -44,7 +44,7 @@ function renderEquipo(id){
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
-        <div class="dnote">${isA?'Complementaria. Se entrega dentro de los paquetes de Mantenimiento.':'Se entrega con su certificado de calibración vigente.'}</div>
+        <div class="dnote">${isA?'Complementaria: no se alquila sola. Va sin costo con cualquier equipo que lleve instrumentista.':'Se entrega con su certificado de calibración vigente.'}</div>
         ${calHTML}${tarifasHTML}${specRows?`<div class="spec"><div class="sh">Ficha técnica</div>${specRows}</div>`:''}
       </div>
     </div>`;

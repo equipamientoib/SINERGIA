@@ -60,6 +60,13 @@ let MEDIO_MIN=100, PEDIDO_MIN=0;
    La hoja puede cambiar la lista (modelo.sin_tecnico = {"id": garantía}). */
 let SIN_TECNICO = {manometro:100, luxometro:100, tacometro:100};
 const soloEquipo = id => Object.prototype.hasOwnProperty.call(SIN_TECNICO, id);
+/* Complementarias: no se alquilan solas (herramientas de apoyo). */
+let COMPLEMENTOS = ['set-46', 'destornillador-elec'];
+const esComplemento = e => !!e.apoyo || COMPLEMENTOS.indexOf(e.id) >= 0;
+/* Lo que va SIN COSTO en todo alquiler con instrumentista. El multímetro sí
+   se alquila solo, pero si ya viene el instrumentista, se incluye. */
+let INCLUIDOS = ['multimetro', 'set-46', 'destornillador-elec'];
+const incluidos = id => EQUIPOS.filter(e => e.id !== id && INCLUIDOS.indexOf(e.id) >= 0);
 const garantiaDe = id => SIN_TECNICO[id] || 0;
 const precioMedio=d=>Math.round(d*MEDIO_PCT);
 const tieneMedio=d=>Number(d) >= MEDIO_MIN;
@@ -69,6 +76,10 @@ const unidadDesde=d=>tieneMedio(d) ? 'medio día' : 'día';
 /* Interruptor general de precios (js/00-config.js -> CONFIG.MOSTRAR_PRECIOS).
    La hoja de Google puede sobrescribirlo con modelo.mostrar_precios. */
 let VER_PRECIOS = (typeof CONFIG!=='undefined' && CONFIG.MOSTRAR_PRECIOS!==undefined) ? !!CONFIG.MOSTRAR_PRECIOS : true;
+/* Vista previa: ?precios=1 enciende los precios solo para quien abra ese
+   enlace, para probar el cotizador antes de publicarlos. */
+let PRECIOS_PRUEBA = false;
+try{ if(location.search.indexOf('precios=1') >= 0){ VER_PRECIOS = true; PRECIOS_PRUEBA = true; } }catch(e){}
 const sumItems=p=>p.items.reduce((s,id)=>s+byId(id).dia,0);
 const fmt=n=>Number(n).toLocaleString('es-PE');
 

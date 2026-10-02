@@ -493,6 +493,9 @@
   .calc{background:var(--crema);border:1px solid var(--linea);border-radius:var(--r-sm);padding:14px;margin:6px 0 16px;font-size:14px}
   .calc div{display:flex;justify-content:space-between;color:var(--gris);padding:1px 0}
   .calc div[hidden]{display:none}
+  .mincluye{margin:10px 0 0;padding:9px 12px;border-radius:10px;background:rgba(103,211,173,.12);
+    border:1px solid rgba(103,211,173,.35);font-size:13.5px;color:var(--grafito);line-height:1.5}
+  .mincluye b{color:var(--onix)}
   .calc .tot{color:var(--onix);font-family:var(--ff-d);font-weight:700;margin-top:7px;padding-top:9px;border-top:1px solid var(--linea)}
 
 /* ===== css/12-extras.css ===== */
