@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=ce19f0fa';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=30bacfac';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=ce19f0fa';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=30bacfac';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=ce19f0fa','js/06-tablero.js?v=ce19f0fa'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=30bacfac','js/06-tablero.js?v=30bacfac'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=ce19f0fa'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=30bacfac'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1793,6 +1793,17 @@ function vFoto(p, i, ligera){ const u=(p.fotos||[])[i||0]; return u ? fotoURL(u,
 
 /* Tarjeta con el mismo formato que la del catálogo de alquiler (.eq):
    foto arriba con etiquetas, categoría, nombre, marca y pie con precio. */
+/* Marca y modelo bien visibles (antes era una línea gris que pasaba
+   desapercibida): marca en mayúsculas, modelo en su propia etiqueta y
+   origen al lado. Nunca se cortan: si no entran, bajan de línea. */
+function vMarcaModelo(p, grande){
+  if(!p.marca && !p.modelo && !p.origen) return '';
+  return `<div class="v-mm${grande?' v-mm-g':''}">${
+    p.marca?`<span class="v-mm-marca">${vEsc(p.marca)}</span>`:''}${
+    p.modelo?`<span class="v-mm-modelo"><small>Modelo</small>${vEsc(p.modelo)}</span>`:''}${
+    p.origen?`<span class="v-mm-origen">Origen: ${vEsc(p.origen)}</span>`:''}</div>`;
+}
+
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
@@ -1811,7 +1822,7 @@ function vCard(p){
     <div class="body">
       <div class="cat">${vEsc(c?c.nombre:'')}</div>
       <h3><a onclick="go('${url}')">${vEsc(p.nom)}</a></h3>
-      <div class="marca">${vEsc([p.marca,p.modelo].filter(Boolean).join(' ').trim())}${p.origen?' · '+vEsc(p.origen):''}</div>
+      ${vMarcaModelo(p)}
       ${p.clave?`<div class="v-exp" title="Código en expedientes técnicos (NTS 113-MINSA)">Expediente ${vEsc(p.clave)}</div>`:''}
       <div class="desc">${vEsc(p.resumen||'')}</div>
       <div class="foot">${pie}<a class="btn" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:''))}" target="_blank" rel="noopener">Cotizar</a></div>
@@ -2029,7 +2040,7 @@ function vProducto(id){
   if(specs) pest.push(['Especificaciones', `<table class="v-tabla">${specs}</table>`]);
   if((p.incluye||[]).length) pest.push(['Incluye', `<ul class="v-puntos">${p.incluye.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul>`]);
   const otros = vDeCat(p.cat).filter(x => x.id !== p.id).slice(0,3);
-  const chips = [['Marca',p.marca],['Modelo',p.modelo],['Origen',p.origen],['Garantía',p.garantia]].filter(x=>x[1]);
+  const chips = [['Garantía',p.garantia]].filter(x=>x[1]);   // marca, modelo y origen ya van arriba (vMarcaModelo)
   const areas = (p.areas||[]).length ? `<div class="v-areas"><span>Se usa en</span>${p.areas.map(a=>`<i>${vEsc(a)}</i>`).join('')}</div>` : '';
   const texto = 'Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:'');
   return `
@@ -2043,7 +2054,7 @@ function vProducto(id){
       <div class="v-info">
         <div class="v-k">${vEsc(c?c.nombre:'')}</div>
         <h1>${vEsc(p.nom)}</h1>
-        <div class="v-marca">${vEsc([p.marca,p.modelo,p.origen].filter(Boolean).join(' · '))}</div>
+        ${vMarcaModelo(p, true)}
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
         ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?'Precio referencial, sujeto a confirmación en la cotización':'Consulta precio y plazo de entrega'}${VENTA.actualizado?' · Precios y stock al '+vEsc(VENTA.actualizado):''}</small></div>`:''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}

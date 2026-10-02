@@ -154,6 +154,17 @@ function vFoto(p, i, ligera){ const u=(p.fotos||[])[i||0]; return u ? fotoURL(u,
 
 /* Tarjeta con el mismo formato que la del catálogo de alquiler (.eq):
    foto arriba con etiquetas, categoría, nombre, marca y pie con precio. */
+/* Marca y modelo bien visibles (antes era una línea gris que pasaba
+   desapercibida): marca en mayúsculas, modelo en su propia etiqueta y
+   origen al lado. Nunca se cortan: si no entran, bajan de línea. */
+function vMarcaModelo(p, grande){
+  if(!p.marca && !p.modelo && !p.origen) return '';
+  return `<div class="v-mm${grande?' v-mm-g':''}">${
+    p.marca?`<span class="v-mm-marca">${vEsc(p.marca)}</span>`:''}${
+    p.modelo?`<span class="v-mm-modelo"><small>Modelo</small>${vEsc(p.modelo)}</span>`:''}${
+    p.origen?`<span class="v-mm-origen">Origen: ${vEsc(p.origen)}</span>`:''}</div>`;
+}
+
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
@@ -172,7 +183,7 @@ function vCard(p){
     <div class="body">
       <div class="cat">${vEsc(c?c.nombre:'')}</div>
       <h3><a onclick="go('${url}')">${vEsc(p.nom)}</a></h3>
-      <div class="marca">${vEsc([p.marca,p.modelo].filter(Boolean).join(' ').trim())}${p.origen?' · '+vEsc(p.origen):''}</div>
+      ${vMarcaModelo(p)}
       ${p.clave?`<div class="v-exp" title="Código en expedientes técnicos (NTS 113-MINSA)">Expediente ${vEsc(p.clave)}</div>`:''}
       <div class="desc">${vEsc(p.resumen||'')}</div>
       <div class="foot">${pie}<a class="btn" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:''))}" target="_blank" rel="noopener">Cotizar</a></div>
@@ -390,7 +401,7 @@ function vProducto(id){
   if(specs) pest.push(['Especificaciones', `<table class="v-tabla">${specs}</table>`]);
   if((p.incluye||[]).length) pest.push(['Incluye', `<ul class="v-puntos">${p.incluye.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul>`]);
   const otros = vDeCat(p.cat).filter(x => x.id !== p.id).slice(0,3);
-  const chips = [['Marca',p.marca],['Modelo',p.modelo],['Origen',p.origen],['Garantía',p.garantia]].filter(x=>x[1]);
+  const chips = [['Garantía',p.garantia]].filter(x=>x[1]);   // marca, modelo y origen ya van arriba (vMarcaModelo)
   const areas = (p.areas||[]).length ? `<div class="v-areas"><span>Se usa en</span>${p.areas.map(a=>`<i>${vEsc(a)}</i>`).join('')}</div>` : '';
   const texto = 'Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:'');
   return `
@@ -404,7 +415,7 @@ function vProducto(id){
       <div class="v-info">
         <div class="v-k">${vEsc(c?c.nombre:'')}</div>
         <h1>${vEsc(p.nom)}</h1>
-        <div class="v-marca">${vEsc([p.marca,p.modelo,p.origen].filter(Boolean).join(' · '))}</div>
+        ${vMarcaModelo(p, true)}
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
         ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?'Precio referencial, sujeto a confirmación en la cotización':'Consulta precio y plazo de entrega'}${VENTA.actualizado?' · Precios y stock al '+vEsc(VENTA.actualizado):''}</small></div>`:''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
