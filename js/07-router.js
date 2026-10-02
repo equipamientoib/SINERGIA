@@ -143,11 +143,12 @@ function aplicarDatos(d, enVivo){
       if(m.descuento_combinar) DESC_COMB=m.descuento_combinar;
       /* La hoja manda sobre el interruptor de precios (modelo.mostrar_precios):
          así se encienden o apagan sin tocar el código. */
-      if(m.mostrar_precios!=null) VER_PRECIOS = !!m.mostrar_precios;
+      if(m.mostrar_precios!=null && !PRECIOS_PRUEBA) VER_PRECIOS = !!m.mostrar_precios;
       if(m.medio_dia_min!=null) MEDIO_MIN=m.medio_dia_min;
       if(m.pedido_min!=null) PEDIDO_MIN=m.pedido_min;
       if(m.sin_tecnico) SIN_TECNICO=m.sin_tecnico;
       if(Array.isArray(m.complementos)) COMPLEMENTOS=m.complementos;
+      if(Array.isArray(m.incluidos)) INCLUIDOS=m.incluidos;
     }
   }
 
