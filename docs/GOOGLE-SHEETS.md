@@ -166,6 +166,6 @@ Qué hace en cada uso: lee los productos **EQUIPOS** del portal (filtro `tp=2`, 
 
 **Fotos:** al terminar, el botón ofrece copiar a Drive (carpeta «Sinergia - Fotos venta») la foto del proveedor de cada equipo publicado que no tiene foto ni en la hoja ni en `img/venta/`. Una descarga por foto, una sola vez; el enlace queda en la columna `fotos`.
 
-**Ampliar el catálogo:** `data/venta-nuevos.json` tiene equipos con stock ya redactados (nombre, categoría, resumen, características). `agregarEquiposNuevos()` (▶ en el editor, una vez) los publica: activa las filas que ya existen con ese código, agrega las que faltan y copia precio y stock desde la pestaña «Proveedor».
+**Ampliar el catálogo:** `data/venta-nuevos.json` tiene equipos con stock ya redactados, elegidos según el estudio de compras públicas 2024-2025 (OECE): todos los tipos del ranking con stock en el proveedor y 18 complementarios. `agregarEquiposNuevos()` se ejecuta dos veces: la 1.ª crea la pestaña **Para revisar** (puesto en el estudio, stock y precio aproximado; publicar SI/NO); la 2.ª publica los SI, pone `ranking` (puesto del tipo en el estudio) a todas las filas, renueva los **más pedidos** (`destacado`, un equipo con stock por tipo) y copia precio y stock desde «Proveedor». La tienda se ordena por más pedidos y luego por `ranking`.
 
 El código del botón está en `js/proveedor-atl.js`. La clave del favorito no está en el repositorio: vive en las Propiedades del script (`ATL_CLAVE`).

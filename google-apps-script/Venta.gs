@@ -173,6 +173,7 @@ function venta_() {
       areas: lista_(r.areas, /[,;\n]+/)
     };
     if (num_(r.destacado)) p.destacado = num_(r.destacado);
+    if (num_(r.ranking)) p.ranking = num_(r.ranking);      // puesto del tipo en el estudio de compras públicas
     if (precio) p.precio = precio;
     if (stock !== null) p.stock = stock;
     var fotos = fotos_(r.fotos);
@@ -393,23 +394,40 @@ function atlActualizar_(datos) {
 }
 
 
-/* ── Agregar equipos con stock (una vez) ───────────────────────────
-   Ejecuta agregarEquiposNuevos (▶) en el editor. Lee la lista preparada
-   en el sitio (data/venta-nuevos.json) y, por cada equipo:
-     · si ya hay una fila con ese código: la publica (SI) y le pone
-       nombre, categoría, resumen y características limpios;
-     · si no: agrega una fila nueva publicada;
-     · las entradas con «fila» solo ponen el código a esa fila.
-   Luego copia precio y stock desde la pestaña «Proveedor». */
+/* ── Agregar equipos con stock (dos pasos) ─────────────────────────
+   La lista está en el sitio (data/venta-nuevos.json), elegida según el
+   estudio de compras públicas 2024-2025: primero los tipos del ranking
+   con stock en el proveedor, luego complementarios.
+   1.ª vez que ejecutas agregarEquiposNuevos (▶): crea la pestaña
+      «Para revisar» con la lista (puesto en el estudio, precio, stock) y
+      se detiene. Ahí cambias a NO lo que no quieras publicar.
+   2.ª vez: publica solo los SI. Si ya hay una fila con ese código la
+      activa y le pone los textos limpios; si no, agrega una fila nueva.
+      Además pone «ranking» (puesto del tipo en el estudio) a todas las
+      filas, renueva los «más pedidos» (destacado) y copia precio y stock
+      desde la pestaña «Proveedor». */
 var URL_NUEVOS = 'https://sinergiabiomedica.pe/data/venta-nuevos.json';
 
 function agregarEquiposNuevos() {
-  var lista = JSON.parse(UrlFetchApp.fetch(URL_NUEVOS + '?t=' + Date.now()).getContentText()).equipos || [];
-  var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss);
+  var datos = JSON.parse(UrlFetchApp.fetch(URL_NUEVOS + '?t=' + Date.now()).getContentText());
+  var lista = datos.equipos || [];
+  var ss = SpreadsheetApp.openById(VENTA_ID);
+  var rev = ss.getSheetByName('Para revisar');
+  if (!rev) { crearRevision_(ss, lista); return; }
+
+  var ok = {};                                            // códigos aprobados (SI)
+  rev.getDataRange().getValues().forEach(function (r) {
+    if (s_(r[0]).toUpperCase() === 'SI' && codAtl_(r[10])) ok[codAtl_(r[10])] = 1;
+  });
+  var sh = hojaVenta_(ss);
   var vals = sh.getDataRange().getValues(), fh = -1;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
   if (fh < 0) throw new Error('hoja de venta sin encabezados');
   var heads = vals[fh].map(function (h) { return s_(h); });
+  if (heads.indexOf('ranking') < 0) {                    // columna nueva, al final
+    sh.getRange(fh + 1, heads.length + 1).setValue('ranking'); heads.push('ranking');
+    vals = sh.getDataRange().getValues();
+  }
   var col = function (n) { return heads.indexOf(n); };
   var porCod = {}, porId = {};
   for (var i = fh + 1; i < vals.length; i++) {
@@ -421,7 +439,7 @@ function agregarEquiposNuevos() {
   var CAMPOS = ['categoria', 'nombre', 'marca', 'modelo', 'origen', 'resumen', 'caracteristicas', 'areas'];
   /* Se escribe columna por columna y nunca en precio_publicado ni
      stock_sinergia: son fórmulas ARRAYFORMULA y un valor encima las rompe. */
-  var ESCRIBIR = ['id', 'publicar', 'codigo_proveedor'].concat(CAMPOS);
+  var ESCRIBIR = ['id', 'publicar', 'codigo_proveedor', 'destacado', 'ranking'].concat(CAMPOS);
   var nFil = vals.length - fh - 1;
   var colVals = {};
   ESCRIBIR.forEach(function (c) { if (col(c) >= 0) colVals[c] = vals.slice(fh + 1).map(function (r) { return [r[col(c)]]; }); });
@@ -433,6 +451,7 @@ function agregarEquiposNuevos() {
       if (f !== undefined && !codAtl_(vals[f][col('codigo_proveedor')])) { colVals.codigo_proveedor[f - fh - 1][0] = "'" + e.codigo; cods++; }
       return;
     }
+    if (!ok[cd]) return;                                  // no aprobado en «Para revisar»
     if (porCod[cd] !== undefined) {                       // fila existente: publicar y limpiar
       var j = porCod[cd] - fh - 1;
       colVals.publicar[j][0] = 'SI';
@@ -447,20 +466,52 @@ function agregarEquiposNuevos() {
   /* Filas nuevas: debajo de la última fila con id. */
   var ultima = fh;
   for (var u = fh + 1; u < vals.length; u++) if (s_(vals[u][0])) ultima = u;
-  var j0 = ultima - fh;                                  // índice (0 = primera fila de datos) donde empiezan
-  var total = Math.max(nFil, j0 + nuevos.length);
+  var j0 = ultima - fh, total = Math.max(nFil, j0 + nuevos.length);
   ESCRIBIR.forEach(function (c) {
     if (!colVals[c]) return;
     while (colVals[c].length < total) colVals[c].push(['']);
     nuevos.forEach(function (nf, q) { colVals[c][j0 + q][0] = nf[c] || ''; });
-    sh.getRange(fh + 2, col(c) + 1, total, 1).setValues(colVals[c]);
   });
-  /* Las columnas con fórmula (precio_publicado, stock_sinergia) no se tocan:
-     al escribir filas completas se respetan porque las fórmulas están en la
-     primera fila de datos (ARRAYFORMULA). */
+  /* Ranking del estudio y «más pedidos», por código, en todas las filas. */
+  var rk = datos.ranking || {}, dest = datos.destacados || {}, rkCod = {}, dCod = {};
+  Object.keys(rk).forEach(function (c) { rkCod[codAtl_(c)] = rk[c]; });
+  Object.keys(dest).forEach(function (c) { dCod[codAtl_(c)] = dest[c]; });
+  for (var q = 0; q < total; q++) {
+    var cq = codAtl_(colVals.codigo_proveedor[q][0]);
+    if (colVals.ranking) colVals.ranking[q][0] = rkCod[cq] || '';
+    if (colVals.destacado) colVals.destacado[q][0] = dCod[cq] || '';
+  }
+  ESCRIBIR.forEach(function (c) { if (colVals[c]) sh.getRange(fh + 2, col(c) + 1, total, 1).setValues(colVals[c]); });
   var res = precioDesdeProveedor_();
-  Logger.log('Publicados (filas existentes): %s · nuevos: %s · códigos puestos: %s · con precio: %s',
+  rev.setName('Para revisar (aplicado ' + Utilities.formatDate(new Date(), 'America/Lima', 'dd/MM') + ')');
+  Logger.log('Listo. Publicados (filas que ya estaban): %s · filas nuevas: %s · códigos puestos: %s · filas con precio: %s',
     act, nuevos.length, cods, res);
+}
+
+/* Pestaña «Para revisar»: la lista con su puesto en el estudio, stock y
+   precio aproximado en la web, para aprobar (SI/NO) antes de publicar. */
+function crearRevision_(ss, lista) {
+  var pv = ss.getSheetByName('Proveedor'), prov = {};
+  if (pv) pv.getDataRange().getValues().slice(1).forEach(function (r) { prov[codAtl_(r[0])] = r; });
+  var sh = hojaVenta_(ss), margen = 35;
+  sh.getRange(1, 1, 3, 2).getValues().forEach(function (r) { if (s_(r[0]).toLowerCase() === 'margen' && num_(r[1]) !== null) margen = num_(r[1]); });
+  var rev = ss.insertSheet('Para revisar');
+  var filas = [['publicar', 'puesto en el estudio', 'tipo de equipo (estudio)', 'nombre en la web', 'marca', 'modelo', 'categoría',
+    'stock proveedor', 'precio proveedor US$', 'precio web aprox. S/', 'codigo']];
+  lista.forEach(function (e) {
+    if (e.fila) return;
+    var p = prov[codAtl_(e.codigo)] || [];
+    filas.push(['SI', e.puesto || '', e.tipo || '', e.nombre, e.marca, e.modelo, e.categoria,
+      Number(p[3]) || '', Number(p[4]) || '', Number(p[5]) ? Math.round(Number(p[5]) * (1 + margen / 100)) : '', "'" + e.codigo]);
+  });
+  rev.getRange(1, 1, filas.length, filas[0].length).setValues(filas);
+  rev.getRange(1, 1, 1, filas[0].length).setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36').setWrap(true);
+  rev.getRange(2, 1, filas.length - 1, 1).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['SI', 'NO'], true).build())
+    .setBackground('#fce9c8').setFontWeight('bold');
+  rev.getRange(2, 10, filas.length - 1, 1).setNumberFormat('#,##0');
+  rev.setFrozenRows(1); rev.setColumnWidth(4, 340); rev.setColumnWidth(3, 220);
+  ss.setActiveSheet(rev);
+  Logger.log('Creé la pestaña «Para revisar» con %s equipos. Cambia a NO los que no quieras y vuelve a ejecutar agregarEquiposNuevos.', filas.length - 1);
 }
 
 /* Copia precio y stock de la pestaña «Proveedor» a la hoja de venta, por

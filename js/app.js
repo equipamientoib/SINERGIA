@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=65c93b97';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=f71b2940';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=65c93b97';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=f71b2940';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=65c93b97','js/06-tablero.js?v=65c93b97'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=f71b2940','js/06-tablero.js?v=f71b2940'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=65c93b97'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=f71b2940'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1974,11 +1974,14 @@ function vtFiltrados(){
     return true;
   });
   const orden = VENTA.categorias.map(c => c.id);
+  /* Orden por defecto: «más pedidos» primero y luego el puesto del tipo de
+     equipo en las compras públicas 2024-2025 (columna «ranking» de la hoja). */
   const dest = p => p.destacado ? Number(p.destacado) : 999;
+  const rank = p => p.ranking ? Number(p.ranking) : 999;
   if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
   else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
   else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
-  else l.sort((a,b) => dest(a)-dest(b) || orden.indexOf(a.cat)-orden.indexOf(b.cat));
+  else l.sort((a,b) => dest(a)-dest(b) || rank(a)-rank(b) || orden.indexOf(a.cat)-orden.indexOf(b.cat) || (a.precio||Infinity)-(b.precio||Infinity));
   return l;
 }
 function vtPintar(){

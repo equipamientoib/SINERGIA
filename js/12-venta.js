@@ -335,11 +335,14 @@ function vtFiltrados(){
     return true;
   });
   const orden = VENTA.categorias.map(c => c.id);
+  /* Orden por defecto: «más pedidos» primero y luego el puesto del tipo de
+     equipo en las compras públicas 2024-2025 (columna «ranking» de la hoja). */
   const dest = p => p.destacado ? Number(p.destacado) : 999;
+  const rank = p => p.ranking ? Number(p.ranking) : 999;
   if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
   else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
   else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
-  else l.sort((a,b) => dest(a)-dest(b) || orden.indexOf(a.cat)-orden.indexOf(b.cat));
+  else l.sort((a,b) => dest(a)-dest(b) || rank(a)-rank(b) || orden.indexOf(a.cat)-orden.indexOf(b.cat) || (a.precio||Infinity)-(b.precio||Infinity));
   return l;
 }
 function vtPintar(){
