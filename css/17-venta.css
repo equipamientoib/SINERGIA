@@ -191,19 +191,20 @@
   .v-tramo:first-child{margin-top:0}
   .v-tramo b{font-family:var(--ff-d);font-size:20px;font-weight:600;color:var(--onix)}
   .v-tramo span{font-size:13px;color:var(--gris)}
-  /* Marca · modelo · origen */
-  .v-mm{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:10px}
-  .v-mm-marca{font-family:var(--ff-d);font-weight:700;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;
-    color:var(--onix);background:var(--crema);border:1px solid var(--linea-b);border-radius:6px;padding:4px 9px;line-height:1.2}
-  .v-mm-modelo{display:inline-flex;align-items:baseline;gap:5px;font-size:13.5px;font-weight:600;color:var(--onix);
-    background:var(--blanco);border:1px solid var(--linea-b);border-radius:6px;padding:3px 9px;line-height:1.3;word-break:break-word}
-  .v-mm-modelo small{font-size:10.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--bronce)}
-  .v-mm-origen{font-size:12.5px;color:var(--gris)}
-  .v-mm-g{margin-top:12px;gap:8px 10px}
-  .v-mm-g .v-mm-marca{font-size:14px;padding:5px 11px}
-  .v-mm-g .v-mm-modelo{font-size:15px;padding:4px 11px}
-  .v-mm-g .v-mm-origen{font-size:14px}
-  .v-eq .v-exp{margin-top:9px}
+  /* Marca · modelo · origen: franja de ficha técnica */
+  .v-ft{display:flex;flex-wrap:wrap;gap:8px 20px;margin:12px 0 0;padding:10px 0;
+    border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
+  .v-ft div{min-width:0}
+  .v-ft dt{font-family:var(--ff-d);font-size:10px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;color:var(--gris);margin:0 0 2px}
+  .v-ft dd{margin:0;font-size:14px;font-weight:600;color:var(--onix);line-height:1.3;overflow-wrap:anywhere}
+  .v-ft .v-ft-marca dd{font-family:var(--ff-d);letter-spacing:.8px;text-transform:uppercase;color:var(--cobre-d)}
+  .v-ft .v-ft-origen dd{font-weight:500;color:var(--grafito)}
+  .v-ft-g{margin-top:16px;padding:14px 0;gap:10px 34px}
+  .v-ft-g dt{font-size:11px}
+  .v-ft-g dd{font-size:17px}
+  .v-eq .v-exp{margin-top:10px}
+  .v-eq .desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:10px;flex:none}
+  .v-eq .foot{margin-top:auto}
   .v-eq .price.v-consulta{font-size:15px;color:var(--gris);font-weight:600}
   .v-eq .price small{font-weight:400}
 

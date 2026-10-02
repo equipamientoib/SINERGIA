@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=aac3ec68';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=5645bad7';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=aac3ec68';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=5645bad7';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=aac3ec68','js/06-tablero.js?v=aac3ec68'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=5645bad7','js/06-tablero.js?v=5645bad7'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=aac3ec68'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=5645bad7'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1796,15 +1796,15 @@ function vFoto(p, i, ligera){ const u=(p.fotos||[])[i||0]; return u ? fotoURL(u,
 
 /* Tarjeta con el mismo formato que la del catálogo de alquiler (.eq):
    foto arriba con etiquetas, categoría, nombre, marca y pie con precio. */
-/* Marca y modelo bien visibles (antes era una línea gris que pasaba
-   desapercibida): marca en mayúsculas, modelo en su propia etiqueta y
-   origen al lado. Nunca se cortan: si no entran, bajan de línea. */
+/* Marca, modelo y origen como una franja de ficha técnica: tres columnas
+   alineadas (título pequeño arriba, dato abajo), sin cajitas, entre dos
+   líneas finas. Se lee de un vistazo y no compite con el nombre. Si un
+   dato es largo, la columna baja de línea en vez de cortarse. */
 function vMarcaModelo(p, grande){
-  if(!p.marca && !p.modelo && !p.origen) return '';
-  return `<div class="v-mm${grande?' v-mm-g':''}">${
-    p.marca?`<span class="v-mm-marca">${vEsc(p.marca)}</span>`:''}${
-    p.modelo?`<span class="v-mm-modelo"><small>Modelo</small>${vEsc(p.modelo)}</span>`:''}${
-    p.origen?`<span class="v-mm-origen">Origen: ${vEsc(p.origen)}</span>`:''}</div>`;
+  const d = [['Marca', p.marca, 'marca'], ['Modelo', p.modelo, 'modelo'], ['Origen', p.origen, 'origen']].filter(x => x[1]);
+  if(!d.length) return '';
+  return `<dl class="v-ft${grande?' v-ft-g':''}">${d.map(([k,v,c]) =>
+    `<div class="v-ft-${c}"><dt>${k}</dt><dd>${vEsc(v)}</dd></div>`).join('')}</dl>`;
 }
 
 function vCard(p){

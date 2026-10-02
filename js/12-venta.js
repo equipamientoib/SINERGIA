@@ -157,15 +157,15 @@ function vFoto(p, i, ligera){ const u=(p.fotos||[])[i||0]; return u ? fotoURL(u,
 
 /* Tarjeta con el mismo formato que la del catálogo de alquiler (.eq):
    foto arriba con etiquetas, categoría, nombre, marca y pie con precio. */
-/* Marca y modelo bien visibles (antes era una línea gris que pasaba
-   desapercibida): marca en mayúsculas, modelo en su propia etiqueta y
-   origen al lado. Nunca se cortan: si no entran, bajan de línea. */
+/* Marca, modelo y origen como una franja de ficha técnica: tres columnas
+   alineadas (título pequeño arriba, dato abajo), sin cajitas, entre dos
+   líneas finas. Se lee de un vistazo y no compite con el nombre. Si un
+   dato es largo, la columna baja de línea en vez de cortarse. */
 function vMarcaModelo(p, grande){
-  if(!p.marca && !p.modelo && !p.origen) return '';
-  return `<div class="v-mm${grande?' v-mm-g':''}">${
-    p.marca?`<span class="v-mm-marca">${vEsc(p.marca)}</span>`:''}${
-    p.modelo?`<span class="v-mm-modelo"><small>Modelo</small>${vEsc(p.modelo)}</span>`:''}${
-    p.origen?`<span class="v-mm-origen">Origen: ${vEsc(p.origen)}</span>`:''}</div>`;
+  const d = [['Marca', p.marca, 'marca'], ['Modelo', p.modelo, 'modelo'], ['Origen', p.origen, 'origen']].filter(x => x[1]);
+  if(!d.length) return '';
+  return `<dl class="v-ft${grande?' v-ft-g':''}">${d.map(([k,v,c]) =>
+    `<div class="v-ft-${c}"><dt>${k}</dt><dd>${vEsc(v)}</dd></div>`).join('')}</dl>`;
 }
 
 function vCard(p){
