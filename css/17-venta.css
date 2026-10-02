@@ -185,6 +185,18 @@
   .v-eq .badge.v-apedido{background:#F4EEE3;color:var(--gris);border-color:var(--linea)}
   .v-eq .v-sinfoto{position:absolute;inset:0;display:grid;place-items:center}
   .v-eq h3 a{cursor:pointer;color:inherit}
+  /* Marca · modelo · origen */
+  .v-mm{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:10px}
+  .v-mm-marca{font-family:var(--ff-d);font-weight:700;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--onix);background:var(--crema);border:1px solid var(--linea-b);border-radius:6px;padding:4px 9px;line-height:1.2}
+  .v-mm-modelo{display:inline-flex;align-items:baseline;gap:5px;font-size:13.5px;font-weight:600;color:var(--onix);
+    background:var(--blanco);border:1px solid var(--linea-b);border-radius:6px;padding:3px 9px;line-height:1.3;word-break:break-word}
+  .v-mm-modelo small{font-size:10.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--bronce)}
+  .v-mm-origen{font-size:12.5px;color:var(--gris)}
+  .v-mm-g{margin-top:12px;gap:8px 10px}
+  .v-mm-g .v-mm-marca{font-size:14px;padding:5px 11px}
+  .v-mm-g .v-mm-modelo{font-size:15px;padding:4px 11px}
+  .v-mm-g .v-mm-origen{font-size:14px}
   .v-eq .v-exp{margin-top:9px}
   .v-eq .price.v-consulta{font-size:15px;color:var(--gris);font-weight:600}
   .v-eq .price small{font-weight:400}
