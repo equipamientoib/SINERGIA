@@ -35,13 +35,14 @@ function vMezclar(){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    /* Las fotos propias del sitio ganan a la foto genérica del proveedor (fotoProv). */
     VENTA.productos = VENTA_VIVO.productos.map(p => {
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
       const b = base.get(p.id);
-      const propias = b && b.fotos && b.fotos.length;
-      return propias && (!(p.fotos && p.fotos.length) || p.fotoProv) ? Object.assign({}, p, {fotos: b.fotos}) : p;
+      /* Orden de prioridad: foto corregida (fotosFijas) › foto de la hoja o
+         del proveedor (modelo real) › foto antigua del sitio (respaldo). */
+      const respaldo = b && b.fotosSitio && b.fotosSitio.length;
+      return respaldo && !(p.fotos && p.fotos.length) ? Object.assign({}, p, {fotos: b.fotosSitio}) : p;
     });
     VENTA.actualizado = VENTA_VIVO.actualizado;
   }
@@ -52,7 +53,7 @@ function cargarVenta(){
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
-      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom), fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[]}; vMezclar(); return VENTA; });
+      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom).map(p => p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})), fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[]}; vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
     if(vu) fetch(vu, {cache:'no-store'}).then(r => r.json()).then(d => { if(d && d.ok !== false) ventaEnVivo(d); }).catch(() => {});
