@@ -964,3 +964,15 @@
 
 .cot-pdf{width:100%;margin-top:9px}
 .cot-f{flex:0 0 auto}
+
+/* lo primero de la caja: el total y los dos botones */
+.cot-top{padding:14px 15px;margin:-18px -18px 4px;border-radius:16px 16px 0 0;background:var(--onix);color:#fff}
+.cot-top>span{display:block;font-size:12px;opacity:.72}
+.cot-top>b{display:block;font-family:var(--ff-d);font-size:28px;font-weight:600;letter-spacing:-.5px;margin-top:2px}
+.cot-top>small{display:block;font-size:11.5px;opacity:.62;margin-top:1px}
+.cot-top.vacio>b{font-size:22px;opacity:.35}
+.cot-acc{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.cot-acc .btn{width:100%;padding:10px 8px;font-size:13px}
+.cot-acc .btn:not(.btn-fill){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28);color:#fff}
+.cot-acc .btn:not(.btn-fill):hover{background:rgba(255,255,255,.18)}
+@media(max-width:560px){.cot-acc{grid-template-columns:1fr}}
