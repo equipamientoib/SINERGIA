@@ -43,7 +43,8 @@ FICHAS = os.path.join(ROOT, 'data', 'fichas')
 # Mismas reglas que el cotizador (js/02-datos.js): medio día solo desde
 # S/ 100 el día, y ningún pedido por debajo de S/ 150.
 MEDIO_DIA_MIN = 100
-PEDIDO_MIN = 150
+# Instrumentos sin instrumentista: retiro en oficina con DNI y garantía (S/).
+SIN_TECNICO = {'manometro': 100, 'luxometro': 100, 'tacometro': 100}
 CATALOGO = os.path.join(ROOT, 'data', 'catalogo.json')
 EXTRA = os.path.join(ROOT, 'data', 'fotos-extra.json')
 CONFIG = os.path.join(ROOT, 'js', '00-config.js')
@@ -448,11 +449,14 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         nota = ('Medio día = un turno de 4 h (9:00 a 13:00 o 14:00 a 18:00); el día completo son los dos turnos.'
                 if hay_medio else
                 'Este instrumento se alquila desde un día completo (9:00 a 13:00 y 14:00 a 18:00).')
+        gar = SIN_TECNICO.get(eq['id'])
+        modo = ('Lo recoges en nuestra oficina: sin instrumentista, con DNI y S/ {:,.0f} de '
+                'garantía que se te devuelve con el equipo.'.format(gar) if gar else
+                'Va con nuestro instrumentista, que se cobra aparte.')
         precio = ('<p class="prod-precio">Desde <b>S/ {:,.0f}</b> por {} · IGV incluido</p>'
-                  '<p class="prod-tarifas">{}<br><span>{} Pedido mínimo S/ {:,.0f}. '
-                  'El personal técnico se cobra aparte.</span></p>').format(
+                  '<p class="prod-tarifas">{}<br><span>{} {}</span></p>').format(
                       medio if hay_medio else d, 'medio día' if hay_medio else 'día',
-                      tarifas, nota, PEDIDO_MIN)
+                      tarifas, nota, modo)
     resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
 
     # pestaña Descripción: el equipo + para qué sirve el tipo

@@ -54,7 +54,13 @@ const MEDIO_PCT=0.6, HORARIO_MANANA='9:00 a 13:00', HORARIO_TARDE='14:00 a 18:00
 /* Medio día solo en los instrumentos de S/ 100 el día a más: por debajo, el
    viaje de entrega y recojo cuesta más que el alquiler. Y ningún pedido baja
    de PEDIDO_MIN, venga un instrumento o varios. */
-let MEDIO_MIN=100, PEDIDO_MIN=150;
+let MEDIO_MIN=100, PEDIDO_MIN=0;
+/* Instrumentos que se alquilan SIN instrumentista: el cliente los recoge en
+   oficina y deja garantía (en soles) + DNI. El resto va con instrumentista.
+   La hoja puede cambiar la lista (modelo.sin_tecnico = {"id": garantía}). */
+let SIN_TECNICO = {manometro:100, luxometro:100, tacometro:100};
+const soloEquipo = id => Object.prototype.hasOwnProperty.call(SIN_TECNICO, id);
+const garantiaDe = id => SIN_TECNICO[id] || 0;
 const precioMedio=d=>Math.round(d*MEDIO_PCT);
 const tieneMedio=d=>Number(d) >= MEDIO_MIN;
 /* Precio de partida de un instrumento: medio día si lo tiene, si no el día. */

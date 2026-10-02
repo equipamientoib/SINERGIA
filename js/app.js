@@ -246,7 +246,13 @@ const MEDIO_PCT=0.6, HORARIO_MANANA='9:00 a 13:00', HORARIO_TARDE='14:00 a 18:00
 /* Medio día solo en los instrumentos de S/ 100 el día a más: por debajo, el
    viaje de entrega y recojo cuesta más que el alquiler. Y ningún pedido baja
    de PEDIDO_MIN, venga un instrumento o varios. */
-let MEDIO_MIN=100, PEDIDO_MIN=150;
+let MEDIO_MIN=100, PEDIDO_MIN=0;
+/* Instrumentos que se alquilan SIN instrumentista: el cliente los recoge en
+   oficina y deja garantía (en soles) + DNI. El resto va con instrumentista.
+   La hoja puede cambiar la lista (modelo.sin_tecnico = {"id": garantía}). */
+let SIN_TECNICO = {manometro:100, luxometro:100, tacometro:100};
+const soloEquipo = id => Object.prototype.hasOwnProperty.call(SIN_TECNICO, id);
+const garantiaDe = id => SIN_TECNICO[id] || 0;
 const precioMedio=d=>Math.round(d*MEDIO_PCT);
 const tieneMedio=d=>Number(d) >= MEDIO_MIN;
 /* Precio de partida de un instrumento: medio día si lo tiene, si no el día. */
@@ -730,7 +736,7 @@ function renderEquipo(id){
         <h1>${e.nom}</h1>
         <div class="dmarca">${e.marca}</div>
         ${priceHTML}
-        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): ${tieneMedio(e.dia)?`&nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp;`:''} día S/ ${fmt(e.dia)} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">${tieneMedio(e.dia)?`Medio día es un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}) y el día completo son los dos turnos.`:`Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}).`} Pedido mínimo S/ ${fmt(PEDIDO_MIN)}. El personal técnico se cobra aparte.</div>`}
+        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): ${tieneMedio(e.dia)?`&nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp;`:''} día S/ ${fmt(e.dia)} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">${tieneMedio(e.dia)?`Medio día es un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}) y el día completo son los dos turnos.`:`Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}).`} ${soloEquipo(e.id) ? `Lo recoges en nuestra oficina: sin instrumentista, con DNI y S/ ${fmt(garantiaDe(e.id))} de garantía que se te devuelve.` : 'Va con nuestro instrumentista, que se cobra aparte.'}</div>`}
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
@@ -890,17 +896,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=d794e9a0';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=19e4ee73';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=d794e9a0';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=19e4ee73';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=d794e9a0','js/06-tablero.js?v=d794e9a0'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=19e4ee73','js/06-tablero.js?v=19e4ee73'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=d794e9a0'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=19e4ee73'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1110,6 +1116,7 @@ function aplicarDatos(d, enVivo){
       if(m.mostrar_precios!=null) VER_PRECIOS = !!m.mostrar_precios;
       if(m.medio_dia_min!=null) MEDIO_MIN=m.medio_dia_min;
       if(m.pedido_min!=null) PEDIDO_MIN=m.pedido_min;
+      if(m.sin_tecnico) SIN_TECNICO=m.sin_tecnico;
     }
   }
 
@@ -1433,20 +1440,29 @@ function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:T
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
 const TURNOS = `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
 function pkgConds(p){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
-function eqConds(dia){return {medio:`Medio día: ${TURNOS}.`,
+function eqConds(dia, id){
+  if(id && soloEquipo(id)) return {medio:`Medio día: ${TURNOS}.`,
+    dia:`Lo recoges y lo devuelves en nuestra oficina. No necesita instrumentista: dejas tu DNI y S/ ${fmt(garantiaDe(id))} de garantía, que se te devuelve con el equipo.`,
+    semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};
+  return {medio:`Medio día: ${TURNOS}.`,
   dia: tieneMedio(dia) ? `Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}).`
                        : `Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}): por su tarifa, medio día no cubre la entrega y el recojo.`,
   semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
-function openModal(nom,marca,prices,conds,tec,igvInc,mod0){
+function openModal(nom,marca,prices,conds,tec,igvInc,mod0,garantia){
   if(!VER_PRECIOS){ go('#/contacto'); return; }   // precios ocultos: se cotiza por contacto
-  actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia'};
+  actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia',gar:garantia||0};
+  /* Sin instrumentista: en vez de la caja del técnico va la de la garantía. */
+  document.getElementById('cajaTec').hidden = !!actual.gar;
+  const cg = document.getElementById('cajaGar');
+  cg.hidden = !actual.gar;
+  if(actual.gar) document.getElementById('cGar').textContent = 'S/ ' + fmt(actual.gar);
   /* Sin medio día (instrumentos económicos), se oculta ese botón. */
   const hayMedio = prices.medio != null;
   const bMedio = document.querySelector('#modSeg [data-m="medio"]');
   if(bMedio) bMedio.hidden = !hayMedio;
   if(!hayMedio && (mod0||'medio') === 'medio') mod0 = 'dia';
-  document.getElementById('mMinNota').textContent =
-    `Pedido mínimo S/ ${fmt(PEDIDO_MIN)} (sin contar al instrumentista).`;
+  document.getElementById('mMinNota').textContent = PEDIDO_MIN
+    ? `Pedido mínimo S/ ${fmt(PEDIDO_MIN)} (sin contar al instrumentista).` : '';
   document.getElementById('mTitulo').textContent=nom;
   document.getElementById('mMarca').textContent=marca;
   document.getElementById('d1').value='';document.getElementById('d2').value='';
@@ -1483,7 +1499,7 @@ function abrir(idx){
   const e=EQUIPOS[idx];
   const pr={dia:e.dia, semana:e.dia*4, mes:e.dia*12};
   if(tieneMedio(e.dia)) pr.medio=precioMedio(e.dia);
-  openModal(e.nom, e.marca, pr, eqConds(e.dia), techRates(), true, 'medio');
+  openModal(e.nom, e.marca, pr, eqConds(e.dia, e.id), techRates(), true, 'medio', garantiaDe(e.id));
 }
 function cerrar(){
   document.getElementById('ov').classList.remove('open');
@@ -1504,12 +1520,12 @@ function calc(){
   }else{
     qty=Math.max(1,parseInt(document.getElementById('nQty').value)||1);
   }
-  const tunit=actual.tec[m]||0;
+  const tunit=actual.gar ? 0 : (actual.tec[m]||0);
   /* Mínimo por pedido: cubre la entrega y el recojo aunque el alquiler sea chico. */
   const bruto=qty*unit, rentTot=Math.max(PEDIDO_MIN, bruto), rSub=rentTot/1.18, rIgv=rentTot-rSub;
   const fMin=document.getElementById('cMinFila');
   if(fMin){ fMin.hidden = !(rentTot > bruto); document.getElementById('cMin').textContent='S/ '+rentTot.toFixed(2); }
-  const tecTot=Math.max(TEC_MIN, qty*tunit), grand=rentTot+tecTot;
+  const tecTot=actual.gar ? 0 : Math.max(TEC_MIN, qty*tunit), grand=rentTot+tecTot;
   document.getElementById('cDias').textContent=qty;
   document.getElementById('cSub').textContent='S/ '+rSub.toFixed(2);
   document.getElementById('cIgv').textContent='incl. S/ '+rIgv.toFixed(2);
