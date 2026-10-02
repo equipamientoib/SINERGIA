@@ -42,7 +42,8 @@ TIPOS = os.path.join(ROOT, 'data', 'seo-tipos.json')
 FICHAS = os.path.join(ROOT, 'data', 'fichas')
 # Mismas reglas que el cotizador (js/02-datos.js): medio día solo desde
 # S/ 100 el día, y ningún pedido por debajo de S/ 150.
-MEDIO_DIA_MIN = 100
+MEDIO_DIA_MIN = 60
+MEDIO_DIA_PISO = 50
 # Instrumentos sin instrumentista: retiro en oficina con DNI y garantía (S/).
 SIN_TECNICO = {'manometro': 100, 'luxometro': 100, 'tacometro': 100}
 TARIFAS = os.path.join(ROOT, 'data', 'tarifas-alquiler.json')
@@ -466,7 +467,7 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         # instrumentista y la garantía se explican en el cotizador, no aquí.
         d = eq['dia']
         hay_medio = d >= MEDIO_DIA_MIN
-        medio = round(d * 0.6)
+        medio = max(MEDIO_DIA_PISO, round(d * 0.6))
         # Solo medio día y día: la semana y el mes se ven en el cotizador.
         otras = ['Día S/ {:,.0f}'.format(d)] if hay_medio else []
         gar = SIN_TECNICO.get(eq['id'])
