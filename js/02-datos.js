@@ -51,7 +51,15 @@ const byId=id=>EQUIPOS.find(e=>e.id===id);
    día, no la mitad: llevar, recoger y revisar el instrumento cuesta igual.
    Es el mínimo de alquiler; por eso ya no se alquila por hora ni por equipo. */
 const MEDIO_PCT=0.6, HORARIO_MANANA='9:00 a 13:00', HORARIO_TARDE='14:00 a 18:00';
+/* Medio día solo en los instrumentos de S/ 100 el día a más: por debajo, el
+   viaje de entrega y recojo cuesta más que el alquiler. Y ningún pedido baja
+   de PEDIDO_MIN, venga un instrumento o varios. */
+let MEDIO_MIN=100, PEDIDO_MIN=150;
 const precioMedio=d=>Math.round(d*MEDIO_PCT);
+const tieneMedio=d=>Number(d) >= MEDIO_MIN;
+/* Precio de partida de un instrumento: medio día si lo tiene, si no el día. */
+const precioDesde=d=>tieneMedio(d) ? precioMedio(d) : Number(d);
+const unidadDesde=d=>tieneMedio(d) ? 'medio día' : 'día';
 /* Interruptor general de precios (js/00-config.js -> CONFIG.MOSTRAR_PRECIOS).
    La hoja de Google puede sobrescribirlo con modelo.mostrar_precios. */
 let VER_PRECIOS = (typeof CONFIG!=='undefined' && CONFIG.MOSTRAR_PRECIOS!==undefined) ? !!CONFIG.MOSTRAR_PRECIOS : true;

@@ -40,6 +40,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITIO = 'https://sinergiabiomedica.pe'
 TIPOS = os.path.join(ROOT, 'data', 'seo-tipos.json')
 FICHAS = os.path.join(ROOT, 'data', 'fichas')
+# Mismas reglas que el cotizador (js/02-datos.js): medio día solo desde
+# S/ 100 el día, y ningún pedido por debajo de S/ 150.
+MEDIO_DIA_MIN = 100
+PEDIDO_MIN = 150
 CATALOGO = os.path.join(ROOT, 'data', 'catalogo.json')
 EXTRA = os.path.join(ROOT, 'data', 'fotos-extra.json')
 CONFIG = os.path.join(ROOT, 'js', '00-config.js')
@@ -434,13 +438,21 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
     precio = ''
     if cfg['precios'] and eq.get('dia'):
-        # Mínimo de alquiler: medio día (un turno de 4 h) = 60 % del día.
-        medio = round(eq['dia'] * 0.6)
-        precio = ('<p class="prod-precio">Desde <b>S/ {:,.0f}</b> por medio día · IGV incluido</p>'
-                  '<p class="prod-tarifas">Día S/ {:,.0f} · semana S/ {:,.0f} · mes S/ {:,.0f}<br>'
-                  '<span>Medio día = un turno de 4 h (9:00 a 13:00 o 14:00 a 18:00); es el mínimo. '
+        # Medio día (un turno de 4 h) = 60 % del día, solo desde MEDIO_DIA_MIN:
+        # por debajo, la entrega y el recojo cuestan más que el alquiler.
+        d = eq['dia']
+        hay_medio = d >= MEDIO_DIA_MIN
+        medio = round(d * 0.6)
+        tarifas = (('Medio día S/ {:,.0f} · '.format(medio) if hay_medio else '')
+                   + 'día S/ {:,.0f} · semana S/ {:,.0f} · mes S/ {:,.0f}'.format(d, d * 4, d * 12))
+        nota = ('Medio día = un turno de 4 h (9:00 a 13:00 o 14:00 a 18:00); el día completo son los dos turnos.'
+                if hay_medio else
+                'Este instrumento se alquila desde un día completo (9:00 a 13:00 y 14:00 a 18:00).')
+        precio = ('<p class="prod-precio">Desde <b>S/ {:,.0f}</b> por {} · IGV incluido</p>'
+                  '<p class="prod-tarifas">{}<br><span>{} Pedido mínimo S/ {:,.0f}. '
                   'El personal técnico se cobra aparte.</span></p>').format(
-                      medio, eq['dia'], eq['dia'] * 4, eq['dia'] * 12)
+                      medio if hay_medio else d, 'medio día' if hay_medio else 'día',
+                      tarifas, nota, PEDIDO_MIN)
     resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
 
     # pestaña Descripción: el equipo + para qué sirve el tipo

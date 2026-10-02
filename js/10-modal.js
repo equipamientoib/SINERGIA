@@ -4,10 +4,20 @@ function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:T
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
 const TURNOS = `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
 function pkgConds(p){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
-function eqConds(){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}).`,semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
+function eqConds(dia){return {medio:`Medio día: ${TURNOS}.`,
+  dia: tieneMedio(dia) ? `Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}).`
+                       : `Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}): por su tarifa, medio día no cubre la entrega y el recojo.`,
+  semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
 function openModal(nom,marca,prices,conds,tec,igvInc,mod0){
   if(!VER_PRECIOS){ go('#/contacto'); return; }   // precios ocultos: se cotiza por contacto
   actual={nom,prices,conds,tec,igvInc:!!igvInc,mod:'dia'};
+  /* Sin medio día (instrumentos económicos), se oculta ese botón. */
+  const hayMedio = prices.medio != null;
+  const bMedio = document.querySelector('#modSeg [data-m="medio"]');
+  if(bMedio) bMedio.hidden = !hayMedio;
+  if(!hayMedio && (mod0||'medio') === 'medio') mod0 = 'dia';
+  document.getElementById('mMinNota').textContent =
+    `Pedido mínimo S/ ${fmt(PEDIDO_MIN)} (sin contar al instrumentista).`;
   document.getElementById('mTitulo').textContent=nom;
   document.getElementById('mMarca').textContent=marca;
   document.getElementById('d1').value='';document.getElementById('d2').value='';
@@ -31,15 +41,20 @@ function setMod(m){
   document.getElementById('cQtyLbl').textContent=L[1];
   document.getElementById('cTecUnitLbl').textContent={medio:'Por medio día',dia:'Por día',semana:'Por semana',mes:'Por mes'}[m];
   document.getElementById('cTecQtyLbl').textContent=L[1];
-  document.getElementById('cDia').textContent='S/ '+actual.prices[m];
+  document.getElementById('cDia').textContent='S/ '+fmt(actual.prices[m]);
   document.getElementById('modCond').textContent=actual.conds[m]||'';
   calc();
 }
-function clearCalc(){['cDias','cSub','cIgv','cTot','cTecUnit','cTecQty','cTec','cGrand'].forEach(id=>document.getElementById(id).textContent='—');}
+function clearCalc(){
+  ['cDias','cSub','cIgv','cTot','cTecUnit','cTecQty','cTec','cGrand'].forEach(id=>document.getElementById(id).textContent='—');
+  const f=document.getElementById('cMinFila'); if(f) f.hidden=true;
+}
 function abrirPaq(id){const p=PAQUETES.find(x=>x.id===id);openModal(p.nom,'Paquete '+p.nivel+' · IGV incluido',{medio:precioMedio(p.dia),dia:p.dia,semana:p.psem,mes:p.pmes},pkgConds(p),techRates(),true,'dia');}
 function abrir(idx){
   const e=EQUIPOS[idx];
-  openModal(e.nom, e.marca, {medio:precioMedio(e.dia), dia:e.dia, semana:e.dia*4, mes:e.dia*12}, eqConds(), techRates(), true, 'medio');
+  const pr={dia:e.dia, semana:e.dia*4, mes:e.dia*12};
+  if(tieneMedio(e.dia)) pr.medio=precioMedio(e.dia);
+  openModal(e.nom, e.marca, pr, eqConds(e.dia), techRates(), true, 'medio');
 }
 function cerrar(){
   document.getElementById('ov').classList.remove('open');
@@ -61,7 +76,10 @@ function calc(){
     qty=Math.max(1,parseInt(document.getElementById('nQty').value)||1);
   }
   const tunit=actual.tec[m]||0;
-  const rentTot=qty*unit, rSub=rentTot/1.18, rIgv=rentTot-rSub;
+  /* Mínimo por pedido: cubre la entrega y el recojo aunque el alquiler sea chico. */
+  const bruto=qty*unit, rentTot=Math.max(PEDIDO_MIN, bruto), rSub=rentTot/1.18, rIgv=rentTot-rSub;
+  const fMin=document.getElementById('cMinFila');
+  if(fMin){ fMin.hidden = !(rentTot > bruto); document.getElementById('cMin').textContent='S/ '+rentTot.toFixed(2); }
   const tecTot=Math.max(TEC_MIN, qty*tunit), grand=rentTot+tecTot;
   document.getElementById('cDias').textContent=qty;
   document.getElementById('cSub').textContent='S/ '+rSub.toFixed(2);
