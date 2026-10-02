@@ -160,4 +160,6 @@ El portal solo deja entrar desde Perú y con usuario, así que no lo puede leer 
 
 **Cada lunes:** entra a altokelite.com, ve a **Productos** y toca el favorito.
 
+Qué hace en cada uso: lee los productos **EQUIPOS** del portal (filtro `tp=2`, ≈789; 2 consultas), guarda la lista completa en la pestaña **Proveedor** y actualiza la hoja de venta. Cada fila se busca por `codigo_proveedor`; si no tiene, por **marca + modelo** en la descripción del portal (descarta accesorios y repuestos) y se escribe el código encontrado. La columna **coincidencia** dice cómo se encontró («código», «marca+modelo», «no aparece hoy en el portal» con un equipo parecido en stock si lo hay).
+
 El código del botón está en `js/proveedor-atl.js`. La clave del favorito no está en el repositorio: vive en las Propiedades del script (`ATL_CLAVE`).

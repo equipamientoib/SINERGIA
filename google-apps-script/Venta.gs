@@ -9,8 +9,12 @@
  *     (precio publicado, stock y fecha). La web lo pide a VENTA_URL
  *     (js/00-config.js).
  *  2) Recibe el botón «Actualizar Sinergia» (js/proveedor-atl.js), que
- *     lee precios y stock en el portal del proveedor (altokelite.com)
- *     y los escribe en la hoja.
+ *     lee los EQUIPOS del portal del proveedor (altokelite.com) y:
+ *       · guarda la lista completa en la pestaña «Proveedor»;
+ *       · pone precio y stock a cada fila de la hoja de venta: por su
+ *         codigo_proveedor y, si no tiene, por marca + modelo (y escribe
+ *         el código encontrado);
+ *       · deja en la columna «coincidencia» cómo se encontró cada fila.
  *
  * INSTALACIÓN (una vez)
  *  1) script.google.com › Nuevo proyecto › pega este archivo › Guardar.
@@ -258,47 +262,122 @@ function atlCodigos_() {
 }
 
 /* Escribe en la hoja lo que mandó el botón. items: [{c:"090.970", s:12, p:850.5}] */
+/* ── Match por marca + modelo ──────────────────────────────────────
+   Para filas sin código de proveedor: se busca en la lista del portal un
+   equipo cuya descripción tenga el modelo (iM20, SE-1200 Express…) y la
+   marca, descartando accesorios y repuestos («Batería p. monitor iM20»).
+   Si hay varias versiones, gana la que más se parece al nombre y luego la
+   más barata (versión base). */
+var ACCESORIO_ = /^(bateria|cable|bandeja|filtro|sensor|brazalete|kit|soporte|base|adaptador|transductor|panel|repuesto|altavoz|estuche|cargador|clamp|electrobomba|helice|interruptor|anillo|boton|calibrador|control|papel|sonda|manguera|tubo|valvula|tarjeta|placa|modulo|fusible|empaque|jarra|frasco|tapa|rueda|pedal|funda|cubierta|electrodo|parche|pinza|cubeta|reactivo|accesorio|juego de|set de|impresora|cabezal|carcasa|adhesivo|canastilla|pantalla|turbina|capucha|diafragma|amortiguador|fuente|camara|software|licencia|tornillo|motor|teclado|mando|membrana|paleta|sticker|lamina|protector|etiqueta|manual)/;
+var EQUIPO_ = /^(monitor|electrocardiografo|desfibrilador|incubadora|cuna|servocuna|bomba|ventilador|aspirador|autoclave|esterilizador|lampara qx|lampara quirurgica|mesa|maquina|ecografo|analizador|centrifuga|microscopio|balanza|cama|camilla|refrigeradora|congelador|cabina|espectrofotometro|tensiometro|estetoscopio|detector|pulsioximetro|electrobisturi|coche de paro|equipo|esterilizadora|lampara|nebulizador|oximetro|termometro|otoscopio|oftalmoscopio|laringoscopio|negatoscopio|doppler|holter|sistema|unidad|cardiotocografo|fotometro|agitador|baño|estufa|horno|destilador|campana)/;
+var STOP_ = { de: 1, del: 1, la: 1, el: 1, con: 1, para: 1, y: 1, en: 1, a: 1, por: 1, x: 1 };
+
+function nrm_(t) { return s_(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
+function patModelo_(modelo) {
+  var m = nrm_(modelo).replace(/\b(serie|series|modelo|mod)\b/g, ' ').replace(/\s+/g, '');
+  if (m.length < 2) return null;
+  return new RegExp('(^|[^a-z0-9])' + m.split('').join('[ ]?') + '($|[^a-z0-9])');
+}
+function tieneMarca_(marca, dn) {
+  var mc = nrm_(marca).replace(/ /g, ''), dd = ' ' + dn + ' ';
+  if (mc.length >= 3 && dn.replace(/ /g, '').indexOf(mc) >= 0) return true;
+  return nrm_(marca).split(' ').some(function (w) { return w.length >= 4 && dd.indexOf(' ' + w + ' ') >= 0; });
+}
+function esAccesorio_(dn) {
+  if (ACCESORIO_.test(dn)) return true;
+  return / (p|para)( |$)/.test(dn) && !EQUIPO_.test(dn);     // «… p. monitor iM20», «… para desfibrilador»
+}
+function afinidad_(nombre, dn) {
+  var dd = ' ' + dn + ' ', n = 0;
+  nrm_(nombre).split(' ').forEach(function (t) { if (t.length > 2 && !STOP_[t] && dd.indexOf(' ' + t.slice(0, 6)) >= 0) n++; });
+  return n;
+}
+function matchModelo_(marca, modelo, nombre, lista) {
+  var re = patModelo_(modelo); if (!re) return null;
+  var cand = lista.filter(function (x) { return re.test(x.dn) && !esAccesorio_(x.dn); });
+  var conMarca = cand.filter(function (x) { return tieneMarca_(marca, x.dn); });
+  if (conMarca.length) cand = conMarca;
+  else if (nrm_(modelo).replace(/ /g, '').length < 5) return null;   // modelo corto y sin marca: dudoso
+  if (!cand.length) return null;
+  cand.forEach(function (x) { x.af = afinidad_(nombre, x.dn); });
+  cand = cand.filter(function (x) { return x.af > 0 || EQUIPO_.test(x.dn); });   // tiene que parecer el equipo
+  if (!cand.length) return null;
+  cand.sort(function (a, b) { return (b.af - a.af) || ((Number(a.p) || 1e12) - (Number(b.p) || 1e12)); });
+  return { it: cand[0], n: cand.length };
+}
+
+/* Pestaña «Proveedor»: la lista completa leída del portal en la última
+   actualización (se reemplaza cada vez). */
+function hojaProveedor_(ss, lista, tc) {
+  var sh = ss.getSheetByName('Proveedor') || ss.insertSheet('Proveedor');
+  sh.clear();
+  var filas = [['codigo', 'descripcion', 'modelo_proveedor', 'stock', 'precio_usd', 'precio_soles', 'imagen']];
+  lista.slice().sort(function (a, b) { return a.dn < b.dn ? -1 : 1; }).forEach(function (x) {
+    filas.push(["'" + x.c, x.d || '', x.mo || '', Number(x.s) || 0, Number(x.p) || '',
+      tc && Number(x.p) ? Math.round(Number(x.p) * tc * 100) / 100 : '', x.img || '']);
+  });
+  sh.getRange(1, 1, filas.length, filas[0].length).setValues(filas);
+  sh.getRange(1, 1, 1, filas[0].length).setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36');
+  sh.setFrozenRows(1);
+  sh.getRange(2, 6, Math.max(filas.length - 1, 1), 1).setNumberFormat('#,##0.00');
+  sh.setColumnWidth(2, 520);
+}
+
 function atlActualizar_(datos) {
-  var sh = hojaVenta_(SpreadsheetApp.openById(VENTA_ID));
+  var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss);
   var vals = sh.getDataRange().getValues(), fh = -1;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
   if (fh < 0) throw new Error('hoja de venta sin encabezados');
   var heads = vals[fh].map(function (h) { return s_(h); });
-  if (heads.indexOf('precio_proveedor_usd') < 0) {           // columna nueva, al final
-    sh.getRange(fh + 1, heads.length + 1).setValue('precio_proveedor_usd');
-    heads.push('precio_proveedor_usd');
-  }
-  var cCod = heads.indexOf('codigo_proveedor'), cPP = heads.indexOf('precio_proveedor'),
-      cSP = heads.indexOf('stock_proveedor'), cUSD = heads.indexOf('precio_proveedor_usd');
+  ['precio_proveedor_usd', 'coincidencia'].forEach(function (c) {      // columnas nuevas, al final
+    if (heads.indexOf(c) < 0) { sh.getRange(fh + 1, heads.length + 1).setValue(c); heads.push(c); }
+  });
+  var col = function (n) { return heads.indexOf(n); };
+  var cCod = col('codigo_proveedor'), cPP = col('precio_proveedor'), cSP = col('stock_proveedor'),
+      cUSD = col('precio_proveedor_usd'), cCoi = col('coincidencia');
   var tc = Number(datos.tc) || 0;
+  var lista = (datos.items || []).map(function (x) { x.dn = nrm_((x.d || '') + ' ' + (x.mo || '')); return x; });
   var mapa = {};
-  (datos.items || []).forEach(function (it) { var cd = codAtl_(it.c); if (cd) mapa[cd] = it; });
+  lista.forEach(function (it) { var cd = codAtl_(it.c); if (cd) mapa[cd] = it; });
+  if (datos.todos && lista.length) hojaProveedor_(ss, lista, tc);
 
-  var n = vals.length - fh - 1, act = 0, sinStock = 0;
-  var pp = sh.getRange(fh + 2, cPP + 1, n, 1).getValues();
-  var sp = sh.getRange(fh + 2, cSP + 1, n, 1).getValues();
-  var usd = sh.getRange(fh + 2, cUSD + 1, n, 1).getValues();
+  var n = vals.length - fh - 1, act = 0, porModelo = 0, sinStock = 0, pubSin = 0;
+  var rango = function (c) { return sh.getRange(fh + 2, c + 1, n, 1); };
+  var cod = rango(cCod).getValues(), pp = rango(cPP).getValues(), sp = rango(cSP).getValues(),
+      usd = rango(cUSD).getValues(), coi = rango(cCoi).getValues();
   for (var i = 0; i < n; i++) {
-    var cd = codAtl_(vals[fh + 1 + i][cCod]);
-    if (!cd) continue;
-    var it = mapa[cd];
+    var fila = vals[fh + 1 + i];
+    if (!s_(fila[0])) continue;
+    var pub = s_(fila[col('publicar')]).toUpperCase() === 'SI';
+    var cd = codAtl_(cod[i][0]), it = cd ? mapa[cd] : null, via = 'código';
+    if (!it && !cd && datos.todos) {                         // sin código: marca + modelo
+      var m = matchModelo_(fila[col('marca')], fila[col('modelo')], fila[col('nombre')], lista);
+      if (m) { it = m.it; via = 'marca+modelo' + (m.n > 1 ? ' (de ' + m.n + ' versiones)' : ''); cod[i][0] = "'" + it.c; porModelo++; }
+    }
     if (it) {
       usd[i][0] = Number(it.p) || '';
       if (tc && Number(it.p)) pp[i][0] = Math.round(Number(it.p) * tc * 100) / 100;
       sp[i][0] = Number(it.s) || 0;
+      coi[i][0] = via + ': ' + s_(it.d).slice(0, 120);
       act++;
-    } else if (datos.completo) {
-      sp[i][0] = 0;                       // no está en el portal: sin stock ahora
-      sinStock++;
+    } else {
+      if (datos.completo && cd) { sp[i][0] = 0; sinStock++; }
+      if (datos.todos) {
+        var alt = cd ? matchModelo_(fila[col('marca')], fila[col('modelo')], fila[col('nombre')], lista) : null;
+        coi[i][0] = cd ? 'no aparece hoy en el portal (¿sin stock?)' +
+            (alt && codAtl_(alt.it.c) !== cd ? ' · parecido en stock: ' + alt.it.c + ' ' + s_(alt.it.d).slice(0, 80) : '')
+          : 'sin código; no se encontró por marca y modelo';
+      }
+      if (pub) pubSin++;
     }
   }
-  sh.getRange(fh + 2, cPP + 1, n, 1).setValues(pp);
-  sh.getRange(fh + 2, cSP + 1, n, 1).setValues(sp);
-  sh.getRange(fh + 2, cUSD + 1, n, 1).setValues(usd);
+  rango(cCod).setValues(cod); rango(cPP).setValues(pp); rango(cSP).setValues(sp);
+  rango(cUSD).setValues(usd); rango(cCoi).setValues(coi);
   sh.getRange('B2').setValue(new Date());
   if (tc) { sh.getRange('D2').setValue('Tipo de cambio usado: S/ ' + tc); }
   limpiarCache();
-  var res = { ok: true, actualizados: act, sin_stock: sinStock, tc: tc, fecha: new Date().toISOString() };
+  var res = { ok: true, id: datos.id || '', actualizados: act, por_modelo: porModelo, sin_stock: sinStock,
+    pub_sin: pubSin, proveedor: lista.length, tc: tc, fecha: new Date().toISOString() };
   PropertiesService.getScriptProperties().setProperty('ATL_ULTIMO', JSON.stringify(res));
   return res;
 }
@@ -335,7 +414,11 @@ function doPost(e) {
   try { datos = JSON.parse(e.postData.contents); } catch (err) { return json_({ ok: false, motivo: 'datos ilegibles' }); }
   if (!claveAtl_() || datos.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
   try { return json_(atlActualizar_(datos)); }
-  catch (err) { return json_({ ok: false, motivo: String(err) }); }
+  catch (err) {
+    var res = { ok: false, id: datos.id || '', motivo: String(err) };
+    PropertiesService.getScriptProperties().setProperty('ATL_ULTIMO', JSON.stringify(res));
+    return json_(res);
+  }
 }
 
 /** Ejecuta (▶) para revisar sin publicar. */
