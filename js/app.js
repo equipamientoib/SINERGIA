@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=5645bad7';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=245a9181';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=5645bad7';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=245a9181';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=5645bad7','js/06-tablero.js?v=5645bad7'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=245a9181','js/06-tablero.js?v=245a9181'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=5645bad7'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=245a9181'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1807,6 +1807,26 @@ function vMarcaModelo(p, grande){
     `<div class="v-ft-${c}"><dt>${k}</dt><dd>${vEsc(v)}</dd></div>`).join('')}</dl>`;
 }
 
+/* Vigencia del precio: 14 días desde la última actualización con el
+   portal del proveedor (fecha «actualizado» de la hoja, dd/mm/aaaa).
+   Devuelve '15/10/2026' o '' si no hay fecha; vencida → 'vencido'. */
+const V_VIGENCIA_DIAS = 14;
+function vVigencia(){
+  const m = String((VENTA && VENTA.actualizado) || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(!m) return '';
+  const f = new Date(+m[3], +m[2]-1, +m[1] + V_VIGENCIA_DIAS);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  if(f < hoy) return 'vencido';
+  const d2 = n => String(n).padStart(2,'0');
+  return `${d2(f.getDate())}/${d2(f.getMonth()+1)}/${f.getFullYear()}`;
+}
+function vNotaPrecio(larga){
+  const v = vVigencia();
+  if(v === 'vencido') return larga ? 'Precio referencial, por confirmar en la cotización' : 'por confirmar';
+  if(v) return larga ? `Precio vigente hasta el ${v} · se confirma en la cotización` : `vigente hasta el ${v}`;
+  return larga ? 'Precio referencial, sujeto a confirmación en la cotización' : 'sujeto a confirmación';
+}
+
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
@@ -1815,7 +1835,7 @@ function vCard(p){
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const tag = p._top ? '<span class="tier">Más pedido</span>' : '';
   const pie = p.precio
-    ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>sujeto a confirmación</small></div>`
+    ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>${vNotaPrecio(false)}</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
   return `<div class="eq v-eq">
     <div class="img${foto?' has-photo':''}" onclick="go('${url}')">
@@ -2118,7 +2138,7 @@ function vProducto(id){
         <h1>${vEsc(p.nom)}</h1>
         ${vMarcaModelo(p, true)}
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
-        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?'Precio referencial, sujeto a confirmación en la cotización':'Consulta precio y plazo de entrega'}${VENTA.actualizado?' · Precios y stock al '+vEsc(VENTA.actualizado):''}</small></div>`:''}
+        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?vNotaPrecio(true):'Consulta precio y plazo de entrega'}</small></div>`:''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
