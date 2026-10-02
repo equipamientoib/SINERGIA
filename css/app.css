@@ -600,6 +600,8 @@
   .ent-card:hover,.ent-card:focus-visible{border-color:var(--linea-b);transform:translateY(-3px);box-shadow:0 18px 40px -18px rgba(23,25,29,.28)}
   .ent-card:focus-visible{outline:2px solid var(--bronce);outline-offset:2px}
   .ent-card .foto{background:var(--crema) center/cover no-repeat;min-height:100%}
+  /* Venta: equipos de la tienda (ventilador y autoclave), vertical y ancha para celular. */
+  .ent-card .foto-venta{background-image:url(../img/venta/portada-venta.webp);background-color:#f8f6f1;background-size:contain}
   .ent-card .cuerpo{padding:24px 26px 22px}
   .ent-card .cab{display:flex;align-items:center;gap:12px}
   .ent-card .ico{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:rgba(154,127,78,.1);color:var(--cobre-d);flex:none}
@@ -622,6 +624,7 @@
   @media (max-width:520px){
     .ent-card{grid-template-columns:1fr}
     .ent-card .foto{height:150px}
+    .ent-card .foto-venta{background-image:url(../img/venta/portada-venta-ancha.webp)}
     .ent-top .logo-h{height:38px}
     .ent-top nav{font-size:13px}
   }
