@@ -83,6 +83,9 @@ def ajustar(p, repo):
     st = q.get('stock')
     if isinstance(st, (int, float)) and st > 0:
         q['stock'] = min(sv.get('maximo', 10), max(1, int(st * sv.get('porcentaje', 30) // 100)))
+    for k, v in ((repo.get('datosFijos') or {}).get(q['id']) or {}).items():
+        if not q.get(k):
+            q[k] = v
     if not q.get('clave'):
         q['clave'] = (repo.get('codigosNTS') or {}).get(q['id'], '')
     if q.get('clave') and not q.get('expediente'):
