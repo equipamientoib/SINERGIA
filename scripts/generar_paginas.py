@@ -718,6 +718,9 @@ def main():
         loc = SITIO + ruta
         fecha = hoy if (rel in cambios or loc not in previas) else previas[loc]
         filas.append('  <url><loc>%s</loc><lastmod>%s</lastmod></url>' % (loc, fecha))
+    # Las páginas de venta (/venta/…) las pone scripts/generar_paginas_venta.py: se conservan.
+    previo = open(SITEMAP, encoding='utf-8').read() if os.path.exists(SITEMAP) else ''
+    filas += [u for u in re.findall(r'  <url>.*?</url>', previo) if '/venta/' in u]
     escribir('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n'
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
              + '\n'.join(filas) + '\n</urlset>\n', cambios)

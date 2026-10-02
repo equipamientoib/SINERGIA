@@ -1,0 +1,57 @@
+# Regenera las páginas propias de los equipos de VENTA (venta/…), su lugar en
+# el sitemap y el mapa de la tienda (window.PAGINA_VENTA en index.html) con los
+# datos EN VIVO de la hoja de venta, una vez al día. Si nada cambió, no hace nada.
+# También se puede lanzar a mano: pestaña Actions → «Páginas de venta» → Run workflow.
+name: Páginas de venta
+
+on:
+  schedule:
+    - cron: '20 11 * * *'       # 06:20 en Lima (después de las de alquiler)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: paginas-venta
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Traer el catálogo de venta en vivo
+        id: vivo
+        run: |
+          URL=$(grep -oE 'VENTA_URL:\s*"https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec"' js/00-config.js | grep -oE 'https://[^"]+')
+          # Google a veces responde una página de error pasajera: hasta 4 intentos.
+          for i in 1 2 3 4; do
+            curl -sSL --max-time 90 -A "Mozilla/5.0 (paginas-venta)" -o /tmp/venta.json "$URL" || true
+            if python3 -c "import json,sys; d=json.load(open('/tmp/venta.json')); n=sum(1 for p in d.get('productos',[]) if p.get('id') and p.get('nom')); print('equipos en vivo:',n); sys.exit(0 if n else 1)"; then
+              echo "ok=1" >> "$GITHUB_OUTPUT"; break
+            fi
+            sleep $((i*15))
+          done
+
+      - name: Generar páginas
+        if: steps.vivo.outputs.ok == '1'
+        run: python3 scripts/generar_paginas_venta.py --datos /tmp/venta.json
+
+      - name: Publicar si algo cambió
+        if: steps.vivo.outputs.ok == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain venta sitemap.xml index.html)" ]; then echo "Sin cambios."; exit 0; fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A venta sitemap.xml index.html
+          git commit -m "Paginas de venta al dia con la hoja"
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push
+          curl -sS -X POST -H "Authorization: Bearer $GH_TOKEN" \
+               -H "Accept: application/vnd.github+json" \
+               "https://api.github.com/repos/${{ github.repository }}/pages/builds" || true

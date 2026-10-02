@@ -171,3 +171,11 @@ Qué hace en cada uso: lee los productos **EQUIPOS** del portal (filtro `tp=2`, 
 **Ampliar el catálogo:** `data/venta-nuevos.json` tiene equipos con stock ya redactados, elegidos según el estudio de compras públicas 2024-2025 (OECE): todos los tipos del ranking con stock en el proveedor y 18 complementarios. `agregarEquiposNuevos()` se ejecuta dos veces: la 1.ª crea la pestaña **Para revisar** (puesto en el estudio, stock y precio aproximado; publicar SI/NO); la 2.ª publica los SI, pone `ranking` (puesto del tipo en el estudio) a todas las filas, renueva los **más pedidos** (`destacado`, un equipo con stock por tipo) y copia precio y stock desde «Proveedor». La tienda se ordena por más pedidos y luego por `ranking`.
 
 El código del botón está en `js/proveedor-atl.js`. La clave del favorito no está en el repositorio: vive en las Propiedades del script (`ATL_CLAVE`).
+
+## Páginas propias de cada equipo de venta
+
+Cada equipo publicado tiene su página de verdad en `venta/<id>/` (y la lista general en `venta/`), con el mismo formato que las páginas de alquiler: galería, marca · modelo · origen, precio con vigencia, stock, ficha técnica, pestañas (Descripción · Parámetros técnicos · Para expedientes técnicos) y Anterior / Siguiente en el orden de la tienda. La tienda abre esas páginas (`window.PAGINA_VENTA` en `index.html`).
+
+- Las genera `scripts/generar_paginas_venta.py --datos <JSON en vivo de VENTA_URL>`; la acción **Páginas de venta** lo hace todos los días a las 6:20 a. m. (y a mano desde Actions). Un equipo que deja de publicarse (sin stock) pierde su página; uno nuevo la tiene al día siguiente (mientras tanto se abre la ficha interna `#/venta/p/<id>`).
+- **Ficha técnica:** deja el PDF en `fichas/venta/ficha-tecnica-<id>.pdf` y la página muestra Ver / Descargar. Sin PDF, queda el espacio con «Pedir ficha».
+- **Parámetros técnicos:** `data/fichas-venta/<id>.json` con el mismo formato que `data/fichas/` (`secciones` con `titulo` y `filas`) reemplaza la tabla de identificación y características.

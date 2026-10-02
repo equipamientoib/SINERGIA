@@ -1,0 +1,426 @@
+#!/usr/bin/env python3
+"""
+generar_paginas_venta.py — Una página de verdad por cada equipo de VENTA.
+
+La tienda vive en direcciones con «#/» (#/venta/p/<id>), que para Google son
+todas la misma página. Este script escribe, con el mismo formato que las
+páginas de alquiler (galería, datos, ficha técnica, pestañas):
+
+    venta/index.html            todos los equipos, por categoría
+    venta/<id>/index.html       un equipo
+    sitemap.xml                 agrega las páginas de venta (las de alquiler
+                                las pone scripts/generar_paginas.py)
+    index.html: window.PAGINA_VENTA (a qué página va cada equipo de la tienda)
+
+Ficha técnica: si existe fichas/venta/ficha-tecnica-<id>.pdf se puede ver y
+descargar; si no, queda el espacio con «Pídela por WhatsApp». Parámetros:
+si existe data/fichas-venta/<id>.json (mismo formato que data/fichas/) se
+usa su tabla; si no, la identificación y las características de la hoja.
+
+Lee
+    --datos <archivo>   JSON en vivo del Apps Script de venta (VENTA_URL)
+    data/venta.json     categorías, fotos fijas y fotos antiguas de respaldo
+
+Uso
+    python3 scripts/generar_paginas_venta.py --datos /tmp/venta.json
+
+Correrlo dos veces sin cambios en los datos no cambia ningún archivo.
+"""
+import argparse
+import datetime
+import json
+import os
+import re
+import sys
+import urllib.parse
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import generar_paginas as gp  # noqa: E402  (plantilla, logo, galería y escritura compartidas)
+
+ROOT = gp.ROOT
+SITIO = gp.SITIO
+e = gp.e
+VENTA = os.path.join(ROOT, 'data', 'venta.json')
+FICHAS_VENTA = os.path.join(ROOT, 'data', 'fichas-venta')
+
+VIGENCIA_DIAS = 14
+TRAMOS = [(2000, 'Hasta S/ 2 000'), (6000, 'S/ 2 000 – 6 000'), (15000, 'S/ 6 000 – 15 000'),
+          (40000, 'S/ 15 000 – 40 000'), (100000, 'S/ 40 000 – 100 000'), (float('inf'), 'Más de S/ 100 000')]
+
+
+# ─────────────────────────── datos ───────────────────────────
+
+def soles(n):
+    return 'S/ {:,.0f}'.format(n)
+
+
+def tramo(p):
+    pr = p.get('precio') or 0
+    if not pr:
+        return len(TRAMOS)
+    return next(i for i, (tope, _) in enumerate(TRAMOS) if pr <= tope)
+
+
+def ordenar(productos):
+    """Mismo orden que la tienda: tramo de precio, puesto en el estudio, precio."""
+    return sorted(productos, key=lambda p: (tramo(p), p.get('ranking') or 999,
+                                            0 if p.get('destacado') else 1, p.get('precio') or 1e12, p['nom']))
+
+
+def vigencia(actualizado):
+    m = re.match(r'(\d{1,2})/(\d{1,2})/(\d{4})', actualizado or '')
+    if not m:
+        return None
+    d = datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    return d + datetime.timedelta(days=VIGENCIA_DIAS)
+
+
+def fotos(p, base, fijas):
+    """[(ligera, grande)] en orden de prioridad: fija › hoja/proveedor › antigua."""
+    urls = fijas.get(p['id']) or p.get('fotos') or (base.get(p['id']) or {}).get('fotosSitio') or []
+    out = []
+    for u in urls:
+        if u.lstrip('/').startswith('img/'):
+            lig = gp.foto_local(u, {}, ligera=True)
+            gra = gp.foto_local(u, {}, ligera=False)
+            if lig:
+                out.append((lig, gra or lig))
+        elif 'drive.google.com/thumbnail' in u:
+            out.append((re.sub(r'sz=w\d+', 'sz=w700', u), re.sub(r'sz=w\d+', 'sz=w1600', u)))
+        elif u.startswith('http'):
+            out.append((u, u))
+    return out
+
+
+def ficha_venta(pid):
+    ruta = os.path.join(FICHAS_VENTA, pid + '.json')
+    return gp.leer_json(ruta) if os.path.exists(ruta) else None
+
+
+def pdf_venta(pid):
+    return '/fichas/venta/ficha-tecnica-%s.pdf' % pid
+
+
+# ─────────────────────────── plantilla ───────────────────────────
+
+def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None):
+    """Igual que la de alquiler, con la cabecera en modo Venta."""
+    doc = gp.pagina(cfg, ruta=ruta, title=title, descripcion=descripcion, migas=migas,
+                    cuerpo=cuerpo, jsonld=jsonld, imagen=imagen)
+    nav_alq = re.search(r'<nav>\s*<span class="modo-sw".*?</nav>', doc, re.S).group(0)
+    nav_venta = '''<nav>
+    <span class="modo-sw" role="group" aria-label="Sección"><a class="on" href="/#/venta">Venta</a><a href="/#/alquiler">Alquiler</a></span>
+    <a href="/#/venta">Inicio</a>
+    <a href="/#/venta/tienda" class="on">Tienda</a>
+    <a href="/#/servicios">Servicios</a>
+    <a href="/#/clientes">Clientes</a>
+    <a href="/#/contacto">Contacto</a>
+  </nav>'''
+    doc = doc.replace(nav_alq, nav_venta)
+    doc = doc.replace('quiero%20cotizar%20un%20alquiler.', 'quiero%20cotizar%20un%20equipo.')
+    doc = doc.replace('scripts/generar_paginas.py a partir de data/seo-tipos.json\n     y del catálogo',
+                      'scripts/generar_paginas_venta.py a partir de la hoja de venta')
+    doc = doc.replace('</head>', '<link rel="stylesheet" href="/css/venta-paginas.css?v=%s">\n</head>'
+                      % sello('venta-paginas.css'), 1)
+    return doc
+
+
+def sello(css):
+    import hashlib
+    with open(os.path.join(ROOT, 'css', css), 'rb') as f:
+        return hashlib.sha256(f.read()).hexdigest()[:8]
+
+
+def galeria(p, fts, primera=True):
+    alt = e(' '.join(x for x in (p['nom'], p.get('marca', ''), p.get('modelo', '')) if x))
+    if not fts:
+        return '<div class="gal una"><div class="gal-main sinfoto">%s</div></div>' % gp.ICONO
+    lig = [a for a, _ in fts]
+    gra = [b for _, b in fts]
+    n = len(lig)
+    minis = ''.join('<button type="button" class="%s" data-i="%d" aria-label="Foto %d">'
+                    '<img src="%s" alt="" loading="lazy" decoding="async" width="120" height="90"></button>'
+                    % ('on' if k == 0 else '', k, k + 1, f) for k, f in enumerate(lig)) if n > 1 else ''
+    flechas = ('<button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button>'
+               '<button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button>'
+               '<span class="gal-n">1 / %d</span>' % n) if n > 1 else ''
+    return f'''<div class="gal{' una' if n < 2 else ''}" data-fotos="{e(json.dumps(lig))}" data-grandes="{e(json.dumps(gra))}">
+        {('<div class="gal-minis">' + minis + '</div>') if minis else ''}
+        <div class="gal-main">
+          <img src="{lig[0]}" alt="{alt}" {'fetchpriority="high"' if primera else 'loading="lazy"'} decoding="async" width="700" height="525">
+          {flechas}
+        </div>
+      </div>'''
+
+
+def franja(p):
+    d = [(k, p.get(c)) for k, c in (('Marca', 'marca'), ('Modelo', 'modelo'), ('Origen', 'origen')) if p.get(c)]
+    if not d:
+        return ''
+    return '<dl class="ft">%s</dl>' % ''.join(
+        '<div class="ft-%s"><dt>%s</dt><dd>%s</dd></div>' % (k.lower(), k, e(v)) for k, v in d)
+
+
+def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
+    texto = 'Hola Sinergia Biomédica, quiero cotizar: %s%s%s.' % (
+        p['nom'], ' ' + p['marca'] if p.get('marca') else '', ' ' + p['modelo'] if p.get('modelo') else '')
+    wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
+    correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote('Cotización: ' + p['nom']),
+                                                urllib.parse.quote(texto))
+    # Precio con vigencia (14 días desde la última actualización con el proveedor)
+    caja = ''
+    stock = p.get('stock')
+    badge = ('<span class="st si">En stock · %d %s</span>' % (stock, 'unidad' if stock == 1 else 'unidades')
+             if isinstance(stock, (int, float)) and stock > 0 else '')
+    if p.get('precio'):
+        nota = ('Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización'
+                % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Precio referencial, se confirma en la cotización'
+        caja = f'''<div class="precio-caja"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{badge}</div>
+          <small class="pc-nota">{nota}</small></div>'''
+    elif badge:
+        caja = '<div class="precio-caja"><div class="pc-fila"><b class="pc-monto consulta">Consultar precio</b>%s</div></div>' % badge
+    chips = ''
+    if p.get('clave'):
+        chips += '<span>Expediente <b>%s</b></span>' % e(p['clave'])
+    chips += '<span>Garantía y <b>mantenimiento</b></span>'
+    # Ficha técnica: activa si ya existe el PDF; si no, el espacio listo
+    pdf = pdf_venta(p['id'])
+    ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
+    if os.path.exists(ruta_pdf):
+        kb = max(1, round(os.path.getsize(ruta_pdf) / 1024))
+        doc = f'''<div class="doc">
+          <span class="doc-ico" aria-hidden="true">PDF</span>
+          <span class="doc-txt"><b>Ficha técnica</b><small>PDF · {kb} KB</small></span>
+          <button type="button" class="btn doc-ver" data-ver="{pdf}" data-pdf="{pdf}" data-titulo="Ficha técnica — {e(p['nom'])}">Ver</button>
+          <a class="btn fill doc-dl" href="{pdf}" download>Descargar</a>
+        </div>'''
+    else:
+        wa_f = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(
+            'Hola Sinergia Biomédica, me envían la ficha técnica de: %s %s %s' % (p['nom'], p.get('marca', ''), p.get('modelo', ''))))
+        doc = f'''<div class="doc pend">
+          <span class="doc-ico" aria-hidden="true">PDF</span>
+          <span class="doc-txt"><b>Ficha técnica</b><small>En preparación · te la enviamos con la cotización</small></span>
+          <a class="btn doc-pedir" href="{wa_f}" target="_blank" rel="noopener">Pedir ficha</a>
+        </div>'''
+
+    # Pestañas: Descripción · Parámetros técnicos · Para expedientes técnicos
+    areas = ''.join('<li>%s</li>' % e(a) for a in p.get('areas') or [])
+    desc = '<p>%s</p>' % e(p.get('resumen') or '')
+    if areas:
+        desc += '<p class="nota-p"><b>Se usa en:</b></p><ul>%s</ul>' % areas
+    desc += ('<p class="nota-p">Incluye asesoría para elegir el modelo, entrega en Lima y provincias '
+             'y mantenimiento después de la venta.</p>')
+    f = ficha_venta(p['id'])
+    if f:
+        filas = ''.join('<tr class="g"><th colspan="2">%s</th></tr>' % e(g['titulo'])
+                        + ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
+                        for g in f['secciones'])
+        pie = '<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del fabricante.</p>' % e(f.get('fuente', 'fabricante'))
+    else:
+        ident = [('Equipo', p['nom']), ('Marca', p.get('marca')), ('Modelo', p.get('modelo')),
+                 ('Procedencia', p.get('origen')), ('Categoría', cat)]
+        filas = '<tr class="g"><th colspan="2">Identificación</th></tr>' + ''.join(
+            '<tr><th>%s</th><td>%s</td></tr>' % (k, e(v)) for k, v in ident if v)
+        car = p.get('caracteristicas') or []
+        if car:
+            filas += '<tr class="g"><th colspan="2">Características principales</th></tr>' + ''.join(
+                '<tr><td colspan="2" class="car">%s</td></tr>' % e(c) for c in car)
+        pie = ('<p class="nota-p fuente">Los parámetros completos del fabricante van en la ficha técnica, '
+               'que te enviamos con la cotización.</p>')
+    pest = [('Descripción', desc), ('Parámetros técnicos', '<table>%s</table>%s' % (filas, pie))]
+    if p.get('expediente') or p.get('clave'):
+        exp = '<table>'
+        if p.get('expediente'):
+            exp += '<tr><th>Nombre en el expediente</th><td>%s</td></tr>' % e(p['expediente'])
+        if p.get('clave'):
+            exp += '<tr><th>Código de referencia</th><td>%s (según NTS 113-MINSA)</td></tr>' % e(p['clave'])
+        exp += '<tr><th>Modelo ofertado</th><td>%s</td></tr></table>' % e(' '.join(x for x in (p.get('marca'), p.get('modelo')) if x))
+        exp += ('<p class="nota-p">Envíanos la ficha técnica de tu expediente y te devolvemos el cuadro de '
+                'cumplimiento, punto por punto, con el modelo ofertado.</p>')
+        pest.append(('Para expedientes técnicos', exp))
+    tabs = ''.join('<button type="button" class="tab%s" role="tab">%s</button>' % (' on' if k == 0 else '', e(n))
+                   for k, (n, _) in enumerate(pest))
+    panels = ''.join('<div class="panel" role="tabpanel"%s>%s</div>' % ('' if k == 0 else ' hidden', c)
+                     for k, (_, c) in enumerate(pest))
+    # Anterior / Siguiente (orden de la tienda) y otros de la categoría
+    nav = '<nav class="sig" aria-label="Más equipos">%s%s</nav>' % (
+        ('<a class="ant" href="/venta/%s/"><small>‹ Anterior</small><b>%s</b></a>' % (prev['id'], e(prev['nom']))) if prev else '<span></span>',
+        ('<a class="pos" href="/venta/%s/"><small>Siguiente ›</small><b>%s</b></a>' % (sig['id'], e(sig['nom']))) if sig else '<span></span>')
+    otros = ''.join('<a href="/venta/%s/">%s</a>' % (o['id'], e(o['nom'] + (' ' + o['modelo'] if o.get('modelo') else '')))
+                    for o in mismos[:12])
+    return f'''
+    <article class="prod venta" id="{e(p['id'])}">
+      {galeria(p, fts)}
+      <div class="prod-info">
+        <div class="k">{e(cat)}</div>
+        <h1 class="prod-h1">{e(p['nom'])}</h1>
+        {franja(p)}
+        <p class="prod-desc">{e(p.get('resumen') or '')}</p>
+        {caja}
+        <div class="prod-chips">{chips}</div>
+        <div class="prod-btns">
+          <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+          <a class="btn" href="{correo}">Cotizar por correo</a>
+        </div>
+        {doc}
+      </div>
+    </article>
+    <div class="pest" data-tabs>
+      <div class="tabs" role="tablist">{tabs}</div>
+      {panels}
+    </div>
+    {nav}
+    {f"""<section class="otros">
+    <h2>Más en {e(cat)}</h2>
+    <div class="chips">{otros}</div>
+  </section>""" if otros else ''}
+  <p class="volver"><a class="btn" href="/#/venta/tienda">← Ver toda la tienda</a></p>'''
+
+
+VIG_JS = '''<script>
+  /* Si la página se generó hace tiempo y la vigencia ya pasó, no se muestra vencida. */
+  document.querySelectorAll('[data-vig]').forEach(function(b){
+    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.closest('.pc-nota').textContent = 'Precio referencial, por confirmar en la cotización';
+  });
+</script>'''
+
+
+def pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos):
+    cat = cats.get(p.get('cat'), '')
+    fts = fotos(p, base, fijas)
+    ruta = '/venta/%s/' % p['id']
+    nombre = ' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)
+    title = '%s | Venta en Lima — Sinergia Biomédica' % nombre
+    descripcion = '%s %s Venta con ficha técnica, entrega en Lima y provincias y mantenimiento.' % (
+        nombre + '.', (p.get('resumen') or '').rstrip('.') + '.' if p.get('resumen') else '')
+    cuerpo = producto(p, cat, cfg, fts, vig, prev, sig, mismos) + VIG_JS
+    oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
+              'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/PreOrder',
+              'seller': {'@id': SITIO + '/#negocio'}}
+    if p.get('precio'):
+        oferta['price'] = str(int(round(p['precio'])))
+        if vig:
+            oferta['priceValidUntil'] = vig.isoformat()
+    jsonld = [{'@type': 'Product', 'name': nombre, 'description': p.get('resumen') or nombre,
+               'brand': {'@type': 'Brand', 'name': p.get('marca') or 'Sinergia Biomédica'},
+               'model': p.get('modelo') or '', 'category': cat,
+               'image': [SITIO + a if a.startswith('/') else a for a, _ in fts][:3],
+               'offers': oferta}]
+    migas = [('Inicio', '/'), ('Venta', '/venta/'), (cat or 'Equipos', '/venta/#' + (p.get('cat') or '')),
+             (p['nom'], ruta)]
+    img = fts[0][0] if fts and fts[0][0].startswith('/') else None
+    return ruta, pagina(cfg, ruta=ruta, title=title, descripcion=descripcion, migas=migas,
+                        cuerpo=cuerpo, jsonld=jsonld, imagen=img)
+
+
+def pagina_hub(productos, cats_orden, cats, cfg, base, fijas):
+    ruta = '/venta/'
+    secciones = []
+    for cid in cats_orden:
+        ps = [p for p in productos if p.get('cat') == cid]
+        if not ps:
+            continue
+        tarjetas = ''.join(
+            '<a class="vt" href="/venta/%s/"><span class="vt-f">%s</span><span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>' % (
+                p['id'],
+                ('<img src="%s" alt="" loading="lazy" decoding="async">' % fotos(p, base, fijas)[0][0]) if fotos(p, base, fijas) else gp.ICONO,
+                e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
+                ('<i>%s</i>' % soles(p['precio'])) if p.get('precio') else '')
+            for p in ps)
+        secciones.append('<section class="vcat" id="%s"><h2>%s <small>%d</small></h2><div class="vts">%s</div></section>'
+                         % (e(cid), e(cats.get(cid, cid)), len(ps), tarjetas))
+    cuerpo = f'''
+  <section class="cabeza">
+    <div class="eyebrow">Venta · Equipamiento biomédico · Lima y provincias</div>
+    <h1>Venta de equipos médicos</h1>
+    <p class="lead">{len(productos)} equipos con stock para hospitales, clínicas y obras de equipamiento: ficha técnica, código de expediente y mantenimiento después de la venta.</p>
+    <p><a class="btn fill" href="/#/venta/tienda">Abrir la tienda con filtros →</a></p>
+  </section>
+  {''.join(secciones)}'''
+    jsonld = [{'@type': 'ItemList', 'name': 'Venta de equipos médicos',
+               'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
+                                    'url': SITIO + '/venta/%s/' % p['id']} for i, p in enumerate(productos)]}]
+    return ruta, pagina(cfg, ruta=ruta, title='Venta de equipos médicos en Lima y provincias | Sinergia Biomédica',
+                        descripcion='Equipos médicos con stock: monitores, electrocardiógrafos, autoclaves, desfibriladores, '
+                                    'ecógrafos y más, con ficha técnica y mantenimiento. Lima y provincias.',
+                        migas=[('Inicio', '/'), ('Venta', ruta)], cuerpo=cuerpo, jsonld=jsonld)
+
+
+# ─────────────────────────── escritura ───────────────────────────
+
+def mapa_portada(productos, cambios):
+    """window.PAGINA_VENTA = {id: '/venta/<id>/'} en index.html: la tienda lo
+    usa para abrir la página propia del equipo."""
+    txt = open(gp.INDEX, encoding='utf-8').read()
+    ini, fin = '<!--VENTA-URL-INICIO-->', '<!--VENTA-URL-FIN-->'
+    js = '<script>window.PAGINA_VENTA=%s;</script>' % json.dumps(
+        {p['id']: '/venta/%s/' % p['id'] for p in productos}, ensure_ascii=False, sort_keys=True)
+    if ini not in txt:
+        txt = txt.replace('<!--TIPOS-URL-FIN-->', '<!--TIPOS-URL-FIN-->\n' + ini + fin, 1)
+    nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin), lambda m: ini + js + fin, txt, flags=re.S)
+    gp.escribir('index.html', nuevo, cambios)
+
+
+def sitemap(paginas, cambios):
+    """Agrega/actualiza las URL de /venta/ sin tocar las demás."""
+    txt = open(gp.SITEMAP, encoding='utf-8').read() if os.path.exists(gp.SITEMAP) else ''
+    previas = gp.fechas_previas()
+    otras = [u for u in re.findall(r'  <url>.*?</url>', txt) if '/venta/' not in u]
+    hoy = datetime.date.today().isoformat()
+    nuevas = []
+    for ruta, rel in paginas:
+        loc = SITIO + ruta
+        fecha = hoy if (rel in cambios or loc not in previas) else previas[loc]
+        nuevas.append('  <url><loc>%s</loc><lastmod>%s</lastmod></url>' % (loc, fecha))
+    gp.escribir('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n'
+                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                + '\n'.join(otras + nuevas) + '\n</urlset>\n', cambios)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--datos', required=True, help='JSON en vivo del Apps Script de venta')
+    args = ap.parse_args()
+    cfg = gp.config_sitio()
+    vivo = gp.leer_json(args.datos)
+    repo = gp.leer_json(VENTA)
+    productos = [p for p in vivo.get('productos', []) if p.get('id') and p.get('nom')]
+    if not productos:
+        sys.exit('No hay equipos en los datos: no se genera nada.')
+    cats = {c['id']: c['nombre'] for c in repo.get('categorias', [])}
+    cats_orden = [c['id'] for c in repo.get('categorias', [])]
+    base = {p['id']: p for p in repo.get('productos', [])}
+    fijas = {k: v for k, v in (repo.get('fotosFijas') or {}).items() if not k.startswith('_')}
+    vig = vigencia(vivo.get('actualizado'))
+
+    orden = ordenar(productos)
+    cambios, paginas = [], []
+    ruta, doc = pagina_hub(orden, cats_orden, cats, cfg, base, fijas)
+    gp.escribir('venta/index.html', doc, cambios)
+    paginas.append((ruta, 'venta/index.html'))
+    for i, p in enumerate(orden):
+        prev = orden[i - 1] if i > 0 else None
+        sig = orden[i + 1] if i + 1 < len(orden) else None
+        mismos = [o for o in orden if o.get('cat') == p.get('cat') and o['id'] != p['id']]
+        ruta, doc = pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos)
+        rel = 'venta/%s/index.html' % p['id']
+        gp.escribir(rel, doc, cambios)
+        paginas.append((ruta, rel))
+
+    # Equipos que ya no se publican (sin stock o despublicados): su página se borra.
+    vigentes = {p['id'] for p in productos}
+    carpeta = os.path.join(ROOT, 'venta')
+    for d in sorted(os.listdir(carpeta)):
+        if os.path.isdir(os.path.join(carpeta, d)) and d not in vigentes:
+            os.remove(os.path.join(carpeta, d, 'index.html'))
+            os.rmdir(os.path.join(carpeta, d))
+            cambios.append('venta/%s/ (borrada)' % d)
+
+    mapa_portada(productos, cambios)
+    sitemap(paginas, cambios)
+    print('%d equipos de venta con página.' % len(productos))
+    print('Cambiaron: %d archivos' % len(cambios))
+
+
+if __name__ == '__main__':
+    main()

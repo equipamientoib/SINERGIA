@@ -1,0 +1,72 @@
+/* =====================================================================
+   Páginas propias de VENTA (venta/<id>/, venta/) — complemento de
+   css/alquiler.css (mismo formato que las páginas de alquiler).
+   Las genera scripts/generar_paginas_venta.py.
+   ===================================================================== */
+
+/* título del equipo (en venta es el h1 de la página) */
+.prod-h1{font-size:clamp(24px,2.6vw,31px);margin-top:6px;line-height:1.15}
+
+/* marca · modelo · origen: franja de ficha técnica */
+.ft{display:flex;flex-wrap:wrap;gap:8px 34px;margin:14px 0 0;padding:12px 0;
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
+.ft dt{font-family:var(--ff-d);font-size:10.5px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--gris)}
+.ft dd{margin:2px 0 0;font-size:17px;font-weight:600;color:var(--onix);line-height:1.25}
+.ft .ft-marca dd{font-family:var(--ff-d);letter-spacing:.8px;text-transform:uppercase;color:var(--cobre-d)}
+.ft .ft-origen dd{font-weight:500;color:var(--grafito)}
+
+/* precio con vigencia y stock */
+.precio-caja{margin-top:16px;padding:14px 18px;border:1px solid var(--linea);border-radius:12px;background:var(--crema)}
+.pc-fila{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px}
+.pc-monto{font-family:var(--ff-d);font-size:28px;font-weight:600;letter-spacing:-.4px;color:var(--onix)}
+.pc-monto.consulta{font-size:19px;color:var(--grafito)}
+.st{font-family:var(--ff-d);font-size:12px;font-weight:600;letter-spacing:.4px;padding:4px 10px;border-radius:99px}
+.st.si{color:#1D6B43;background:#E6F3EA;border:1px solid #BFE0CB}
+.st.si::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2E8B57;margin-right:6px;vertical-align:1px}
+.pc-nota{display:block;margin-top:6px;font-size:13px;color:var(--gris)}
+.pc-nota b{color:var(--grafito);font-weight:600}
+
+/* ficha técnica aún sin PDF: el espacio queda listo */
+.doc.pend{grid-template-columns:auto 1fr auto}
+.doc.pend .doc-ico{background:#C9BFA9}
+.doc-pedir{padding:9px 16px;font-size:13.5px;background:#fff}
+
+/* parámetros: características como lista dentro de la tabla */
+.panel td.car{font-weight:500;color:var(--grafito);padding-left:30px;position:relative}
+.panel td.car::before{content:"";position:absolute;left:12px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--bronce)}
+
+/* anterior / siguiente */
+.sig{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.sig a{display:flex;flex-direction:column;gap:2px;padding:14px 18px;background:var(--blanco);border:1px solid var(--linea);
+  border-radius:12px;transition:border-color .2s,transform .2s}
+.sig a:hover{border-color:var(--bronce);transform:translateY(-2px)}
+.sig a.pos{text-align:right}
+.sig small{font-family:var(--ff-d);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--bronce)}
+.sig b{font-family:var(--ff-d);font-size:15.5px;font-weight:600;color:var(--onix)}
+.volver{margin:26px 0 40px}
+
+/* página general /venta/ */
+.vcat{margin-top:26px;scroll-margin-top:90px}
+.vcat h2 small{font-size:13px;color:var(--gris);font-weight:500;margin-left:6px}
+.vts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.vt{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:center;padding:10px;background:var(--blanco);
+  border:1px solid var(--linea);border-radius:12px;transition:border-color .2s}
+.vt:hover{border-color:var(--bronce)}
+.vt-f{width:76px;height:64px;display:grid;place-items:center;background:#fff;border-radius:8px;overflow:hidden;color:var(--bronce)}
+.vt-f img{max-width:100%;max-height:100%;object-fit:contain}
+.vt-f svg{width:30px;height:30px}
+.vt-t b{display:block;font-family:var(--ff-d);font-size:14.5px;font-weight:600;line-height:1.25}
+.vt-t small{display:block;font-size:12.5px;color:var(--gris)}
+.vt-t i{font-style:normal;font-family:var(--ff-d);font-size:13px;font-weight:600;color:var(--cobre-d)}
+
+@media(max-width:860px){
+  .vts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+  .vts{grid-template-columns:1fr}
+  .sig{grid-template-columns:1fr}
+  .sig a.pos{text-align:left}
+  .ft{gap:8px 22px}
+  .ft dd{font-size:15.5px}
+  .pc-monto{font-size:24px}
+}
