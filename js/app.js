@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=cfedfb2d';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=d2f0e6bd';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=cfedfb2d';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=d2f0e6bd';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=cfedfb2d','js/06-tablero.js?v=cfedfb2d'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=d2f0e6bd','js/06-tablero.js?v=d2f0e6bd'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=cfedfb2d'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=d2f0e6bd'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1691,7 +1691,7 @@ function cargarVenta(){
     VENTA_CARGA = fetch('data/venta.json', {cache:'no-cache'})
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .catch(() => ({categorias:[], productos:[]}))
-      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom), fijas: d.fotosFijas||{}}; vMezclar(); return VENTA; });
+      .then(d => { VENTA = {categorias: d.categorias||[], productos: (d.productos||[]).filter(p => p && p.id && p.nom), fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[]}; vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
     if(vu) fetch(vu, {cache:'no-store'}).then(r => r.json()).then(d => { if(d && d.ok !== false) ventaEnVivo(d); }).catch(() => {});
@@ -1812,7 +1812,7 @@ function vCard(p){
   const url = `#/venta/p/${p.id}`;
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
-  const tag = p.destacado ? '<span class="tier">Más pedido</span>' : '';
+  const tag = p._top ? '<span class="tier">Más pedido</span>' : '';
   const pie = p.precio
     ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>sujeto a confirmación</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
@@ -1837,12 +1837,42 @@ function vHueso(){
     Array.from({length:8},()=>'<div class="v-cat v-hueso"></div>').join('')}</div></section>`;
 }
 
+/* ── Orden de la tienda ─────────────────────────────────────────────
+   1) Los fijados en data/venta.json («primerosWeb»), en ese orden.
+   2) Hasta S/ 60 000 antes; los más caros al final.
+   3) Dentro de cada tramo, variado y según el estudio de compras
+      públicas: primero una opción de cada tipo de equipo (la
+      representativa de la hoja o la más accesible), en el orden del
+      ranking; luego la segunda opción de cada tipo; etc.
+   Marca _top (etiqueta «Más pedido») al primero de cada tipo del ranking. */
+const V_CARO = 60000;
+function vOrden(lista){
+  const pin = (VENTA && VENTA.primeros) || [];
+  const grupos = new Map();
+  lista.forEach(p => { const k = p.ranking ? 'r'+p.ranking : 'c'+p.cat; if(!grupos.has(k)) grupos.set(k, []); grupos.get(k).push(p); });
+  const key = new Map();
+  grupos.forEach(g => {
+    /* Primera opción de cada tipo: la fijada, luego la elegida como
+       representativa en la hoja (destacado) y luego por precio. */
+    const fij = p => pin.includes(p.id) ? 0 : 1, des = p => p.destacado ? 0 : 1;
+    g.sort((a,b) => fij(a)-fij(b) || des(a)-des(b) || (a.precio||Infinity)-(b.precio||Infinity));
+    const ronda = [0,0];
+    g.forEach(p => { const t = (p.precio||0) > V_CARO ? 1 : 0; const r = ronda[t]++; key.set(p, [t, r]); p._top = !!(p.ranking && r === 0) || pin.includes(p.id); });
+  });
+  return lista.slice().sort((a,b) => {
+    const pa = pin.indexOf(a.id), pb = pin.indexOf(b.id);
+    if(pa >= 0 || pb >= 0) return (pa < 0 ? 999 : pa) - (pb < 0 ? 999 : pb);
+    const ka = key.get(a), kb = key.get(b);
+    return ka[0]-kb[0] || ka[1]-kb[1] || (a.ranking||999)-(b.ranking||999) || (a.precio||Infinity)-(b.precio||Infinity);
+  });
+}
+
 /* ── Portada de venta ─────────────────────────────────────────────── */
 function vPortada(){
   /* Mismo esquema que el inicio de alquiler: hero con imagen, franja de
      marcas, «más pedidos» con acceso a la tienda y accesos por categoría.
      destacado = puesto según las compras públicas 2024-2025 (OECE). */
-  const dest = VENTA.productos.filter(p => p.destacado).sort((a,b) => Number(a.destacado)-Number(b.destacado));
+  const dest = vOrden(VENTA.productos).filter(p => p._top);
   const n = VENTA.productos.length;
   const mosaico = dest.filter(p => (p.fotos||[]).length).slice(0,4);
   const marcas = ['EDAN','TUTTNAUER','KLS MARTIN','CU MEDICAL','SIARE','MEMMERT'];
@@ -1880,7 +1910,7 @@ function vPortada(){
         <div><div class="k">Tienda de venta</div><h2>Equipos más pedidos</h2></div>
         <a class="btn btn-fill" onclick="go('#/venta/tienda')">Ver toda la tienda →</a>
       </div>
-      <div class="grid">${dest.slice(0,6).map(vCard).join('')}</div>
+      <div class="grid">${dest.slice(0,8).map(vCard).join('')}</div>
       <div class="cat-chips">
         <span>Ir directo a</span>
         ${VENTA.categorias.filter(c => vDeCat(c.id).length).map(c => `<button class="chip" onclick="go('#/venta/cat/${c.id}')">${vEsc(c.nombre)}</button>`).join('')}
@@ -1991,15 +2021,15 @@ function vtFiltrados(){
     }
     return true;
   });
-  const orden = VENTA.categorias.map(c => c.id);
-  /* Orden por defecto: «más pedidos» primero y luego el puesto del tipo de
-     equipo en las compras públicas 2024-2025 (columna «ranking» de la hoja). */
-  const dest = p => p.destacado ? Number(p.destacado) : 999;
-  const rank = p => p.ranking ? Number(p.ranking) : 999;
   if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
   else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
   else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
-  else l.sort((a,b) => dest(a)-dest(b) || rank(a)-rank(b) || orden.indexOf(a.cat)-orden.indexOf(b.cat) || (a.precio||Infinity)-(b.precio||Infinity));
+  else {
+    /* Orden por defecto (vOrden) calculado sobre todo el catálogo, para que
+       la etiqueta «Más pedido» no cambie al filtrar. */
+    const pos = new Map(vOrden(VENTA.productos).map((p,i) => [p.id, i]));
+    l.sort((a,b) => pos.get(a.id)-pos.get(b.id));
+  }
   return l;
 }
 function vtPintar(){
