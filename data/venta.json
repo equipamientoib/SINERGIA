@@ -1,5 +1,5 @@
 {
-  "_nota": "Catálogo de VENTA. Cada producto lleva su categoría (cat), marca, modelo y, si aplica, el nombre y código con que aparece en los expedientes técnicos (expediente, clave). Las fotos van en img/venta/<id>-01.jpg (con versiones -m y .webp) y se listan en «fotos». Lo que falte no se muestra.",
+  "_nota": "Catálogo de VENTA. Cada producto lleva su categoría (cat), marca, modelo y, si aplica, el nombre y código con que aparece en los expedientes técnicos (expediente, clave). Las fotos van en img/venta/<id>-01.jpg (con versiones -m y .webp) y se listan en «fotosSitio» (respaldo: la foto del proveedor, la del modelo real, tiene prioridad). Lo que falte no se muestra.",
   "categorias": [
     {
       "id": "monitoreo",
@@ -79,7 +79,7 @@
         "Hospitalización",
         "Consulta externa"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-im20.jpg"
       ]
     },
@@ -104,7 +104,7 @@
         "Centro quirúrgico"
       ],
       "destacado": 4,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-im50.jpg"
       ]
     },
@@ -125,7 +125,7 @@
         "Cuidados intensivos",
         "Centro quirúrgico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-im70.jpg"
       ]
     },
@@ -148,7 +148,7 @@
         "Hospitalización",
         "Emergencia"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-m3.jpg"
       ]
     },
@@ -171,7 +171,7 @@
         "Consulta externa",
         "Emergencia"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-h100b.jpg"
       ]
     },
@@ -196,7 +196,7 @@
         "Cuidados intensivos",
         "Centro quirúrgico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/cu-medical-hd1.jpg"
       ]
     },
@@ -219,7 +219,7 @@
         "Emergencia",
         "Ambulancias"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/cu-medical-dea.jpg"
       ]
     },
@@ -242,7 +242,7 @@
         "Hospitalización",
         "Cuidados intensivos"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/metro-lifeline-lec2.jpg"
       ]
     },
@@ -267,7 +267,7 @@
         "Emergencia",
         "Hospitalización"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-se301.jpg"
       ]
     },
@@ -291,7 +291,7 @@
         "Consulta externa",
         "Cardiología"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-se1200-express.jpg"
       ]
     },
@@ -313,7 +313,7 @@
         "Consulta externa",
         "Hospitalización"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/heine-gamma-xxl-lf-s.jpg"
       ]
     },
@@ -333,7 +333,7 @@
       "areas": [
         "Consulta externa"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/riester-exacta.jpg"
       ]
     },
@@ -354,7 +354,7 @@
         "Consulta externa",
         "Hospitalización"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/riester-duplex-2.jpg"
       ]
     },
@@ -377,7 +377,7 @@
         "Centro obstétrico",
         "Neonatología"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/david-hkn-93a.jpg"
       ]
     },
@@ -401,7 +401,7 @@
         "Emergencia",
         "Ambulancias"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/david-ti-2000.jpg"
       ]
     },
@@ -425,7 +425,7 @@
         "Centro obstétrico",
         "Consulta externa"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-f3.jpg"
       ]
     },
@@ -447,7 +447,7 @@
       "areas": [
         "Centro obstétrico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-f9.jpg"
       ]
     },
@@ -469,7 +469,7 @@
         "Consulta externa",
         "Centro obstétrico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-sd3-plus.jpg"
       ]
     },
@@ -491,7 +491,7 @@
         "Consulta externa",
         "Centro obstétrico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-sd5.jpg"
       ]
     },
@@ -515,7 +515,7 @@
         "Centro obstétrico"
       ],
       "destacado": 5,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/david-yp-2000.jpg"
       ]
     },
@@ -535,7 +535,7 @@
       "areas": [
         "Centro quirúrgico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/medifa-6000.jpg"
       ]
     },
@@ -560,7 +560,7 @@
         "Centro obstétrico"
       ],
       "destacado": 7,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/kls-marled-e9i.jpg"
       ]
     },
@@ -581,7 +581,7 @@
       "areas": [
         "Centro quirúrgico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/kls-marled-x.jpg"
       ]
     },
@@ -602,7 +602,7 @@
         "Centro quirúrgico"
       ],
       "destacado": 8,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/ledspa-surtron-300.jpg"
       ]
     },
@@ -622,7 +622,7 @@
       "areas": [
         "Centro quirúrgico"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/comen-ax800.jpg"
       ]
     },
@@ -646,7 +646,7 @@
         "Emergencia",
         "Cuidados intensivos"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/cami-new-hospivac-350.jpg"
       ]
     },
@@ -668,7 +668,7 @@
         "Emergencia",
         "Hospitalización"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/cami-new-askir-30.jpg"
       ]
     },
@@ -691,7 +691,7 @@
         "Emergencia"
       ],
       "destacado": 2,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/siare-aria-104.jpg"
       ]
     },
@@ -715,7 +715,7 @@
         "Hospitalización",
         "Emergencia"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/medrena-vp50-pro.jpg"
       ]
     },
@@ -735,7 +735,7 @@
         "Cuidados intensivos",
         "Neonatología"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/medrena-sp50.jpg"
       ]
     },
@@ -760,7 +760,7 @@
         "Centro obstétrico"
       ],
       "destacado": 3,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-dus60.jpg"
       ]
     },
@@ -783,7 +783,7 @@
         "Diagnóstico por imágenes"
       ],
       "destacado": 6,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/perlove-rx-digital.jpg"
       ]
     },
@@ -807,7 +807,7 @@
         "Odontología"
       ],
       "destacado": 1,
-      "fotos": [
+      "fotosSitio": [
         "img/venta/tuttnauer-t-top-11.jpg"
       ]
     },
@@ -847,7 +847,7 @@
       "areas": [
         "Central de esterilización"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/tuttnauer-3870-ea.jpg"
       ]
     },
@@ -870,7 +870,7 @@
         "Central de esterilización",
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/memmert-sn55.jpg"
       ]
     },
@@ -891,7 +891,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/edan-h30-pro.jpg"
       ]
     },
@@ -910,7 +910,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/mindray-ba88a.jpg"
       ]
     },
@@ -930,7 +930,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/boeco-bm-120.jpg"
       ]
     },
@@ -950,7 +950,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/boeco-hc-240.jpg"
       ]
     },
@@ -969,7 +969,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/boeco-c-28a.jpg"
       ]
     },
@@ -991,7 +991,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/memmert-in55.jpg"
       ]
     },
@@ -1011,7 +1011,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/biobase-bsc-4fa2.jpg"
       ]
     },
@@ -1030,7 +1030,7 @@
       "areas": [
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/boeco-s200.jpg"
       ]
     },
@@ -1053,7 +1053,7 @@
         "Inmunizaciones",
         "Cadena de frío"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/meling-yc-315l.jpg"
       ]
     },
@@ -1073,7 +1073,7 @@
         "Banco de sangre",
         "Laboratorio"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/meling-xc-630l.jpg"
       ]
     },
@@ -1094,7 +1094,7 @@
         "Laboratorio",
         "Banco de sangre"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/meling-dw-fl528.jpg"
       ]
     },
@@ -1116,7 +1116,7 @@
       "areas": [
         "Hospitalización"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/hebei-pukang-b21-1.jpg"
       ]
     },
@@ -1137,7 +1137,7 @@
         "Consulta externa",
         "Triaje"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/detecto-solo.jpg"
       ]
     },
@@ -1158,7 +1158,7 @@
         "Consulta externa",
         "Neonatología"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/detecto-mb130.jpg"
       ]
     },
@@ -1180,7 +1180,7 @@
         "Emergencia",
         "Cuidados intensivos"
       ],
-      "fotos": [
+      "fotosSitio": [
         "img/venta/optium-emergeum.jpg"
       ]
     }
