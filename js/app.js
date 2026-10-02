@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2eef36d6';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=c10c3ee7';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2eef36d6';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=c10c3ee7';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=2eef36d6','js/06-tablero.js?v=2eef36d6'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=c10c3ee7','js/06-tablero.js?v=c10c3ee7'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=2eef36d6'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=c10c3ee7'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1894,6 +1894,20 @@ function vOrden(lista){
   });
 }
 
+/* Inicio: igual que la tienda, por tramo de precio; de cada tramo los 3
+   más pedidos y el acceso a la tienda filtrada por ese tramo. */
+function vPortadaTramos(){
+  const l = vOrdenTienda(VENTA.productos);
+  const out = [];
+  [...V_TRAMOS.keys(), V_TRAMOS.length].forEach(i => {
+    const g = l.filter(p => vTramo(p) === i);
+    if(!g.length) return;
+    out.push(`<div class="v-tramo"><b>${vTramoNombre(i)}</b><a onclick="go('#/venta/precio/${i}')">Ver ${g.length===1?'el equipo':'los '+g.length+' equipos'} →</a></div>
+      <div class="grid v-tramo-grid">${g.slice(0,3).map(vCard).join('')}</div>`);
+  });
+  return out.join('');
+}
+
 /* ── Portada de venta ─────────────────────────────────────────────── */
 function vPortada(){
   /* Mismo esquema que el inicio de alquiler: hero con imagen, franja de
@@ -1934,10 +1948,10 @@ function vPortada(){
     <div id="vResPortada"></div>
     <div data-sin-busqueda>
       <div class="shead">
-        <div><div class="k">Tienda de venta</div><h2>Equipos más pedidos</h2></div>
+        <div><div class="k">Tienda de venta</div><h2>Equipos más pedidos, por rango de precio</h2></div>
         <a class="btn btn-fill" onclick="go('#/venta/tienda')">Ver toda la tienda →</a>
       </div>
-      <div class="grid">${dest.slice(0,8).map(vCard).join('')}</div>
+      ${vPortadaTramos()}
       <div class="cat-chips">
         <span>Ir directo a</span>
         ${VENTA.categorias.filter(c => vDeCat(c.id).length).map(c => `<button class="chip" onclick="go('#/venta/cat/${c.id}')">${vEsc(c.nombre)}</button>`).join('')}
@@ -2001,8 +2015,9 @@ function vtConteo(campo){
   VENTA.productos.forEach(p => { const v = p[campo]; if(v) m.set(v, (m.get(v)||0)+1); });
   return m;
 }
-function vTienda(catInicial){
-  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false;
+function vTienda(catInicial, precioInicial){
+  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='dest';
+  if(precioInicial != null && precioInicial !== '') VT.precio.add(String(precioInicial));
   VT.cat = new Set(catInicial && vCat(catInicial) ? [catInicial] : []);
   const cc = vtConteo('cat'), cm = vtConteo('marca'), co = vtConteo('origen');
   const cats = VENTA.categorias.filter(c => cc.get(c.id)).map(c => [c.id, c.nombre, cc.get(c.id)]);
@@ -2051,6 +2066,24 @@ function vTienda(catInicial){
   </div></section>
   <section class="v-sec"><div class="wrap vt-lista">${vListaCaja()}</div></section>`;
 }
+/* Orden por defecto de la tienda (y del inicio): tramo de precio y, dentro,
+   más pedidos (puesto del tipo en el estudio), «Más pedido» primero y precio. */
+function vOrdenTienda(l){
+  vOrden(VENTA.productos);                 // marca «Más pedido» (_top) sobre todo el catálogo
+  const pin = (VENTA && VENTA.primeros) || [];
+  const rk = p => p.ranking ? Number(p.ranking) : 999;
+  /* Dentro de cada tramo: primero los fijados (primerosWeb), luego una
+     opción de cada tipo de equipo en el orden del estudio, luego la segunda
+     de cada tipo, etc. (así no salen dos microscopios seguidos). */
+  const ronda = new Map(), cuenta = new Map();
+  l.slice().sort((a,b) => (b._top?1:0)-(a._top?1:0) || (a.precio||Infinity)-(b.precio||Infinity)).forEach(p => {
+    const k = vTramo(p) + '|' + (p.ranking ? 'r'+p.ranking : 'c'+p.cat);
+    const n = cuenta.get(k) || 0; cuenta.set(k, n+1); ronda.set(p, n);
+  });
+  const fij = p => { const i = pin.indexOf(p.id); return i < 0 ? 999 : i; };
+  return l.slice().sort((a,b) => vTramo(a)-vTramo(b) || fij(a)-fij(b) || ronda.get(a)-ronda.get(b)
+    || rk(a)-rk(b) || (a.precio||Infinity)-(b.precio||Infinity));
+}
 function vtFiltrados(){
   const t = vNorm(VT.q).split(/\s+/).filter(w => w.length > 1);
   let l = VENTA.productos.filter(p => {
@@ -2069,11 +2102,7 @@ function vtFiltrados(){
   if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
   else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
   else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
-  else {
-    vOrden(VENTA.productos);                 // marca «Más pedido» (_top) sobre todo el catálogo
-    const rk = p => p.ranking ? Number(p.ranking) : 999;
-    l.sort((a,b) => vTramo(a)-vTramo(b) || rk(a)-rk(b) || (b._top?1:0)-(a._top?1:0) || (a.precio||Infinity)-(b.precio||Infinity));
-  }
+  else l = vOrdenTienda(l);
   return l;
 }
 function vtPintar(){
@@ -2182,8 +2211,8 @@ function renderVenta(parte){
     cargarVenta().then(() => { if(location.hash.startsWith('#/venta')) renderVenta(parte); });
     return;
   }
-  const tienda = parte[0]==='tienda' || parte[0]==='cat';
+  const tienda = parte[0]==='tienda' || parte[0]==='cat' || parte[0]==='precio';
   if(parte[0]==='p' && vPagina(parte[1])){ location.replace(vPagina(parte[1])); return; }   // enlaces viejos → página propia
-  el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
+  el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null, parte[0]==='precio' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
   if(tienda) vtPintar();
 }

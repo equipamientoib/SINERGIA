@@ -823,6 +823,10 @@
   .v-tramo:first-child{margin-top:0}
   .v-tramo b{font-family:var(--ff-d);font-size:20px;font-weight:600;color:var(--onix)}
   .v-tramo span{font-size:13px;color:var(--gris)}
+  .v-tramo a{font-family:var(--ff-d);font-size:14px;font-weight:600;color:var(--cobre-d);cursor:pointer;white-space:nowrap}
+  .v-tramo a:hover{text-decoration:underline}
+  .v-tramo-grid{margin-top:18px}
+  .v-tramo-grid + .v-tramo{margin-top:34px}
   /* Marca · modelo · origen: franja de ficha técnica */
   .v-ft{display:flex;flex-wrap:wrap;gap:8px 20px;margin:12px 0 0;padding:10px 0;
     border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
