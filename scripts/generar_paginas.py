@@ -438,7 +438,7 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
     # Sin precios, se cotiza como antes, por WhatsApp o correo.
     if cfg['precios'] and eq.get('dia'):
         # Un solo botón: el cotizador ya ofrece WhatsApp y correo al final.
-        botones = ('<a class="btn fill calc-link uno" href="/#/equipo/%s">Calcular mi alquiler</a>'
+        botones = ('<a class="btn fill calc-link uno" href="/#/cotizar/%s">Calcular mi alquiler</a>'
                    % eq['id'])
     else:
         botones = ('<a class="btn fill" href="%s" target="_blank" rel="noopener">Cotizar por WhatsApp</a>'

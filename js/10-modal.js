@@ -3,13 +3,13 @@ const vEscT = t => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<
 let actual=null;
 function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
-const TURNOS = `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
-function pkgConds(p){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
+const turnos = () => `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
+function pkgConds(p){return {medio:`Medio día: ${turnos()}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
 function eqConds(dia, id){
-  if(id && soloEquipo(id)) return {medio:`Medio día: ${TURNOS}.`,
+  if(id && soloEquipo(id)) return {medio:`Medio día: ${turnos()}.`,
     dia:`Lo recoges y lo devuelves en nuestra oficina. No necesita instrumentista: dejas tu DNI y S/ ${fmt(garantiaDe(id))} de garantía, que se te devuelve con el equipo.`,
     semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};
-  return {medio:`Medio día: ${TURNOS}.`,
+  return {medio:`Medio día: ${turnos()}.`,
   dia: tieneMedio(dia) ? `Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}).`
                        : `Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}): por su tarifa, medio día no cubre la entrega y el recojo.`,
   semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
@@ -71,6 +71,14 @@ function abrir(idx){
   if(tieneMedio(e.dia)) pr.medio=precioMedio(e.dia);
   openModal(e.nom, e.marca, pr, eqConds(e.dia, e.id), techRates(), true, 'medio', garantiaDe(e.id), e.id);
 }
+/* Abre el cotizador de un equipo por su id. El catálogo llega del Apps
+   Script y puede tardar, así que reintenta unos segundos antes de rendirse. */
+function abrirCotizador(id, intento){
+  const i = EQUIPOS.findIndex(e => e.id === id);
+  if(i >= 0){ abrir(i); return; }
+  if((intento||0) < 40) setTimeout(() => abrirCotizador(id, (intento||0)+1), 250);
+}
+
 function cerrar(){
   document.getElementById('ov').classList.remove('open');
   document.body.classList.remove('lock');

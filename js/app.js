@@ -917,17 +917,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=a75f5195';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4d097cc7';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=a75f5195';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4d097cc7';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=a75f5195','js/06-tablero.js?v=a75f5195'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=4d097cc7','js/06-tablero.js?v=4d097cc7'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=a75f5195'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=4d097cc7'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1001,7 +1001,17 @@ function route(sinMover){
   if(h.startsWith('#/equipo/') && (window.PAGINA_TIPO||{})[h.split('/')[2]]){
     location.replace(window.PAGINA_TIPO[h.split('/')[2]]); return;
   }
-  if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
+  /* #/cotizar/<id>: abre el cotizador de ese equipo. Es la ruta de los
+     botones «Calcular mi alquiler» de las páginas propias; no se redirige,
+     porque si no volvería a la página de donde vino. */
+  if(h.startsWith('#/cotizar/')){
+    pageId='page-catalogo'; navKey='#/catalogo'; setView('eq');
+    /* Diferido: route() puede correr mientras el paquete aún se evalúa y
+       10-modal.js todavía no existe. */
+    const idc = h.split('/')[2];
+    setTimeout(() => { if(typeof abrirCotizador === 'function') abrirCotizador(idc); }, 0);
+  }
+  else if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/paquete/')){renderPaquete(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/proyecto/')){renderProyecto(h.split('/')[2]);pageId='page-equipo';navKey='#/clientes';}
   else if(h==='#/venta'||h.startsWith('#/venta/')){renderVenta(h.split('/').slice(2));pageId='page-venta';navKey=h==='#/venta'?'#/venta':'#/venta/tienda';}
@@ -1016,7 +1026,7 @@ function route(sinMover){
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */
   const enVenta = h==='#/venta' || h.startsWith('#/venta/');
-  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete)\//.test(h);
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar)\//.test(h);
   let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
   try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
   modo = modo || 'alquiler';
@@ -1462,13 +1472,13 @@ const vEscT = t => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<
 let actual=null;
 function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
-const TURNOS = `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
-function pkgConds(p){return {medio:`Medio día: ${TURNOS}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
+const turnos = () => `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
+function pkgConds(p){return {medio:`Medio día: ${turnos()}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
 function eqConds(dia, id){
-  if(id && soloEquipo(id)) return {medio:`Medio día: ${TURNOS}.`,
+  if(id && soloEquipo(id)) return {medio:`Medio día: ${turnos()}.`,
     dia:`Lo recoges y lo devuelves en nuestra oficina. No necesita instrumentista: dejas tu DNI y S/ ${fmt(garantiaDe(id))} de garantía, que se te devuelve con el equipo.`,
     semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};
-  return {medio:`Medio día: ${TURNOS}.`,
+  return {medio:`Medio día: ${turnos()}.`,
   dia: tieneMedio(dia) ? `Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}).`
                        : `Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}): por su tarifa, medio día no cubre la entrega y el recojo.`,
   semana:'Tarifa semanal: equivale a 4 días.',mes:'Tarifa mensual: equivale a 12 días.'};}
@@ -1530,6 +1540,14 @@ function abrir(idx){
   if(tieneMedio(e.dia)) pr.medio=precioMedio(e.dia);
   openModal(e.nom, e.marca, pr, eqConds(e.dia, e.id), techRates(), true, 'medio', garantiaDe(e.id), e.id);
 }
+/* Abre el cotizador de un equipo por su id. El catálogo llega del Apps
+   Script y puede tardar, así que reintenta unos segundos antes de rendirse. */
+function abrirCotizador(id, intento){
+  const i = EQUIPOS.findIndex(e => e.id === id);
+  if(i >= 0){ abrir(i); return; }
+  if((intento||0) < 40) setTimeout(() => abrirCotizador(id, (intento||0)+1), 250);
+}
+
 function cerrar(){
   document.getElementById('ov').classList.remove('open');
   document.body.classList.remove('lock');
