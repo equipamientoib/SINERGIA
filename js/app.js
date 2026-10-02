@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=3817c9f0';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=65c93b97';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=3817c9f0';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=65c93b97';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=3817c9f0','js/06-tablero.js?v=3817c9f0'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=65c93b97','js/06-tablero.js?v=65c93b97'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=3817c9f0'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=65c93b97'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1773,10 +1773,14 @@ function vMail(asunto){
 
 /* Precio publicado (proveedor + margen, calculado en la hoja) y stock. */
 const vSoles = n => 'S/ ' + Number(n).toLocaleString('es-PE', {maximumFractionDigits: 0});
-function vStock(p){
+/* En la ficha (detalle=true) se muestra siempre la cantidad; en las tarjetas,
+   solo cuando quedan pocas unidades. */
+function vStock(p, detalle){
   if(p.stock === undefined || p.stock === null || p.stock === '') return '';
   const n = Number(p.stock);
-  return n > 0 ? `<span class="v-stock si">En stock${n<=5?' · '+n+' und.':''}</span>` : '<span class="v-stock">A pedido</span>';
+  if(!(n > 0)) return '<span class="v-stock">A pedido</span>';
+  const cant = detalle || n <= 5 ? ' · ' + n + (n === 1 ? ' unidad' : (detalle ? ' unidades' : ' und.')) : '';
+  return `<span class="v-stock si">En stock${cant}</span>`;
 }
 
 /* Foto del producto: la versión ligera (-m) en tarjetas y la grande en la ficha. */
@@ -2033,7 +2037,7 @@ function vProducto(id){
         <h1>${vEsc(p.nom)}</h1>
         <div class="v-marca">${vEsc([p.marca,p.modelo,p.origen].filter(Boolean).join(' · '))}</div>
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
-        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p)}<small>${p.precio?'Precio referencial, sujeto a confirmación en la cotización':'Consulta precio y plazo de entrega'}${VENTA.actualizado?' · Precios y stock al '+vEsc(VENTA.actualizado):''}</small></div>`:''}
+        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?'Precio referencial, sujeto a confirmación en la cotización':'Consulta precio y plazo de entrega'}${VENTA.actualizado?' · Precios y stock al '+vEsc(VENTA.actualizado):''}</small></div>`:''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
