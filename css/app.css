@@ -817,6 +817,12 @@
   .v-eq .badge.v-apedido{background:#F4EEE3;color:var(--gris);border-color:var(--linea)}
   .v-eq .v-sinfoto{position:absolute;inset:0;display:grid;place-items:center}
   .v-eq h3 a{cursor:pointer;color:inherit}
+  /* Títulos de tramo de precio en la tienda */
+  .v-tramo{grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    margin:18px 0 -4px;padding-bottom:10px;border-bottom:1px solid var(--linea-b)}
+  .v-tramo:first-child{margin-top:0}
+  .v-tramo b{font-family:var(--ff-d);font-size:20px;font-weight:600;color:var(--onix)}
+  .v-tramo span{font-size:13px;color:var(--gris)}
   /* Marca · modelo · origen */
   .v-mm{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:10px}
   .v-mm-marca{font-family:var(--ff-d);font-weight:700;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;

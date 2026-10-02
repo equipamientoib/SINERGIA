@@ -310,7 +310,21 @@ function vPortada(){
    (categoría, marca, procedencia, disponibilidad), buscador y orden
    arriba. #/venta/cat/<id> abre la tienda con esa categoría marcada.
    Filtrar solo repinta la grilla, así el buscador no pierde el foco. */
-var VT = {q:'', cat:new Set(), marca:new Set(), origen:new Set(), stock:false, orden:'dest'};
+var VT = {q:'', cat:new Set(), marca:new Set(), origen:new Set(), precio:new Set(), stock:false, orden:'dest'};
+
+/* Tramos de precio de la tienda (S/). Orden por defecto: por tramo, de menor
+   a mayor, y dentro de cada tramo por «más pedidos» (puesto del tipo de
+   equipo en el estudio de compras públicas 2024-2025). */
+const V_TRAMOS = [            // límite superior y nombre (con espacios que no se cortan)
+  [2000,     'Hasta S/ 2 000'],
+  [6000,     'S/ 2 000 – 6 000'],
+  [15000,    'S/ 6 000 – 15 000'],
+  [40000,    'S/ 15 000 – 40 000'],
+  [100000,   'S/ 40 000 – 100 000'],
+  [Infinity, 'Más de S/ 100 000']
+];
+function vTramo(p){ return p.precio ? V_TRAMOS.findIndex(t => p.precio <= t[0]) : V_TRAMOS.length; }
+function vTramoNombre(i){ return i < V_TRAMOS.length ? V_TRAMOS[i][1] : 'Consultar precio'; }
 
 function vtFaceta(titulo, clave, opciones){
   if(!opciones.length) return '';
@@ -323,7 +337,7 @@ function vtConteo(campo){
   return m;
 }
 function vTienda(catInicial){
-  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.stock=false;
+  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false;
   VT.cat = new Set(catInicial && vCat(catInicial) ? [catInicial] : []);
   const cc = vtConteo('cat'), cm = vtConteo('marca'), co = vtConteo('origen');
   const cats = VENTA.categorias.filter(c => cc.get(c.id)).map(c => [c.id, c.nombre, cc.get(c.id)]);
@@ -331,6 +345,8 @@ function vTienda(catInicial){
   const origenes = [...co].sort((a,b) => a[0].localeCompare(b[0])).map(([v,n]) => [v,v,n]);
   const hayStock = VENTA.productos.some(p => p.stock !== undefined && p.stock !== null && p.stock !== '');
   const hayPrecio = VENTA.productos.some(p => p.precio);
+  const ct = new Map(); VENTA.productos.forEach(p => { const t = String(vTramo(p)); ct.set(t, (ct.get(t)||0)+1); });
+  const tramos = [...V_TRAMOS.keys(), V_TRAMOS.length].filter(i => ct.get(String(i))).map(i => [String(i), vTramoNombre(i), ct.get(String(i))]);
   const c1 = VT.cat.size===1 ? vCat([...VT.cat][0]) : null;
   return `
   <div class="wrap pagehead">
@@ -343,6 +359,7 @@ function vTienda(catInicial){
     <button class="filtros-btn" onclick="document.getElementById('vtSide').classList.toggle('open')">Filtros ▾</button>
     <div class="catalog-layout">
       <aside class="filters-side" id="vtSide">
+        ${hayPrecio ? vtFaceta('Precio','precio',tramos) : ''}
         ${vtFaceta('Categoría','cat',cats)}
         ${vtFaceta('Marca','marca',marcas)}
         ${vtFaceta('Procedencia','origen',origenes)}
@@ -356,7 +373,7 @@ function vTienda(catInicial){
             <input type="search" placeholder="Buscar equipo, marca, modelo o código (ej. D-18)" oninput="VT.q=this.value;vtPintar()" aria-label="Buscar en la tienda">
           </label>
           <select class="vt-orden" onchange="VT.orden=this.value;vtPintar()" aria-label="Ordenar">
-            <option value="dest">Más pedidos primero</option>
+            <option value="dest">Por precio y más pedidos</option>
             <option value="az">Nombre (A–Z)</option>
             ${hayPrecio ? '<option value="pmen">Precio: menor a mayor</option><option value="pmay">Precio: mayor a menor</option>' : ''}
           </select>
@@ -375,6 +392,7 @@ function vtFiltrados(){
     if(VT.cat.size && !VT.cat.has(p.cat)) return false;
     if(VT.marca.size && !VT.marca.has(p.marca)) return false;
     if(VT.origen.size && !VT.origen.has(p.origen)) return false;
+    if(VT.precio.size && !VT.precio.has(String(vTramo(p)))) return false;
     if(VT.stock && !(Number(p.stock) > 0)) return false;
     if(t.length){
       const c = vCat(p.cat);
@@ -387,10 +405,9 @@ function vtFiltrados(){
   else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
   else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
   else {
-    /* Orden por defecto (vOrden) calculado sobre todo el catálogo, para que
-       la etiqueta «Más pedido» no cambie al filtrar. */
-    const pos = new Map(vOrden(VENTA.productos).map((p,i) => [p.id, i]));
-    l.sort((a,b) => pos.get(a.id)-pos.get(b.id));
+    vOrden(VENTA.productos);                 // marca «Más pedido» (_top) sobre todo el catálogo
+    const rk = p => p.ranking ? Number(p.ranking) : 999;
+    l.sort((a,b) => vTramo(a)-vTramo(b) || rk(a)-rk(b) || (b._top?1:0)-(a._top?1:0) || (a.precio||Infinity)-(b.precio||Infinity));
   }
   return l;
 }
@@ -402,9 +419,21 @@ function vtPintar(){
   VT.cat.forEach(v => { const c = vCat(v); chips.push(['cat',v,c?c.nombre:v]); });
   VT.marca.forEach(v => chips.push(['marca',v,v]));
   VT.origen.forEach(v => chips.push(['origen',v,v]));
+  VT.precio.forEach(v => chips.push(['precio',v,vTramoNombre(Number(v))]));
   document.getElementById('vtActivos').innerHTML = chips.map(([k,v,t]) =>
     `<button onclick="vtMarcar('${k}','${vEsc(v)}',false,true)">${vEsc(t)} ✕</button>`).join('');
-  g.innerHTML = l.length ? l.map(vCard).join('') : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
+  /* En el orden por defecto, un título por cada tramo de precio. */
+  let html = '';
+  if(VT.orden === 'dest'){
+    let t = -1;
+    l.forEach(p => {
+      const tp = vTramo(p);
+      if(tp !== t){ t = tp; const n = l.filter(x => vTramo(x) === tp).length;
+        html += `<div class="v-tramo"><b>${vTramoNombre(tp)}</b><span>${n} ${n===1?'equipo':'equipos'}</span></div>`; }
+      html += vCard(p);
+    });
+  } else html = l.map(vCard).join('');
+  g.innerHTML = l.length ? html : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
 }
 function vtMarcar(clave, v, on, desmarcar){
   on ? VT[clave].add(v) : VT[clave].delete(v);
@@ -412,7 +441,7 @@ function vtMarcar(clave, v, on, desmarcar){
   vtPintar();
 }
 function vtLimpiar(){
-  ['cat','marca','origen'].forEach(k => VT[k].clear()); VT.stock=false; VT.q='';
+  ['cat','marca','origen','precio'].forEach(k => VT[k].clear()); VT.stock=false; VT.q='';
   document.querySelectorAll('#vtSide input').forEach(i => i.checked=false);
   const b = document.querySelector('.vt-busca input'); if(b) b.value='';
   vtPintar();
