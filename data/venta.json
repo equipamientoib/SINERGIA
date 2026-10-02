@@ -1184,5 +1184,11 @@
         "img/venta/optium-emergeum.jpg"
       ]
     }
-  ]
+  ],
+  "fotosFijas": {
+    "_nota": "Fotos que reemplazan a la del proveedor cuando la suya está equivocada (id de la fila → fotos).",
+    "perlove-099414": [
+      "img/venta/perlove-rx-digital.jpg"
+    ]
+  }
 }
