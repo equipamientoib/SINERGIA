@@ -1,4 +1,5 @@
 /* ---- MODAL RESERVA ---- */
+const vEscT = t => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let actual=null;
 function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
@@ -20,6 +21,11 @@ function openModal(nom,marca,prices,conds,tec,igvInc,mod0,garantia){
   const cg = document.getElementById('cajaGar');
   cg.hidden = !actual.gar;
   if(actual.gar) document.getElementById('cGar').textContent = 'S/ ' + fmt(actual.gar);
+  /* Herramientas complementarias: van sin costo cuando va el instrumentista. */
+  const extra = document.getElementById('mIncluye');
+  const comp = actual.gar ? [] : complementos();
+  extra.hidden = !comp.length;
+  if(comp.length) extra.innerHTML = `<b>Incluido sin costo:</b> ${comp.map(c => vEscT(c.nom)).join(' · ')}.`;
   /* Sin medio día (instrumentos económicos), se oculta ese botón. */
   const hayMedio = prices.medio != null;
   const bMedio = document.querySelector('#modSeg [data-m="medio"]');

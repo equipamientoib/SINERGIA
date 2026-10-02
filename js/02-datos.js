@@ -60,6 +60,12 @@ let MEDIO_MIN=100, PEDIDO_MIN=0;
    La hoja puede cambiar la lista (modelo.sin_tecnico = {"id": garantía}). */
 let SIN_TECNICO = {manometro:100, luxometro:100, tacometro:100};
 const soloEquipo = id => Object.prototype.hasOwnProperty.call(SIN_TECNICO, id);
+/* Complementarias: no se alquilan solas. Van sin costo en todo alquiler con
+   instrumentista (el multímetro calibrado, por ejemplo, vale por su
+   certificado, y ese cliente ya está alquilando el analizador). */
+let COMPLEMENTOS = ['multimetro', 'set-46', 'destornillador-elec'];
+const esComplemento = e => !!e.apoyo || COMPLEMENTOS.indexOf(e.id) >= 0;
+const complementos = () => EQUIPOS.filter(esComplemento);
 const garantiaDe = id => SIN_TECNICO[id] || 0;
 const precioMedio=d=>Math.round(d*MEDIO_PCT);
 const tieneMedio=d=>Number(d) >= MEDIO_MIN;

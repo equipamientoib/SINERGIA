@@ -6,7 +6,7 @@ function buildCustom(){
   const pz = txt => VER_PRECIOS ? `<span class="cp">${txt}</span>` : '';
   const groups=[['ansim','Analizadores y simuladores'],['med','Instrumentos de medición'],['elec','Medidores eléctricos']];
   let html=groups.map(([g,label])=>{
-    const items=EQUIPOS.filter(e=>e.g===g&&!e.apoyo);
+    const items=EQUIPOS.filter(e=>e.g===g&&!esComplemento(e));
     if(!items.length)return '';
     return `<div class="cgroup"><div class="cgh">${label}</div>`+items.map(e=>`<label class="citem"><input type="checkbox" value="${e.id}" ${CUSTOM.sel.has(e.id)?'checked':''} onchange="toggleCustom('${e.id}',this.checked)"><span class="cn">${e.nom}</span>${pz('S/ '+e.dia+'/día')}</label>`).join('')+`</div>`;
   }).join('');
