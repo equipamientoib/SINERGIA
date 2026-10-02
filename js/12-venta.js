@@ -284,14 +284,9 @@ function vOrden(lista){
   });
 }
 
-/* Inicio: igual que la tienda, por tramo de precio; de cada tramo los 3
-   más pedidos y el acceso a la tienda filtrada por ese tramo. */
+/* Inicio: exactamente el mismo orden que la tienda, los 12 primeros. */
 function vPortadaTramos(){
-  /* Mismo orden que la tienda (tramos de precio de menor a mayor y, dentro,
-     más pedidos), sin mostrar los tramos: 2 equipos de cada tramo. */
-  const l = vOrdenTienda(VENTA.productos), sel = [];
-  [...V_TRAMOS.keys(), V_TRAMOS.length].forEach(i => sel.push(...l.filter(p => vTramo(p) === i).slice(0, 2)));
-  return `<div class="grid">${sel.map(vCard).join('')}</div>`;
+  return `<div class="grid">${vOrdenTienda(VENTA.productos).slice(0, 12).map(vCard).join('')}</div>`;
 }
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
