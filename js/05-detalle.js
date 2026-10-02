@@ -12,7 +12,7 @@ function renderEquipo(id){
   const priceHTML=isA
     ?`<div class="pricebox"><span class="pp" style="font-size:19px">Complementaria</span><span class="pu">· incluida en paquetes de Mantenimiento</span></div>`
     :(VER_PRECIOS
-      ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${fmt(precioMedio(e.dia))}</span><span class="pu">/ medio día · IGV incluido</span><span class="tag">${e.tier}</span></div>`
+      ?`<div class="pricebox"><span class="desde-d">Desde</span><span class="pp">S/ ${fmt(precioDesde(e.dia))}</span><span class="pu">/ ${unidadDesde(e.dia)} · IGV incluido</span><span class="tag">${e.tier}</span></div>`
       :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span><span class="tag">${e.tier}</span></div>`);
   const btnsHTML=isA
     ?`<div class="dbtns"><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
@@ -25,7 +25,7 @@ function renderEquipo(id){
     +(e.cal_fin?`<div class="row"><span class="l">Vigente hasta</span><span class="v">${e.cal_fin}</span></div>`:'')
     +(e.cal_pdf?`<div class="row"><span class="l">Documento</span><span class="v"><a href="${e.cal_pdf}" target="_blank" rel="noopener">Ver certificado</a></span></div>`:'')
     +`</div>`:'';
-  const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div><div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
+  const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div>${tieneMedio(e.dia)?`<div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div>`:''}<div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
     <div class="detail">
@@ -40,7 +40,7 @@ function renderEquipo(id){
         <h1>${e.nom}</h1>
         <div class="dmarca">${e.marca}</div>
         ${priceHTML}
-        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): &nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp; día S/ ${fmt(e.dia)} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">El mínimo es medio día: un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}). El día completo son los dos turnos. El personal técnico se cobra aparte.</div>`}
+        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): ${tieneMedio(e.dia)?`&nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp;`:''} día S/ ${fmt(e.dia)} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">${tieneMedio(e.dia)?`Medio día es un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}) y el día completo son los dos turnos.`:`Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}).`} Pedido mínimo S/ ${fmt(PEDIDO_MIN)}. El personal técnico se cobra aparte.</div>`}
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}

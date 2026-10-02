@@ -32,5 +32,6 @@
   .modal .btn{width:100%;margin-top:8px;padding:13px;font-size:15px}
   .calc{background:var(--crema);border:1px solid var(--linea);border-radius:var(--r-sm);padding:14px;margin:6px 0 16px;font-size:14px}
   .calc div{display:flex;justify-content:space-between;color:var(--gris);padding:1px 0}
+  .calc div[hidden]{display:none}
   .calc .tot{color:var(--onix);font-family:var(--ff-d);font-weight:700;margin-top:7px;padding-top:9px;border-top:1px solid var(--linea)}
 
