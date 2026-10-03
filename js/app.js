@@ -81,7 +81,7 @@ const CONFIG = {
   /* Clave para emitir cotizaciones (#/emitir/…). Solo viaja su hash SHA-256,
      nunca la clave. Para cambiarla, reemplaza este hash por el de la nueva.
      El cliente nunca pasa por esa pantalla: su enlace es el del resumen. */
-  EMITIR_HASH: "32620d6710820b70ee3c335f6f55426652fb1a4a6264ad7b55ecab7f74b529ae",
+  EMITIR_HASH: "d50bf3508be54ee073f3d0c99265eb970addad7af33d9776c10e2524b4650fb2",
 
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
@@ -251,6 +251,31 @@ let TEC_MIN=60;          // mínimo: medio día
 let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
 
+/* ── Paquetes del cotizador ───────────────────────────────────────────
+   Combinaciones armadas con los instrumentos que ya tenemos, pensadas por
+   área del hospital. Tienen precio propio (más barato que sumar los
+   instrumentos sueltos) y se alquilan por medio día o por día, incluso
+   cuando alguno de sus instrumentos, solo, no se alquila por medio día.
+   Todos van con instrumentista metrológico, que se cobra aparte.
+   Los precios se pueden cambiar desde data/tarifas-alquiler.json. */
+let COT_PAQ = [
+  {id:'uci', nom:'Paquete UCI y emergencia', eq:['esa620','defib','sp-sim','ms400'],
+   dia:490, medio:290,
+   para:'Monitores multiparámetro, desfibriladores, pulsioxímetros y electrocardiógrafos.'},
+  {id:'electro', nom:'Paquete electromedicina básica', eq:['esa620','ms400'],
+   dia:260, medio:155,
+   para:'Lo que se pide en casi todo mantenimiento: seguridad eléctrica y simulación de signos vitales.'},
+  {id:'quirofano', nom:'Paquete sala de operaciones', eq:['luxometro','manometro','fluke-945'],
+   dia:140, medio:85,
+   para:'Iluminación del campo quirúrgico, presión diferencial de la sala y nivel de ruido.'},
+  {id:'laboratorio', nom:'Paquete laboratorio', eq:['tacometro','fluke-51','luxometro'],
+   dia:135, medio:80,
+   para:'Centrífugas (rpm), baños maría, refrigeradoras e incubadoras (temperatura) e iluminación del mesón.'}
+];
+const paqById = id => COT_PAQ.find(p => p.id === id);
+/* Lo que costaría comprando los instrumentos del paquete por separado. */
+const paqSuelto = p => p.eq.reduce((s, id) => s + Number((byId(id) || {}).dia || 0), 0);
+
 const byId=id=>EQUIPOS.find(e=>e.id===id);
 /* Tarifas acordadas (data/tarifas-alquiler.json). Mandan sobre la hoja para
    poder publicarlas sin esperar a que la hoja se actualice. */
@@ -264,6 +289,8 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
     if(d.medioDiaDesde) MEDIO_MIN = d.medioDiaDesde;
     if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
+    if(d.paquetes) COT_PAQ.forEach(p => { const x = d.paquetes[p.id];
+      if(x){ if(x.dia > 0) p.dia = x.dia; if(x.medio > 0) p.medio = x.medio; } });
     if(d.dia){ TARIFAS = d.dia; aplicarTarifas();
     if(typeof repintarTodo === 'function') repintarTodo(); } }).catch(() => {});
 /* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
@@ -936,17 +963,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=960d4fc2';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=893aacf4';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=960d4fc2';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=893aacf4';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=960d4fc2','js/06-tablero.js?v=960d4fc2'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=893aacf4','js/06-tablero.js?v=893aacf4'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=960d4fc2'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=893aacf4'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2378,7 +2405,10 @@ function renderVenta(parte){
    #/cotizar/<id> entra con ese instrumento ya marcado: es a donde llevan
    los botones «Calcular mi alquiler» de las páginas de cada equipo.
    ===================================================================== */
-var COT = {sel: new Set(), mod: 'medio', qty: 1, d1: '', d2: ''};
+var COT = {sel: new Set(), mod: 'medio', qty: 1, d1: '', d2: '', paq: ''};
+/* Desde este número de días el alquiler se conversa directamente: a esa
+   altura cambian el precio, la logística y la calibración. */
+const COT_LARGO = 7;
 
 const cotEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
   ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -2388,7 +2418,23 @@ const cotLista = () => EQUIPOS.filter(e => !esComplemento(e) && e.dia > 0);
 
 function cotMarcar(id, on){
   on ? COT.sel.add(id) : COT.sel.delete(id);
+  COT.paq = cotPaqDe([...COT.sel]);   // deja de ser paquete si ya no coincide
   cotPintar();
+}
+/* Devuelve el paquete cuya lista coincide exactamente con lo marcado. */
+function cotPaqDe(ids){
+  const p = COT_PAQ.find(x => x.eq.length === ids.length && x.eq.every(i => ids.indexOf(i) >= 0));
+  return p ? p.id : '';
+}
+function cotPaquete(id){
+  const p = paqById(id);
+  if(!p) return;
+  if(COT.paq === id){ cotLimpiar(); return; }   // volver a tocarlo lo quita
+  COT.sel = new Set(p.eq.filter(byId));
+  COT.paq = id;
+  cotPintar();
+  const caja = document.getElementById('cotRes');
+  if(caja && window.innerWidth < 900) caja.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 function cotMod(m){ COT.mod = m; cotPintar(); }
 function cotCantidad(v){ COT.qty = Math.max(1, parseInt(v, 10) || 1); cotResumen(); }
@@ -2397,7 +2443,7 @@ function cotFechas(){
   COT.d2 = (document.getElementById('cotD2') || {}).value || '';
   cotResumen();
 }
-function cotLimpiar(){ COT.sel.clear(); COT.qty = 1; COT.d1 = COT.d2 = ''; cotPintar(); }
+function cotLimpiar(){ COT.sel.clear(); COT.paq = ''; COT.qty = 1; COT.d1 = COT.d2 = ''; cotPintar(); }
 
 /* ── Cálculo ──────────────────────────────────────────────────────────
    Una sola función con toda la cuenta, para que el resumen y el mensaje
@@ -2405,12 +2451,15 @@ function cotLimpiar(){ COT.sel.clear(); COT.qty = 1; COT.d1 = COT.d2 = ''; cotPi
 function cotCalcular(){
   const sel = [...COT.sel].map(byId).filter(Boolean);
   const base = sel.reduce((s, e) => s + Number(e.dia || 0), 0);
-  const desc = sel.length >= 4 ? (DESC_COMB['4'] || 0.15) : (DESC_COMB[String(sel.length)] || 0);
-  const dia = Math.round(base * (1 - desc));
-  /* Medio día: solo si TODOS los elegidos lo tienen. */
-  const hayMedio = sel.length > 0 && sel.every(e => tieneMedio(e.dia));
+  /* Paquete: precio propio, siempre con medio día. Fuera de paquete manda
+     el descuento por combinar y el medio día depende de cada instrumento. */
+  const paq = COT.paq ? paqById(COT.paq) : null;
+  const desc = paq ? (base ? 1 - paq.dia / base : 0)
+                   : (sel.length >= 4 ? (DESC_COMB['4'] || 0.15) : (DESC_COMB[String(sel.length)] || 0));
+  const dia = paq ? paq.dia : Math.round(base * (1 - desc));
+  const hayMedio = paq ? true : (sel.length > 0 && sel.every(e => tieneMedio(e.dia)));
   const mod = (COT.mod === 'medio' && !hayMedio) ? 'dia' : COT.mod;
-  const unit = {medio: precioMedio(dia), dia: dia, semana: dia * 4, mes: dia * 12}[mod];
+  const unit = mod === 'medio' ? (paq ? paq.medio : precioMedio(dia)) : dia;
   /* Cantidad: por días, del calendario; en el resto, a mano. */
   let qty = COT.qty, fechasOk = true;
   if(mod === 'dia'){
@@ -2419,22 +2468,47 @@ function cotCalcular(){
     else { fechasOk = !!(COT.d1 || COT.d2) ? false : true; qty = COT.qty; }
   }
   const alquiler = unit * qty;
-  /* Instrumentista: va si algún instrumento lo lleva. */
-  const conTecnico = sel.some(e => !soloEquipo(e.id));
-  const tunit = {medio: TEC_MIN, dia: TEC_DIA, semana: TEC_DIA * 4, mes: TEC_DIA * 12}[mod];
+  /* Instrumentista: va si algún instrumento lo lleva. En paquete va siempre. */
+  const conTecnico = !!paq || sel.some(e => !soloEquipo(e.id));
+  const tunit = mod === 'medio' ? TEC_MIN : TEC_DIA;
   const tecnico = conTecnico ? Math.max(TEC_MIN, tunit * qty) : 0;
   /* Garantía: solo cuando el cliente se los lleva sin instrumentista. */
   const garantia = conTecnico ? 0 : sel.reduce((s, e) => s + garantiaDe(e.id), 0);
-  return {sel, base, desc, dia, mod, hayMedio, unit, qty, alquiler, conTecnico, tecnico,
-          garantia, total: alquiler + tecnico, fechasOk};
+  /* Una semana o más ya no se cotiza solo: se conversa. */
+  const largo = mod === 'dia' && qty >= COT_LARGO;
+  return {sel, paq, base, desc, dia, mod, hayMedio, unit, qty, alquiler, conTecnico, tecnico,
+          garantia, total: alquiler + tecnico, fechasOk, largo};
 }
 
-const COT_MOD = [['medio', 'Medio día'], ['dia', 'Por día'], ['semana', 'Por semana'], ['mes', 'Por mes']];
-const COT_UNI = {medio: 'medio día', dia: 'día', semana: 'semana', mes: 'mes'};
-const COT_CANT = {medio: 'Turnos de medio día', dia: 'Días', semana: 'Semanas', mes: 'Meses'};
+/* «1 medio día», «2 medios días», «3 días». */
+const cotPlural = (u, q) => q === 1 ? u : (u === 'medio día' ? 'medios días' : u + 's');
+
+/* Solo medio día y día: de una semana en adelante se habla directamente. */
+const COT_MOD = [['medio', 'Medio día'], ['dia', 'Por día']];
+const COT_UNI = {medio: 'medio día', dia: 'día'};
+const COT_CANT = {medio: 'Turnos de medio día', dia: 'Días'};
 
 /* ── Página ─────────────────────────────────────────────────────────── */
+/* Tarjetas de los paquetes: un clic marca todos sus instrumentos. */
+function cotPaqPintar(){
+  const caja = document.getElementById('cotPaq');
+  if(!caja) return;
+  caja.innerHTML = COT_PAQ.map(p => {
+    const eq = p.eq.map(byId).filter(Boolean);
+    if(eq.length < p.eq.length) return '';
+    const suelto = paqSuelto(p), ahorro = suelto - p.dia;
+    return `<button type="button" class="cot-pq${COT.paq === p.id ? ' on' : ''}" onclick="cotPaquete('${p.id}')">
+      <b>${cotEsc(p.nom)}</b>
+      <span class="pq-eq">${eq.map(e => cotEsc(e.nom)).join(' · ')}</span>
+      <span class="pq-para">${cotEsc(p.para)}</span>
+      <span class="pq-pre"><i>S/ ${fmt(p.medio)}</i> medio día · S/ ${fmt(p.dia)} día</span>
+      ${ahorro > 0 ? `<span class="pq-ah">Ahorras S/ ${fmt(ahorro)} al día</span>` : ''}
+    </button>`;
+  }).join('');
+}
+
 function cotPintar(){
+  cotPaqPintar();
   const lista = document.getElementById('cotEq');
   if(!lista) return;
   const grupos = [['ansim', 'Analizadores y simuladores'], ['med', 'Instrumentos de medición'],
@@ -2506,36 +2580,56 @@ function cotResumen(){
   const u = COT_UNI[c.mod];
   /* Lo primero que se ve: el total y los dos botones. El detalle queda
      debajo, para quien quiera revisarlo. */
+  /* Lo primero que se ve: el total y los botones. Y si pide una semana o
+     más, en vez del total va la invitación a conversarlo. */
+  const arriba = c.largo
+    ? `<div class="cot-top largo">
+         <span>${c.qty} días · una semana o más</span>
+         <b>Conversémoslo</b>
+         <small>A partir de ${COT_LARGO} días el precio se arma caso por caso: cambian la
+           logística, la calibración y la disponibilidad. Te respondemos el mismo día.</small>
+         <div class="cot-acc">
+           <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Escríbenos por WhatsApp</button>
+         </div>
+       </div>`
+    : `<div class="cot-top">
+         <span>Tu cotización · ${c.qty} ${cotPlural(u, c.qty)}${c.paq ? ' · ' + cotEsc(c.paq.nom) : ''}</span>
+         <b>S/ ${c.total.toFixed(2)}</b>
+         <small>IGV incluido${c.garantia ? ' · + S/ ' + fmt(c.garantia) + ' de garantía que se devuelve' : ''}</small>
+         <div class="cot-acc">
+           <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
+           <button class="btn" onclick="cotVista()">Ver el resumen</button>
+         </div>
+       </div>`;
   caja.innerHTML = `
-    <div class="cot-top">
-      <span>Tu cotización · ${c.qty} ${c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's')}</span>
-      <b>S/ ${c.total.toFixed(2)}</b>
-      <small>IGV incluido${c.garantia ? ' · + S/ ' + fmt(c.garantia) + ' de garantía que se devuelve' : ''}</small>
-      <div class="cot-acc">
-        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
-        <button class="btn" onclick="cotVista()">Ver el resumen</button>
-      </div>
-    </div>
+    ${arriba}
 
     <div class="cot-paso"><b>2</b> ¿Por cuánto tiempo?</div>
     <div class="cot-seg">${seg}</div>
     ${c.mod === 'medio'
-      ? `<p class="cot-ayuda">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.</p>`
-      : (sinMedio.length ? `<p class="cot-ayuda">No hay medio día porque ${sinMedio.length === 1
+      ? `<p class="cot-ayuda">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.${c.paq
+          ? ' En paquete, el medio día vale también para los instrumentos que solos van desde un día.' : ''}</p>`
+      : (c.paq ? '' : sinMedio.length ? `<p class="cot-ayuda">No hay medio día porque ${sinMedio.length === 1
             ? 'el ' + cotEsc(sinMedio[0].nom.toLowerCase()) + ' se alquila' : 'algunos se alquilan'} desde un día completo.</p>` : '')}
     ${cant}
+    ${(c.largo || c.mod !== 'dia') ? '' : `<p class="cot-ayuda">¿Lo necesitas una semana o más? Ese caso lo vemos
+      directamente: elige las fechas y te aparece cómo escribirnos.</p>`}
 
     <div class="cot-paso"><b>3</b> El detalle</div>
     <ul class="cot-sel">${c.sel.map(e =>
       `<li><span>${cotEsc(e.nom)}</span><span>S/ ${fmt(e.dia)}</span></li>`).join('')}
-      ${c.desc ? `<li class="des"><span>Descuento por combinar ${n} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></li>` : ''}
+      ${c.paq
+        ? `<li class="des"><span>${cotEsc(c.paq.nom)} (−${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(c.base - c.paq.dia)}</span></li>`
+        : (c.desc ? `<li class="des"><span>Descuento por combinar ${n} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></li>` : '')}
     </ul>
-    <div class="cot-cuenta">
+    ${c.largo ? `<p class="cot-aviso"><b>No ponemos precio a ${c.qty} días en automático.</b>
+      Para una semana o más lo vemos contigo: escríbenos y te pasamos el precio del plazo completo.</p>`
+    : `<div class="cot-cuenta">
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
-      <div><span>× ${c.qty} ${c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's')}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
+      <div><span>× ${c.qty} ${cotPlural(u, c.qty)}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
       ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
       <div class="fino"><span>Incluye IGV 18 %</span><span>S/ ${(c.alquiler / 1.18 * 0.18).toFixed(2)}</span></div>
-    </div>
+    </div>`}
     ${c.garantia ? `<p class="cot-aviso"><b>Además dejas S/ ${fmt(c.garantia)} de garantía.</b>
       No es un cobro: se te devuelve cuando regreses el equipo. Lo recoges en nuestra oficina con tu DNI.</p>` : ''}
     ${inc.length ? `<p class="cot-aviso ok"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
@@ -2573,9 +2667,10 @@ function cotRestaurar(){
 /* Mensaje de la solicitud: numerado y con el detalle de cada instrumento,
    para que se pueda pasar tal cual a la cotización formal. */
 function cotTexto(c, nom, mail, tel){
-  const u = COT_UNI[c.mod], uq = c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
+  const u = COT_UNI[c.mod], uq = cotPlural(u, c.qty);
   const L = [];
-  L.push('SOLICITUD DE ALQUILER — ' + ((typeof SITE !== 'undefined' && SITE.nombre) || 'Sinergia Biomédica'));
+  L.push((c.largo ? 'ALQUILER POR UNA SEMANA O MÁS — ' : 'SOLICITUD DE ALQUILER — ') +
+    ((typeof SITE !== 'undefined' && SITE.nombre) || 'Sinergia Biomédica'));
   L.push('N.º ' + cotNumero() + ' · ' + new Date().toLocaleDateString('es-PE'));
   L.push('');
   L.push('CLIENTE');
@@ -2583,6 +2678,7 @@ function cotTexto(c, nom, mail, tel){
   if(mail) L.push('  Correo: ' + mail);
   if(tel)  L.push('  Teléfono: ' + tel);
   L.push('');
+  if(c.paq) L.push('PAQUETE: ' + c.paq.nom);
   L.push('PERIODO: ' + c.qty + ' ' + uq + (c.mod === 'medio' ? ' (turnos de 4 h)' : ''));
   if(c.mod === 'dia' && COT.d1 && COT.d2) L.push('  Del ' + COT.d1 + ' al ' + COT.d2);
   L.push('');
@@ -2592,6 +2688,12 @@ function cotTexto(c, nom, mail, tel){
     L.push('   ' + (e.marca || '') + ' · S/ ' + fmt(e.dia) + ' por día');
   });
   L.push('');
+  if(c.largo){
+    L.push('Son ' + c.qty + ' días, así que les pido su mejor precio para este plazo.');
+    L.push('');
+    L.push('Entrega en oficina (Lima). A provincias, envío por agencia a cargo del cliente.');
+    return L.join('\n');
+  }
   L.push('CUENTA');
   if(c.desc) L.push('  Suma por día: S/ ' + fmt(c.base));
   if(c.desc) L.push('  Descuento por combinar ' + c.sel.length + ': −' + Math.round(c.desc * 100) + ' % (S/ ' + fmt(Math.round(c.base * c.desc)) + ')');
@@ -2635,17 +2737,20 @@ function cotEnviar(via){
     const el = document.getElementById('cotNom'); if(el && !nom) setTimeout(() => el.focus(), 350);
     return;
   }
-  const enlace = cotEnlace(doc);
-  const texto = cotTexto(c, nom, mail, tel) + '\n\nResumen de este pedido:\n' + enlace;
+  /* Una semana o más: va el pedido sin precio, para conversarlo. */
+  const texto = c.largo
+    ? cotTexto(c, nom, mail, tel)
+    : cotTexto(c, nom, mail, tel) + '\n\nResumen de este pedido:\n' + cotEnlace(doc);
   if(typeof enviarAlEndpoint === 'function')
     enviarAlEndpoint({tipo: 'cotizador', equipo: c.sel.map(e => e.nom).join(' + '), modalidad: c.mod,
                       total: 'S/ ' + c.total.toFixed(2), nombre: nom, correo: mail, telefono: tel});
-  avisar('cotAviso', via === 'correo'
-    ? 'Abriendo tu correo con el resumen de tu pedido…'
-    : 'Abriendo WhatsApp con el resumen de tu pedido…', 'ok');
+  avisar('cotAviso', c.largo
+    ? (via === 'correo' ? 'Abriendo tu correo con tu pedido…' : 'Abriendo WhatsApp con tu pedido…')
+    : (via === 'correo' ? 'Abriendo tu correo con el resumen de tu pedido…'
+                        : 'Abriendo WhatsApp con el resumen de tu pedido…'), 'ok');
   /* Solo viaja el enlace: el cliente no se descarga ningún documento. El
      único PDF es la cotización formal que emite la empresa. */
-  abrirCanal(via, texto, 'Solicitud de alquiler');
+  abrirCanal(via, texto, c.largo ? 'Alquiler por una semana o más' : 'Solicitud de alquiler');
 }
 
 /* ── Cotización formal ───────────────────────────────────────────────
@@ -2699,7 +2804,7 @@ function cotDoc(c, nom, mail, tel, numero){
   return {
     num: numero, fecha: new Date().toLocaleDateString('es-PE'),
     nom: nom, mail: mail, tel: tel,
-    mod: c.mod, qty: c.qty, d1: COT.d1, d2: COT.d2,
+    mod: c.mod, qty: c.qty, d1: COT.d1, d2: COT.d2, paq: c.paq ? c.paq.nom : '',
     items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia, f: cotFotoAbs(e)})),
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
     tec: c.tecnico, gar: c.garantia, total: c.total,
@@ -2736,10 +2841,11 @@ function cotEnlace(doc, ruta){
 
 /* Términos y condiciones, numerados como en las cotizaciones de la empresa. */
 function cotTerminos(c){
-  const u = COT_UNI[c.mod], uq = c.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
+  const u = COT_UNI[c.mod], uq = cotPlural(u, c.qty);
   const conTec = !!c.tec, gar = c.gar || 0;
   const T = [];
-  T.push(['1. Precio de la oferta.', 'Importes en Soles (S/), con IGV incluido. Comprenden el alquiler de los instrumentos por ' +
+  T.push(['1. Precio de la oferta.', 'Importes en Soles (S/), con IGV incluido. Comprenden el alquiler ' +
+    (c.paq ? 'del ' + String(c.paq).toLowerCase() + ' completo' : 'de los instrumentos') + ' por ' +
     c.qty + ' ' + uq + (conTec ? ' y el servicio de instrumentista metrológico.' : '.')]);
   T.push(['2. Vigencia de la oferta.', 'Quince (15) días calendario contados desde la emisión de esta cotización.']);
   T.push(['3. Calibración.', 'Todos los instrumentos se entregan con su certificado de calibración vigente, emitido por laboratorio acreditado, y se devuelven con el mismo certificado.']);
@@ -2770,7 +2876,7 @@ function cotTerminos(c){
    El cliente nunca genera la segunda: eso lo decide la empresa. */
 function cotHTML(d, formal){
   const S = (typeof SITE !== 'undefined') ? SITE : {};
-  const u = COT_UNI[d.mod], uq = d.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
+  const u = COT_UNI[d.mod], uq = cotPlural(u, d.qty);
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
   const neto = d.total / 1.18, igv = d.total - neto;
@@ -2882,6 +2988,7 @@ function cotHTML(d, formal){
           emite ${cotEsc(S.razonSocial || '')} después de confirmar la disponibilidad.</div>
         <div class="meta"><span>Solicitud N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
         <p class="para"><b>Para:</b> ${cotEsc(d.nom || '—')}${d.tel ? ' · ' + cotEsc(d.tel) : ''}${d.mail ? ' · ' + cotEsc(d.mail) : ''}<br>
+          ${d.paq ? '<b>Paquete:</b> ' + cotEsc(d.paq) + '<br>' : ''}
           <b>Periodo:</b> ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}</p>
         <h2>Instrumentos y precio estimado</h2>
         ${cuadro}
@@ -2943,7 +3050,7 @@ function cotHTML(d, formal){
       <p class="cli">Señores:<br><b>${cotEsc((d.nom || '[RAZÓN SOCIAL DEL CLIENTE]').toUpperCase())}</b><br>
         ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
         ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
-      <p class="campo"><b>Asunto:</b> Alquiler de instrumentos de metrología biomédica con certificado de
+      <p class="campo"><b>Asunto:</b> Alquiler de ${d.paq ? cotEsc(d.paq).toLowerCase() + ' (instrumentos de metrología biomédica)' : 'instrumentos de metrología biomédica'} con certificado de
         calibración vigente, por ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}.</p>
       <p class="intro">Es grato dirigirnos a ustedes para saludarlos cordialmente y, en atención a su
         requerimiento, alcanzarles nuestra propuesta económica por el alquiler de los instrumentos

@@ -80,7 +80,7 @@ const CONFIG = {
   /* Clave para emitir cotizaciones (#/emitir/…). Solo viaja su hash SHA-256,
      nunca la clave. Para cambiarla, reemplaza este hash por el de la nueva.
      El cliente nunca pasa por esa pantalla: su enlace es el del resumen. */
-  EMITIR_HASH: "32620d6710820b70ee3c335f6f55426652fb1a4a6264ad7b55ecab7f74b529ae",
+  EMITIR_HASH: "d50bf3508be54ee073f3d0c99265eb970addad7af33d9776c10e2524b4650fb2",
 
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
