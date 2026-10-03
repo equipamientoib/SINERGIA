@@ -414,8 +414,8 @@ function cotHTML(d, formal){
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
   const neto = d.total / 1.18, igv = d.total - neto;
-  /* Precio unitario de cada instrumento, prorrateado sobre el total: así la
-     suma del cuadro cuadra exactamente con el total que vio el cliente. */
+  /* Precio unitario prorrateado sobre el total: la suma del cuadro cuadra
+     exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   const filas = d.items.map((e, i) => {
     const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
@@ -434,30 +434,30 @@ function cotHTML(d, formal){
         <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
       <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '');
-  const term = cotTerminos(d).map(([k, v]) =>
-    `<p class="term"><b>${cotEsc(k)}</b> ${cotEsc(v)}</p>`).join('');
+  const cuadro = `<table>
+      <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
+        <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
+      ${filas}
+      <tr class="tot"><td class="k" colspan="5">SUBTOTAL (S/)</td><td class="d">${neto.toFixed(2)}</td></tr>
+      <tr class="tot"><td class="k" colspan="5">IGV (18%) (S/)</td><td class="d">${igv.toFixed(2)}</td></tr>
+      <tr class="gran"><td class="k" colspan="5">TOTAL CON IGV (S/)</td><td class="d">${d.total.toFixed(2)}</td></tr>
+    </table>`;
   const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
                  'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre'];
   const hoy = new Date();
   const fechaLarga = 'Lima, ' + String(hoy.getDate()).padStart(2, '0') + ' de ' +
     meses[hoy.getMonth()] + ' de ' + hoy.getFullYear();
-  return `<!doctype html><html lang="es"><head><meta charset="utf-8">
-  <title>Cotización ${cotEsc(d.num)}</title><style>
-    @page{size:A4 portrait;margin:14mm 16mm}
+
+  /* Estilos comunes a los dos documentos. */
+  const base = `
+    @page{size:A4 portrait;margin:14mm 16mm 16mm}
     *{box-sizing:border-box}
-    body{margin:0 auto;padding:12mm 14mm;max-width:210mm;background:#fff;color:#1a1a1a;
-      font:11px/1.5 "Segoe UI",Calibri,Arial,Helvetica,sans-serif}
-    .membrete{width:100%;display:block;margin-bottom:14px}
-    h1{margin:0;text-align:center;font-size:13.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;
-      text-transform:uppercase;line-height:1.35}
-    .lin{height:2px;background:#9A7F4E;margin:7px 0 12px}
-    .nf{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:14px}
-    .cli{margin:0 0 12px;line-height:1.55}
-    .cli b{font-weight:700}
-    .campo{margin:0 0 8px;text-align:justify}
-    .campo b{color:#9A7F4E}
-    .intro{margin:12px 0 16px;text-align:justify}
-    h2{margin:18px 0 6px;font-size:11.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;text-transform:uppercase}
+    body{margin:0;background:#fff;color:#1a1a1a;font:11px/1.5 "Segoe UI",Calibri,Arial,Helvetica,sans-serif}
+    .hoja{position:relative;width:210mm;min-height:297mm;margin:0 auto;padding:14mm 16mm 16mm}
+    /* Membrete en <thead> y pie en <tfoot>: el navegador los repite solo
+       en cada hoja impresa, sin pisar el texto. */
+    .pag{width:100%;border-collapse:collapse}
+    .pag>thead>tr>td,.pag>tfoot>tr>td,.pag>tbody>tr>td{border:0;padding:0;vertical-align:top}
     table{width:100%;border-collapse:collapse;font-size:10px}
     th{background:#9A7F4E;color:#fff;border:1px solid #9A7F4E;padding:6px 5px;font-size:9.5px;
       font-weight:700;text-align:center;letter-spacing:.3px}
@@ -470,71 +470,132 @@ function cotHTML(d, formal){
     tr.tot td{background:#f5f2ec;font-weight:700}
     tr.tot td.k{text-align:right}
     tr.gran td{background:#9A7F4E;color:#fff;font-weight:700}
+    h2{margin:18px 0 6px;font-size:11.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;text-transform:uppercase}
     .nota{margin:7px 0 0;font-size:9.5px;color:#7A7A7A;text-align:justify}
+    /* Al imprimir mandan los márgenes de @page. */
+    @media print{.hoja{width:auto;min-height:0;margin:0;padding:0}tr,.term{break-inside:avoid}}`;
+
+  if(!formal){
+    /* ── RESUMEN del cliente ──────────────────────────────────────────
+       Tiene que verse distinto de una cotización: sello de agua, franja
+       de aviso, sin carta formal, sin firma y sin datos de pago. */
+    return `<!doctype html><html lang="es"><head><meta charset="utf-8">
+    <title>Resumen de alquiler ${cotEsc(d.num)}</title><style>${base}
+      .sello{position:absolute;top:44%;left:0;right:0;text-align:center;font-size:54px;font-weight:800;
+        color:rgba(154,127,78,.10);letter-spacing:3px;transform:rotate(-20deg);z-index:0;
+        pointer-events:none}
+      .cont{position:relative;z-index:1}
+      .cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+        border-bottom:2px solid #9A7F4E;padding-bottom:7px;margin-bottom:12px}
+      .cab b{font-size:15px;color:#9A7F4E}
+      .cab span{font-size:10.5px;color:#555}
+      h1{margin:0 0 10px;font-size:17px;font-weight:700;color:#1a1a1a}
+      .franja{margin:0 0 14px;padding:11px 13px;background:#fdf6e6;border:1px solid #e3cf9b;
+        border-left:4px solid #c9a227;border-radius:4px;font-size:10.5px;line-height:1.55;text-align:justify}
+      .franja b{display:block;font-size:12px;color:#8a6d1d;margin-bottom:3px}
+      .meta{display:flex;justify-content:space-between;font-size:10.5px;color:#555;margin-bottom:12px}
+      .para{margin:0 0 12px;font-size:11px}
+      .para b{color:#9A7F4E}
+      ul.lst{margin:4px 0 0;padding-left:16px;font-size:10.5px;line-height:1.6}
+      .pasos{margin-top:16px;padding:12px 14px;background:#f5f2ec;border-radius:5px;font-size:10.5px;line-height:1.6}
+      .pasos b{color:#9A7F4E}
+      .pie{margin-top:9mm;padding-top:3mm;border-top:1px solid #ddd8cc;
+        font-size:9px;color:#8a8a8a;text-align:center}
+    </style></head><body>
+      <div class="hoja"><div class="sello">REFERENCIAL</div><table class="pag">
+        <tfoot><tr><td><div class="pie">${cotEsc(S.nombre || '')} · ${cotEsc(S.web || '')} · Documento referencial, sin validez comercial</div></td></tr></tfoot>
+        <tbody><tr><td><div class="cont">
+        <div class="cab"><b>${cotEsc(S.nombre || '')}</b><span>${cotEsc(S.web || '')} · ${cotEsc(S.telefono || '')}</span></div>
+        <h1>Resumen de tu alquiler</h1>
+        <div class="franja"><b>Esto no es una cotización.</b>
+          Es un estimado que calculaste en nuestra web, sujeto a confirmar que los instrumentos estén
+          libres en las fechas que necesitas. La cotización formal, con firma y validez comercial, la
+          emite ${cotEsc(S.razonSocial || '')} después de confirmar la disponibilidad.</div>
+        <div class="meta"><span>Solicitud N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
+        <p class="para"><b>Para:</b> ${cotEsc(d.nom || '—')}${d.tel ? ' · ' + cotEsc(d.tel) : ''}${d.mail ? ' · ' + cotEsc(d.mail) : ''}<br>
+          <b>Periodo:</b> ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}</p>
+        <h2>Instrumentos y precio estimado</h2>
+        ${cuadro}
+        <p class="nota">Importes en Soles (S/), con IGV incluido. ${cotMontoLetras(d.total)}${d.gar
+          ? ' Además se deja una garantía en depósito de S/ ' + fmt(d.gar) + ', que se devuelve al retornar los instrumentos.' : ''}</p>
+        <h2>Qué incluye</h2>
+        <ul class="lst">
+          <li>Certificado de calibración vigente de cada instrumento.</li>
+          ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'
+                  : '<li>Retiro y devolución en nuestra oficina de Lima, presentando documento de identidad.</li>'}
+          ${(d.inc || []).length ? '<li>Sin costo: ' + cotEsc((d.inc || []).join(', ')) + '.</li>' : ''}
+          <li>${d.mod === 'medio' ? 'Medio día es un turno de 4 horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.'
+                                  : 'El día completo son los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.'}</li>
+        </ul>
+        <div class="pasos"><b>Para confirmar:</b> escríbenos por WhatsApp al ${cotEsc(S.telefono || '')}
+          o a ${cotEsc(S.email || '')}, indicando el número de solicitud ${cotEsc(d.num)}.
+          Revisamos la disponibilidad y te enviamos la cotización formal el mismo día.</div>
+      </div></td></tr></tbody></table></div>
+    </body></html>`;
+  }
+
+  /* ── COTIZACIÓN formal ────────────────────────────────────────────
+     Membrete arriba y pie con razón social y RUC en todas las páginas,
+     como la plantilla de Word de la empresa. */
+  const term = cotTerminos(d).map(([k, v]) =>
+    `<p class="term"><b>${cotEsc(k)}</b> ${cotEsc(v)}</p>`).join('');
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8">
+  <title>Cotización ${cotEsc(d.num)}</title><style>${base}
+    .memb{padding-bottom:7mm}
+    .memb img{width:100%;display:block}
+    .pie{margin-top:8mm;padding-top:3mm;border-top:1px solid #d9d2c2;
+      font-size:9px;color:#6b6b6b;text-align:center;letter-spacing:.2px}
+    h1{margin:0;text-align:center;font-size:13.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;
+      text-transform:uppercase;line-height:1.35}
+    .lin{height:2px;background:#9A7F4E;margin:7px 0 12px}
+    .nf{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:14px}
+    .cli{margin:0 0 12px;line-height:1.55}
+    .campo{margin:0 0 8px;text-align:justify}
+    .campo b{color:#9A7F4E}
+    .intro{margin:12px 0 16px;text-align:justify}
     .term{margin:0 0 6px;text-align:justify;font-size:10.5px}
-    .term b{color:#1a1a1a}
     .dpag{margin-top:6px;font-size:10.5px}
     .dpag div{display:flex;gap:8px;padding:1px 0}
     .dpag span{min-width:160px;color:#555}
     .cierre{margin:14px 0 0;text-align:justify}
-    .cab-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
-      border-bottom:2px solid #9A7F4E;padding-bottom:7px;margin-bottom:12px}
-    .cab-r b{font-size:15px;color:#9A7F4E;letter-spacing:-.2px}
-    .cab-r span{font-size:10.5px;color:#555}
-    .aviso{margin:0 0 12px;padding:9px 11px;background:#f7f4ee;border:1px solid #e0d8c7;
-      border-radius:4px;font-size:10px;line-height:1.5;text-align:justify;color:#4a443a}
-    .aviso b{color:#9A7F4E}
     .firma{margin-top:10px}
     .firma img{width:170px;display:block}
-    @media print{body{padding:0;max-width:none}.term,tr{break-inside:avoid}}
   </style></head><body>
-    ${formal
-      ? `<img class="membrete" src="${org}/img/cotizacion/membrete.png" alt="${cotEsc(S.razonSocial || '')}">`
-      : `<div class="cab-r"><b>${cotEsc(S.nombre || '')}</b><span>${cotEsc(S.web || '')} · ${cotEsc(S.telefono || '')}</span></div>`}
-    <h1>${formal ? 'Cotización de alquiler de instrumentos de metrología biomédica'
-                 : 'Resumen de tu alquiler'}</h1>
-    <div class="lin"></div>
-    ${formal ? '' : `<p class="aviso"><b>Estimado referencial.</b> Sujeto a confirmación de disponibilidad
-      de los instrumentos en las fechas solicitadas. No constituye una cotización formal ni compromiso de
-      contratación. La cotización formal la emite ${cotEsc(S.razonSocial || 'la empresa')} tras confirmar
-      disponibilidad.</p>`}
-    <div class="nf"><span>${formal ? 'N° ' : 'Solicitud N° '}${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
-    <p class="cli">Señores:<br><b>${cotEsc((d.nom || '[RAZÓN SOCIAL DEL CLIENTE]').toUpperCase())}</b><br>
-      ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
-      ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
-    <p class="campo"><b>Asunto:</b> Alquiler de instrumentos de metrología biomédica con certificado de calibración vigente,
-      por ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}.</p>
-    <p class="intro">Es grato dirigirnos a ustedes para saludarlos cordialmente y, en atención a su requerimiento,
-      alcanzarles nuestra propuesta económica por el alquiler de los instrumentos detallados en el Cuadro N° 1.</p>
-    <h2>Cuadro N° 1 — Detalle del alquiler</h2>
-    <table>
-      <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
-        <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
-      ${filas}
-      <tr class="tot"><td class="k" colspan="5">SUBTOTAL (S/)</td><td class="d">${neto.toFixed(2)}</td></tr>
-      <tr class="tot"><td class="k" colspan="5">IGV (18%) (S/)</td><td class="d">${igv.toFixed(2)}</td></tr>
-      <tr class="gran"><td class="k" colspan="5">TOTAL CON IGV (S/)</td><td class="d">${d.total.toFixed(2)}</td></tr>
-    </table>
-    <p class="nota">Importes en Soles (S/). El valor de venta asciende a S/ ${neto.toFixed(2)} sin IGV;
-      el total con IGV (18%) es de S/ ${d.total.toFixed(2)}. ${cotMontoLetras(d.total)}
-      ${d.gar ? ' Adicionalmente se deja una garantía en depósito de S/ ' + fmt(d.gar) + ', que se devuelve al retornar los instrumentos.' : ''}</p>
-    <h2>Términos y condiciones</h2>
-    ${term}
-    ${d.nota ? `<p class="campo"><b>Nota:</b> ${cotEsc(d.nota)}</p>` : ''}
-    ${formal ? `<h2>Datos generales para facturación y pago</h2>` : ''}
-    ${formal ? `<div class="dpag">
-      <div><span>Razón social:</span> ${cotEsc(S.razonSocial || '')}</div>
-      <div><span>RUC:</span> ${cotEsc(S.ruc || '')}</div>
-      ${S.banco ? `<div><span>Entidad bancaria:</span> ${cotEsc(S.banco)}</div>` : ''}
-      ${S.cuenta ? `<div><span>N° cuenta corriente (S/):</span> ${cotEsc(S.cuenta)}</div>` : ''}
-      ${S.cci ? `<div><span>CCI:</span> ${cotEsc(S.cci)}</div>` : ''}
-    </div>
-    <p class="cierre">Sin otro particular y a la espera de su gentil aceptación, quedamos a su disposición
-      para cualquier consulta adicional.</p>
-    <div class="firma">Atentamente,<br><img src="${org}/img/cotizacion/firma.png" alt="Firma"></div>`
-    : `<p class="cierre">Para confirmar la disponibilidad y recibir la cotización formal,
-      escríbenos por WhatsApp al ${cotEsc(S.telefono || '')} o a ${cotEsc(S.email || '')},
-      indicando el número de solicitud ${cotEsc(d.num)}.</p>`}
+    <div class="hoja"><table class="pag">
+      <thead><tr><td><div class="memb"><img src="${org}/img/cotizacion/membrete.png" alt="${cotEsc(S.razonSocial || '')}"></div></td></tr></thead>
+      <tfoot><tr><td><div class="pie">${cotEsc((S.razonSocial || '').toUpperCase())} &nbsp;·&nbsp; RUC ${cotEsc(S.ruc || '')}</div></td></tr></tfoot>
+      <tbody><tr><td>
+      <h1>Cotización de alquiler de instrumentos de metrología biomédica</h1>
+      <div class="lin"></div>
+      <div class="nf"><span>N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
+      <p class="cli">Señores:<br><b>${cotEsc((d.nom || '[RAZÓN SOCIAL DEL CLIENTE]').toUpperCase())}</b><br>
+        ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
+        ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
+      <p class="campo"><b>Asunto:</b> Alquiler de instrumentos de metrología biomédica con certificado de
+        calibración vigente, por ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}.</p>
+      <p class="intro">Es grato dirigirnos a ustedes para saludarlos cordialmente y, en atención a su
+        requerimiento, alcanzarles nuestra propuesta económica por el alquiler de los instrumentos
+        detallados en el Cuadro N° 1.</p>
+      <h2>Cuadro N° 1 — Detalle del alquiler</h2>
+      ${cuadro}
+      <p class="nota">Importes en Soles (S/). El valor de venta asciende a S/ ${neto.toFixed(2)} sin IGV;
+        el total con IGV (18%) es de S/ ${d.total.toFixed(2)}. ${cotMontoLetras(d.total)}${d.gar
+        ? ' Adicionalmente se deja una garantía en depósito de S/ ' + fmt(d.gar) + ', que se devuelve al retornar los instrumentos.' : ''}</p>
+      <h2>Términos y condiciones</h2>
+      ${term}
+      ${d.nota ? `<p class="campo"><b>Nota:</b> ${cotEsc(d.nota)}</p>` : ''}
+      <h2>Datos generales para facturación y pago</h2>
+      <div class="dpag">
+        <div><span>Razón social:</span> ${cotEsc(S.razonSocial || '')}</div>
+        <div><span>RUC:</span> ${cotEsc(S.ruc || '')}</div>
+        ${S.banco ? `<div><span>Entidad bancaria:</span> ${cotEsc(S.banco)}</div>` : ''}
+        ${S.cuenta ? `<div><span>N° cuenta corriente (S/):</span> ${cotEsc(S.cuenta)}</div>` : ''}
+        ${S.cci ? `<div><span>CCI:</span> ${cotEsc(S.cci)}</div>` : ''}
+      </div>
+      <p class="cierre">Sin otro particular y a la espera de su gentil aceptación, quedamos a su
+        disposición para cualquier consulta adicional.</p>
+      <div class="firma">Atentamente,<br><img src="${org}/img/cotizacion/firma.png" alt="Firma"></div>
+      </td></tr></tbody></table></div>
   </body></html>`;
 }
 
