@@ -27,6 +27,10 @@ const SITE = {
   banco: "Banco Internacional del Perú S.A.A. (INTERBANK)",
   cuenta: "7023008608425",
   cci: "00370200300860842585",
+
+  /* Clave para emitir cotizaciones (#/emitir/…): solo viaja su hash SHA-256,
+     nunca la clave. Para cambiarla, reemplaza este hash. */
+
   lema: "Herramientas de metrología que distinguen su servicio",
   direccion: "Pueblo Libre, Lima — Perú",
 
@@ -73,6 +77,11 @@ const CONFIG = {
      │ Cambia solo esta palabra cuando termines de definir tus costos.  │
      └──────────────────────────────────────────────────────────────────┘ */
   MOSTRAR_PRECIOS: true,
+
+  /* Clave para emitir cotizaciones (#/emitir/…). Solo viaja su hash SHA-256,
+     nunca la clave. Para cambiarla, reemplaza este hash por el de la nueva.
+     El cliente nunca pasa por esa pantalla: su enlace es el del resumen. */
+  EMITIR_HASH: "32620d6710820b70ee3c335f6f55426652fb1a4a6264ad7b55ecab7f74b529ae",
 
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
@@ -927,17 +936,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=6eeddf61';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2cb8c172';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=6eeddf61';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2cb8c172';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=6eeddf61','js/06-tablero.js?v=6eeddf61'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=2cb8c172','js/06-tablero.js?v=2cb8c172'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=6eeddf61'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=2cb8c172'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1014,10 +1023,15 @@ function route(sinMover){
   /* #/cotizar/<id>: abre el cotizador de ese equipo. Es la ruta de los
      botones «Calcular mi alquiler» de las páginas propias; no se redirige,
      porque si no volvería a la página de donde vino. */
-  if(h.startsWith('#/cotizacion/')){
+  if(h.startsWith('#/resumen/') || h.startsWith('#/cotizacion/')){
     pageId='page-cotizacion'; navKey='#/catalogo';
-    const cod = h.slice('#/cotizacion/'.length);
+    const cod = h.slice(h.indexOf('/', 2) + 1);
     setTimeout(() => { if(typeof cotVer === 'function') cotVer(cod); }, 0);
+  }
+  else if(h.startsWith('#/emitir/')){
+    pageId='page-emitir'; navKey='#/catalogo';
+    const cod = h.slice('#/emitir/'.length);
+    setTimeout(() => { if(typeof cotEmitir === 'function') cotEmitir(cod); }, 0);
   }
   else if(h==='#/cotizar' || h.startsWith('#/cotizar/')){
     pageId='page-cotizador'; navKey='#/catalogo';
@@ -1040,7 +1054,7 @@ function route(sinMover){
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */
   const enVenta = h==='#/venta' || h.startsWith('#/venta/');
-  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar|cotizacion)\//.test(h) || h==='#/cotizar';
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar|cotizacion|resumen|emitir)\//.test(h) || h==='#/cotizar';
   let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
   try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
   modo = modo || 'alquiler';
@@ -2595,12 +2609,12 @@ function cotTexto(c, nom, mail, tel){
 
 /* Número correlativo visible, para que el cliente y nosotros hablemos del
    mismo documento: COT-AAMMDD-HHMM. */
+/* Número de SOLICITUD, no de cotización: el correlativo COT-SB-MMAA-NN lo
+   lleva la empresa a mano y se pone al emitir. Así no chocan. */
 function cotNumero(){
-  /* Mismo correlativo que usa la empresa: COT-SB-MMAA-NN. El NN sale de la
-     hora, para que dos cotizaciones del mismo día no se repitan. */
   const d = new Date(), p = n => String(n).padStart(2, '0');
-  return 'COT-SB-' + p(d.getMonth() + 1) + String(d.getFullYear()).slice(2)
-         + '-' + p(d.getDate()) + p(d.getHours()) + p(d.getMinutes());
+  return 'SOL-' + String(d.getFullYear()).slice(2) + p(d.getMonth() + 1) + p(d.getDate())
+         + '-' + p(d.getHours()) + p(d.getMinutes());
 }
 
 function cotDatos(){
@@ -2716,9 +2730,9 @@ function cotDecodificar(txt){
     return JSON.parse(decodeURIComponent(escape(atob(b))));
   }catch(e){ return null; }
 }
-function cotEnlace(doc){
+function cotEnlace(doc, ruta){
   const base = location.origin + location.pathname;
-  return base + '#/cotizacion/' + cotCodificar(doc);
+  return base + '#/' + (ruta || 'resumen') + '/' + cotCodificar(doc);
 }
 
 /* Términos y condiciones, numerados como en las cotizaciones de la empresa. */
@@ -2749,7 +2763,13 @@ function cotTerminos(c){
   return T;
 }
 
-function cotHTML(d){
+/* Dos documentos distintos a partir de los mismos datos:
+     · formal = false → RESUMEN para el cliente: precios y detalle, pero sin
+       membrete, sin firma y sin número de cotización. Es referencial.
+     · formal = true  → COTIZACIÓN de la empresa, con membrete, firma, número
+       propio y los ajustes que haya hecho quien la emite.
+   El cliente nunca genera la segunda: eso lo decide la empresa. */
+function cotHTML(d, formal){
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const u = COT_UNI[d.mod], uq = d.qty === 1 ? u : (u === 'mes' ? 'meses' : u + 's');
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
@@ -2818,15 +2838,30 @@ function cotHTML(d){
     .dpag div{display:flex;gap:8px;padding:1px 0}
     .dpag span{min-width:160px;color:#555}
     .cierre{margin:14px 0 0;text-align:justify}
+    .cab-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+      border-bottom:2px solid #9A7F4E;padding-bottom:7px;margin-bottom:12px}
+    .cab-r b{font-size:15px;color:#9A7F4E;letter-spacing:-.2px}
+    .cab-r span{font-size:10.5px;color:#555}
+    .aviso{margin:0 0 12px;padding:9px 11px;background:#f7f4ee;border:1px solid #e0d8c7;
+      border-radius:4px;font-size:10px;line-height:1.5;text-align:justify;color:#4a443a}
+    .aviso b{color:#9A7F4E}
     .firma{margin-top:10px}
     .firma img{width:170px;display:block}
     @media print{body{padding:0;max-width:none}.term,tr{break-inside:avoid}}
   </style></head><body>
-    <img class="membrete" src="${org}/img/cotizacion/membrete.png" alt="${cotEsc(S.razonSocial || '')}">
-    <h1>Cotización de alquiler de instrumentos de metrología biomédica</h1>
+    ${formal
+      ? `<img class="membrete" src="${org}/img/cotizacion/membrete.png" alt="${cotEsc(S.razonSocial || '')}">`
+      : `<div class="cab-r"><b>${cotEsc(S.nombre || '')}</b><span>${cotEsc(S.web || '')} · ${cotEsc(S.telefono || '')}</span></div>`}
+    <h1>${formal ? 'Cotización de alquiler de instrumentos de metrología biomédica'
+                 : 'Resumen de tu alquiler'}</h1>
     <div class="lin"></div>
-    <div class="nf"><span>N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
+    ${formal ? '' : `<p class="aviso"><b>Estimado referencial.</b> Sujeto a confirmación de disponibilidad
+      de los instrumentos en las fechas solicitadas. No constituye una cotización formal ni compromiso de
+      contratación. La cotización formal la emite ${cotEsc(S.razonSocial || 'la empresa')} tras confirmar
+      disponibilidad.</p>`}
+    <div class="nf"><span>${formal ? 'N° ' : 'Solicitud N° '}${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
     <p class="cli">Señores:<br><b>${cotEsc((d.nom || '[RAZÓN SOCIAL DEL CLIENTE]').toUpperCase())}</b><br>
+      ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
       ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
     <p class="campo"><b>Asunto:</b> Alquiler de instrumentos de metrología biomédica con certificado de calibración vigente,
       por ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}.</p>
@@ -2846,8 +2881,9 @@ function cotHTML(d){
       ${d.gar ? ' Adicionalmente se deja una garantía en depósito de S/ ' + fmt(d.gar) + ', que se devuelve al retornar los instrumentos.' : ''}</p>
     <h2>Términos y condiciones</h2>
     ${term}
-    <h2>Datos generales para facturación y pago</h2>
-    <div class="dpag">
+    ${d.nota ? `<p class="campo"><b>Nota:</b> ${cotEsc(d.nota)}</p>` : ''}
+    ${formal ? `<h2>Datos generales para facturación y pago</h2>` : ''}
+    ${formal ? `<div class="dpag">
       <div><span>Razón social:</span> ${cotEsc(S.razonSocial || '')}</div>
       <div><span>RUC:</span> ${cotEsc(S.ruc || '')}</div>
       ${S.banco ? `<div><span>Entidad bancaria:</span> ${cotEsc(S.banco)}</div>` : ''}
@@ -2856,14 +2892,17 @@ function cotHTML(d){
     </div>
     <p class="cierre">Sin otro particular y a la espera de su gentil aceptación, quedamos a su disposición
       para cualquier consulta adicional.</p>
-    <div class="firma">Atentamente,<br><img src="${org}/img/cotizacion/firma.png" alt="Firma"></div>
+    <div class="firma">Atentamente,<br><img src="${org}/img/cotizacion/firma.png" alt="Firma"></div>`
+    : `<p class="cierre">Para confirmar la disponibilidad y recibir la cotización formal,
+      escríbenos por WhatsApp al ${cotEsc(S.telefono || '')} o a ${cotEsc(S.email || '')},
+      indicando el número de solicitud ${cotEsc(d.num)}.</p>`}
   </body></html>`;
 }
 
-function cotImprimir(doc){
+function cotImprimir(doc, formal){
   const w = window.open('', '_blank');
   if(!w){ avisar('cotAviso', 'Tu navegador bloqueó la ventana. Permite las ventanas emergentes y vuelve a intentarlo.', 'err'); return; }
-  w.document.write(cotHTML(doc).replace('</body>',
+  w.document.write(cotHTML(doc, formal).replace('</body>',
     '<script>window.onload=function(){window.print()}<\/script></body>'));
   w.document.close();
 }
@@ -2892,24 +2931,130 @@ function cotVer(codigo){
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const wa = 'https://wa.me/' + (S.whatsapp || '') + '?text=' + encodeURIComponent(
-    'Hola, quiero confirmar la cotización ' + d.num + ' por S/ ' + d.total.toFixed(2) + '.');
+    'Hola, quiero confirmar la solicitud ' + d.num + ' por S/ ' + d.total.toFixed(2) + ' y recibir la cotización formal.');
   caja.innerHTML = `
     <div class="wrap cotv-cab">
       <div>
-        <div class="k">Cotización</div>
+        <div class="k">Resumen de alquiler</div>
         <h1>${cotEsc(d.num)}</h1>
         <p>${cotEsc(d.nom || '')} · ${cotEsc(d.fecha)} · <b>S/ ${d.total.toFixed(2)}</b> con IGV</p>
       </div>
       <div class="cotv-btns">
-        <button class="btn btn-fill" onclick="cotImprimir(COT_DOC)">Descargar en PDF</button>
+        <button class="btn btn-fill" onclick="cotImprimir(COT_DOC)">Descargar el resumen</button>
         <a class="btn" href="${wa}" target="_blank" rel="noopener">Escribirnos por WhatsApp</a>
       </div>
     </div>
-    <div class="wrap"><div class="cotv-hoja"><iframe title="Cotización ${cotEsc(d.num)}"></iframe></div></div>`;
+    <div class="wrap"><div class="cotv-hoja"><iframe title="Resumen ${cotEsc(d.num)}"></iframe></div></div>
+    <div class="wrap"><p class="cotv-emitir"><a href="#/emitir/${cotEsc(codigo)}">Soy de ${cotEsc((typeof SITE!=='undefined'&&SITE.nombre)||'la empresa')} · emitir la cotización</a></p></div>`;
   const f = caja.querySelector('iframe');
-  f.srcdoc = cotHTML(d);
+  f.srcdoc = cotHTML(d, false);
   /* El alto del marco se ajusta a lo que mida la hoja. */
   f.onload = () => { try{ f.style.height = (f.contentDocument.body.scrollHeight + 24) + 'px'; }catch(e){} };
+}
+
+/* ── Emisión de la cotización formal (#/emitir/<codigo>) ─────────────
+   Solo para la empresa. Aquí se revisa el pedido, se pone el número del
+   correlativo propio, se ajusta el precio si hace falta y recién entonces
+   se descarga el documento con membrete y firma. El cliente nunca pasa por
+   aquí: su enlace es el del resumen. */
+var COT_EMI = null;
+
+function cotClaveOk(){
+  try{ return sessionStorage.getItem('sb-emitir') === '1'; }catch(e){ return false; }
+}
+async function cotEntrar(){
+  const el = document.getElementById('emiClave');
+  const v = (el && el.value || '').trim();
+  const esperado = (typeof CONFIG !== 'undefined' && CONFIG.EMITIR_HASH) || '';
+  let ok = false;
+  try{
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+    ok = [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('') === esperado;
+  }catch(e){ ok = false; }
+  if(!ok){ avisar('emiAviso', 'Clave incorrecta.', 'err'); if(el){ el.value = ''; el.focus(); } return; }
+  try{ sessionStorage.setItem('sb-emitir', '1'); }catch(e){}
+  cotEmitir(location.hash.slice('#/emitir/'.length));
+}
+
+function cotEmitir(codigo){
+  const caja = document.getElementById('cotEmiBody');
+  if(!caja) return;
+  const d = cotDecodificar(codigo || '');
+  if(!d || !d.items || !d.items.length){
+    caja.innerHTML = `<div class="wrap"><p class="cotv-mal">No pudimos leer esta solicitud.</p></div>`;
+    return;
+  }
+  if(!cotClaveOk()){
+    caja.innerHTML = `<div class="wrap emi-puerta">
+      <h1>Emitir cotización</h1>
+      <p>Esta pantalla es solo para ${cotEsc((typeof SITE !== 'undefined' && SITE.nombre) || 'la empresa')}.
+        El cliente ve el resumen, no la cotización firmada.</p>
+      <label>Clave de emisión<input type="password" id="emiClave" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')cotEntrar()"></label>
+      <div class="form-msg" id="emiAviso" role="status" aria-live="polite"></div>
+      <button class="btn btn-fill" onclick="cotEntrar()">Entrar</button>
+      <p class="emi-vol"><a href="#/resumen/${cotEsc(codigo)}">← Ver el resumen del cliente</a></p>
+    </div>`;
+    setTimeout(() => { const el = document.getElementById('emiClave'); if(el) el.focus(); }, 60);
+    return;
+  }
+  /* Número propio sugerido, con el correlativo de la empresa. */
+  const h = new Date(), p2 = n => String(n).padStart(2, '0');
+  COT_EMI = Object.assign({}, d, {
+    num: d.numCot || ('COT-SB-' + p2(h.getMonth() + 1) + String(h.getFullYear()).slice(2) + '-'),
+    ruc: d.ruc || '', aten: d.aten || '', nota: d.nota || '', ajuste: 0
+  });
+  caja.innerHTML = `
+    <div class="wrap emi-cab">
+      <div><div class="k">Emitir cotización · solicitud ${cotEsc(d.num)}</div>
+        <h1>${cotEsc(d.nom || 'Cliente sin nombre')}</h1>
+        <p>${d.items.length} ${d.items.length === 1 ? 'instrumento' : 'instrumentos'} ·
+          ${d.qty} ${COT_UNI[d.mod]}${d.qty === 1 ? '' : 's'} · pedido por S/ ${d.total.toFixed(2)}</p></div>
+    </div>
+    <div class="wrap emi">
+      <div class="emi-form">
+        <div class="emi-g"><b>1</b> Datos de la cotización</div>
+        <label>N° de cotización <small>tu correlativo</small>
+          <input id="emiNum" value="${cotEsc(COT_EMI.num)}" oninput="cotEmiCambio()"></label>
+        <div class="cot-f2">
+          <label>RUC del cliente<input id="emiRuc" value="${cotEsc(COT_EMI.ruc)}" oninput="cotEmiCambio()"></label>
+          <label>Atención<input id="emiAten" value="${cotEsc(COT_EMI.aten)}" oninput="cotEmiCambio()"></label>
+        </div>
+        <label>Razón social del cliente<input id="emiNom" value="${cotEsc(d.nom || '')}" oninput="cotEmiCambio()"></label>
+
+        <div class="emi-g"><b>2</b> Precio</div>
+        <label>Descuento sobre el total <small>en soles, 0 si no aplica</small>
+          <input id="emiDesc" type="number" min="0" step="1" value="0" oninput="cotEmiCambio()"></label>
+        <p class="emi-tot" id="emiTot"></p>
+
+        <div class="emi-g"><b>3</b> Nota para el cliente <small>opcional</small></div>
+        <label><textarea id="emiNota" rows="3" oninput="cotEmiCambio()"
+          placeholder="Disponibilidad confirmada del 10 al 14 de octubre."></textarea></label>
+
+        <button class="btn btn-fill emi-pdf" onclick="cotImprimir(COT_EMI, true)">Descargar la cotización en PDF</button>
+        <p class="emi-nota">Sale con membrete, firma y datos de pago. Revisa la vista de al lado antes de enviarla.</p>
+      </div>
+      <div class="emi-vista"><div class="cotv-hoja"><iframe title="Cotización"></iframe></div></div>
+    </div>`;
+  cotEmiCambio();
+}
+
+function cotEmiCambio(){
+  if(!COT_EMI) return;
+  const v = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  COT_EMI.num = v('emiNum'); COT_EMI.ruc = v('emiRuc'); COT_EMI.aten = v('emiAten');
+  COT_EMI.nom = v('emiNom'); COT_EMI.nota = v('emiNota');
+  const desc = Math.max(0, Number(v('emiDesc')) || 0);
+  COT_EMI.total = Math.max(0, (COT_EMI.totalBase || (COT_EMI.totalBase = COT_EMI.total)) - desc);
+  const t = document.getElementById('emiTot');
+  if(t) t.innerHTML = desc
+    ? `Pedido S/ ${COT_EMI.totalBase.toFixed(2)} − descuento S/ ${desc.toFixed(2)} = <b>S/ ${COT_EMI.total.toFixed(2)}</b>`
+    : `Total: <b>S/ ${COT_EMI.total.toFixed(2)}</b>`;
+  const f = document.querySelector('.emi-vista iframe');
+  if(f){
+    f.srcdoc = cotHTML(COT_EMI, true);
+    f.onload = () => { try{ f.style.height = (f.contentDocument.body.scrollHeight + 24) + 'px'; }catch(e){} };
+  }
 }
 
 /* Entrada desde las páginas de cada equipo: #/cotizar/<id>. Los datos del

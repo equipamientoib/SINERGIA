@@ -26,6 +26,10 @@ const SITE = {
   banco: "Banco Internacional del Perú S.A.A. (INTERBANK)",
   cuenta: "7023008608425",
   cci: "00370200300860842585",
+
+  /* Clave para emitir cotizaciones (#/emitir/…): solo viaja su hash SHA-256,
+     nunca la clave. Para cambiarla, reemplaza este hash. */
+
   lema: "Herramientas de metrología que distinguen su servicio",
   direccion: "Pueblo Libre, Lima — Perú",
 
@@ -72,6 +76,11 @@ const CONFIG = {
      │ Cambia solo esta palabra cuando termines de definir tus costos.  │
      └──────────────────────────────────────────────────────────────────┘ */
   MOSTRAR_PRECIOS: true,
+
+  /* Clave para emitir cotizaciones (#/emitir/…). Solo viaja su hash SHA-256,
+     nunca la clave. Para cambiarla, reemplaza este hash por el de la nueva.
+     El cliente nunca pasa por esa pantalla: su enlace es el del resumen. */
+  EMITIR_HASH: "32620d6710820b70ee3c335f6f55426652fb1a4a6264ad7b55ecab7f74b529ae",
 
   /* De dónde lee la web el catálogo, paquetes y proyectos:
      - "data/catalogo.json"  -> archivo del repo (Opción B: Excel + build_catalogo.py)
