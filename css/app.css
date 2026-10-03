@@ -1035,8 +1035,22 @@
   .emi-form{position:static}
 }
 
-/* ── Paquetes listos ───────────────────────────────────────────────── */
-.cot-pqh{margin:0 0 12px;font-size:13.5px;color:var(--gris);line-height:1.6}
+/* ── Los dos caminos: paquete (A) o instrumento por instrumento (B) ── */
+.cot-via{margin:0}
+.cot-vh{display:flex;align-items:flex-start;gap:11px;margin:0 0 14px}
+.cot-vh .n{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  background:var(--cobre-d);color:#fff;font-size:13px;font-weight:700;font-family:var(--ff-d)}
+.cot-vh b{display:block;font-size:16px;line-height:1.35}
+.cot-vh small{display:block;margin-top:2px;font-size:13px;color:var(--gris);line-height:1.55}
+.cot-o{display:flex;align-items:center;gap:14px;margin:26px 0 24px;color:var(--gris);font-size:13px}
+.cot-o::before,.cot-o::after{content:"";flex:1;height:1px;background:var(--linea)}
+.cot-pqon{margin:0 0 14px;padding:11px 13px;border-radius:11px;font-size:13px;line-height:1.6;
+  background:rgba(154,127,78,.09);border:1px solid rgba(154,127,78,.28)}
+.cot-pqon button{background:none;border:0;padding:0;margin-left:4px;font:inherit;font-weight:600;
+  color:var(--cobre-d);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.cot-mail{margin:2px 0 0;font-size:13px;color:var(--gris);line-height:1.6}
+.cot-mail button{background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--cobre-d);
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .cot-pqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:0 0 26px}
 .cot-pq{display:flex;flex-direction:column;gap:5px;text-align:left;padding:15px 16px 14px;
   background:var(--fondo2,#fff);border:1px solid var(--linea);border-radius:14px;cursor:pointer;
@@ -1052,3 +1066,40 @@
   background:rgba(46,125,50,.12);color:#2e7d32}
 .cot-top.largo b{font-size:26px}
 .cot-top.largo small{line-height:1.6}
+
+/* ── Ventana flotante con la vista previa de la solicitud ──────────── */
+body.cot-bloq{overflow:hidden}
+body.cot-bloq .wafab{display:none}
+.cotm{position:fixed;inset:0;z-index:80;display:none;background:rgba(15,16,19,.58);
+  padding:24px;overflow:auto;-webkit-overflow-scrolling:touch}
+.cotm.on{display:flex;align-items:center;justify-content:center}
+.cotm-p{display:flex;flex-direction:column;width:min(880px,100%);max-height:calc(100vh - 48px);
+  margin:auto;background:var(--fondo2,#fff);border-radius:16px;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.6);overflow:hidden}
+.cotm-c,.cotm-a{flex:none}
+.cotm-c{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:16px 20px;border-bottom:1px solid var(--linea)}
+.cotm-c b{display:block;font-size:16px}
+.cotm-c span{display:block;margin-top:2px;font-size:13px;color:var(--gris)}
+.cotm-x{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--linea);
+  background:none;font-size:15px;color:var(--gris);cursor:pointer}
+.cotm-x:hover{border-color:var(--cobre);color:var(--cobre-d)}
+.cotm-h{flex:0 1 auto;min-height:0;max-height:none;overflow:auto;background:#fff;border-bottom:1px solid var(--linea)}
+.cotm-h iframe{display:block;width:794px;height:1123px;border:0;transform-origin:top left}
+.cotm-a{display:flex;gap:10px;flex-wrap:wrap;padding:14px 20px 16px}
+@media(max-width:560px){.cotm{padding:10px}.cotm-p{max-height:calc(100vh - 20px)}.cotm-a .btn{flex:1}}
+
+/* ── Barra fija del celular ────────────────────────────────────────── */
+.cot-barra{display:none}
+@media(max-width:900px){
+  .cot-barra[hidden]{display:none}
+  .cot-barra{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;align-items:center;
+    justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    background:var(--onix,#17191d);color:#fff;box-shadow:0 -10px 30px -18px rgba(0,0,0,.7)}
+  .cot-barra span{display:block;font-size:11.5px;color:rgba(255,255,255,.72)}
+  .cot-barra b{display:block;font-size:21px;font-family:var(--ff-d)}
+  .cot-barra .btn{flex:none;padding:11px 20px;background:#fff;border-color:#fff;color:var(--onix,#17191d)}
+  body.cot-bloq .cot-barra{display:none}
+  body.cot-conbarra .wafab{bottom:88px}
+  #page-cotizador section{padding-bottom:84px}
+}
