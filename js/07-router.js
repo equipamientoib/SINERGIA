@@ -40,6 +40,10 @@ function route(sinMover){
     else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
   }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
+  /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
+     cotizador todo vuelve a su sitio. */
+  document.body.classList.toggle('cot-conbarra',
+    pageId === 'page-cotizador' && !!(document.getElementById('cotBarra') || {}).innerHTML);
   /* Sección activa: decide qué menú se ve (venta o alquiler). Las páginas
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */

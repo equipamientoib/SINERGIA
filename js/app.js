@@ -963,17 +963,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=3820ca73';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=fbb3469a';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=3820ca73';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=fbb3469a';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=3820ca73','js/06-tablero.js?v=3820ca73'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=fbb3469a','js/06-tablero.js?v=fbb3469a'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=3820ca73'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=fbb3469a'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1077,6 +1077,10 @@ function route(sinMover){
     else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
   }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
+  /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
+     cotizador todo vuelve a su sitio. */
+  document.body.classList.toggle('cot-conbarra',
+    pageId === 'page-cotizador' && !!(document.getElementById('cotBarra') || {}).innerHTML);
   /* Sección activa: decide qué menú se ve (venta o alquiler). Las páginas
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */
@@ -2493,10 +2497,35 @@ const COT_UNI = {medio: 'medio día', dia: 'día'};
 const COT_CANT = {medio: 'Turnos de medio día', dia: 'Días'};
 
 /* ── Página ─────────────────────────────────────────────────────────── */
+/* Barra fija del celular: el total siempre a la vista. */
+function cotBarra(c){
+  const b = document.getElementById('cotBarra');
+  if(!b) return;
+  b.hidden = !c.sel.length;
+  document.body.classList.toggle('cot-conbarra', !!c.sel.length);
+  if(!c.sel.length){ b.innerHTML = ''; return; }
+  b.innerHTML = c.largo
+    ? `<div><span>${c.qty} días</span><b>Conversémoslo</b></div>
+       <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Escríbenos</button>`
+    : `<div><span>${c.sel.length} ${c.sel.length === 1 ? 'instrumento' : 'instrumentos'} · ${c.qty} ${cotPlural(COT_UNI[c.mod], c.qty)}</span>
+         <b>S/ ${c.total.toFixed(2)}</b></div>
+       <button class="btn btn-fill" onclick="cotVista()">Ver</button>`;
+}
+
 /* Tarjetas de los paquetes: un clic marca todos sus instrumentos. */
 function cotPaqPintar(){
   const caja = document.getElementById('cotPaq');
   if(!caja) return;
+  const aviso = document.getElementById('cotPaqOn');
+  if(aviso){
+    const p = COT.paq ? paqById(COT.paq) : null;
+    aviso.innerHTML = p
+      ? `<b>Estás llevando el ${cotEsc(p.nom.replace(/^Paquete /, 'paquete '))}.</b>
+         Si marcas o desmarcas algo abajo, el paquete se desarma y se cobra instrumento por instrumento.
+         <button type="button" onclick="cotPaquete('${p.id}')">Quitar el paquete</button>`
+      : '';
+    aviso.hidden = !p;
+  }
   caja.innerHTML = COT_PAQ.map(p => {
     const eq = p.eq.map(byId).filter(Boolean);
     if(eq.length < p.eq.length) return '';
@@ -2558,6 +2587,7 @@ function cotResumen(){
   if(!caja) return;
   const c = cotCalcular();
   const n = c.sel.length;
+  cotBarra(c);
   document.getElementById('cotCuenta').textContent =
     n ? (n + (n === 1 ? ' instrumento elegido' : ' instrumentos elegidos')) : '';
   if(!n){
@@ -2646,10 +2676,8 @@ function cotResumen(){
         <label>Teléfono<input id="cotTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></label>
       </div>
       <div class="form-msg" id="cotAviso" role="status" aria-live="polite"></div>
-      <div class="cot-btns">
-        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar por WhatsApp</button>
-        <button class="btn" onclick="cotEnviar('correo')">Enviar por correo</button>
-      </div>
+      <p class="cot-mail">Con tus datos listos, usa el botón de arriba.
+        ${c.largo ? '' : `¿Prefieres correo? <button type="button" onclick="cotEnviar('correo')">Enviar por correo</button>`}</p>
     </div>
     <p class="cot-nota">Entrega y devolución en nuestra oficina de Lima. A provincias se envía por agencia; el envío lo paga el cliente.</p>
     <button type="button" class="cot-limpiar" onclick="cotLimpiar()">Empezar de nuevo</button>`;
@@ -2958,7 +2986,7 @@ function cotHTML(d, formal){
        Tiene que verse distinto de una cotización: sello de agua, franja
        de aviso, sin carta formal, sin firma y sin datos de pago. */
     return `<!doctype html><html lang="es"><head><meta charset="utf-8">
-    <title>Resumen de alquiler ${cotEsc(d.num)}</title><style>${base}
+    <title>Solicitud de cotización ${cotEsc(d.num)}</title><style>${base}
       .sello{position:absolute;top:44%;left:0;right:0;text-align:center;font-size:54px;font-weight:800;
         color:rgba(154,127,78,.10);letter-spacing:3px;transform:rotate(-20deg);z-index:0;
         pointer-events:none}
@@ -2985,7 +3013,7 @@ function cotHTML(d, formal){
         <tfoot><tr><td><div class="hueco"></div></td></tr></tfoot>
         <tbody><tr><td><div class="cont">
         <div class="cab"><b>${cotEsc(S.nombre || '')}</b><span>${cotEsc(S.web || '')} · ${cotEsc(S.telefono || '')}</span></div>
-        <h1>Resumen de tu alquiler</h1>
+        <h1>Solicitud de cotización</h1>
         <div class="franja"><b>Esto no es una cotización.</b>
           Es un estimado que calculaste en nuestra web, sujeto a confirmar que los instrumentos estén
           libres en las fechas que necesitas. La cotización formal, con firma y validez comercial, la
@@ -3091,12 +3119,46 @@ function cotImprimir(doc, formal){
     '<script>window.onload=function(){window.print()}<\/script></body>'));
   w.document.close();
 }
-/* Vista previa del resumen, en pantalla. No descarga nada. */
+/* Vista previa en una ventana flotante, sin salir del cotizador ni
+   descargar nada: el cliente mira cómo quedó y sigue editando. */
 function cotVista(){
   const c = cotCalcular();
-  if(!c.sel.length) return;
+  if(!c.sel.length || c.largo) return;
   const {nom, mail, tel} = cotDatos();
-  location.hash = '#/resumen/' + cotCodificar(cotDoc(c, nom, mail, tel, cotNumero()));
+  cotModal(cotDoc(c, nom, mail, tel, cotNumero()));
+}
+function cotModal(doc){
+  let m = document.getElementById('cotModal');
+  if(!m){
+    m = document.createElement('div');
+    m.id = 'cotModal'; m.className = 'cotm';
+    document.body.appendChild(m);
+    m.addEventListener('click', e => { if(e.target === m) cotModalCerrar(); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') cotModalCerrar(); });
+  }
+  m.innerHTML = `<div class="cotm-p" role="dialog" aria-modal="true" aria-label="Vista previa de tu solicitud">
+    <div class="cotm-c">
+      <div><b>Así le llega tu solicitud</b>
+        <span>N° ${cotEsc(doc.num)} · S/ ${doc.total.toFixed(2)} con IGV</span></div>
+      <button type="button" class="cotm-x" onclick="cotModalCerrar()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="cotm-h"><iframe title="Vista previa de la solicitud"></iframe></div>
+    <div class="cotm-a">
+      <button class="btn btn-fill" onclick="cotModalCerrar();cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
+      <button class="btn" onclick="cotModalCerrar()">Seguir editando</button>
+    </div>
+  </div>`;
+  const f = m.querySelector('iframe');
+  f.srcdoc = cotHTML(doc, false);
+  f.onload = () => cotAjustarHoja(f);
+  document.body.classList.add('cot-bloq');
+  m.classList.add('on');
+}
+function cotModalCerrar(){
+  const m = document.getElementById('cotModal');
+  if(!m) return;
+  m.classList.remove('on'); m.innerHTML = '';
+  document.body.classList.remove('cot-bloq');
 }
 
 /* ── Página de la cotización (#/cotizacion/<codigo>) ─────────────────
@@ -3123,7 +3185,7 @@ function cotVer(codigo){
   caja.innerHTML = `
     <div class="wrap cotv-cab">
       <div>
-        <div class="k">Resumen de alquiler</div>
+        <div class="k">Solicitud de cotización</div>
         <h1>${cotEsc(d.num)}</h1>
         <p>${cotEsc(d.nom || '')} · ${cotEsc(d.fecha)} · <b>S/ ${d.total.toFixed(2)}</b> con IGV</p>
       </div>
@@ -3131,8 +3193,8 @@ function cotVer(codigo){
         <a class="btn btn-fill" href="${wa}" target="_blank" rel="noopener">Enviar este resumen por WhatsApp</a>
       </div>
     </div>
-    <div class="wrap"><div class="cotv-hoja"><iframe title="Resumen ${cotEsc(d.num)}"></iframe></div></div>
-    <div class="wrap"><p class="cotv-emitir"><a href="#/emitir/${cotEsc(codigo)}">Soy de ${cotEsc((typeof SITE!=='undefined'&&SITE.nombre)||'la empresa')} · emitir la cotización</a></p></div>`;
+    <div class="wrap"><div class="cotv-hoja"><iframe title="Solicitud ${cotEsc(d.num)}"></iframe></div></div>
+    <div class="wrap"><p class="cotv-emitir"><a href="#/emitir/${cotEsc(codigo)}">Soy de ${cotEsc((typeof SITE!=='undefined'&&SITE.nombre)||'la empresa')}</a></p></div>`;
   const f = caja.querySelector('iframe');
   f.srcdoc = cotHTML(d, false);
   /* La hoja mide 210 mm (794 px). En el celular no entra, así que se
@@ -3143,6 +3205,10 @@ function cotVer(codigo){
 
 function cotAjustarHoja(f){
   try{
+    /* En pantalla la hoja no necesita medir un A4 completo: sin ese mínimo
+       no queda un hueco en blanco debajo del contenido. */
+    const hoja = f.contentDocument.querySelector('.hoja');
+    if(hoja) hoja.style.minHeight = '0';
     const caja = f.parentNode, s = Math.min(1, caja.clientWidth / 794);
     const alto = f.contentDocument.body.scrollHeight + 16;
     f.style.height = alto + 'px';
