@@ -169,3 +169,21 @@
   .emi{grid-template-columns:minmax(0,1fr)}
   .emi-form{position:static}
 }
+
+/* ── Paquetes listos ───────────────────────────────────────────────── */
+.cot-pqh{margin:0 0 12px;font-size:13.5px;color:var(--gris);line-height:1.6}
+.cot-pqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:0 0 26px}
+.cot-pq{display:flex;flex-direction:column;gap:5px;text-align:left;padding:15px 16px 14px;
+  background:var(--fondo2,#fff);border:1px solid var(--linea);border-radius:14px;cursor:pointer;
+  font:inherit;color:inherit;transition:border-color .15s,box-shadow .15s,background .15s}
+.cot-pq:hover{border-color:var(--cobre);box-shadow:0 10px 26px -20px rgba(0,0,0,.45)}
+.cot-pq.on{border-color:var(--cobre-d);background:rgba(154,127,78,.07);box-shadow:inset 0 0 0 1px var(--cobre-d)}
+.cot-pq b{font-size:15px;line-height:1.3}
+.cot-pq .pq-eq{font-size:12px;color:var(--cobre-d);line-height:1.5}
+.cot-pq .pq-para{font-size:12.5px;color:var(--gris);line-height:1.55}
+.cot-pq .pq-pre{margin-top:4px;font-size:13px;color:var(--gris)}
+.cot-pq .pq-pre i{font-style:normal;font-size:17px;font-weight:700;color:var(--texto)}
+.cot-pq .pq-ah{align-self:flex-start;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;
+  background:rgba(46,125,50,.12);color:#2e7d32}
+.cot-top.largo b{font-size:26px}
+.cot-top.largo small{line-height:1.6}

@@ -46,6 +46,31 @@ let TEC_MIN=60;          // mínimo: medio día
 let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
 
+/* ── Paquetes del cotizador ───────────────────────────────────────────
+   Combinaciones armadas con los instrumentos que ya tenemos, pensadas por
+   área del hospital. Tienen precio propio (más barato que sumar los
+   instrumentos sueltos) y se alquilan por medio día o por día, incluso
+   cuando alguno de sus instrumentos, solo, no se alquila por medio día.
+   Todos van con instrumentista metrológico, que se cobra aparte.
+   Los precios se pueden cambiar desde data/tarifas-alquiler.json. */
+let COT_PAQ = [
+  {id:'uci', nom:'Paquete UCI y emergencia', eq:['esa620','defib','sp-sim','ms400'],
+   dia:490, medio:290,
+   para:'Monitores multiparámetro, desfibriladores, pulsioxímetros y electrocardiógrafos.'},
+  {id:'electro', nom:'Paquete electromedicina básica', eq:['esa620','ms400'],
+   dia:260, medio:155,
+   para:'Lo que se pide en casi todo mantenimiento: seguridad eléctrica y simulación de signos vitales.'},
+  {id:'quirofano', nom:'Paquete sala de operaciones', eq:['luxometro','manometro','fluke-945'],
+   dia:140, medio:85,
+   para:'Iluminación del campo quirúrgico, presión diferencial de la sala y nivel de ruido.'},
+  {id:'laboratorio', nom:'Paquete laboratorio', eq:['tacometro','fluke-51','luxometro'],
+   dia:135, medio:80,
+   para:'Centrífugas (rpm), baños maría, refrigeradoras e incubadoras (temperatura) e iluminación del mesón.'}
+];
+const paqById = id => COT_PAQ.find(p => p.id === id);
+/* Lo que costaría comprando los instrumentos del paquete por separado. */
+const paqSuelto = p => p.eq.reduce((s, id) => s + Number((byId(id) || {}).dia || 0), 0);
+
 const byId=id=>EQUIPOS.find(e=>e.id===id);
 /* Tarifas acordadas (data/tarifas-alquiler.json). Mandan sobre la hoja para
    poder publicarlas sin esperar a que la hoja se actualice. */
@@ -59,6 +84,8 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
     if(d.medioDiaDesde) MEDIO_MIN = d.medioDiaDesde;
     if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
+    if(d.paquetes) COT_PAQ.forEach(p => { const x = d.paquetes[p.id];
+      if(x){ if(x.dia > 0) p.dia = x.dia; if(x.medio > 0) p.medio = x.medio; } });
     if(d.dia){ TARIFAS = d.dia; aplicarTarifas();
     if(typeof repintarTodo === 'function') repintarTodo(); } }).catch(() => {});
 /* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
