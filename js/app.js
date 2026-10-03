@@ -936,17 +936,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=09b5fd6a';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=960d4fc2';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=09b5fd6a';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=960d4fc2';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=09b5fd6a','js/06-tablero.js?v=09b5fd6a'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=960d4fc2','js/06-tablero.js?v=960d4fc2'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=09b5fd6a'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=960d4fc2'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2484,8 +2484,8 @@ function cotResumen(){
     n ? (n + (n === 1 ? ' instrumento elegido' : ' instrumentos elegidos')) : '';
   if(!n){
     caja.innerHTML = `<div class="cot-top vacio"><span>Tu cotización</span><b>— —</b></div>
-      <p class="cot-vacio">Marca al menos un instrumento de la lista. Aquí aparece el total,
-      y con un clic te llevas la cotización en PDF o nos escribes por WhatsApp.</p>`;
+      <p class="cot-vacio">Marca al menos un instrumento de la lista. Aquí aparece el total
+      y, con un clic, nos mandas tu pedido por WhatsApp.</p>`;
     return;
   }
   const sinMedio = c.sel.filter(e => !tieneMedio(e.dia));
@@ -2512,8 +2512,8 @@ function cotResumen(){
       <b>S/ ${c.total.toFixed(2)}</b>
       <small>IGV incluido${c.garantia ? ' · + S/ ' + fmt(c.garantia) + ' de garantía que se devuelve' : ''}</small>
       <div class="cot-acc">
-        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Pedirla por WhatsApp</button>
-        <button class="btn" onclick="cotPDF()">Ver / descargar PDF</button>
+        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
+        <button class="btn" onclick="cotVista()">Ver el resumen</button>
       </div>
     </div>
 
@@ -2636,17 +2636,16 @@ function cotEnviar(via){
     return;
   }
   const enlace = cotEnlace(doc);
-  const texto = cotTexto(c, nom, mail, tel) + '\n\nVer y descargar esta cotización:\n' + enlace;
+  const texto = cotTexto(c, nom, mail, tel) + '\n\nResumen de este pedido:\n' + enlace;
   if(typeof enviarAlEndpoint === 'function')
     enviarAlEndpoint({tipo: 'cotizador', equipo: c.sel.map(e => e.nom).join(' + '), modalidad: c.mod,
                       total: 'S/ ' + c.total.toFixed(2), nombre: nom, correo: mail, telefono: tel});
   avisar('cotAviso', via === 'correo'
-    ? 'Abriendo tu correo y descargando la cotización…'
-    : 'Abriendo WhatsApp y descargando la cotización…', 'ok');
-  /* Se manda el mensaje y, además, se abre la cotización para guardarla:
-     así el cliente se queda con el documento sin tener que pedirlo. */
+    ? 'Abriendo tu correo con el resumen de tu pedido…'
+    : 'Abriendo WhatsApp con el resumen de tu pedido…', 'ok');
+  /* Solo viaja el enlace: el cliente no se descarga ningún documento. El
+     único PDF es la cotización formal que emite la empresa. */
   abrirCanal(via, texto, 'Solicitud de alquiler');
-  setTimeout(() => cotImprimir(doc), 600);
 }
 
 /* ── Cotización formal ───────────────────────────────────────────────
@@ -2815,10 +2814,13 @@ function cotHTML(d, formal){
     *{box-sizing:border-box}
     body{margin:0;background:#fff;color:#1a1a1a;font:11px/1.5 "Segoe UI",Calibri,Arial,Helvetica,sans-serif}
     .hoja{position:relative;width:210mm;min-height:297mm;margin:0 auto;padding:14mm 16mm 16mm}
-    /* Membrete en <thead> y pie en <tfoot>: el navegador los repite solo
-       en cada hoja impresa, sin pisar el texto. */
+    /* El membrete va en <thead>: el navegador lo repite solo en cada hoja
+       impresa. El <tfoot> solo reserva el hueco de abajo; el pie se dibuja
+       aparte, pegado al final de cada hoja, para que nunca quede a media
+       página ni encima del texto. */
     .pag{width:100%;border-collapse:collapse}
     .pag>thead>tr>td,.pag>tfoot>tr>td,.pag>tbody>tr>td{border:0;padding:0;vertical-align:top}
+    .hueco{height:0}
     table{width:100%;border-collapse:collapse;font-size:10px}
     th{background:#9A7F4E;color:#fff;border:1px solid #9A7F4E;padding:6px 5px;font-size:9.5px;
       font-weight:700;text-align:center;letter-spacing:.3px}
@@ -2834,7 +2836,12 @@ function cotHTML(d, formal){
     h2{margin:18px 0 6px;font-size:11.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;text-transform:uppercase}
     .nota{margin:7px 0 0;font-size:9.5px;color:#7A7A7A;text-align:justify}
     /* Al imprimir mandan los márgenes de @page. */
-    @media print{.hoja{width:auto;min-height:0;margin:0;padding:0}tr,.term{break-inside:avoid}}`;
+    @media print{
+      .hoja{width:auto;min-height:0;margin:0;padding:0}
+      tr,.term{break-inside:avoid}
+      .hueco{height:13mm}
+      .pie{position:fixed;bottom:0;left:0;right:0;margin:0;background:#fff}
+    }`;
 
   if(!formal){
     /* ── RESUMEN del cliente ──────────────────────────────────────────
@@ -2862,9 +2869,10 @@ function cotHTML(d, formal){
       .pasos b{color:#9A7F4E}
       .pie{margin-top:9mm;padding-top:3mm;border-top:1px solid #ddd8cc;
         font-size:9px;color:#8a8a8a;text-align:center}
+      @media print{.pie{padding-bottom:1mm}}
     </style></head><body>
       <div class="hoja"><div class="sello">REFERENCIAL</div><table class="pag">
-        <tfoot><tr><td><div class="pie">${cotEsc(S.nombre || '')} · ${cotEsc(S.web || '')} · Documento referencial, sin validez comercial</div></td></tr></tfoot>
+        <tfoot><tr><td><div class="hueco"></div></td></tr></tfoot>
         <tbody><tr><td><div class="cont">
         <div class="cab"><b>${cotEsc(S.nombre || '')}</b><span>${cotEsc(S.web || '')} · ${cotEsc(S.telefono || '')}</span></div>
         <h1>Resumen de tu alquiler</h1>
@@ -2891,7 +2899,9 @@ function cotHTML(d, formal){
         <div class="pasos"><b>Para confirmar:</b> escríbenos por WhatsApp al ${cotEsc(S.telefono || '')}
           o a ${cotEsc(S.email || '')}, indicando el número de solicitud ${cotEsc(d.num)}.
           Revisamos la disponibilidad y te enviamos la cotización formal el mismo día.</div>
-      </div></td></tr></tbody></table></div>
+      </div></td></tr></tbody></table>
+      <div class="pie">${cotEsc(S.nombre || '')} · ${cotEsc(S.web || '')} · Documento referencial, sin validez comercial</div>
+      </div>
     </body></html>`;
   }
 
@@ -2906,6 +2916,7 @@ function cotHTML(d, formal){
     .memb img{width:100%;display:block}
     .pie{margin-top:8mm;padding-top:3mm;border-top:1px solid #d9d2c2;
       font-size:9px;color:#6b6b6b;text-align:center;letter-spacing:.2px}
+    @media print{.pie{padding-bottom:1mm}}
     h1{margin:0;text-align:center;font-size:13.5px;font-weight:700;color:#9A7F4E;letter-spacing:.3px;
       text-transform:uppercase;line-height:1.35}
     .lin{height:2px;background:#9A7F4E;margin:7px 0 12px}
@@ -2924,7 +2935,7 @@ function cotHTML(d, formal){
   </style></head><body>
     <div class="hoja"><table class="pag">
       <thead><tr><td><div class="memb"><img src="${org}/img/cotizacion/membrete.png" alt="${cotEsc(S.razonSocial || '')}"></div></td></tr></thead>
-      <tfoot><tr><td><div class="pie">${cotEsc((S.razonSocial || '').toUpperCase())} &nbsp;·&nbsp; RUC ${cotEsc(S.ruc || '')}</div></td></tr></tfoot>
+      <tfoot><tr><td><div class="hueco"></div></td></tr></tfoot>
       <tbody><tr><td>
       <h1>Cotización de alquiler de instrumentos de metrología biomédica</h1>
       <div class="lin"></div>
@@ -2956,7 +2967,9 @@ function cotHTML(d, formal){
       <p class="cierre">Sin otro particular y a la espera de su gentil aceptación, quedamos a su
         disposición para cualquier consulta adicional.</p>
       <div class="firma">Atentamente,<br><img src="${org}/img/cotizacion/firma.png" alt="Firma"></div>
-      </td></tr></tbody></table></div>
+      </td></tr></tbody></table>
+      <div class="pie">${cotEsc((S.razonSocial || '').toUpperCase())} &nbsp;·&nbsp; RUC ${cotEsc(S.ruc || '')}</div>
+    </div>
   </body></html>`;
 }
 
@@ -2967,17 +2980,19 @@ function cotImprimir(doc, formal){
     '<script>window.onload=function(){window.print()}<\/script></body>'));
   w.document.close();
 }
-function cotPDF(){
+/* Vista previa del resumen, en pantalla. No descarga nada. */
+function cotVista(){
   const c = cotCalcular();
   if(!c.sel.length) return;
   const {nom, mail, tel} = cotDatos();
-  cotImprimir(cotDoc(c, nom, mail, tel, cotNumero()));
+  location.hash = '#/resumen/' + cotCodificar(cotDoc(c, nom, mail, tel, cotNumero()));
 }
 
 /* ── Página de la cotización (#/cotizacion/<codigo>) ─────────────────
-   El enlace que va por WhatsApp abre esto: la cotización tal cual, con el
-   botón para descargarla y el de escribirnos. El documento viaja dentro
-   del propio enlace, así que no hace falta servidor ni base de datos. */
+   El enlace que va por WhatsApp abre esto: el resumen tal cual, solo para
+   verlo en pantalla. No se descarga nada: el único PDF es la cotización
+   formal que emite la empresa. El documento viaja dentro del propio
+   enlace, así que no hace falta servidor ni base de datos. */
 var COT_DOC = null;
 function cotVer(codigo){
   const caja = document.getElementById('cotVerBody');
@@ -2992,7 +3007,8 @@ function cotVer(codigo){
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const wa = 'https://wa.me/' + (S.whatsapp || '') + '?text=' + encodeURIComponent(
-    'Hola, quiero confirmar la solicitud ' + d.num + ' por S/ ' + d.total.toFixed(2) + ' y recibir la cotización formal.');
+    'Hola, quiero confirmar la solicitud ' + d.num + ' por S/ ' + d.total.toFixed(2) +
+    ' y recibir la cotización formal.\n\n' + location.href);
   caja.innerHTML = `
     <div class="wrap cotv-cab">
       <div>
@@ -3001,17 +3017,32 @@ function cotVer(codigo){
         <p>${cotEsc(d.nom || '')} · ${cotEsc(d.fecha)} · <b>S/ ${d.total.toFixed(2)}</b> con IGV</p>
       </div>
       <div class="cotv-btns">
-        <button class="btn btn-fill" onclick="cotImprimir(COT_DOC)">Descargar el resumen</button>
-        <a class="btn" href="${wa}" target="_blank" rel="noopener">Escribirnos por WhatsApp</a>
+        <a class="btn btn-fill" href="${wa}" target="_blank" rel="noopener">Enviar este resumen por WhatsApp</a>
       </div>
     </div>
     <div class="wrap"><div class="cotv-hoja"><iframe title="Resumen ${cotEsc(d.num)}"></iframe></div></div>
     <div class="wrap"><p class="cotv-emitir"><a href="#/emitir/${cotEsc(codigo)}">Soy de ${cotEsc((typeof SITE!=='undefined'&&SITE.nombre)||'la empresa')} · emitir la cotización</a></p></div>`;
   const f = caja.querySelector('iframe');
   f.srcdoc = cotHTML(d, false);
-  /* El alto del marco se ajusta a lo que mida la hoja. */
-  f.onload = () => { try{ f.style.height = (f.contentDocument.body.scrollHeight + 24) + 'px'; }catch(e){} };
+  /* La hoja mide 210 mm (794 px). En el celular no entra, así que se
+     reduce a escala hasta el ancho disponible y el marco se ajusta al
+     alto real de la hoja: se ve completa, sin cortes ni hueco en blanco. */
+  f.onload = () => cotAjustarHoja(f);
 }
+
+function cotAjustarHoja(f){
+  try{
+    const caja = f.parentNode, s = Math.min(1, caja.clientWidth / 794);
+    const alto = f.contentDocument.body.scrollHeight + 16;
+    f.style.height = alto + 'px';
+    f.style.transform = s < 1 ? 'scale(' + s + ')' : 'none';
+    caja.style.height = Math.round(alto * s) + 'px';
+  }catch(e){}
+}
+window.addEventListener('resize', () => {
+  const f = document.querySelector('.cotv-hoja iframe');
+  if(f && f.contentDocument) cotAjustarHoja(f);
+});
 
 /* ── Emisión de la cotización formal (#/emitir/<codigo>) ─────────────
    Solo para la empresa. Aquí se revisa el pedido, se pone el número del
