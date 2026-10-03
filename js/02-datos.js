@@ -54,18 +54,18 @@ let DESC_COMB={"2":0.10,"3":0.12,"4":0.15}; // descuentos por combinar
    Todos van con instrumentista metrológico, que se cobra aparte.
    Los precios se pueden cambiar desde data/tarifas-alquiler.json. */
 let COT_PAQ = [
-  {id:'uci', nom:'Paquete UCI y emergencia', eq:['esa620','defib','sp-sim','ms400'],
+  {id:'uci', nom:'Paquete desfibriladores y monitores', eq:['esa620','defib','sp-sim','ms400'],
    dia:490, medio:290,
-   para:'Monitores multiparámetro, desfibriladores, pulsioxímetros y electrocardiógrafos.'},
-  {id:'electro', nom:'Paquete electromedicina básica', eq:['esa620','ms400'],
+   para:'Desfibriladores, monitores multiparámetro, pulsioxímetros y electrocardiógrafos.'},
+  {id:'electro', nom:'Paquete monitores de signos vitales', eq:['esa620','ms400'],
    dia:260, medio:155,
-   para:'Lo que se pide en casi todo mantenimiento: seguridad eléctrica y simulación de signos vitales.'},
-  {id:'quirofano', nom:'Paquete sala de operaciones', eq:['luxometro','manometro','fluke-945'],
+   para:'Monitores multiparámetro y electrocardiógrafos: simulación de signos vitales y seguridad eléctrica.'},
+  {id:'quirofano', nom:'Paquete lámparas quirúrgicas y cabinas de flujo', eq:['luxometro','manometro','fluke-945'],
    dia:140, medio:85,
-   para:'Iluminación del campo quirúrgico, presión diferencial de la sala y nivel de ruido.'},
-  {id:'laboratorio', nom:'Paquete laboratorio', eq:['tacometro','fluke-51','luxometro'],
+   para:'Lámparas cialíticas, cabinas de flujo y salas de presión diferencial, con medición de ruido.'},
+  {id:'laboratorio', nom:'Paquete centrífugas, estufas y refrigeradoras', eq:['tacometro','fluke-51','luxometro'],
    dia:135, medio:80,
-   para:'Centrífugas (rpm), baños maría, refrigeradoras e incubadoras (temperatura) e iluminación del mesón.'}
+   para:'Centrífugas y agitadores (rpm), estufas, baños maría y refrigeradoras (temperatura), y microscopios.'}
 ];
 const paqById = id => COT_PAQ.find(p => p.id === id);
 /* Lo que costaría comprando los instrumentos del paquete por separado. */

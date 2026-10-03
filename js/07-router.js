@@ -240,6 +240,10 @@ function repintarCatalogo(){
 function repintarTodo(){
   repintarCatalogo();
   seguro('proyectos', ()=>pintarProyectos());
+  /* El cotizador también: si se abrió antes de que llegaran las tarifas,
+     se quedaba con los precios viejos del catálogo. */
+  seguro('cotizador', ()=>{ const c=document.getElementById('cotEq');
+    if(c && c.innerHTML && typeof cotPintar==='function') cotPintar(); });
 }
 
 /* Descarga con límite de tiempo. Sin esto, si Google se queda pensando
