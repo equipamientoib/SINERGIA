@@ -204,12 +204,14 @@ function cotResumen(){
      debajo, para quien quiera revisarlo. */
   /* Lo primero que se ve: el total y los botones. Y si pide una semana o
      más, en vez del total va la invitación a conversarlo. */
+  const porProv = c.prov && c.conTecnico;
   const arriba = c.largo
     ? `<div class="cot-top largo">
-         <span>${c.qty} días · una semana o más</span>
+         <span>${porProv ? 'Provincia con instrumentista' : c.qty + ' días · una semana o más'}</span>
          <b>Conversémoslo</b>
-         <small>A partir de ${COT_LARGO} días el precio se arma caso por caso: cambian la
-           logística, la calibración y la disponibilidad. Te respondemos el mismo día.</small>
+         <small>${porProv
+           ? 'El instrumentista viaja contigo: pasajes, hospedaje y días de viaje se cotizan caso por caso. Mándanos tu pedido y te respondemos el mismo día.'
+           : 'A partir de ' + COT_LARGO + ' días el precio se arma caso por caso: cambian la logística, la calibración y la disponibilidad. Te respondemos el mismo día.'}</small>
          <div class="cot-acc">
            <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Escríbenos por WhatsApp</button>
          </div>
@@ -260,8 +262,9 @@ function cotResumen(){
       `<li><span>${cotEsc(e.nom)}</span><span>S/ ${fmt(e.dia)}</span></li>`).join('')}
       ${c.desc ? `<li class="des"><span>Descuento por combinar ${n} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></li>` : ''}
     </ul>
-    ${c.largo ? `<p class="cot-aviso"><b>No ponemos precio a ${c.qty} días en automático.</b>
-      Para una semana o más lo vemos contigo: escríbenos y te pasamos el precio del plazo completo.</p>`
+    ${c.largo ? `<p class="cot-aviso">${porProv
+        ? '<b>Fuera de Lima con instrumentista no ponemos precio en automático.</b> Depende de la ciudad y de los días de viaje: escríbenos y te pasamos el precio cerrado.'
+        : '<b>No ponemos precio a ' + c.qty + ' días en automático.</b> Para una semana o más lo vemos contigo: escríbenos y te pasamos el precio del plazo completo.'}</p>`
     : `<div class="cot-cuenta">
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
       <div><span>× ${c.qty} ${cotPlural(u, c.qty)}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
@@ -334,7 +337,9 @@ function cotRestaurar(){
 function cotTexto(c, nom, mail, tel){
   const u = COT_UNI[c.mod], uq = cotPlural(u, c.qty);
   const L = [];
-  L.push((c.largo ? 'ALQUILER POR UNA SEMANA O MÁS — ' : 'SOLICITUD DE ALQUILER — ') +
+  L.push((!c.largo ? 'SOLICITUD DE ALQUILER — '
+          : (c.prov && c.conTecnico) ? 'ALQUILER EN PROVINCIA CON INSTRUMENTISTA — '
+          : 'ALQUILER POR UNA SEMANA O MÁS — ') +
     ((typeof SITE !== 'undefined' && SITE.nombre) || 'Sinergia Biomédica'));
   L.push('N.º ' + cotNumero() + ' · ' + new Date().toLocaleDateString('es-PE'));
   L.push('');
@@ -353,7 +358,9 @@ function cotTexto(c, nom, mail, tel){
   });
   L.push('');
   if(c.largo){
-    L.push('Son ' + c.qty + ' días, así que les pido su mejor precio para este plazo.');
+    L.push((c.prov && c.conTecnico)
+      ? 'Es fuera de Lima y necesito al instrumentista, así que les pido su precio para mi ciudad.'
+      : 'Son ' + c.qty + ' días, así que les pido su mejor precio para este plazo.');
     L.push('');
     L.push(c.prov ? 'Envío por agencia a provincia, de ida y vuelta, a cargo del cliente.'
                 : 'Entrega y devolución en oficina (Pueblo Libre, Lima).');
@@ -417,7 +424,9 @@ function cotEnviar(via){
                         : 'Abriendo WhatsApp con el resumen de tu pedido…'), 'ok');
   /* Solo viaja el enlace: el cliente no se descarga ningún documento. El
      único PDF es la cotización formal que emite la empresa. */
-  abrirCanal(via, texto, c.largo ? 'Alquiler por una semana o más' : 'Solicitud de alquiler');
+  abrirCanal(via, texto, !c.largo ? 'Solicitud de alquiler'
+    : (c.prov && c.conTecnico) ? 'Alquiler en provincia con instrumentista'
+    : 'Alquiler por una semana o más');
 }
 
 /* ── Cotización formal ───────────────────────────────────────────────
