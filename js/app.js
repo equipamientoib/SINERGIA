@@ -963,17 +963,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=fbb3469a';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=f076af50';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=fbb3469a';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=f076af50';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=fbb3469a','js/06-tablero.js?v=fbb3469a'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=f076af50','js/06-tablero.js?v=f076af50'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=fbb3469a'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=f076af50'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2413,7 +2413,7 @@ function renderVenta(parte){
    #/cotizar/<id> entra con ese instrumento ya marcado: es a donde llevan
    los botones «Calcular mi alquiler» de las páginas de cada equipo.
    ===================================================================== */
-var COT = {sel: new Set(), mod: 'medio', qty: 1, d1: '', d2: '', paq: ''};
+var COT = {sel: new Set(), mod: 'medio', qty: 1, paq: ''};
 /* Desde este número de días el alquiler se conversa directamente: a esa
    altura cambian el precio, la logística y la calibración. */
 const COT_LARGO = 7;
@@ -2446,12 +2446,7 @@ function cotPaquete(id){
 }
 function cotMod(m){ COT.mod = m; cotPintar(); }
 function cotCantidad(v){ COT.qty = Math.max(1, parseInt(v, 10) || 1); cotResumen(); }
-function cotFechas(){
-  COT.d1 = (document.getElementById('cotD1') || {}).value || '';
-  COT.d2 = (document.getElementById('cotD2') || {}).value || '';
-  cotResumen();
-}
-function cotLimpiar(){ COT.sel.clear(); COT.paq = ''; COT.qty = 1; COT.d1 = COT.d2 = ''; cotPintar(); }
+function cotLimpiar(){ COT.sel.clear(); COT.paq = ''; COT.qty = 1; cotPintar(); }
 
 /* ── Cálculo ──────────────────────────────────────────────────────────
    Una sola función con toda la cuenta, para que el resumen y el mensaje
@@ -2465,16 +2460,13 @@ function cotCalcular(){
   const desc = paq ? (base ? 1 - paq.dia / base : 0)
                    : (sel.length >= 4 ? (DESC_COMB['4'] || 0.15) : (DESC_COMB[String(sel.length)] || 0));
   const dia = paq ? paq.dia : Math.round(base * (1 - desc));
-  const hayMedio = paq ? true : (sel.length > 0 && sel.every(e => tieneMedio(e.dia)));
+  /* Medio día si al menos un instrumento lo tiene: los económicos, solos,
+     van desde un día completo, pero acompañando a uno que ya sale en medio
+     día el viaje ya está pagado, y el precio sale prorrateado del conjunto. */
+  const hayMedio = paq ? true : sel.some(e => tieneMedio(e.dia));
   const mod = (COT.mod === 'medio' && !hayMedio) ? 'dia' : COT.mod;
   const unit = mod === 'medio' ? (paq ? paq.medio : precioMedio(dia)) : dia;
-  /* Cantidad: por días, del calendario; en el resto, a mano. */
-  let qty = COT.qty, fechasOk = true;
-  if(mod === 'dia'){
-    const a = new Date(COT.d1), b = new Date(COT.d2);
-    if(COT.d1 && COT.d2 && !isNaN(a) && !isNaN(b) && b >= a) qty = Math.round((b - a) / 86400000) + 1;
-    else { fechasOk = !!(COT.d1 || COT.d2) ? false : true; qty = COT.qty; }
-  }
+  const qty = COT.qty;   // siempre a mano: cuántos medios días o cuántos días
   const alquiler = unit * qty;
   /* Instrumentista: va si algún instrumento lo lleva. En paquete va siempre. */
   const conTecnico = !!paq || sel.some(e => !soloEquipo(e.id));
@@ -2485,7 +2477,7 @@ function cotCalcular(){
   /* Una semana o más ya no se cotiza solo: se conversa. */
   const largo = mod === 'dia' && qty >= COT_LARGO;
   return {sel, paq, base, desc, dia, mod, hayMedio, unit, qty, alquiler, conTecnico, tecnico,
-          garantia, total: alquiler + tecnico, fechasOk, largo};
+          garantia, total: alquiler + tecnico, largo};
 }
 
 /* «1 medio día», «2 medios días», «3 días». */
@@ -2600,16 +2592,8 @@ function cotResumen(){
   const mods = COT_MOD.filter(([m]) => m !== 'medio' || c.hayMedio);
   const seg = mods.map(([m, t]) =>
     `<button type="button" class="${c.mod === m ? 'on' : ''}" onclick="cotMod('${m}')">${t}</button>`).join('');
-  const cant = c.mod === 'dia'
-    ? `<div class="cot-f2">
-         <label>Desde<input type="date" id="cotD1" value="${COT.d1}" oninput="cotFechas()" onchange="cotFechas()"></label>
-         <label>Hasta<input type="date" id="cotD2" value="${COT.d2}" oninput="cotFechas()" onchange="cotFechas()"></label>
-       </div>
-       <p class="cot-ayuda">${COT.d1 && COT.d2
-          ? `Son <b>${c.qty} ${c.qty === 1 ? 'día' : 'días'}</b>.`
-          : 'Elige las fechas. Mientras tanto se calcula <b>1 día</b>.'}</p>`
-    : `<label class="cot-f1">${COT_CANT[c.mod]}<input type="number" min="1" step="1" value="${c.qty}"
-         oninput="cotCantidad(this.value)" onchange="cotCantidad(this.value)"></label>`;
+  const cant = `<label class="cot-f1">${COT_CANT[c.mod]}<input type="number" min="1" step="1" value="${c.qty}"
+      oninput="cotCantidad(this.value)" onchange="cotCantidad(this.value)"></label>`;
   const inc = c.conTecnico ? incluidos('') : [];
   const u = COT_UNI[c.mod];
   /* Lo primero que se ve: el total y los dos botones. El detalle queda
@@ -2641,13 +2625,18 @@ function cotResumen(){
     <div class="cot-paso"><b>2</b> ¿Por cuánto tiempo?</div>
     <div class="cot-seg">${seg}</div>
     ${c.mod === 'medio'
-      ? `<p class="cot-ayuda">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.${c.paq
-          ? ' En paquete, el medio día vale también para los instrumentos que solos van desde un día.' : ''}</p>`
-      : (c.paq ? '' : sinMedio.length ? `<p class="cot-ayuda">No hay medio día porque ${sinMedio.length === 1
-            ? 'el ' + cotEsc(sinMedio[0].nom.toLowerCase()) + ' se alquila' : 'algunos se alquilan'} desde un día completo.</p>` : '')}
+      ? `<p class="cot-ayuda">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.${
+          c.paq ? ' En paquete, el medio día vale también para los instrumentos que solos van desde un día.'
+        : sinMedio.length ? ' ' + (sinMedio.length === 1
+            ? 'El ' + cotEsc(sinMedio[0].nom.toLowerCase()) + ', solo, va desde un día completo'
+            : 'Los instrumentos económicos, solos, van desde un día completo') +
+            '; acompañando a los demás entra en el medio día y el precio sale prorrateado.' : ''}</p>`
+      : (c.paq || c.hayMedio ? '' : `<p class="cot-ayuda">No hay medio día porque ${c.sel.length === 1
+            ? 'el ' + cotEsc(c.sel[0].nom.toLowerCase()) + ' se alquila' : 'todos los elegidos se alquilan'
+          } desde un día completo. Si agregas uno de los grandes, entran todos en medio día.</p>`)}
     ${cant}
     ${(c.largo || c.mod !== 'dia') ? '' : `<p class="cot-ayuda">¿Lo necesitas una semana o más? Ese caso lo vemos
-      directamente: elige las fechas y te aparece cómo escribirnos.</p>`}
+      directamente: pon los días y te aparece cómo escribirnos.</p>`}
 
     <div class="cot-paso"><b>3</b> El detalle</div>
     <ul class="cot-sel">${c.sel.map(e =>
@@ -2712,7 +2701,6 @@ function cotTexto(c, nom, mail, tel){
   L.push('');
   if(c.paq) L.push('PAQUETE: ' + c.paq.nom);
   L.push('PERIODO: ' + c.qty + ' ' + uq + (c.mod === 'medio' ? ' (turnos de 4 h)' : ''));
-  if(c.mod === 'dia' && COT.d1 && COT.d2) L.push('  Del ' + COT.d1 + ' al ' + COT.d2);
   L.push('');
   L.push('INSTRUMENTOS');
   c.sel.forEach((e, i) => {
@@ -2836,7 +2824,7 @@ function cotDoc(c, nom, mail, tel, numero){
   return {
     num: numero, fecha: new Date().toLocaleDateString('es-PE'),
     nom: nom, mail: mail, tel: tel,
-    mod: c.mod, qty: c.qty, d1: COT.d1, d2: COT.d2, paq: c.paq ? c.paq.nom : '',
+    mod: c.mod, qty: c.qty, paq: c.paq ? c.paq.nom : '',
     items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia, f: cotFotoAbs(e)})),
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
     tec: c.tecnico, gar: c.garantia, total: c.total,
@@ -3021,7 +3009,7 @@ function cotHTML(d, formal){
         <div class="meta"><span>Solicitud N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
         <p class="para"><b>Para:</b> ${cotEsc(d.nom || '—')}${d.tel ? ' · ' + cotEsc(d.tel) : ''}${d.mail ? ' · ' + cotEsc(d.mail) : ''}<br>
           ${d.paq ? '<b>Paquete:</b> ' + cotEsc(d.paq) + '<br>' : ''}
-          <b>Periodo:</b> ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}</p>
+          <b>Periodo:</b> ${cotEsc(d.qty + ' ' + uq)}</p>
         <h2>Instrumentos y precio estimado</h2>
         ${cuadro}
         <p class="nota">Importes en Soles (S/), con IGV incluido. ${cotMontoLetras(d.total)}${d.gar
@@ -3083,7 +3071,7 @@ function cotHTML(d, formal){
         ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
         ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
       <p class="campo"><b>Asunto:</b> Alquiler de ${d.paq ? cotEsc(d.paq).toLowerCase() + ' (instrumentos de metrología biomédica)' : 'instrumentos de metrología biomédica'} con certificado de
-        calibración vigente, por ${cotEsc(d.qty + ' ' + uq)}${d.mod === 'dia' && d.d1 && d.d2 ? ' (del ' + cotEsc(d.d1) + ' al ' + cotEsc(d.d2) + ')' : ''}.</p>
+        calibración vigente, por ${cotEsc(d.qty + ' ' + uq)}.</p>
       <p class="intro">Es grato dirigirnos a ustedes para saludarlos cordialmente y, en atención a su
         requerimiento, alcanzarles nuestra propuesta económica por el alquiler de los instrumentos
         detallados en el Cuadro N° 1.</p>
