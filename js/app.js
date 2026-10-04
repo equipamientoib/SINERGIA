@@ -801,17 +801,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=c49fd4de';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=d8525c43';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=c49fd4de';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=d8525c43';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=c49fd4de','js/06-tablero.js?v=c49fd4de'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=d8525c43','js/06-tablero.js?v=d8525c43'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=c49fd4de'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=d8525c43'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1105,7 +1105,6 @@ function seguro(nombre, fn){
 function repintarCatalogo(){
   seguro('filtros',      ()=>buildFacetsEq());
   seguro('equipos',      ()=>pintar());
-  seguro('paquetes',     ()=>pintarPaquetes());
   seguro('destacados',   ()=>pintarDestacados());
   seguro('form contacto',()=>pintarSelectContacto());
 }
@@ -1555,6 +1554,21 @@ function abrirCanal(via, texto, asunto){
 }
 
 /* ── formulario de contacto ─────────────────────────────────────────── */
+/* La lista de equipos del formulario se llena con el catálogo ya cargado. */
+function pintarSelectContacto(){
+  const sel = document.getElementById('cEq'); if(!sel) return;
+  const previo = sel.value;
+  sel.innerHTML = '<option value="">— Selecciona —</option>' +
+    '<option value="Venta de equipamiento biomédico">Venta de equipamiento biomédico</option>' +
+    EQUIPOS.map(e => `<option value="${e.nom}">${e.nom}</option>`).join('') +
+    '<option value="Otro / no está en la lista">Otro / no está en la lista</option>';
+  if(previo){
+    const op = [...sel.options].find(o => o.value === previo);
+    if(op) sel.value = previo;
+  }
+}
+pintarSelectContacto();
+
 function enviarContacto(via){
   const nom = val('cNom'), mail = val('cMail'), tel = val('cTel'), msg = val('cMsg');
   const sel = document.getElementById('cEq');

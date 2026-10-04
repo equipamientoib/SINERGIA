@@ -69,6 +69,21 @@ function abrirCanal(via, texto, asunto){
 }
 
 /* ── formulario de contacto ─────────────────────────────────────────── */
+/* La lista de equipos del formulario se llena con el catálogo ya cargado. */
+function pintarSelectContacto(){
+  const sel = document.getElementById('cEq'); if(!sel) return;
+  const previo = sel.value;
+  sel.innerHTML = '<option value="">— Selecciona —</option>' +
+    '<option value="Venta de equipamiento biomédico">Venta de equipamiento biomédico</option>' +
+    EQUIPOS.map(e => `<option value="${e.nom}">${e.nom}</option>`).join('') +
+    '<option value="Otro / no está en la lista">Otro / no está en la lista</option>';
+  if(previo){
+    const op = [...sel.options].find(o => o.value === previo);
+    if(op) sel.value = previo;
+  }
+}
+pintarSelectContacto();
+
 function enviarContacto(via){
   const nom = val('cNom'), mail = val('cMail'), tel = val('cTel'), msg = val('cMsg');
   const sel = document.getElementById('cEq');

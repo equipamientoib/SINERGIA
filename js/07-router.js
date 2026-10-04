@@ -230,7 +230,6 @@ function seguro(nombre, fn){
 function repintarCatalogo(){
   seguro('filtros',      ()=>buildFacetsEq());
   seguro('equipos',      ()=>pintar());
-  seguro('paquetes',     ()=>pintarPaquetes());
   seguro('destacados',   ()=>pintarDestacados());
   seguro('form contacto',()=>pintarSelectContacto());
 }
