@@ -1,0 +1,9 @@
+{
+  "_nota": "Terminos y condiciones de la cotizacion de VENTA. Cambia estos textos y la web los usa tal cual. plazoStock y plazoPedido van en el termino de entrega.",
+  "vigenciaDias": 15,
+  "plazoStock": "de 2 a 5 días hábiles",
+  "plazoPedido": "se confirma al emitir la cotización, según la programación del fabricante",
+  "garantiaMeses": 12,
+  "pago": "50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.",
+  "incluye": "Manual de usuario, certificado de garantía y capacitación de uso en la entrega."
+}

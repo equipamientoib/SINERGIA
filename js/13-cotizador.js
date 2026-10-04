@@ -687,14 +687,27 @@ function cotTerminos(c){
    El cliente nunca genera la segunda: eso lo decide la empresa. */
 function cotHTML(d, formal){
   const S = (typeof SITE !== 'undefined') ? SITE : {};
-  const u = COT_UNI[d.mod], per = cotPeriodo(d.mod, d.qty);
+  const venta = d.tipo === 'venta';
+  const u = COT_UNI[d.mod] || 'día', per = venta ? '' : cotPeriodo(d.mod, d.qty);
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
   const neto = d.total / 1.18, igv = d.total - neto;
   /* Precio unitario prorrateado sobre el total: la suma del cuadro cuadra
      exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
-  const filas = d.items.map((e, i) => {
+  /* Venta: cada equipo con su cantidad y su precio unitario. */
+  const filasVenta = () => d.items.map((e, i) => {
+    const pu = e.pu / 1.18, pt = e.t / 1.18;
+    return `<tr>
+      <td class="c">${i + 1}</td>
+      <td><b>${cotEsc(e.n.toUpperCase())}</b>
+        ${e.f ? `<img class="mini" src="${cotEsc(e.f)}" alt="">` : ''}
+        <span class="det">${cotEsc(e.m || '—')}${e.nts ? '<br>Código NTS ' + cotEsc(e.nts) + ' (NTS 113-MINSA)' : ''}
+        <br>Equipo nuevo, con garantía del fabricante.</span></td>
+      <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
+      <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
+  }).join('');
+  const filasAlq = () => d.items.map((e, i) => {
     const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
     return `<tr>
       <td class="c">${i + 1}</td>
@@ -724,6 +737,7 @@ function cotHTML(d, formal){
           ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
       <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${(d.via / 1.18).toFixed(2)}</td></tr>` : '');
+  const filas = venta ? filasVenta() : filasAlq();
   const cuadro = `<table>
       <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
         <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
@@ -809,32 +823,37 @@ function cotHTML(d, formal){
         <div class="cab"><b>${cotEsc(S.nombre || '')}</b><span>${cotEsc(S.web || '')} · ${cotEsc(S.telefono || '')}</span></div>
         <h1>Solicitud de cotización</h1>
         <div class="franja"><b>Esto no es una cotización.</b>
-          Es un estimado que calculaste en nuestra web, sujeto a confirmar que los instrumentos estén
-          libres en las fechas que necesitas. La cotización formal, con firma y validez comercial, la
-          emite ${cotEsc(S.razonSocial || '')} después de confirmar la disponibilidad.</div>
+          ${venta
+            ? 'Es la lista que armaste en nuestra web, con precios referenciales. La cotización formal, con firma y validez comercial, la emite ' + cotEsc(S.razonSocial || '') + ' después de confirmar el stock y el plazo de entrega.'
+            : 'Es un estimado que calculaste en nuestra web, sujeto a confirmar que los instrumentos estén libres en las fechas que necesitas. La cotización formal, con firma y validez comercial, la emite ' + cotEsc(S.razonSocial || '') + ' después de confirmar la disponibilidad.'}</div>
         <div class="meta"><span>Solicitud N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
-        <p class="para"><b>Para:</b> ${cotEsc(d.nom || '—')}${d.tel ? ' · ' + cotEsc(d.tel) : ''}${d.mail ? ' · ' + cotEsc(d.mail) : ''}<br>
-          <b>Dónde:</b> ${!d.prov ? 'Lima'
+        <p class="para"><b>Para:</b> ${cotEsc(d.nom || '—')}${d.tel ? ' · ' + cotEsc(d.tel) : ''}${d.mail ? ' · ' + cotEsc(d.mail) : ''}
+          ${venta ? '' : `<br><b>Dónde:</b> ${!d.prov ? 'Lima'
             : d.ciu ? 'Provincia · ' + cotEsc(d.ciu) + ' (viaja el instrumentista)'
             : 'Provincia (envío por agencia, a cargo del cliente)'}<br>
-          <b>Periodo:</b> ${cotEsc(per)}</p>
-        <h2>Instrumentos y precio estimado</h2>
+          <b>Periodo:</b> ${cotEsc(per)}`}</p>
+        <h2>${venta ? 'Equipos y precio referencial' : 'Instrumentos y precio estimado'}</h2>
         ${cuadro}
         <p class="nota">Importes en Soles (S/), con IGV incluido. ${cotMontoLetras(d.total)}${d.gar
           ? ' Además se deja una garantía en depósito de S/ ' + fmt(d.gar) + ', que se devuelve al retornar los instrumentos.' : ''}</p>
         <h2>Qué incluye</h2>
         <ul class="lst">
+          ${venta ? `<li>Equipos nuevos, con ${VCOT_TERM.garantiaMeses} meses de garantía del fabricante.</li>
+            <li>${cotEsc(VCOT_TERM.incluye)}</li>
+            <li>Entrega en Lima; a provincia se envía por agencia, a cargo del cliente.</li>
+            <li>Factura electrónica a nombre de tu razón social.</li>` : `
           <li>Certificado de calibración vigente de cada instrumento.</li>
           ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'
                   : '<li>Retiro y devolución en nuestra oficina de Lima, presentando documento de identidad.</li>'}
           ${d.prov && d.tec ? '<li>El instrumentista viaja a ' + cotEsc(d.ciu || 'tu ciudad') + ': sale de noche y regresa de noche, así que solo pagas los días de trabajo. El pasaje y los viáticos ya están en el cuadro de arriba.</li>' : ''}
           ${d.prov && !d.tec ? '<li>Los instrumentos viajan por agencia (Shalom o la que prefieras); el envío de ida y vuelta lo contratas y lo pagas tú, directo con la agencia.</li>' : ''}
           <li>${d.mod === 'medio' ? 'Medio día es un turno de 4 horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.'
-                                  : 'El día completo son los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.'}</li>
+                                  : 'El día completo son los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.'}</li>`}
         </ul>
         <div class="pasos"><b>Para confirmar:</b> escríbenos por WhatsApp al ${cotEsc(S.telefono || '')}
           o a ${cotEsc(S.email || '')}, indicando el número de solicitud ${cotEsc(d.num)}.
-          Revisamos la disponibilidad y te enviamos la cotización formal el mismo día.</div>
+          ${venta ? 'Confirmamos el stock, el precio y el plazo de entrega, y te enviamos la cotización formal el mismo día.'
+                  : 'Revisamos la disponibilidad y te enviamos la cotización formal el mismo día.'}</div>
       </div></td></tr></tbody></table>
       <div class="pie">${cotEsc(S.nombre || '')} · ${cotEsc(S.web || '')} · Documento referencial, sin validez comercial</div>
       </div>
@@ -844,7 +863,7 @@ function cotHTML(d, formal){
   /* ── COTIZACIÓN formal ────────────────────────────────────────────
      Membrete arriba y pie con razón social y RUC en todas las páginas,
      como la plantilla de Word de la empresa. */
-  const term = cotTerminos(d).map(([k, v]) =>
+  const term = (venta && typeof vcTerminos === 'function' ? vcTerminos(d) : cotTerminos(d)).map(([k, v]) =>
     `<p class="term"><b>${cotEsc(k)}</b> ${cotEsc(v)}</p>`).join('');
   return `<!doctype html><html lang="es"><head><meta charset="utf-8">
   <title>Cotización ${cotEsc(d.num)}</title><style>${base}
@@ -873,18 +892,20 @@ function cotHTML(d, formal){
       <thead><tr><td><div class="memb"><img src="${org}/img/cotizacion/membrete.png" alt="${cotEsc(S.razonSocial || '')}"></div></td></tr></thead>
       <tfoot><tr><td><div class="hueco"></div></td></tr></tfoot>
       <tbody><tr><td>
-      <h1>Cotización de alquiler de instrumentos de metrología biomédica</h1>
+      <h1>${venta ? 'Cotización de venta de equipamiento biomédico'
+                  : 'Cotización de alquiler de instrumentos de metrología biomédica'}</h1>
       <div class="lin"></div>
       <div class="nf"><span>N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
       <p class="cli">Señores:<br><b>${cotEsc((d.nom || '[RAZÓN SOCIAL DEL CLIENTE]').toUpperCase())}</b><br>
         ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
         ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
-      <p class="campo"><b>Asunto:</b> Alquiler de instrumentos de metrología biomédica con certificado de
-        calibración vigente, por ${cotEsc(per)}.</p>
+      <p class="campo"><b>Asunto:</b> ${venta
+        ? 'Venta de equipamiento biomédico, según el detalle del Cuadro N° 1.'
+        : 'Alquiler de instrumentos de metrología biomédica con certificado de calibración vigente, por ' + cotEsc(per) + '.'}</p>
       <p class="intro">Es grato dirigirnos a ustedes para saludarlos cordialmente y, en atención a su
-        requerimiento, alcanzarles nuestra propuesta económica por el alquiler de los instrumentos
+        requerimiento, alcanzarles nuestra propuesta económica por ${venta ? 'los equipos' : 'el alquiler de los instrumentos'}
         detallados en el Cuadro N° 1.</p>
-      <h2>Cuadro N° 1 — Detalle del alquiler</h2>
+      <h2>Cuadro N° 1 — ${venta ? 'Detalle de los equipos' : 'Detalle del alquiler'}</h2>
       ${cuadro}
       <p class="nota">Importes en Soles (S/). El valor de venta asciende a S/ ${neto.toFixed(2)} sin IGV;
         el total con IGV (18%) es de S/ ${d.total.toFixed(2)}. ${cotMontoLetras(d.total)}${d.gar

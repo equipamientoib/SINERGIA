@@ -244,7 +244,7 @@ function vCard(p){
       ${vMarcaModelo(p)}
       ${p.clave?`<div class="v-exp" title="${vEsc(p.expediente||'Código NTS 113-MINSA')}">Código NTS ${vEsc(p.clave)}</div>`:''}
       <div class="desc">${vEsc(p.resumen||'')}</div>
-      <div class="foot">${pie}<a class="btn" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:''))}" target="_blank" rel="noopener">Cotizar</a></div>
+      <div class="foot">${pie}<button type="button" class="btn v-add" onclick="vcAgregar('${p.id}')">Cotizar</button></div>
     </div>
   </div>`;
 }
@@ -548,8 +548,8 @@ function vProducto(id){
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
-          <a class="btn btn-fill btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-          <a class="btn btn-lg" href="${vMail('Cotización: '+p.nom)}">Cotizar por correo</a>
+          <button type="button" class="btn btn-fill btn-lg v-add" onclick="vcAgregar('${p.id}')">Agregar a mi cotización</button>
+          <a class="btn btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         ${p.ficha_pdf?`<a class="v-doc" href="${vEsc(p.ficha_pdf)}" target="_blank" rel="noopener"><span class="doc-ico">PDF</span><span><b>Ficha técnica</b><small>Ver o descargar</small></span></a>`:''}
       </div>
