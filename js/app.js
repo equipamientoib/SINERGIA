@@ -2501,6 +2501,30 @@ function cotOfertas(c, cuantas){
     .slice(0, cuantas || 3);
 }
 
+/* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
+   Al agregar un instrumento sube el descuento por combinar, así que lo que
+   cuesta de más casi siempre es menos que su precio suelto. Se calcula de
+   verdad: se simula el total con ese instrumento y se resta el actual. */
+function cotSimular(id){
+  const antes = COT.sel;
+  COT.sel = new Set([...antes, id]);
+  const c = cotCalcular();
+  COT.sel = antes;
+  return c;
+}
+function cotOfertas(c, cuantas){
+  if(!c.sel.length || c.largo) return [];
+  const yaEstan = new Set(c.sel.map(e => e.id));
+  return cotLista()
+    .filter(e => !yaEstan.has(e.id))
+    .map(e => {
+      const sim = cotSimular(e.id);
+      return {e: e, mas: Math.max(0, sim.total - c.total), suelto: sim.unit - c.unit};
+    })
+    .sort((a, b) => a.mas - b.mas)
+    .slice(0, cuantas || 3);
+}
+
 /* «1 medio día», «2 medios días», «3 días». */
 const cotPlural = (u, q) => q === 1 ? u : (u === 'medio día' ? 'medios días' : u + 's');
 
