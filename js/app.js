@@ -232,23 +232,10 @@ let EQUIPOS = [
 const APOYO = {"multimetro":"Multímetro digital Sanwa","destornillador-elec":"Destornillador eléctrico inalámbrico","set-46":"Set de herramientas 46 pzs"};
 const KIT=["multimetro","destornillador-elec","set-46"];
 
-let PAQUETES = [
-  {"id": "pkg-monitores-cal", "app": "Monitores de paciente", "nivel": "Calibración", "nom": "Pack Monitores de paciente · Calibración", "items": ["esa620", "sp-sim", "ms400", "manometro"], "kit": [], "pe": 108, "ph": 146, "dia": 624, "psem": 2496, "pmes": 7488, "eqh": 1.5, "eqd": 10, "desc": "Instrumentos para calibrar y certificar monitores: seguridad eléctrica + SpO2 + ECG/multiparámetro + presión (NIBP)."},
-  {"id": "pkg-monitores-mant", "app": "Monitores de paciente", "nivel": "Mantenimiento", "nom": "Pack Monitores de paciente · Mantenimiento", "items": ["esa620", "sp-sim", "ms400", "manometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 124, "ph": 168, "dia": 718, "psem": 2872, "pmes": 8616, "eqh": 1.5, "eqd": 10, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-desfib-cal", "app": "Desfibriladores", "nivel": "Calibración", "nom": "Pack Desfibriladores · Calibración", "items": ["esa620", "defib"], "kit": [], "pe": 120, "ph": 162, "dia": 693, "psem": 2772, "pmes": 8316, "eqh": 1.5, "eqd": 10, "desc": "Seguridad eléctrica + energía entregada (joules) y sincronía."},
-  {"id": "pkg-desfib-mant", "app": "Desfibriladores", "nivel": "Mantenimiento", "nom": "Pack Desfibriladores · Mantenimiento", "items": ["esa620", "defib"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 138, "ph": 186, "dia": 797, "psem": 3188, "pmes": 9564, "eqh": 1.5, "eqd": 10, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-centrifugas-cal", "app": "Centrífugas", "nivel": "Calibración", "nom": "Pack Centrífugas · Calibración", "items": ["esa620", "tacometro"], "kit": [], "pe": 100, "ph": 135, "dia": 578, "psem": 2312, "pmes": 6936, "eqh": 2, "eqd": 14, "desc": "Seguridad eléctrica + verificación de rpm."},
-  {"id": "pkg-centrifugas-mant", "app": "Centrífugas", "nivel": "Mantenimiento", "nom": "Pack Centrífugas · Mantenimiento", "items": ["esa620", "tacometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 115, "ph": 155, "dia": 665, "psem": 2660, "pmes": 7980, "eqh": 2, "eqd": 14, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-lamparas-cal", "app": "Lámparas cialíticas", "nivel": "Calibración", "nom": "Pack Lámparas cialíticas · Calibración", "items": ["esa620", "luxometro"], "kit": [], "pe": 120, "ph": 162, "dia": 693, "psem": 2772, "pmes": 8316, "eqh": 2, "eqd": 14, "desc": "Seguridad eléctrica + nivel de iluminación (lux)."},
-  {"id": "pkg-lamparas-mant", "app": "Lámparas cialíticas", "nivel": "Mantenimiento", "nom": "Pack Lámparas cialíticas · Mantenimiento", "items": ["esa620", "luxometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 138, "ph": 186, "dia": 797, "psem": 3188, "pmes": 9564, "eqh": 2, "eqd": 14, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-dental-cal", "app": "Unidad dental", "nivel": "Calibración", "nom": "Pack Unidad dental · Calibración", "items": ["esa620", "fluke-945", "manometro"], "kit": [], "pe": 90, "ph": 121, "dia": 520, "psem": 2080, "pmes": 6240, "eqh": 1.5, "eqd": 10, "desc": "Seguridad eléctrica + ruido (sonómetro) + presión (manómetro)."},
-  {"id": "pkg-dental-mant", "app": "Unidad dental", "nivel": "Mantenimiento", "nom": "Pack Unidad dental · Mantenimiento", "items": ["esa620", "fluke-945", "manometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 103, "ph": 140, "dia": 598, "psem": 2392, "pmes": 7176, "eqh": 1.5, "eqd": 10, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."}
-];
 
 /* Parámetros del modelo (se sobreescriben desde la hoja vía loadData) */
 let TEC_DIA=120;         // instrumentista S/ por día
 let TEC_MIN=60;          // mínimo: medio día
-let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 /* Descuento por combinar instrumentos: mientras más lleva, más baja el
    precio del día. Se puede cambiar desde data/tarifas-alquiler.json. */
 let DESC_COMB={"2":0.10,"3":0.14,"4":0.18,"5":0.20};
@@ -490,8 +477,7 @@ const eqBrand=e=>(e&&e.specs&&e.specs.Marca)||'—',
       eqOrigen=e=>(e&&e.specs&&e.specs.Origen)||'—',
       uniq=a=>[...new Set(a)];
 const F={grupo:new Set(),marca:new Set(),tipo:new Set(),origen:new Set()};
-const FP={app:new Set()};
-let curNivel='all', curGrupo='all';
+let curGrupo='all';
 
 function facetSection(title,key,opts,labelFn){
   return `<details class="facet" open><summary>${title}</summary><div class="opts">`+
@@ -510,14 +496,6 @@ function huesoEq(n){
         <span class="ln w35"></span><span class="ln w85"></span>
         <span class="ln w60"></span><span class="ln w85"></span>
       </div>
-    </div>`).join('');
-}
-function huesoPk(n){
-  return Array.from({length:n},()=>`
-    <div class="pkg pkg-hueso">
-      <span class="ln w35"></span><span class="ln w85"></span>
-      <span class="ln w60"></span><span class="ln w85"></span>
-      <span class="ln w60"></span>
     </div>`).join('');
 }
 function huesoFacetas(){
@@ -541,17 +519,8 @@ function buildFacetsEq(){
     facetSection('Procedencia','origen',uniq(eqs.map(eqOrigen)).sort())+
     `<div class="filters-clear"><button onclick="clearF()">Limpiar filtros</button></div>`;
 }
-function buildFacetsPk(){
-  if(!CATALOGO_LISTO){ document.getElementById('filtersSide').innerHTML=huesoFacetas(); return; }
-  document.getElementById('filtersSide').innerHTML=
-    `<details class="facet" open><summary>Aplicación</summary><div class="opts">`+
-    uniq(PAQUETES.map(p=>p.app)).map(a=>`<label><input type="checkbox" value="${a}" onchange="toggleFP(this.value,this.checked)"> ${a}</label>`).join('')+
-    `</div></details><div class="filters-clear"><button onclick="clearFP()">Limpiar filtros</button></div>`;
-}
 function toggleF(k,v,on){on?F[k].add(v):F[k].delete(v);pintar();}
 function clearF(){Object.values(F).forEach(s=>s.clear());document.querySelectorAll('#filtersSide input').forEach(i=>i.checked=false);pintar();}
-function toggleFP(v,on){on?FP.app.add(v):FP.app.delete(v);pintarPaquetes();}
-function clearFP(){FP.app.clear();document.querySelectorAll('#filtersSide input').forEach(i=>i.checked=false);pintarPaquetes();}
 function matchEq(e){
   if(curGrupo!=='all'&&e.g!==curGrupo)return false;
   if(F.marca.size&&!F.marca.has(eqBrand(e)))return false;
@@ -573,7 +542,7 @@ function cardEq(e){
   const foot=esComplemento(e)
     ?`<div class="foot"><div class="price" style="font-size:14px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Sin costo<small style="font-weight:400">va incluida con tu alquiler</small></div><button class="btn" onclick="go('#/equipo/${e.id}')">Ver detalle</button></div>`
     :(VER_PRECIOS
-      ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${fmt(precioDesde(e.dia))}<span>/${unidadDesde(e.dia)} · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`
+      ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${fmt(precioDesde(e.dia))}<span>/${unidadDesde(e.dia)} · IGV incl.</span><small>${tieneMedio(e.dia)?`día S/ ${fmt(e.dia)}`:'desde un día completo'}</small></div><button class="btn" onclick="go('#/cotizar/'+'${e.id}')">Cotizar</button></div>`
       :`<div class="foot"><div class="price" style="font-size:15px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Consultar tarifa<small style="font-weight:400">te respondemos con precio y disponibilidad</small></div><button class="btn" onclick="go('#/contacto')">Cotizar</button></div>`);
   /* Varias fotos: se ve la primera y las flechas pasan a las demás. La primera suele ser la de
      estudio y las siguientes, el instrumento midiendo en un equipo real:
@@ -614,37 +583,6 @@ function pintar(){
   document.getElementById('countEq').textContent=list.length+(list.length===1?' equipo':' equipos');
 }
 
-/* PAQUETES */
-function pintarPaquetes(){
-  const cont=document.getElementById('pkgs');
-  if(!CATALOGO_LISTO){
-    cont.innerHTML=huesoPk(4);
-    document.getElementById('countPk').textContent='';
-    return;
-  }
-  const list=PAQUETES.filter(p=>(curNivel==='all'||p.nivel===curNivel)&&(!FP.app.size||FP.app.has(p.app)));
-  cont.innerHTML=list.map(p=>{
-    const items=p.items.map(id=>byId(id));
-    const kitLine=p.kit.length?`<li style="opacity:.7">+ Kit de intervención: ${p.kit.map(k=>APOYO[k]).join(', ')}</li>`:'';
-    const badge=p.nivel==='Calibración'?`<span class="ptag">CALIBRACIÓN</span>`:`<span class="ptag" style="background:var(--onix)">MANTENIMIENTO</span>`;
-    const pkFoto=(p.fotos&&p.fotos.length)?p.fotos[0]:(p.foto||'');
-    const pkImg=pkFoto?`<div class="pkimg" onclick="go('#/paquete/${p.id}')" style="height:172px;margin:0 0 16px;overflow:hidden;border-radius:12px;border:1px solid var(--linea);cursor:pointer;background:var(--blanco)"><img src="${fotoURL(pkFoto,600,true)}" alt="${p.nom}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:'';
-    return `<div class="pkg">
-      ${badge}
-      ${pkImg}
-      <h3 onclick="go('#/paquete/${p.id}')">${p.nom}</h3>
-      <div class="pdesc">${p.desc}</div>
-      <ul class="inc">${items.map(e=>`<li>${e.nom}</li>`).join('')}${kitLine}</ul>
-      ${VER_PRECIOS?`<div class="pfoot">
-        <div class="pprice">S/ ${p.dia}<span>/día · IGV incluido</span></div>
-        <div class="pmod">Otras modalidades: medio día S/ ${fmt(precioMedio(p.dia))} · semana S/ ${fmt(p.psem)} · mes S/ ${fmt(p.pmes)}</div>
-      </div>`:`<div class="pfoot"><div class="pprice" style="font-size:17px;color:var(--gris)">Consultar tarifa<span style="display:block">te respondemos con precio y disponibilidad</span></div></div>`}
-      <div class="pbtns">${VER_PRECIOS?`<button class="btn btn-fill" onclick="abrirPaq('${p.id}')">Reservar paquete</button>`:`<button class="btn btn-fill" onclick="go('#/contacto')">Solicitar cotización</button>`}<a class="btn" onclick="go('#/paquete/${p.id}')">Ver detalle</a></div>
-    </div>`;
-  }).join('')||'<p style="color:var(--gris);grid-column:1/-1">No hay paquetes con esos filtros.</p>';
-  document.getElementById('countPk').textContent=list.length+(list.length===1?' paquete':' paquetes');
-}
-function setNivel(n){curNivel=n;document.querySelectorAll('#subPk button').forEach(b=>b.classList.toggle('on',b.dataset.niv===n));pintarPaquetes();}
 function setGrupo(g){curGrupo=g;document.querySelectorAll('#subEq button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));pintar();}
 
 const DESTACADOS=["esa620","sp-sim","defib"];
@@ -655,20 +593,7 @@ function pintarDestacados(){
 }
 /* Primer pintado: solo marcadores. Los datos reales los pinta
    aplicarDatos() en js/07-router.js cuando llega la primera fuente buena. */
-buildFacetsEq();pintar();pintarPaquetes();pintarDestacados();
-function setView(v){
-  const eq=v==='eq', pk=v==='pk', cu=v==='custom';
-  document.getElementById('viewEq').style.display=eq?'':'none';
-  document.getElementById('viewPk').style.display=pk?'':'none';
-  document.getElementById('viewCustom').style.display=cu?'':'none';
-  document.getElementById('segEq').classList.toggle('on',eq);
-  document.getElementById('segPk').classList.toggle('on',pk);
-  document.getElementById('segCustom').classList.toggle('on',cu);
-  const side=document.getElementById('filtersSide'), lay=document.getElementById('catLayout');
-  if(cu){side.style.display='none';lay.classList.add('nofilters');buildCustom();}
-  else{side.style.display='';lay.classList.remove('nofilters');if(eq){buildFacetsEq();pintar();}else{buildFacetsPk();pintarPaquetes();}}
-  side.classList.remove('open');
-}
+buildFacetsEq();pintar();pintarDestacados();
 function toggleFiltros(){document.getElementById('filtersSide').classList.toggle('open');}
 
 
@@ -712,76 +637,6 @@ function eqcarIr(c,n){
 }
 
 ;
-/* ===== js/04-personaliza.js ===== */
-/* ---- PERSONALIZA TU PAQUETE ---- */
-const CUSTOM={sel:new Set(),kit:false};
-function buildCustom(){
-  /* Con CONFIG.MOSTRAR_PRECIOS en false no debe verse ningún precio.
-     Antes esta lista los mostraba igual, saltándose el interruptor.  */
-  const pz = txt => VER_PRECIOS ? `<span class="cp">${txt}</span>` : '';
-  const groups=[['ansim','Analizadores y simuladores'],['med','Instrumentos de medición'],['elec','Medidores eléctricos']];
-  let html=groups.map(([g,label])=>{
-    const items=EQUIPOS.filter(e=>e.g===g&&!esComplemento(e));
-    if(!items.length)return '';
-    return `<div class="cgroup"><div class="cgh">${label}</div>`+items.map(e=>`<label class="citem"><input type="checkbox" value="${e.id}" ${CUSTOM.sel.has(e.id)?'checked':''} onchange="toggleCustom('${e.id}',this.checked)"><span class="cn">${e.nom}</span>${pz('S/ '+e.dia+'/día')}</label>`).join('')+`</div>`;
-  }).join('');
-  html+=`<div class="cgroup"><div class="cgh">Extra</div><label class="citem"><input type="checkbox" ${CUSTOM.kit?'checked':''} onchange="toggleKit(this.checked)"><span class="cn">Kit de herramientas de apoyo (set 46 pzs + destornillador eléctrico)</span>${pz('+ S/ '+KIT_DIA+'/día')}</label></div>`;
-  document.getElementById('customList').innerHTML=html;
-  renderCustomSummary();
-}
-function toggleCustom(id,on){on?CUSTOM.sel.add(id):CUSTOM.sel.delete(id);renderCustomSummary();}
-function toggleKit(on){CUSTOM.kit=on;renderCustomSummary();}
-function customDisc(n){if(n>=4)return DESC_COMB["4"]||0.15;return DESC_COMB[String(n)]||0;}
-function customCalc(){
-  let sum=0;CUSTOM.sel.forEach(id=>sum+=byId(id).dia);
-  const disc=customDisc(CUSTOM.sel.size);
-  let dia=sum*(1-disc); if(CUSTOM.kit)dia+=KIT_DIA;
-  return {sum,disc,dia:Math.round(dia)};
-}
-function renderCustomSummary(){
-  const c=customCalc(), n=CUSTOM.sel.size;
-  const items=[...CUSTOM.sel].map(id=>byId(id).nom);
-  document.getElementById('customSummary').innerHTML=
-    `<div class="csh">Tu paquete</div>`+
-    (n?`<ul class="csel">${items.map(x=>`<li>${x}</li>`).join('')}${CUSTOM.kit?'<li>Kit de herramientas de apoyo</li>':''}</ul>`:`<div class="cempty">Aún no eliges instrumentos. Marca los que necesites a la izquierda.</div>`)+
-    (n&&VER_PRECIOS?`<div class="crow"><span>Suma instrumentos</span><span>S/ ${fmt(c.sum)}/día</span></div>`:'')+
-    (c.disc&&VER_PRECIOS?`<div class="crow disc"><span>Descuento por combinar (${Math.round(c.disc*100)}%)</span><span>− S/ ${fmt(Math.round(c.sum*c.disc))}</span></div>`:'')+
-    (CUSTOM.kit&&VER_PRECIOS?`<div class="crow"><span>Kit de apoyo</span><span>+ S/ ${fmt(KIT_DIA)}</span></div>`:'')+
-    (VER_PRECIOS
-      ?`<div class="ctot"><span>Total por día</span><span>S/ ${fmt(c.dia)}</span></div>`
-      +`<button class="btn btn-fill" ${n<1?'disabled':''} onclick="reservarCustom()">Reservar mi paquete</button>`
-      +`<div class="cnote">Precio con IGV incluido. Al reservar eliges por día, semana, mes, etc.</div>`
-      :`<div class="ctot"><span>Total por día</span><span style="font-size:16px;color:var(--gris)">Consultar</span></div>`
-      +`<button class="btn btn-fill" ${n<1?'disabled':''} onclick="go('#/contacto')">Solicitar cotización</button>`
-      +`<div class="cnote">Arma tu combinación y envíanosla: te respondemos con la tarifa y la disponibilidad.</div>`);
-}
-function reservarCustom(){
-  const c=customCalc(); if(c.dia<=0)return;
-  const n=CUSTOM.sel.size;
-  const nom='Paquete personalizado ('+n+' instrumento'+(n!==1?'s':'')+(CUSTOM.kit?' + kit':'')+')';
-  openModal(nom,'Paquete personalizado · IGV incluido',{medio:precioMedio(c.dia),dia:c.dia,semana:c.dia*4,mes:c.dia*12},eqConds(c.dia),techRates(),true,'dia');
-}
-
-/* Selector de equipos del formulario de contacto.
-   ANTES: se llenaba una sola vez, al cargar el archivo, con los datos de
-   respaldo — y nunca se actualizaba. Si la hoja tenía un equipo nuevo,
-   el cliente no podía elegirlo. Ahora lo repinta el router cada vez que
-   llegan datos buenos, conservando lo que el usuario ya había elegido. */
-function pintarSelectContacto(){
-  const sel=document.getElementById('cEq'); if(!sel)return;
-  const previo=sel.value;
-  sel.innerHTML='<option value="">— Selecciona —</option>'+
-    '<option value="Venta de equipamiento biomédico">Venta de equipamiento biomédico</option>'+
-    EQUIPOS.map(e=>`<option value="${e.nom}">${e.nom}</option>`).join('')+
-    '<option value="Otro / no está en la lista">Otro / no está en la lista</option>';
-  if(previo){
-    const op=[...sel.options].find(o=>o.value===previo);
-    if(op) sel.value=previo;
-  }
-}
-pintarSelectContacto();
-
-;
 /* ===== js/05-detalle.js ===== */
 /* ---- DETALLE ---- */
 function renderEquipo(id){
@@ -802,7 +657,7 @@ function renderEquipo(id){
   const btnsHTML=isA
     ?`<div class="dbtns"><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
     :(VER_PRECIOS
-      ?`<div class="dbtns"><button class="btn btn-fill btn-lg" onclick="abrir(${idx})">Reservar por días</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
+      ?`<div class="dbtns"><button class="btn btn-fill btn-lg" onclick="go('#/cotizar/'+'${e.id}')">Calcular mi alquiler</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
       :`<div class="dbtns"><a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a></div>`);
   /* Bloque de calibración: fechas y certificado (hoja Equipos, columnas cal_*). */
   const calHTML=(e.cal_fin||e.cal_pdf)?`<div class="spec"><div class="sh">Certificado de calibración</div>`
@@ -825,7 +680,7 @@ function renderEquipo(id){
         <h1>${e.nom}</h1>
         <div class="dmarca">${e.marca}</div>
         ${priceHTML}
-        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): ${tieneMedio(e.dia)?`&nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp;`:''} día S/ ${fmt(e.dia)} &nbsp;·&nbsp; semana S/ ${fmt(e.dia*4)} &nbsp;·&nbsp; mes S/ ${fmt(e.dia*12)}</div><div class="modnote">${tieneMedio(e.dia)?`Medio día es un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}) y el día completo son los dos turnos.`:`Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}).`} ${soloEquipo(e.id) ? `Lo recoges en nuestra oficina: sin instrumentista, con DNI y S/ ${fmt(garantiaDe(e.id))} de garantía que se te devuelve.` : 'Va con nuestro instrumentista, que se cobra aparte.'}</div>`}
+        ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): ${tieneMedio(e.dia)?`&nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp;`:''} día S/ ${fmt(e.dia)}</div><div class="modnote">${tieneMedio(e.dia)?`Medio día es un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}) y el día completo son los dos turnos.`:`Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}).`} ${soloEquipo(e.id) ? `Lo recoges en nuestra oficina: sin instrumentista, con DNI y S/ ${fmt(garantiaDe(e.id))} de garantía que se te devuelve.` : 'Va con nuestro instrumentista, que se cobra aparte.'}</div>`}
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
@@ -835,45 +690,6 @@ function renderEquipo(id){
     </div>`;
   window._galItems=items;
   setTimeout(galSiguienteFoto, 400);   // tras dar tiempo a la portada
-}
-function renderPaquete(id){
-  const p=PAQUETES.find(x=>x.id===id);
-  const body=document.getElementById('equipoBody');
-  if(!p){body.innerHTML='<div class="pagehead"><h1>Paquete no encontrado</h1></div>';return;}
-  const items=p.items.map(x=>byId(x));
-  const rows=items.map(e=>`<div class="row" onclick="irEquipo('${e.id}')"><span>${e.nom}</span><span class="v">${VER_PRECIOS?'S/ '+e.dia+'/día':'consultar'}</span></div>`).join('');
-  const kitRows=p.kit.map(k=>`<div class="row"><span>${APOYO[k]}</span><span class="v">incluido</span></div>`).join('');
-  const kitBlock=p.kit.length?`<div class="pkinc"><div class="sh">Kit de intervención (+ S/ ${KIT_DIA}/día)</div>${kitRows}</div>`:'';
-  /* Galería del paquete: fotos del conjunto (hoja Paquetes, columnas foto / fotos). */
-  const pkFotos=(p.fotos&&p.fotos.length)?p.fotos:(p.foto?[p.foto]:[]);
-  const pkGal=pkFotos.length
-    ? pkFotos.map(u=>`<img src="${fotoURL(u,900)}" alt="${p.nom}">`)
-    : items.map(e=>device(e));
-  const pkMini=pkFotos.length
-    ? pkFotos.map(u=>`<img src="${fotoURL(u,200)}" alt="${p.nom}">`)
-    : pkGal;
-  body.innerHTML=`
-    <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; Paquetes &nbsp;/&nbsp; ${p.nom}</div>
-    <div class="detail">
-      <div class="gallery">
-        <div class="main" id="galMain">${pkGal[0]}<span class="gp"></span></div>
-        <div class="thumbs">${pkMini.map((it,i)=>`<div class="thumb ${i===0?'on':''}" onclick="swapPk(${i})">${it}</div>`).join('')}</div>
-      </div>
-      <div class="dinfo">
-        <div class="dcat">Paquete · ${p.nivel}</div>
-        <h1>${p.nom}</h1>
-        <div class="dmarca">${items.length} instrumentos${p.kit.length?' + kit de intervención':''}</div>
-        ${VER_PRECIOS?`<div class="pricebox"><span class="pp">S/ ${p.dia}</span><span class="pu">/ día · IGV incluido</span></div>
-        <div class="pmodbig">Modalidades (IGV incluido): &nbsp;medio día S/ ${fmt(precioMedio(p.dia))} &nbsp;·&nbsp; día S/ ${fmt(p.dia)} &nbsp;·&nbsp; semana S/ ${fmt(p.psem)} &nbsp;·&nbsp; mes S/ ${fmt(p.pmes)}</div>`
-        :`<div class="pricebox"><span class="pp" style="font-size:21px">Consultar tarifa</span><span class="pu">· te respondemos con precio y disponibilidad</span></div>`}
-        <div class="modnote">Van de menor a mayor: a más tiempo, menor precio por día. En un día completo (dos turnos de 4 h) se atienden hasta ~${p.eqd} equipos. El mínimo es medio día.</div>
-        <div class="ddesc">${p.desc}</div>
-        <div class="dbtns">${VER_PRECIOS?`<button class="btn btn-fill btn-lg" onclick="abrirPaq('${p.id}')">Reservar paquete</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a>`:`<a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a>`}</div>
-        <div class="dnote">Cada instrumento del paquete se entrega con su certificado de calibración vigente.</div>
-        ${VER_PRECIOS?`<div class="spec"><div class="sh">Tarifas del paquete</div><div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(p.dia))}</span></div><div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(p.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(p.psem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(p.pmes)}</span></div></div>`:''}<div class="pkinc"><div class="sh">Instrumentos (${items.length})</div>${rows}</div>${kitBlock}
-      </div>
-    </div>`;
-  window._pkItems=items; window._pkGal=pkGal;
 }
 function swapPk(i){
   document.getElementById('galMain').innerHTML=window._pkGal[i]+'<span class="gp"></span>';
@@ -985,17 +801,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=27b51471';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=bda34ae9';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=27b51471';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=bda34ae9';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=27b51471','js/06-tablero.js?v=27b51471'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=bda34ae9','js/06-tablero.js?v=bda34ae9'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=27b51471'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=bda34ae9'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1089,14 +905,11 @@ function route(sinMover){
     setTimeout(() => { if(typeof cotAbrir === 'function') cotAbrir(idc); }, 0);
   }
   else if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
-  else if(h.startsWith('#/paquete/')){renderPaquete(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/proyecto/')){renderProyecto(h.split('/')[2]);pageId='page-equipo';navKey='#/clientes';}
   else if(h==='#/venta'||h.startsWith('#/venta/')){renderVenta(h.split('/').slice(2));pageId='page-venta';navKey=h==='#/venta'?'#/venta':'#/venta/tienda';}
   else if(h.startsWith('#/catalogo/')){
     const g=h.split('/')[2]||'';pageId='page-catalogo';navKey='#/catalogo';
-    if(g==='paquetes')setView('pk');
-    else if(g==='custom')setView('custom');
-    else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
+    setGrupo(GRUPOS[g]?g:'all');
   }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
   /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
@@ -1107,7 +920,7 @@ function route(sinMover){
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */
   const enVenta = h==='#/venta' || h.startsWith('#/venta/');
-  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar|cotizacion|resumen|emitir)\//.test(h) || h==='#/cotizar';
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|cotizar|cotizacion|resumen|emitir)\//.test(h) || h==='#/cotizar';
   let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
   try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
   modo = modo || 'alquiler';
@@ -1214,14 +1027,12 @@ function aplicarDatos(d, enVivo){
        filas vacías, y pintarlas dejaba tarjetas en blanco en la web: mejor
        quedarse con lo que ya había.                                     */
     const validos = a => Array.isArray(a) ? a.filter(x => x && x.id && x.nom) : [];
-    const eqOk = validos(d.equipos), pkOk = validos(d.paquetes);
+    const eqOk = validos(d.equipos);
     if(eqOk.length){ EQUIPOS = eqOk; aplicarTarifas(); }
-    if(pkOk.length) PAQUETES = pkOk;
     if(d.modelo){
       const m=d.modelo;
       if(m.instrumentista_dia!=null) TEC_DIA=m.instrumentista_dia;
       if(m.instrumentista_min!=null) TEC_MIN=m.instrumentista_min;
-      if(m.kit_dia!=null) KIT_DIA=m.kit_dia;
       if(m.descuento_combinar) DESC_COMB=m.descuento_combinar;
       /* La hoja manda sobre el interruptor de precios (modelo.mostrar_precios):
          así se encienden o apagan sin tocar el código. */
@@ -1558,7 +1369,6 @@ let actual=null;
 function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
 const turnos = () => `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
-function pkgConds(p){return {medio:`Medio día: ${turnos()}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
 function eqConds(dia, id){
   if(id && soloEquipo(id)) return {medio:`Medio día: ${turnos()}.`,
     dia:`Lo recoges y lo devuelves en nuestra oficina. No necesita instrumentista: dejas tu DNI y S/ ${fmt(garantiaDe(id))} de garantía, que se te devuelve con el equipo.`,
@@ -1618,7 +1428,6 @@ function clearCalc(){
   ['cDias','cSub','cIgv','cTot','cTecUnit','cTecQty','cTec','cGrand'].forEach(id=>document.getElementById(id).textContent='—');
   const f=document.getElementById('cMinFila'); if(f) f.hidden=true;
 }
-function abrirPaq(id){const p=PAQUETES.find(x=>x.id===id);openModal(p.nom,'Paquete '+p.nivel+' · IGV incluido',{medio:precioMedio(p.dia),dia:p.dia,semana:p.psem,mes:p.pmes},pkgConds(p),techRates(),true,'dia');}
 function abrir(idx){
   const e=EQUIPOS[idx];
   const pr={dia:e.dia, semana:e.dia*4, mes:e.dia*12};
@@ -2697,7 +2506,7 @@ function cotResumen(){
     ${c.prov && c.conTecnico ? `<label class="cot-f1">¿A qué ciudad?
       <select onchange="cotCiudad(this.value)">
         <option value="">Elige tu ciudad…</option>
-        ${Object.keys(VIAJE_ZONAS).map(z => `<optgroup label="${VIAJE_ZONAS[z]} · pasaje S/ ${fmt(VIAJE.zonas[z])}">
+        ${Object.keys(VIAJE_ZONAS).map(z => `<optgroup label="${VIAJE_ZONAS[z]}">
           ${CIUDADES.filter(x => String(x.z) === z).map(x =>
             `<option value="${cotEsc(x.n)}"${COT.ciudad === x.n ? ' selected' : ''}>${cotEsc(x.n)}</option>`).join('')}
         </optgroup>`).join('')}
