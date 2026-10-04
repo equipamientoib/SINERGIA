@@ -175,6 +175,28 @@ Falabella vende la marca, pero no ese modelo, así que no hay comparación váli
 | Rayos X digital con 2 detectores y mesa flotante | S/ 432,973 | Perlove |
 | Autoclave horizontal de 430 L, 2 puertas | S/ 562,302 | Tuttnauer |
 
+## Corrección del 4/10/2026 (segunda revisión, con la hoja de proveedor a la vista)
+
+Al revisar fila por fila contra la hoja «Sinergia - Venta (catálogo en vivo)» aparecieron dos errores en la tabla de arriba:
+
+1. **Laringoscopio adulto Macintosh Ri-standard: no estamos caros, estamos 27 % más baratos.**
+   La búsqueda había tomado el aviso más barato de Falabella con la marca Ri-standard, que es el **set 7050 pediátrico** (S/ 1 059,80). El nuestro es el **set 7040 de adulto**, y ese sí está en Falabella: «Set de Laringoscopio Standard Macintosh 7040», **S/ 1 575**. Nuestro precio de S/ 1 148 queda 27 % por debajo. Este equipo se devolvió a la web.
+
+2. **Riester Exacta y Ri-champion N: no hay precio con el que competir.** No es que estemos caros de más; en Falabella los venden por debajo de nuestro propio costo de proveedor:
+
+   | Equipo | Nuestro costo | Nuestro precio | Falabella |
+   |---|---|---|---|
+   | Tensiómetro aneroide de mano Exacta 1350 | S/ 297 | S/ 401 | S/ 280 a S/ 340 (4 vendedores) |
+   | Tensiómetro digital de mano Ri-champion N 1725-145 | S/ 548 | S/ 740 | S/ 426 el más barato; S/ 612 el mismo 1725-145 |
+
+   Los dos quedan retirados. Vender a ese precio sería perder dinero.
+
+3. **El reemplazo del tensiómetro aneroide de mano ya estaba publicado:** el **Heine Gamma G5** (alemán, S/ 398, 22 en stock), y Falabella no lo vende. Así que ese tipo de equipo sigue cubierto en la web, con otra marca y sin comparación posible.
+
+4. **Para el tensiómetro digital de mano no hay reemplazo.** Es el único tensiómetro digital con stock en la lista del proveedor (540 equipos revisados), así que ese tipo de equipo queda fuera del catálogo hasta que entre otro modelo.
+
+Resultado: la tienda queda con **148 equipos** y **2 retirados**.
+
 ## Conclusión
 
 - Solo **10 de 150** equipos (7 %) tienen un modelo idéntico en Falabella. Son todos equipos de bajo precio: tensiómetros, pulsioxímetros, laringoscopios y sets de diagnóstico.
