@@ -110,7 +110,36 @@ const CONFIG = {
      (Formspree, Getform, Basin…), pega aquí la URL del endpoint y las
      solicitudes también se enviarán ahí. Vacío = solo WhatsApp/correo. */
   FORM_ENDPOINT: "",
+
+  /* GOOGLE ANALYTICS 4 — medir cuánta gente entra y por dónde.
+     Pega aquí tu identificador, con el formato G-XXXXXXXXXX, y la web
+     empieza a medir sola (también las páginas sueltas de venta y de
+     alquiler). Se saca en analytics.google.com › Administrar › Flujos
+     de datos › Web. Vacío = no se carga nada ni se envía nada.        */
+  ANALYTICS: "",
 };
+
+/* Carga de Google Analytics. Solo si hay identificador: sin él no se pide
+   ni un archivo a Google, así la web no cambia para nadie. En una web de
+   una sola página hay que avisar cada cambio de dirección a mano, porque
+   el navegador no recarga. */
+function cargarAnalytics(){
+  const id = (typeof CONFIG !== 'undefined' && CONFIG.ANALYTICS) || '';
+  if(!/^G-[A-Z0-9]+$/i.test(id) || window.__ga) return;
+  window.__ga = true;
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function(){ window.dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', id);
+  addEventListener('hashchange', () => gtag('event', 'page_view', {
+    page_location: location.href, page_title: document.title}));
+}
+if(document.readyState === 'loading') addEventListener('DOMContentLoaded', cargarAnalytics);
+else cargarAnalytics();
 
 ;
 /* ===== js/01-componentes.js ===== */
@@ -179,8 +208,8 @@ function renderFooter(){
       ${LOGO_FOOTER}
       <p>${SITE.razonSocial}<br>${SITE.direccion}</p>
       <div class="wa-row">
-        <a class="wa" id="waLink" href="https://wa.me/${SITE.whatsapp}" target="_blank" rel="noopener">WhatsApp</a>
-        <a class="wa2" onclick="go('#/contacto')">· solicitar cotización →</a>
+        <a class="wa" id="waLink" href="https://wa.me/${SITE.whatsapp}" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+        <a class="wa2" onclick="go('#/contacto')">o déjanos tus datos →</a>
       </div>
     </div>
     <div>
@@ -803,17 +832,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=92f56422';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4ec4ae8e';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=92f56422';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4ec4ae8e';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=92f56422','js/06-tablero.js?v=92f56422'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=4ec4ae8e','js/06-tablero.js?v=4ec4ae8e'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=92f56422'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=4ec4ae8e'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -875,6 +904,54 @@ function renderProyecto(){
 
 ;
 /* ===== js/07-router.js ===== */
+/* ── Título y descripción por página ───────────────────────────────────
+   La web es de una sola página: sin esto, Google y las pestañas del
+   navegador veían siempre el mismo título. Las páginas propias
+   (alquiler/… y venta/…) ya traen el suyo en el HTML.             */
+const TITULOS = {
+  '#/':            ['Sinergia Biomédica — Venta y alquiler de equipos biomédicos en Lima',
+                    'Equipamiento biomédico y alquiler de instrumentos de metrología con certificado de calibración vigente. Lima, Perú.'],
+  '#/alquiler':    ['Alquiler de instrumentos de metrología biomédica | Sinergia Biomédica',
+                    'Analizadores y simuladores Fluke y Rigel por días, con certificado de calibración vigente. Entrega en Lima y provincias.'],
+  '#/catalogo':    ['Catálogo de alquiler · instrumentos por días | Sinergia Biomédica',
+                    'Analizadores de seguridad eléctrica, simuladores, sonómetros, luxómetros y más, con su precio por día.'],
+  '#/cotizar':     ['Arma tu alquiler y mira el precio | Sinergia Biomédica',
+                    'Marca los instrumentos, elige Lima o provincia y mira el total con IGV. Mientras más lleves juntos, menos cuesta el día.'],
+  '#/venta':       ['Venta de equipos biomédicos en Lima | Sinergia Biomédica',
+                    'Monitores, autoclaves, ecógrafos, ventiladores y equipamiento hospitalario con precio, stock y código NTS.'],
+  '#/venta/tienda':['Tienda de equipos biomédicos · precios y stock | Sinergia Biomédica',
+                    'Todos los equipos publicados con su precio con IGV, su stock y su ficha técnica.'],
+  '#/cotizar-venta':['Tu cotización de equipos | Sinergia Biomédica',
+                    'Revisa las cantidades y recibe tu cotización formal con disponibilidad y plazo de entrega.'],
+  '#/servicios':   ['Servicios de metrología y equipamiento biomédico | Sinergia Biomédica',
+                    'Alquiler de instrumentos, suministro hospitalario y talleres prácticos de metrología biomédica.'],
+  '#/talleres':    ['Talleres prácticos de metrología biomédica | Sinergia Biomédica',
+                    'Formación en seguridad eléctrica y metrología biomédica sobre instrumentos reales Fluke y Rigel.'],
+  '#/clientes':    ['Proyectos y clientes | Sinergia Biomédica',
+                    'Instituciones de salud que equipamos y verificamos en Lima y provincias.'],
+  '#/nosotros':    ['Quiénes somos | Sinergia Biomédica',
+                    'Servicios Integrales Sinergia S.A.C., equipamiento y metrología biomédica en Lima, Perú.'],
+  '#/contacto':    ['Contacto · pide tu cotización | Sinergia Biomédica',
+                    'Escríbenos por WhatsApp o déjanos tus datos y te respondemos con la cotización.']
+};
+function tituloDe(h){
+  if(TITULOS[h]) return TITULOS[h];
+  if(h.startsWith('#/venta/')) return TITULOS['#/venta/tienda'];
+  if(h.startsWith('#/catalogo/') || h.startsWith('#/equipo/')) return TITULOS['#/catalogo'];
+  if(h.startsWith('#/cotizar/')) return TITULOS['#/cotizar'];
+  if(h.startsWith('#/proyecto/')) return TITULOS['#/clientes'];
+  return TITULOS['#/'];
+}
+function ponerTitulo(h){
+  const t = tituloDe(h);
+  document.title = t[0];
+  let m = document.querySelector('meta[name="description"]');
+  if(!m){ m = document.createElement('meta'); m.setAttribute('name','description'); document.head.appendChild(m); }
+  m.setAttribute('content', t[1]);
+  let c = document.querySelector('link[rel="canonical"]');
+  if(c) c.setAttribute('href', location.origin + '/' + (h === '#/' ? '' : h));
+}
+
 /* ---- ROUTER ---- */
 const PAGES={'':'page-entrada','#/':'page-entrada','#/alquiler':'page-home','#/nosotros':'page-nosotros','#/servicios':'page-servicios','#/talleres':'page-talleres','#/catalogo':'page-catalogo','#/clientes':'page-clientes','#/contacto':'page-contacto'};
 function go(hash){location.hash=hash;closeMenu();}
@@ -917,6 +994,10 @@ function route(sinMover){
     const g=h.split('/')[2]||'';pageId='page-catalogo';navKey='#/catalogo';
     setGrupo(GRUPOS[g]?g:'all');
   }
+  /* Dirección que no existe (un enlace viejo o mal copiado): antes se
+     quedaba en blanco. Ahora va a la página 404, que explica y ofrece
+     volver. Los anclajes internos («#main») no entran aquí. */
+  else if(h.startsWith('#/') && !PAGES[h]){ location.replace('/404.html'); return; }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
   /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
      cotizador todo vuelve a su sitio. */
@@ -938,6 +1019,8 @@ function route(sinMover){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  document.body.classList.toggle('wa-propio', h === '#/cotizar-venta');
+  seguro('título', () => ponerTitulo(h));
   if(!sinMover) window.scrollTo(0,0);   // al sincronizar datos no se mueve la vista
 }
 window.addEventListener('hashchange',function(){ route(); });   // al navegar SÍ sube al inicio
@@ -1714,15 +1797,27 @@ function vAjustar(p){
   if(q.clave && !q.expediente) q.expediente = ((VENTA && VENTA.ntsNom) || {})[q.clave] || '';
   return q;
 }
+/* Equipos retirados a mano (data/venta.json › noPublicar): siguen con
+   publicar = SI en la hoja, pero no se muestran ni se cotizan. Motivo
+   anotado en el propio archivo (precio por encima de la competencia). */
+function vBloqueado(id){
+  const no = (VENTA && VENTA.noPublicar) || {};
+  return !!id && id !== '_nota' && Object.prototype.hasOwnProperty.call(no, id);
+}
+
 function vMezclar(){
   if(VENTA && VENTA_VIVO){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    VENTA.productos = VENTA_VIVO.productos.map(p => {
+    VENTA.productos = VENTA_VIVO.productos.filter(p => !vBloqueado(p.id)).map(p => {
       p = vAjustar(p);
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
+      /* Copia propia en img/venta/ (la deja scripts/bajar_fotos_venta.py):
+         va antes que el enlace de Drive porque la sirve nuestro dominio,
+         así Google la indexa y además carga más rápido. */
+      if((VENTA.locales||{})[p.id]) return Object.assign({}, p, {fotos: ['img/venta/' + p.id + '.jpg']});
       const b = base.get(p.id);
       /* Orden de prioridad: foto corregida (fotosFijas) › foto de la hoja o
          del proveedor (modelo real) › foto antigua del sitio (respaldo). */
@@ -1747,8 +1842,10 @@ function cargarVenta(){
       .then(d => copia.then(c => { if(c && !VENTA_VIVO) ventaEnVivo(c); return d; }))
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
+                 noPublicar: d.noPublicar||{},
+                 locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
-        VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
+        VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
@@ -1796,10 +1893,13 @@ function vBuscar(q){
 }
 function vBuscarEn(q, destino){
   const caja = document.getElementById(destino); if(!caja) return;
-  const r = vBuscar(q);
+  /* Con una sola letra todavía no se busca: antes salía «no encontramos
+     «a»» apenas el cliente empezaba a escribir. */
+  const corta = q.trim().length < 2;
+  const r = corta ? [] : vBuscar(q);
   const otros = document.querySelectorAll('[data-sin-busqueda]');
-  otros.forEach(e => e.hidden = !!q.trim());
-  caja.innerHTML = !q.trim() ? '' : (r.length
+  otros.forEach(e => e.hidden = !corta);
+  caja.innerHTML = corta ? '' : (r.length
     ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid">${r.map(vCard).join('')}</div>`
     : `<div class="v-vacio"><h3>No encontramos «${vEsc(q)}» en el catálogo publicado</h3><p>Igual podemos conseguirlo. Escríbenos con el nombre o el código de tu listado y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+q)}" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div></div>`);
 }
@@ -2306,6 +2406,12 @@ const COT_LARGO = 7;
 const cotEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
   ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
+/* Un solo formato de dinero en pantalla: «S/ 1,234», sin decimales. El
+   neto se redondea y el IGV sale de restarlo, así subtotal + IGV da
+   exactamente el total que ve el cliente. */
+const soles = n => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
+const cotNeto = total => Math.round(Number(total || 0) / 1.18);
+
 /* Instrumentos que se pueden cotizar (las complementarias van incluidas). */
 const cotLista = () => EQUIPOS.filter(e => !esComplemento(e) && e.dia > 0);
 
@@ -2476,7 +2582,7 @@ function cotBarra(c){
     ? `<div><span>${c.qty} días</span><b>Conversémoslo</b></div>
        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Escríbenos</button>`
     : `<div><span>${cuantos} · ${cotPeriodo(c.mod, c.qty)}</span>
-         <b>S/ ${c.total.toFixed(2)}</b></div>
+         <b>${soles(c.total)}</b></div>
        <button class="btn" onclick="cotVista()">Ver</button>
        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar</button>`;
 }
@@ -2613,7 +2719,7 @@ function cotResumen(){
        </div>`
     : `<div class="cot-top">
          <span>Tu cotización · ${cotPeriodo(c.mod, c.qty)}${c.prov ? ' · provincia' : ''}</span>
-         <b>S/ ${c.total.toFixed(2)}</b>
+         <b>${soles(c.total)}</b>
          <small>IGV incluido${c.garantia ? ' · + S/ ' + fmt(c.garantia) + ' de garantía que se devuelve' : ''}</small>
          <div class="cot-acc">
            <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
@@ -2649,14 +2755,14 @@ function cotResumen(){
       Para una semana o más lo vemos contigo: escríbenos y te pasamos el precio del plazo completo.</p>`
     : `<div class="cot-cuenta">
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
-      <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
-      ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
-      ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>S/ ${c.pasaje.toFixed(2)}</span></div>
+      <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>${soles(c.alquiler)}</span></div>
+      ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>${soles(c.tecnico)}</span></div>` : ''}
+      ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>${soles(c.pasaje)}</span></div>
         <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
-          ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>S/ ${c.viatico.toFixed(2)}</span></div>` : ''}
-      <div class="sub"><span>Subtotal (S/)</span><span>${(c.total / 1.18).toFixed(2)}</span></div>
-      <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total / 1.18 * 0.18).toFixed(2)}</span></div>
-      <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
+          ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>${soles(c.viatico)}</span></div>` : ''}
+      <div class="sub"><span>Subtotal</span><span>${soles(cotNeto(c.total))}</span></div>
+      <div class="sub"><span>IGV (18 %)</span><span>${soles(c.total - cotNeto(c.total))}</span></div>
+      <div class="gran"><span>Total con IGV</span><span>${soles(c.total)}</span></div>
     </div>`}
     ${c.faltaCiudad ? `<p class="cot-aviso"><b>Elige tu ciudad para ver el total.</b>
       El pasaje del instrumentista cambia con la distancia, así que el precio se calcula recién
@@ -3506,6 +3612,9 @@ function vcCalcular(){
 
 /* ── Página ─────────────────────────────────────────────────────────── */
 function vcAbrir(){
+  /* La página ya tiene su botón de WhatsApp: el verde flotante sobraba y
+     encima tapaba el formulario. */
+  document.body.classList.add('wa-propio');
   vcPintarTodo();
   /* Si se vino del carrito tocando «Enviar por WhatsApp», se baja al
      formulario y se intenta enviar de una vez. */
@@ -3556,7 +3665,7 @@ function vcPintar(){
     </div>`;
     return;
   }
-  const neto = c.total / 1.18;
+  const neto = Math.round(c.total / 1.18);
   caja.innerHTML = `
     <div class="wrap pagehead"><div class="k">Venta de equipos</div>
       <h1>Tu cotización</h1>
@@ -3585,9 +3694,9 @@ function vcPintar(){
           `<li><span>${vEsc(x.p.nom)}${x.q > 1 ? ' × ' + x.q : ''}</span><span>${vSoles(x.total)}</span></li>`).join('')}
         </ul>
         <div class="cot-cuenta">
-          <div class="sub"><span>Subtotal (S/)</span><span>${neto.toFixed(2)}</span></div>
-          <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total - neto).toFixed(2)}</span></div>
-          <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
+  <div class="sub"><span>Subtotal</span><span>${vSoles(neto)}</span></div>
+          <div class="sub"><span>IGV (18 %)</span><span>${vSoles(c.total - neto)}</span></div>
+          <div class="gran"><span>Total con IGV</span><span>${vSoles(c.total)}</span></div>
         </div>
         <p class="cot-aviso"><b>Es un precio referencial.</b> Lo confirmamos al emitir la cotización
           formal, junto con el stock y el plazo de entrega de cada equipo.</p>
@@ -3612,6 +3721,17 @@ function vcPintar(){
   vcRestaurar();
 }
 
+/* Pedir mas unidades de las que hay: antes seguia diciendo «En stock» y
+   cotizaba igual. Ahora se avisa que es un pedido especial. */
+function vcSobraStock(p, q){
+  const n = Number(p && p.stock);
+  return n > 0 && Number(q) > n ? n : 0;
+}
+function vcAviso(p, q){
+  const n = vcSobraStock(p, q);
+  return n ? `<span class="v-stock v-pedido">Pedido especial · ${n} en stock</span>` : '';
+}
+
 function vcFila(x){
   const p = x.p, foto = x.foto;
   return `<div class="vc-i">
@@ -3619,7 +3739,7 @@ function vcFila(x){
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
       <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
-      ${p.stock != null ? vStock(p) : ''}
+      ${vcAviso(p, x.q) || (p.stock != null ? vStock(p) : '')}
     </div>
     <div class="vc-q">
       <button type="button" onclick="vcCantidad('${p.id}',${x.q - 1})" aria-label="Quitar uno">−</button>
@@ -3722,8 +3842,10 @@ function vcTexto(c, d){
   L.push('');
   L.push('EQUIPOS');
   c.items.forEach((x, i) => {
+    const hay = vcSobraStock(x.p, x.q);
     L.push((i + 1) + '. ' + x.p.nom + ' · ' + [x.p.marca, x.p.modelo].filter(Boolean).join(' ') +
-           (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total));
+           (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total) +
+           (hay ? '  [PEDIDO ESPECIAL: en stock ' + hay + ']' : ''));
   });
   L.push('');
   L.push('  TOTAL REFERENCIAL (IGV incluido): ' + vSoles(c.total));

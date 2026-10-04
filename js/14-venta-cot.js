@@ -62,6 +62,9 @@ function vcCalcular(){
 
 /* ── Página ─────────────────────────────────────────────────────────── */
 function vcAbrir(){
+  /* La página ya tiene su botón de WhatsApp: el verde flotante sobraba y
+     encima tapaba el formulario. */
+  document.body.classList.add('wa-propio');
   vcPintarTodo();
   /* Si se vino del carrito tocando «Enviar por WhatsApp», se baja al
      formulario y se intenta enviar de una vez. */
@@ -112,7 +115,7 @@ function vcPintar(){
     </div>`;
     return;
   }
-  const neto = c.total / 1.18;
+  const neto = Math.round(c.total / 1.18);
   caja.innerHTML = `
     <div class="wrap pagehead"><div class="k">Venta de equipos</div>
       <h1>Tu cotización</h1>
@@ -141,9 +144,9 @@ function vcPintar(){
           `<li><span>${vEsc(x.p.nom)}${x.q > 1 ? ' × ' + x.q : ''}</span><span>${vSoles(x.total)}</span></li>`).join('')}
         </ul>
         <div class="cot-cuenta">
-          <div class="sub"><span>Subtotal (S/)</span><span>${neto.toFixed(2)}</span></div>
-          <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total - neto).toFixed(2)}</span></div>
-          <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
+  <div class="sub"><span>Subtotal</span><span>${vSoles(neto)}</span></div>
+          <div class="sub"><span>IGV (18 %)</span><span>${vSoles(c.total - neto)}</span></div>
+          <div class="gran"><span>Total con IGV</span><span>${vSoles(c.total)}</span></div>
         </div>
         <p class="cot-aviso"><b>Es un precio referencial.</b> Lo confirmamos al emitir la cotización
           formal, junto con el stock y el plazo de entrega de cada equipo.</p>
@@ -168,6 +171,17 @@ function vcPintar(){
   vcRestaurar();
 }
 
+/* Pedir mas unidades de las que hay: antes seguia diciendo «En stock» y
+   cotizaba igual. Ahora se avisa que es un pedido especial. */
+function vcSobraStock(p, q){
+  const n = Number(p && p.stock);
+  return n > 0 && Number(q) > n ? n : 0;
+}
+function vcAviso(p, q){
+  const n = vcSobraStock(p, q);
+  return n ? `<span class="v-stock v-pedido">Pedido especial · ${n} en stock</span>` : '';
+}
+
 function vcFila(x){
   const p = x.p, foto = x.foto;
   return `<div class="vc-i">
@@ -175,7 +189,7 @@ function vcFila(x){
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
       <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
-      ${p.stock != null ? vStock(p) : ''}
+      ${vcAviso(p, x.q) || (p.stock != null ? vStock(p) : '')}
     </div>
     <div class="vc-q">
       <button type="button" onclick="vcCantidad('${p.id}',${x.q - 1})" aria-label="Quitar uno">−</button>
@@ -278,8 +292,10 @@ function vcTexto(c, d){
   L.push('');
   L.push('EQUIPOS');
   c.items.forEach((x, i) => {
+    const hay = vcSobraStock(x.p, x.q);
     L.push((i + 1) + '. ' + x.p.nom + ' · ' + [x.p.marca, x.p.modelo].filter(Boolean).join(' ') +
-           (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total));
+           (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total) +
+           (hay ? '  [PEDIDO ESPECIAL: en stock ' + hay + ']' : ''));
   });
   L.push('');
   L.push('  TOTAL REFERENCIAL (IGV incluido): ' + vSoles(c.total));

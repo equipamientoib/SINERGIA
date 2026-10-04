@@ -195,6 +195,12 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
   .dv-caja{height:100%;border-radius:0}
   .dv-tit{font-size:13px}
 }
+/* En tablet (768 px) el menú medía 774 px: «Contacto» quedaba cortado y
+   la página se corría de lado. Con menos separación entra justo. */
+@media(max-width:860px){
+  .top nav{gap:13px;font-size:13px}
+  .top .wrap{gap:12px}
+}
 @media(max-width:700px){
   .top nav{gap:14px;font-size:13px}
   .top nav > a{display:none}
@@ -214,3 +220,7 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .prod-btns:has(.uno){grid-template-columns:1fr}
 .calc-link{background:var(--cobre-d);border-color:var(--cobre-d);color:#fff}
 .calc-link:hover{filter:brightness(1.08)}
+
+/* El botón verde flotante tapaba el botón principal de la ficha: en las
+   páginas que ya tienen su propio WhatsApp a la vista, no se muestra. */
+body.wa-propio .wafab{display:none}

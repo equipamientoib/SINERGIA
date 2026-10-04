@@ -109,4 +109,33 @@ const CONFIG = {
      (Formspree, Getform, Basin…), pega aquí la URL del endpoint y las
      solicitudes también se enviarán ahí. Vacío = solo WhatsApp/correo. */
   FORM_ENDPOINT: "",
+
+  /* GOOGLE ANALYTICS 4 — medir cuánta gente entra y por dónde.
+     Pega aquí tu identificador, con el formato G-XXXXXXXXXX, y la web
+     empieza a medir sola (también las páginas sueltas de venta y de
+     alquiler). Se saca en analytics.google.com › Administrar › Flujos
+     de datos › Web. Vacío = no se carga nada ni se envía nada.        */
+  ANALYTICS: "",
 };
+
+/* Carga de Google Analytics. Solo si hay identificador: sin él no se pide
+   ni un archivo a Google, así la web no cambia para nadie. En una web de
+   una sola página hay que avisar cada cambio de dirección a mano, porque
+   el navegador no recarga. */
+function cargarAnalytics(){
+  const id = (typeof CONFIG !== 'undefined' && CONFIG.ANALYTICS) || '';
+  if(!/^G-[A-Z0-9]+$/i.test(id) || window.__ga) return;
+  window.__ga = true;
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function(){ window.dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', id);
+  addEventListener('hashchange', () => gtag('event', 'page_view', {
+    page_location: location.href, page_title: document.title}));
+}
+if(document.readyState === 'loading') addEventListener('DOMContentLoaded', cargarAnalytics);
+else cargarAnalytics();

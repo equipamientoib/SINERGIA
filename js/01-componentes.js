@@ -63,8 +63,8 @@ function renderFooter(){
       ${LOGO_FOOTER}
       <p>${SITE.razonSocial}<br>${SITE.direccion}</p>
       <div class="wa-row">
-        <a class="wa" id="waLink" href="https://wa.me/${SITE.whatsapp}" target="_blank" rel="noopener">WhatsApp</a>
-        <a class="wa2" onclick="go('#/contacto')">· solicitar cotización →</a>
+        <a class="wa" id="waLink" href="https://wa.me/${SITE.whatsapp}" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+        <a class="wa2" onclick="go('#/contacto')">o déjanos tus datos →</a>
       </div>
     </div>
     <div>

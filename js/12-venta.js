@@ -47,15 +47,27 @@ function vAjustar(p){
   if(q.clave && !q.expediente) q.expediente = ((VENTA && VENTA.ntsNom) || {})[q.clave] || '';
   return q;
 }
+/* Equipos retirados a mano (data/venta.json › noPublicar): siguen con
+   publicar = SI en la hoja, pero no se muestran ni se cotizan. Motivo
+   anotado en el propio archivo (precio por encima de la competencia). */
+function vBloqueado(id){
+  const no = (VENTA && VENTA.noPublicar) || {};
+  return !!id && id !== '_nota' && Object.prototype.hasOwnProperty.call(no, id);
+}
+
 function vMezclar(){
   if(VENTA && VENTA_VIVO){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    VENTA.productos = VENTA_VIVO.productos.map(p => {
+    VENTA.productos = VENTA_VIVO.productos.filter(p => !vBloqueado(p.id)).map(p => {
       p = vAjustar(p);
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
+      /* Copia propia en img/venta/ (la deja scripts/bajar_fotos_venta.py):
+         va antes que el enlace de Drive porque la sirve nuestro dominio,
+         así Google la indexa y además carga más rápido. */
+      if((VENTA.locales||{})[p.id]) return Object.assign({}, p, {fotos: ['img/venta/' + p.id + '.jpg']});
       const b = base.get(p.id);
       /* Orden de prioridad: foto corregida (fotosFijas) › foto de la hoja o
          del proveedor (modelo real) › foto antigua del sitio (respaldo). */
@@ -80,8 +92,10 @@ function cargarVenta(){
       .then(d => copia.then(c => { if(c && !VENTA_VIVO) ventaEnVivo(c); return d; }))
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
+                 noPublicar: d.noPublicar||{},
+                 locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
-        VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
+        VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
@@ -129,10 +143,13 @@ function vBuscar(q){
 }
 function vBuscarEn(q, destino){
   const caja = document.getElementById(destino); if(!caja) return;
-  const r = vBuscar(q);
+  /* Con una sola letra todavía no se busca: antes salía «no encontramos
+     «a»» apenas el cliente empezaba a escribir. */
+  const corta = q.trim().length < 2;
+  const r = corta ? [] : vBuscar(q);
   const otros = document.querySelectorAll('[data-sin-busqueda]');
-  otros.forEach(e => e.hidden = !!q.trim());
-  caja.innerHTML = !q.trim() ? '' : (r.length
+  otros.forEach(e => e.hidden = !corta);
+  caja.innerHTML = corta ? '' : (r.length
     ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid">${r.map(vCard).join('')}</div>`
     : `<div class="v-vacio"><h3>No encontramos «${vEsc(q)}» en el catálogo publicado</h3><p>Igual podemos conseguirlo. Escríbenos con el nombre o el código de tu listado y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+q)}" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div></div>`);
 }

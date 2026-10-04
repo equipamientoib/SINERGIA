@@ -1,3 +1,51 @@
+/* ── Título y descripción por página ───────────────────────────────────
+   La web es de una sola página: sin esto, Google y las pestañas del
+   navegador veían siempre el mismo título. Las páginas propias
+   (alquiler/… y venta/…) ya traen el suyo en el HTML.             */
+const TITULOS = {
+  '#/':            ['Sinergia Biomédica — Venta y alquiler de equipos biomédicos en Lima',
+                    'Equipamiento biomédico y alquiler de instrumentos de metrología con certificado de calibración vigente. Lima, Perú.'],
+  '#/alquiler':    ['Alquiler de instrumentos de metrología biomédica | Sinergia Biomédica',
+                    'Analizadores y simuladores Fluke y Rigel por días, con certificado de calibración vigente. Entrega en Lima y provincias.'],
+  '#/catalogo':    ['Catálogo de alquiler · instrumentos por días | Sinergia Biomédica',
+                    'Analizadores de seguridad eléctrica, simuladores, sonómetros, luxómetros y más, con su precio por día.'],
+  '#/cotizar':     ['Arma tu alquiler y mira el precio | Sinergia Biomédica',
+                    'Marca los instrumentos, elige Lima o provincia y mira el total con IGV. Mientras más lleves juntos, menos cuesta el día.'],
+  '#/venta':       ['Venta de equipos biomédicos en Lima | Sinergia Biomédica',
+                    'Monitores, autoclaves, ecógrafos, ventiladores y equipamiento hospitalario con precio, stock y código NTS.'],
+  '#/venta/tienda':['Tienda de equipos biomédicos · precios y stock | Sinergia Biomédica',
+                    'Todos los equipos publicados con su precio con IGV, su stock y su ficha técnica.'],
+  '#/cotizar-venta':['Tu cotización de equipos | Sinergia Biomédica',
+                    'Revisa las cantidades y recibe tu cotización formal con disponibilidad y plazo de entrega.'],
+  '#/servicios':   ['Servicios de metrología y equipamiento biomédico | Sinergia Biomédica',
+                    'Alquiler de instrumentos, suministro hospitalario y talleres prácticos de metrología biomédica.'],
+  '#/talleres':    ['Talleres prácticos de metrología biomédica | Sinergia Biomédica',
+                    'Formación en seguridad eléctrica y metrología biomédica sobre instrumentos reales Fluke y Rigel.'],
+  '#/clientes':    ['Proyectos y clientes | Sinergia Biomédica',
+                    'Instituciones de salud que equipamos y verificamos en Lima y provincias.'],
+  '#/nosotros':    ['Quiénes somos | Sinergia Biomédica',
+                    'Servicios Integrales Sinergia S.A.C., equipamiento y metrología biomédica en Lima, Perú.'],
+  '#/contacto':    ['Contacto · pide tu cotización | Sinergia Biomédica',
+                    'Escríbenos por WhatsApp o déjanos tus datos y te respondemos con la cotización.']
+};
+function tituloDe(h){
+  if(TITULOS[h]) return TITULOS[h];
+  if(h.startsWith('#/venta/')) return TITULOS['#/venta/tienda'];
+  if(h.startsWith('#/catalogo/') || h.startsWith('#/equipo/')) return TITULOS['#/catalogo'];
+  if(h.startsWith('#/cotizar/')) return TITULOS['#/cotizar'];
+  if(h.startsWith('#/proyecto/')) return TITULOS['#/clientes'];
+  return TITULOS['#/'];
+}
+function ponerTitulo(h){
+  const t = tituloDe(h);
+  document.title = t[0];
+  let m = document.querySelector('meta[name="description"]');
+  if(!m){ m = document.createElement('meta'); m.setAttribute('name','description'); document.head.appendChild(m); }
+  m.setAttribute('content', t[1]);
+  let c = document.querySelector('link[rel="canonical"]');
+  if(c) c.setAttribute('href', location.origin + '/' + (h === '#/' ? '' : h));
+}
+
 /* ---- ROUTER ---- */
 const PAGES={'':'page-entrada','#/':'page-entrada','#/alquiler':'page-home','#/nosotros':'page-nosotros','#/servicios':'page-servicios','#/talleres':'page-talleres','#/catalogo':'page-catalogo','#/clientes':'page-clientes','#/contacto':'page-contacto'};
 function go(hash){location.hash=hash;closeMenu();}
@@ -40,6 +88,10 @@ function route(sinMover){
     const g=h.split('/')[2]||'';pageId='page-catalogo';navKey='#/catalogo';
     setGrupo(GRUPOS[g]?g:'all');
   }
+  /* Dirección que no existe (un enlace viejo o mal copiado): antes se
+     quedaba en blanco. Ahora va a la página 404, que explica y ofrece
+     volver. Los anclajes internos («#main») no entran aquí. */
+  else if(h.startsWith('#/') && !PAGES[h]){ location.replace('/404.html'); return; }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
   /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
      cotizador todo vuelve a su sitio. */
@@ -61,6 +113,8 @@ function route(sinMover){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  document.body.classList.toggle('wa-propio', h === '#/cotizar-venta');
+  seguro('título', () => ponerTitulo(h));
   if(!sinMover) window.scrollTo(0,0);   // al sincronizar datos no se mueve la vista
 }
 window.addEventListener('hashchange',function(){ route(); });   // al navegar SÍ sube al inicio
