@@ -141,7 +141,8 @@
     var lista = p.querySelector('.sb-cart-l'), pie = p.querySelector('.sb-cart-f');
     if(!ids.length){
       lista.innerHTML = '<p class="sb-cart-v">Tu carrito está vacío.<br>Toca «Agregar al carrito» en los equipos que te interesen.</p>';
-      pie.innerHTML = '<a class="sb-cart-ir" href="/#/venta/tienda">Ver la tienda</a>';
+      pie.innerHTML = '<button type="button" class="sb-cart-ir" data-ir="/#/venta/tienda">Ver la tienda</button>';
+      enlazarPie(pie);
       return;
     }
     lista.innerHTML = ids.map(function(id){
@@ -160,15 +161,52 @@
     var tot = C.total();
     pie.innerHTML = '<div class="sb-cart-t"><span>Total referencial</span><b>' + soles(tot) + '</b></div>' +
       '<small>Incluye IGV. Lo confirmamos en la cotización.</small>' +
-      '<a class="sb-cart-ir" href="/#/cotizar-venta">Ir a mi cotización</a>' +
+      '<button type="button" class="sb-cart-ir sb-cart-wa" data-enviar="1">Enviar mi pedido por WhatsApp</button>' +
+      '<button type="button" class="sb-cart-ir sb-cart-2" data-ir="/#/cotizar-venta">Ver mi cotización</button>' +
       '<button type="button" class="sb-cart-seguir">Seguir viendo equipos</button>';
+    enlazarPie(pie);
     lista.querySelectorAll('[data-mas]').forEach(function(b){
       b.onclick = function(){ C.agregar(b.dataset.mas, null, 1); pintarPanel(); }; });
     lista.querySelectorAll('[data-menos]').forEach(function(b){
       b.onclick = function(){ C.cantidad(b.dataset.menos, Number(leer()[b.dataset.menos].q) - 1); pintarPanel(); }; });
     lista.querySelectorAll('[data-quitar]').forEach(function(b){
       b.onclick = function(){ C.quitar(b.dataset.quitar); pintarPanel(); }; });
-    pie.querySelector('.sb-cart-seguir').onclick = C.cerrar;
+  }
+
+  /* Los botones del pie: ir a la cotización y enviar por WhatsApp. Si ya
+     se está en la página de la cotización, no hay a dónde navegar: basta
+     con cerrar el panel (antes parecía que no pasaba nada). */
+  function enlazarPie(pie){
+    var seguir = pie.querySelector('.sb-cart-seguir');
+    if(seguir) seguir.onclick = C.cerrar;
+    pie.querySelectorAll('[data-ir]').forEach(function(b){
+      b.onclick = function(){ C.cerrar(); irA(b.dataset.ir); };
+    });
+    var wa = pie.querySelector('[data-enviar]');
+    if(wa) wa.onclick = function(){
+      C.cerrar();
+      /* En la web, el envío necesita los datos del cliente: se va al
+         formulario y se intenta enviar; en una página suelta, primero se
+         llega a la cotización. */
+      if(typeof window.vcEnviar === 'function' && location.hash.indexOf('#/cotizar-venta') === 0){
+        window.vcEnviar('whatsapp');
+      }else{
+        try{ sessionStorage.setItem('sb-ir-enviar', '1'); }catch(e){}
+        irA('/#/cotizar-venta');
+      }
+    };
+  }
+
+  function irA(destino){
+    var hash = destino.replace(/^.*#/, '#');
+    if(location.hash === hash){
+      /* Ya estamos ahí: solo se sube y se repinta. */
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      if(typeof window.vcPintarTodo === 'function') window.vcPintarTodo();
+      return;
+    }
+    if(location.pathname === '/' || location.pathname === '/index.html'){ location.hash = hash; }
+    else location.href = destino;
   }
 
   /* ── Aviso al agregar ─────────────────────────────────────────────── */
