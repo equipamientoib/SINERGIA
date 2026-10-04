@@ -652,4 +652,24 @@ function renderVenta(parte){
   el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null, parte[0]==='precio' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
   if(tienda) vtPintar();
   vCarritoEngancha();
+  vPromoVentana();
+}
+
+/* La ventana flotante de remates, al entrar a la tienda (js/promo-ventana.js).
+   Solo en la portada de venta y en la tienda: dentro de una ficha o de la
+   cotización el visitante ya está en lo suyo y estorbaría. */
+function vPromoVentana(){
+  if(typeof SBPromo === 'undefined' || !VENTA) return;
+  const h = location.hash;
+  if(h !== '#/venta' && h !== '#/venta/tienda') return;
+  const enof = VENTA.productos.filter(p => vPromo(p));
+  if(!enof.length) return;
+  const fin = new Date(Math.min(...enof.map(p => vPromo(p).fin.getTime())));
+  setTimeout(() => SBPromo.abrir(enof.map(p => {
+    const of = vPromo(p);
+    return {id: p.id, nom: p.nom,
+            mm: [p.marca, p.modelo].filter(Boolean).join(' · '),
+            precio: p.precio, antes: of.antes,
+            foto: vFoto(p, 0, true) || '', url: vPagina(p.id) || ('#/venta/p/' + p.id)};
+  }), fin), 700);
 }

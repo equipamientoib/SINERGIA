@@ -832,17 +832,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2a3110a3';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=82013bf6';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2a3110a3';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=82013bf6';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=2a3110a3','js/06-tablero.js?v=2a3110a3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=82013bf6','js/06-tablero.js?v=82013bf6'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=2a3110a3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=82013bf6'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2402,6 +2402,26 @@ function renderVenta(parte){
   el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null, parte[0]==='precio' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
   if(tienda) vtPintar();
   vCarritoEngancha();
+  vPromoVentana();
+}
+
+/* La ventana flotante de remates, al entrar a la tienda (js/promo-ventana.js).
+   Solo en la portada de venta y en la tienda: dentro de una ficha o de la
+   cotización el visitante ya está en lo suyo y estorbaría. */
+function vPromoVentana(){
+  if(typeof SBPromo === 'undefined' || !VENTA) return;
+  const h = location.hash;
+  if(h !== '#/venta' && h !== '#/venta/tienda') return;
+  const enof = VENTA.productos.filter(p => vPromo(p));
+  if(!enof.length) return;
+  const fin = new Date(Math.min(...enof.map(p => vPromo(p).fin.getTime())));
+  setTimeout(() => SBPromo.abrir(enof.map(p => {
+    const of = vPromo(p);
+    return {id: p.id, nom: p.nom,
+            mm: [p.marca, p.modelo].filter(Boolean).join(' · '),
+            precio: p.precio, antes: of.antes,
+            foto: vFoto(p, 0, true) || '', url: vPagina(p.id) || ('#/venta/p/' + p.id)};
+  }), fin), 700);
 }
 
 ;

@@ -189,10 +189,12 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
     doc = doc.replace('scripts/generar_paginas.py a partir de data/seo-tipos.json\n     y del catálogo',
                       'scripts/generar_paginas_venta.py a partir de la hoja de venta')
     doc = doc.replace('</head>', '<link rel="stylesheet" href="/css/venta-paginas.css?v=%s">\n'
-                      '<link rel="stylesheet" href="/css/carrito.css?v=%s">\n</head>'
-                      % (sello('venta-paginas.css'), sello('carrito.css')), 1)
-    doc = doc.replace('</body>', '<script defer src="/js/carrito.js?v=%s"></script>\n</body>'
-                      % sello_js('carrito.js'), 1)
+                      '<link rel="stylesheet" href="/css/carrito.css?v=%s">\n'
+                      '<link rel="stylesheet" href="/css/promo-ventana.css?v=%s">\n</head>'
+                      % (sello('venta-paginas.css'), sello('carrito.css'), sello('promo-ventana.css')), 1)
+    doc = doc.replace('</body>', '<script defer src="/js/carrito.js?v=%s"></script>\n'
+                      '<script defer src="/js/promo-ventana.js?v=%s"></script>\n</body>'
+                      % (sello_js('carrito.js'), sello_js('promo-ventana.js')), 1)
     return doc
 
 
@@ -403,6 +405,16 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
                         cuerpo=cuerpo, jsonld=jsonld, imagen=img)
 
 
+def promo_item(p, base, fijas, locales):
+    """Lo que necesita la ventana flotante de un equipo en remate."""
+    fts = fotos(p, base, fijas, locales)
+    of = promo(p)
+    return {'id': p['id'], 'nom': p['nom'],
+            'mm': ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x),
+            'precio': p['precio'], 'antes': of['antes'] if of else 0,
+            'foto': fts[0][0] if fts else '', 'url': '/venta/%s/' % p['id']}
+
+
 def tarjeta_venta(p, base, fijas, locales, promos):
     """La tarjeta de un equipo en /venta/ (la usan las categorías y la franja
     de promociones, para que se vean iguales)."""
@@ -451,6 +463,11 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
             '<div class="vts">%s</div></section>'
             % (len(enof), hasta.strftime('%d/%m/%Y'),
                ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)))
+        # La ventana flotante de bienvenida lee esto (js/promo-ventana.js).
+        franja_promo += ('<script>window.SB_PROMOS=%s</script>'
+                         % json.dumps({'hasta': hasta.isoformat(),
+                                       'lista': [promo_item(p, base, fijas, locales) for p in enof]},
+                                      ensure_ascii=False))
 
     cuerpo = f'''
   <section class="cabeza">
