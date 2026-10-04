@@ -110,7 +110,36 @@ const CONFIG = {
      (Formspree, Getform, Basin…), pega aquí la URL del endpoint y las
      solicitudes también se enviarán ahí. Vacío = solo WhatsApp/correo. */
   FORM_ENDPOINT: "",
+
+  /* GOOGLE ANALYTICS 4 — medir cuánta gente entra y por dónde.
+     Pega aquí tu identificador, con el formato G-XXXXXXXXXX, y la web
+     empieza a medir sola (también las páginas sueltas de venta y de
+     alquiler). Se saca en analytics.google.com › Administrar › Flujos
+     de datos › Web. Vacío = no se carga nada ni se envía nada.        */
+  ANALYTICS: "",
 };
+
+/* Carga de Google Analytics. Solo si hay identificador: sin él no se pide
+   ni un archivo a Google, así la web no cambia para nadie. En una web de
+   una sola página hay que avisar cada cambio de dirección a mano, porque
+   el navegador no recarga. */
+function cargarAnalytics(){
+  const id = (typeof CONFIG !== 'undefined' && CONFIG.ANALYTICS) || '';
+  if(!/^G-[A-Z0-9]+$/i.test(id) || window.__ga) return;
+  window.__ga = true;
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function(){ window.dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', id);
+  addEventListener('hashchange', () => gtag('event', 'page_view', {
+    page_location: location.href, page_title: document.title}));
+}
+if(document.readyState === 'loading') addEventListener('DOMContentLoaded', cargarAnalytics);
+else cargarAnalytics();
 
 ;
 /* ===== js/01-componentes.js ===== */
@@ -803,17 +832,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=36706cc0';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4ec4ae8e';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=36706cc0';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4ec4ae8e';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=36706cc0','js/06-tablero.js?v=36706cc0'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=4ec4ae8e','js/06-tablero.js?v=4ec4ae8e'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=36706cc0'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=4ec4ae8e'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1785,6 +1814,10 @@ function vMezclar(){
       p = vAjustar(p);
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
+      /* Copia propia en img/venta/ (la deja scripts/bajar_fotos_venta.py):
+         va antes que el enlace de Drive porque la sirve nuestro dominio,
+         así Google la indexa y además carga más rápido. */
+      if((VENTA.locales||{})[p.id]) return Object.assign({}, p, {fotos: ['img/venta/' + p.id + '.jpg']});
       const b = base.get(p.id);
       /* Orden de prioridad: foto corregida (fotosFijas) › foto de la hoja o
          del proveedor (modelo real) › foto antigua del sitio (respaldo). */
@@ -1810,6 +1843,7 @@ function cargarVenta(){
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
                  noPublicar: d.noPublicar||{},
+                 locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
         VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
         vMezclar(); return VENTA; });

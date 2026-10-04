@@ -93,9 +93,14 @@ def ajustar(p, repo):
     return q
 
 
-def fotos(p, base, fijas):
-    """[(ligera, grande)] en orden de prioridad: fija › hoja/proveedor › antigua."""
-    urls = fijas.get(p['id']) or p.get('fotos') or (base.get(p['id']) or {}).get('fotosSitio') or []
+def fotos(p, base, fijas, locales=()):
+    """[(ligera, grande)] por orden: fija › copia propia › hoja/proveedor › antigua.
+
+    La copia propia (img/venta/<id>.jpg, la deja scripts/bajar_fotos_venta.py)
+    va antes que el enlace de Drive: servida desde nuestro dominio, Google la
+    rastrea e indexa, y además carga más rápido."""
+    propia = ['img/venta/%s.jpg' % p['id']] if p['id'] in locales else []
+    urls = fijas.get(p['id']) or propia or p.get('fotos') or (base.get(p['id']) or {}).get('fotosSitio') or []
     out = []
     for u in urls:
         if u.lstrip('/').startswith('img/'):
@@ -323,9 +328,9 @@ VIG_JS = '''<script>
 </script>'''
 
 
-def pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos):
+def pagina_producto(p, cats, cfg, base, fijas, locales, vig, prev, sig, mismos):
     cat = cats.get(p.get('cat'), '')
-    fts = fotos(p, base, fijas)
+    fts = fotos(p, base, fijas, locales)
     ruta = '/venta/%s/' % p['id']
     nombre = ' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)
     nts = ('Código NTS %s' % p['clave']) if p.get('clave') else ''
@@ -347,7 +352,9 @@ def pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos):
                   if p.get('clave') else {}),
                'brand': {'@type': 'Brand', 'name': p.get('marca') or 'Sinergia Biomédica'},
                'model': p.get('modelo') or '', 'category': cat,
-               'image': [SITIO + a if a.startswith('/') else a for a, _ in fts][:3],
+               # La grande (no la ligera): Google pide la mayor resolución
+               # disponible para mostrar la ficha con foto y precio.
+               'image': [SITIO + b if b.startswith('/') else b for _, b in fts][:3],
                'offers': oferta}]
     migas = [('Inicio', '/'), ('Venta', '/venta/'), (cat or 'Equipos', '/venta/#' + (p.get('cat') or '')),
              (p['nom'], ruta)]
@@ -356,7 +363,7 @@ def pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos):
                         cuerpo=cuerpo, jsonld=jsonld, imagen=img)
 
 
-def pagina_hub(productos, cats_orden, cats, cfg, base, fijas):
+def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales):
     ruta = '/venta/'
     secciones = []
     for cid in cats_orden:
@@ -367,9 +374,9 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas):
             '<a class="vt" href="/venta/%s/"><span class="vt-f">%s</span><span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>' % (
                 p['id'],
                 ('<img src="%s" alt="%s" loading="lazy" decoding="async">'
-                 % (fotos(p, base, fijas)[0][0],
+                 % (fotos(p, base, fijas, locales)[0][0],
                     e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))
-                 ) if fotos(p, base, fijas) else gp.ICONO,
+                 ) if fotos(p, base, fijas, locales) else gp.ICONO,
                 e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
                 ('<i>%s</i>' % soles(p['precio'])) if p.get('precio') else '')
             for p in ps)
@@ -456,6 +463,74 @@ def sitemap(paginas, cambios):
                 + '\n'.join(otras + nuevas) + '\n</urlset>\n', cambios)
 
 
+def feed_google(productos, cfg, base, fijas, locales, cambios):
+    """feed-google.xml — el archivo que lee Google Merchant Center.
+
+    Con él los equipos pueden salir gratis en la pestaña «Compras» con su
+    foto, su precio y su stock. En Merchant Center se registra una vez como
+    «fuente de datos desde un archivo» apuntando a
+    https://sinergiabiomedica.pe/feed-google.xml y Google lo vuelve a leer
+    solo. Se regenera con cada extracción, así que el precio nunca se
+    queda viejo.
+    """
+    hoy = datetime.date.today().isoformat()
+    filas = []
+    for p in productos:
+        if not p.get('precio'):
+            continue
+        fts = fotos(p, base, fijas, locales)
+        if not fts:
+            continue                      # sin foto no entra: Google la exige
+        # JPEG antes que WebP: Merchant Center acepta los dos, pero el
+        # JPEG no da problemas con ningún revisor.
+        grande = fts[0][1]
+        if grande.startswith('/img/') and os.path.exists(
+                os.path.join(ROOT, grande.lstrip('/').rsplit('.', 1)[0] + '.jpg')):
+            grande = grande.rsplit('.', 1)[0] + '.jpg'
+        marca = p.get('marca') or ''
+        modelo = p.get('modelo') or ''
+        desc = ' '.join(x for x in ([p.get('resumen') or p['nom']] +
+                                    list(p.get('caracteristicas') or [])) if x)
+        if p.get('clave'):
+            desc += ' Código NTS %s.' % p['clave']
+        filas.append(
+            '  <item>\n'
+            '    <g:id>%s</g:id>\n'
+            '    <title>%s</title>\n'
+            '    <description>%s</description>\n'
+            '    <link>%s/venta/%s/</link>\n'
+            '    <g:image_link>%s</g:image_link>\n'
+            '    <g:availability>%s</g:availability>\n'
+            '    <g:price>%d PEN</g:price>\n'
+            '    <g:condition>new</g:condition>\n'
+            '    <g:brand>%s</g:brand>\n'
+            '    %s\n'
+            '    <g:identifier_exists>no</g:identifier_exists>\n'
+            '    <g:product_type>%s</g:product_type>\n'
+            '    <g:google_product_category>2496</g:google_product_category>\n'
+            '  </item>' % (
+                e(p['id']),
+                e(' '.join(x for x in (p['nom'], marca, modelo) if x))[:150],
+                e(desc)[:4900],
+                SITIO.rstrip('/'), e(p['id']),
+                e(grande if grande.startswith('http') else SITIO.rstrip('/') + grande),
+                'in_stock' if (p.get('stock') or 0) else 'backorder',
+                int(round(p['precio'])),
+                e(marca or 'Sinergia Biomédica'),
+                ('<g:mpn>%s</g:mpn>' % e(modelo)) if modelo else '',
+                e(cfg.get('categorias', {}).get(p.get('cat'), p.get('cat') or ''))))
+    doc = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+           '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">\n'
+           '<channel>\n'
+           '  <title>Sinergia Biomédica — equipos biomédicos</title>\n'
+           '  <link>%s</link>\n'
+           '  <description>Equipamiento biomédico con precio, stock y código NTS. '
+           'Actualizado el %s.</description>\n%s\n</channel>\n</rss>\n'
+           % (SITIO.rstrip('/'), hoy, '\n'.join(filas)))
+    gp.escribir('feed-google.xml', doc, cambios)
+    return len(filas)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--datos', required=True, help='JSON en vivo del Apps Script de venta')
@@ -477,11 +552,12 @@ def main():
     cats_orden = [c['id'] for c in repo.get('categorias', [])]
     base = {p['id']: p for p in repo.get('productos', [])}
     fijas = {k: v for k, v in (repo.get('fotosFijas') or {}).items() if not k.startswith('_')}
+    locales = set(repo.get('fotosLocales') or [])   # fotos ya guardadas en el sitio
     vig = vigencia(vivo.get('actualizado'))
 
     orden = ordenar(productos)
     cambios, paginas = [], []
-    ruta, doc = pagina_hub(orden, cats_orden, cats, cfg, base, fijas)
+    ruta, doc = pagina_hub(orden, cats_orden, cats, cfg, base, fijas, locales)
     gp.escribir('venta/index.html', doc, cambios)
     paginas.append((ruta, 'venta/index.html'))
     ruta, doc = pagina_nts(orden, cfg)
@@ -491,7 +567,7 @@ def main():
         prev = orden[i - 1] if i > 0 else None
         sig = orden[i + 1] if i + 1 < len(orden) else None
         mismos = [o for o in orden if o.get('cat') == p.get('cat') and o['id'] != p['id']]
-        ruta, doc = pagina_producto(p, cats, cfg, base, fijas, vig, prev, sig, mismos)
+        ruta, doc = pagina_producto(p, cats, cfg, base, fijas, locales, vig, prev, sig, mismos)
         rel = 'venta/%s/index.html' % p['id']
         gp.escribir(rel, doc, cambios)
         paginas.append((ruta, rel))
@@ -513,6 +589,8 @@ def main():
 
     mapa_portada(productos, cambios)
     sitemap(paginas, cambios)
+    n_feed = feed_google(orden, {'categorias': cats}, base, fijas, locales, cambios)
+    print('%d equipos en feed-google.xml (Google Merchant Center).' % n_feed)
     print('%d equipos de venta con página.' % len(productos))
     print('Cambiaron: %d archivos' % len(cambios))
 

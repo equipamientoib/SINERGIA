@@ -64,6 +64,10 @@ function vMezclar(){
       p = vAjustar(p);
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
+      /* Copia propia en img/venta/ (la deja scripts/bajar_fotos_venta.py):
+         va antes que el enlace de Drive porque la sirve nuestro dominio,
+         así Google la indexa y además carga más rápido. */
+      if((VENTA.locales||{})[p.id]) return Object.assign({}, p, {fotos: ['img/venta/' + p.id + '.jpg']});
       const b = base.get(p.id);
       /* Orden de prioridad: foto corregida (fotosFijas) › foto de la hoja o
          del proveedor (modelo real) › foto antigua del sitio (respaldo). */
@@ -89,6 +93,7 @@ function cargarVenta(){
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
                  noPublicar: d.noPublicar||{},
+                 locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
         VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
         vMezclar(); return VENTA; });

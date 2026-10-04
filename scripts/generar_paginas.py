@@ -91,7 +91,19 @@ def config_sitio():
         'whatsapp': campo('whatsapp', '51908704131'),
         'email': campo('email', 'logistica@sinergiabiomedica.pe'),
         'precios': bool(precios and precios.group(1) == 'true'),
+        'analytics': campo('ANALYTICS'),      # G-XXXXXXXXXX, o vacío
     }
+
+
+def analytics(cfg):
+    """Google Analytics en las páginas sueltas. Sin identificador en
+    js/00-config.js no se escribe nada ni se pide nada a Google."""
+    ident = (cfg.get('analytics') or '').strip()
+    if not re.fullmatch(r'G-[A-Za-z0-9]+', ident):
+        return ''
+    return ('<script async src="https://www.googletagmanager.com/gtag/js?id=%s"></script>\n'
+            '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}'
+            'gtag(\'js\',new Date());gtag(\'config\',\'%s\')</script>\n' % (ident, ident))
 
 
 def slugify(txt):
@@ -278,7 +290,7 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <link rel="stylesheet" href="/css/00-fuentes.css">
 <link rel="stylesheet" href="/css/alquiler.css?v={sello_css()}">
 <script type="application/ld+json">{json.dumps(graph, ensure_ascii=False)}</script>
-</head>
+{analytics(cfg)}</head>
 <body class="wa-propio">
 <!-- wa-propio: la página ya tiene su botón de WhatsApp a la vista, así que
      el botón verde flotante se esconde y no tapa «Agregar al carrito».
