@@ -214,13 +214,19 @@ body.cot-bloq .wafab{display:none}
 /* ── Barra fija del celular ────────────────────────────────────────── */
 .cot-barra{display:none}
 @media(max-width:900px){
+  /* El total vive en la barra de abajo, que acompaña todo el rato: el
+     bloque oscuro del panel repetiría el mismo precio más abajo. */
+  .cot-res>.cot-top{display:none}
   .cot-barra[hidden]{display:none}
   .cot-barra{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;align-items:center;
     justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
     background:var(--onix,#17191d);color:#fff;box-shadow:0 -10px 30px -18px rgba(0,0,0,.7)}
   .cot-barra span{display:block;font-size:11.5px;color:rgba(255,255,255,.72)}
   .cot-barra b{display:block;font-size:21px;font-family:var(--ff-d)}
-  .cot-barra .btn{flex:none;padding:11px 20px;background:#fff;border-color:#fff;color:var(--onix,#17191d)}
+  .cot-barra>div{flex:1;min-width:0}
+  .cot-barra .btn{flex:none;padding:11px 14px}
+  .cot-barra .btn-fill{background:#fff;border-color:#fff;color:var(--onix,#17191d)}
+  .cot-barra .btn:not(.btn-fill){background:none;border-color:rgba(255,255,255,.4);color:#fff}
   body.cot-bloq .cot-barra{display:none}
   body.cot-conbarra .wafab{bottom:88px}
   #page-cotizador section{padding-bottom:84px}
