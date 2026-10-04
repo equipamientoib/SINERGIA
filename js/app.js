@@ -803,17 +803,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=9fb7d2f6';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=1fe04663';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=9fb7d2f6';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=1fe04663';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=9fb7d2f6','js/06-tablero.js?v=9fb7d2f6'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=1fe04663','js/06-tablero.js?v=1fe04663'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=9fb7d2f6'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=1fe04663'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -3229,7 +3229,7 @@ function cotModal(doc){
     </div>
     <div class="cotm-h"><iframe title="Vista previa de la solicitud"></iframe></div>
     <div class="cotm-a">
-      <button class="btn btn-fill" onclick="cotModalCerrar();cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
+      <button class="btn btn-fill" onclick="cotModalCerrar();cotEnviarDoc('${doc.tipo === 'venta' ? 'venta' : 'alquiler'}')">Enviar mi pedido por WhatsApp</button>
       <button class="btn" onclick="cotModalCerrar()">Seguir editando</button>
     </div>
   </div>`;
@@ -3238,6 +3238,12 @@ function cotModal(doc){
   f.onload = () => cotAjustarHoja(f);
   document.body.classList.add('cot-bloq');
   m.classList.add('on');
+}
+/* La misma ventana sirve para el alquiler y para la venta: cada una
+   manda su pedido con su propia función. */
+function cotEnviarDoc(tipo){
+  if(tipo === 'venta' && typeof vcEnviar === 'function') vcEnviar('whatsapp');
+  else cotEnviar('whatsapp');
 }
 function cotModalCerrar(){
   const m = document.getElementById('cotModal');
