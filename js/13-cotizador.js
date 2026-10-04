@@ -160,12 +160,17 @@ function cotBarra(c){
   b.hidden = !c.sel.length;
   document.body.classList.toggle('cot-conbarra', !!c.sel.length);
   if(!c.sel.length){ b.innerHTML = ''; return; }
-  b.innerHTML = c.largo
+  const cuantos = c.sel.length + (c.sel.length === 1 ? ' instrumento' : ' instrumentos');
+  b.innerHTML = c.faltaCiudad
+    ? `<div><span>${cuantos} · provincia</span><b>Elige tu ciudad</b></div>
+       <button class="btn btn-fill" onclick="cotIrCiudad()">Elegir</button>`
+    : c.largo
     ? `<div><span>${c.qty} días</span><b>Conversémoslo</b></div>
        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Escríbenos</button>`
-    : `<div><span>${c.sel.length} ${c.sel.length === 1 ? 'instrumento' : 'instrumentos'} · ${c.qty} ${cotPlural(COT_UNI[c.mod], c.qty)}</span>
+    : `<div><span>${cuantos} · ${c.qty} ${cotPlural(COT_UNI[c.mod], c.qty)}</span>
          <b>S/ ${c.total.toFixed(2)}</b></div>
-       <button class="btn btn-fill" onclick="cotVista()">Ver</button>`;
+       <button class="btn" onclick="cotVista()">Ver</button>
+       <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar</button>`;
 }
 
 function cotPintar(){
@@ -327,6 +332,9 @@ function cotResumen(){
       <div class="fino"><span>Incluye IGV 18 %</span><span>S/ ${(c.total / 1.18 * 0.18).toFixed(2)}</span></div>
     </div>`}
     ${cotOfertasHTML(c)}
+    ${c.faltaCiudad ? `<p class="cot-aviso"><b>Elige tu ciudad para ver el total.</b>
+      El pasaje del instrumentista cambia con la distancia, así que el precio se calcula recién
+      cuando nos dices a qué ciudad va.</p>` : ''}
     ${c.viaja && c.ciudad ? `<p class="cot-aviso"><b>El viaje ya está incluido en el total.</b>
       Pasaje de ida y vuelta a ${cotEsc(c.ciudad.n)}: S/ ${fmt(c.pasaje)}, una sola vez.
       Viáticos: comida S/ ${fmt(VIAJE.viaticoDia)} por día${c.noches
@@ -346,7 +354,7 @@ function cotResumen(){
         <label>Teléfono<input id="cotTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></label>
       </div>
       <div class="form-msg" id="cotAviso" role="status" aria-live="polite"></div>
-      <p class="cot-mail">Con tus datos listos, usa el botón de arriba.
+      <p class="cot-mail">Con tus datos listos, toca «Enviar mi pedido por WhatsApp».
         ${c.largo ? '' : `¿Prefieres correo? <button type="button" onclick="cotEnviar('correo')">Enviar por correo</button>`}</p>
     </div>
     <p class="cot-nota">${c.prov
