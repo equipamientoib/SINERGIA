@@ -803,17 +803,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=1fe04663';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=63f2a45b';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=1fe04663';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=63f2a45b';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=1fe04663','js/06-tablero.js?v=1fe04663'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=63f2a45b','js/06-tablero.js?v=63f2a45b'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=1fe04663'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=63f2a45b'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2965,11 +2965,13 @@ function cotHTML(d, formal){
   /* Venta: cada equipo con su cantidad y su precio unitario. */
   const filasVenta = () => d.items.map((e, i) => {
     const pu = e.pu / 1.18, pt = e.t / 1.18;
+    const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
+      : {nom: e.n || e.i || 'Equipo', mm: e.m || '', nts: e.nts || '', foto: e.f || ''};
     return `<tr>
       <td class="c">${i + 1}</td>
-      <td><b>${cotEsc(e.n.toUpperCase())}</b>
-        ${e.f ? `<img class="mini" src="${cotEsc(e.f)}" alt="">` : ''}
-        <span class="det">${cotEsc(e.m || '—')}${e.nts ? '<br>Código NTS ' + cotEsc(e.nts) + ' (NTS 113-MINSA)' : ''}
+      <td><b>${cotEsc(inf.nom.toUpperCase())}</b>
+        ${inf.foto ? `<img class="mini" src="${cotEsc(inf.foto)}" alt="">` : ''}
+        <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Código NTS ' + cotEsc(inf.nts) + ' (NTS 113-MINSA)' : ''}
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
@@ -3588,7 +3590,8 @@ function vcPintar(){
           <label>¿Algo que debamos saber?<textarea id="vcMsg" rows="2" placeholder="Para qué área, si es para un expediente, fechas…"></textarea></label>
           <div class="form-msg" id="vcAviso" role="status" aria-live="polite"></div>
           <p class="cot-mail">Con tus datos listos, toca «Enviar mi pedido por WhatsApp».
-            ¿Prefieres correo? <button type="button" onclick="vcEnviar('correo')">Enviar por correo</button></p>
+            ¿Prefieres correo? <button type="button" onclick="vcEnviar('correo')">Enviar por correo</button>
+            · <button type="button" onclick="vcCopiar()">Copiar el mensaje</button></p>
         </div>
         <p class="cot-nota">Entrega en Lima. A provincia se envía por agencia de transporte; el envío
           lo contrata y lo paga el cliente.</p>
@@ -3640,11 +3643,19 @@ function vcDoc(c, d){
     tipo: 'venta',
     num: vcNumero(), fecha: new Date().toLocaleDateString('es-PE'),
     nom: d.nom, mail: d.mail, tel: d.tel, nota: d.msg || '',
-    items: c.items.map(x => ({
-      n: x.p.nom, m: [x.p.marca, x.p.modelo].filter(Boolean).join(' · '),
-      q: x.q, pu: x.precio, t: x.total, nts: x.p.clave || '',
-      f: cotFotoAbs ? cotFotoAbs({photo: (x.p.fotos || [])[0]}) : ''
-    })),
+    /* Solo lo imprescindible: id, cantidad y precio. El nombre, la marca y
+       el código NTS se leen del catálogo al abrir el enlace, y solo viajan
+       dentro cuando el equipo ya no está en el catálogo. Con esto el enlace
+       no crece sin control y WhatsApp siempre lo acepta. */
+    items: c.items.map(x => {
+      const it = {i: x.p.id, q: x.q, pu: x.precio, t: x.total};
+      if(!vcProducto(x.p.id)){
+        it.n = x.p.nom;
+        it.m = [x.p.marca, x.p.modelo].filter(Boolean).join(' · ');
+        it.nts = x.p.clave || '';
+      }
+      return it;
+    }),
     total: c.total, gar: 0, tec: 0, pas: 0, via: 0, inc: []
   };
 }
@@ -3652,6 +3663,20 @@ function vcNumero(){
   const d = new Date(), z = n => String(n).padStart(2, '0');
   return 'SOL-V-' + String(d.getFullYear()).slice(2) + z(d.getMonth() + 1) + z(d.getDate()) +
          '-' + z(d.getHours()) + z(d.getMinutes());
+}
+
+/* Los datos del equipo para el documento: del catálogo si está, y si no,
+   de lo que viajó dentro del enlace. */
+function vcInfoDe(e){
+  const p = vcProducto(e.i);
+  let foto = '';
+  if(p){ try{ foto = cotFotoAbs({photo: (p.fotos || [])[0]}) || ''; }catch(x){} }
+  return {
+    nom: p ? p.nom : (e.n || e.i || 'Equipo'),
+    mm: p ? [p.marca, p.modelo].filter(Boolean).join(' · ') : (e.m || ''),
+    nts: p ? (p.clave || '') : (e.nts || ''),
+    foto: e.f || foto
+  };
 }
 
 /* Términos de la cotización de venta. */
@@ -3685,9 +3710,8 @@ function vcTexto(c, d){
   L.push('');
   L.push('EQUIPOS');
   c.items.forEach((x, i) => {
-    L.push((i + 1) + '. ' + x.p.nom + (x.q > 1 ? ' × ' + x.q : ''));
-    L.push('   ' + [x.p.marca, x.p.modelo].filter(Boolean).join(' ') +
-           (x.p.clave ? ' · NTS ' + x.p.clave : '') + ' · ' + vSoles(x.precio) + ' c/u');
+    L.push((i + 1) + '. ' + x.p.nom + ' · ' + [x.p.marca, x.p.modelo].filter(Boolean).join(' ') +
+           (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total));
   });
   L.push('');
   L.push('  TOTAL REFERENCIAL (IGV incluido): ' + vSoles(c.total));
@@ -3710,7 +3734,18 @@ function vcEnviar(via){
     return;
   }
   const doc = vcDoc(c, d);
-  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + cotEnlace(doc);
+  const enlace = cotEnlace(doc);
+  let texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + enlace;
+  /* WhatsApp se queda en blanco con direcciones muy largas: si el pedido
+     es grande, va el resumen corto y el enlace, que lo tiene todo. */
+  if(encodeURIComponent(texto).length > 1500){
+    texto = ['SOLICITUD DE COTIZACIÓN — ' + ((typeof SITE !== 'undefined' && SITE.nombre) || 'Sinergia Biomédica'),
+      'Cliente: ' + (d.nom || '—') + (d.tel ? ' · ' + d.tel : ''),
+      c.items.length + (c.items.length === 1 ? ' equipo' : ' equipos') + ' · ' +
+        c.unidades + (c.unidades === 1 ? ' unidad' : ' unidades') +
+        ' · TOTAL REFERENCIAL ' + vSoles(c.total) + ' (IGV incluido)',
+      '', 'El detalle completo está aquí:', enlace].join('\n');
+  }
   if(typeof enviarAlEndpoint === 'function')
     enviarAlEndpoint({tipo: 'venta-cotizador', equipo: c.items.map(x => x.p.nom).join(' + '),
                       total: vSoles(c.total), nombre: d.nom, correo: d.mail, telefono: d.tel, mensaje: d.msg});
@@ -3718,6 +3753,28 @@ function vcEnviar(via){
     ? 'Abriendo tu correo con el resumen de tu pedido…'
     : 'Abriendo WhatsApp con el resumen de tu pedido…', 'ok');
   abrirCanal(via, texto, 'Solicitud de cotización · venta');
+}
+
+/* Si WhatsApp no abre (pasa en algunas computadoras), el mensaje se puede
+   copiar y pegar a mano. */
+function vcCopiar(){
+  const c = vcCalcular();
+  if(!c.items.length) return;
+  const d = vcDatos();
+  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + cotEnlace(vcDoc(c, d));
+  const ok = () => avisar('vcAviso', 'Mensaje copiado: pégalo donde quieras enviarlo.', 'ok');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(texto).then(ok).catch(() => vcCopiarViejo(texto, ok));
+  }else vcCopiarViejo(texto, ok);
+}
+function vcCopiarViejo(texto, ok){
+  const t = document.createElement('textarea');
+  t.value = texto; t.style.position = 'fixed'; t.style.opacity = '0';
+  document.body.appendChild(t); t.select();
+  try{ document.execCommand('copy'); ok(); }catch(e){
+    avisar('vcAviso', 'No se pudo copiar. Usa «Enviar por correo».', 'err');
+  }
+  t.remove();
 }
 
 /* Vista previa, en una ventana flotante: no descarga nada. */
