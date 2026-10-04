@@ -90,8 +90,12 @@
       '<i class="sb-cart-n" hidden></i>';
     b.onclick = C.abrir;
     /* Antes del botón de menú, para que en el celular quede a su lado. */
+    /* Junto al menú (la web) o junto al selector Venta/Alquiler (las
+       páginas sueltas): así queda en la misma fila, arriba a la derecha. */
     var burger = cab.querySelector('.burger');
+    var modo = cab.querySelector('nav .modo-sw');
     if(burger && burger.parentNode) burger.parentNode.insertBefore(b, burger);
+    else if(modo && modo.parentNode) modo.parentNode.insertBefore(b, modo.nextSibling);
     else cab.appendChild(b);
     return b;
   }
@@ -241,6 +245,14 @@
   else arrancar();
   /* Si el carrito cambia en otra pestaña, esta se entera. */
   window.addEventListener('storage', function(e){ if(e.key === LLAVE) pintar(); });
+
+  /* Volver: si se llegó desde el propio sitio, atrás de verdad; si se
+     entró directo desde Google, a la tienda. */
+  window.sbAtras = function(){
+    var mismo = document.referrer && document.referrer.indexOf(location.origin) === 0;
+    if(mismo && history.length > 1) history.back();
+    else location.href = '/#/venta/tienda';
+  };
 
   window.SBCarrito = C;
 })();

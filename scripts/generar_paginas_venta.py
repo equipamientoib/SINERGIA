@@ -284,6 +284,10 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
     otros = ''.join('<a href="/venta/%s/">%s</a>' % (o['id'], e(o['nom'] + (' ' + o['modelo'] if o.get('modelo') else '')))
                     for o in mismos[:12])
     return f'''
+    <button type="button" class="sb-atras" onclick="sbAtras()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      Seguir viendo equipos</button>
     <article class="prod venta" id="{e(p['id'])}">
       {galeria(p, fts)}
       <div class="prod-info">
