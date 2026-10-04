@@ -107,17 +107,20 @@ function cotSimular(id){
   COT.sel = antes;
   return c;
 }
-function cotOfertas(c, cuantas){
+function cotOfertas(c){
   if(!c.sel.length || c.largo || c.faltaCiudad) return [];
   const yaEstan = new Set(c.sel.map(e => e.id));
+  /* Todos los instrumentos, los grandes primero y las herramientas de
+     apoyo al final. Los que ya eligió se quedan en la lista, marcados:
+     así ve de un vistazo lo que lleva y puede quitarlo. */
   return cotLista()
-    .filter(e => !yaEstan.has(e.id))
+    .slice()
+    .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
+      if(yaEstan.has(e.id)) return {e: e, on: true, mas: 0};
       const sim = cotSimular(e.id);
-      return {e: e, mas: Math.max(0, sim.total - c.total), suelto: sim.unit - c.unit};
-    })
-    .sort((a, b) => a.mas - b.mas)
-    .slice(0, cuantas || 99);
+      return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
+    });
 }
 
 /* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
@@ -131,17 +134,20 @@ function cotSimular(id){
   COT.sel = antes;
   return c;
 }
-function cotOfertas(c, cuantas){
+function cotOfertas(c){
   if(!c.sel.length || c.largo || c.faltaCiudad) return [];
   const yaEstan = new Set(c.sel.map(e => e.id));
+  /* Todos los instrumentos, los grandes primero y las herramientas de
+     apoyo al final. Los que ya eligió se quedan en la lista, marcados:
+     así ve de un vistazo lo que lleva y puede quitarlo. */
   return cotLista()
-    .filter(e => !yaEstan.has(e.id))
+    .slice()
+    .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
+      if(yaEstan.has(e.id)) return {e: e, on: true, mas: 0};
       const sim = cotSimular(e.id);
-      return {e: e, mas: Math.max(0, sim.total - c.total), suelto: sim.unit - c.unit};
-    })
-    .sort((a, b) => a.mas - b.mas)
-    .slice(0, cuantas || 99);
+      return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
+    });
 }
 
 /* «1 medio día», «2 medios días», «3 días». */
@@ -374,10 +380,16 @@ function cotOfertasHTML(c){
   const u = COT_UNI[c.mod];
   return `<div class="cot-of">
     <div class="cot-ofh">Agrega por un poco más</div>
-    <p class="cot-ofs">Precio de cada uno si lo sumas a lo que ya elegiste, por ${u}.</p>
+    <p class="cot-ofs">Lo que cuesta cada uno si lo sumas a lo que ya elegiste, por ${u}.
+      Toca para agregarlo o quitarlo.</p>
     ${of.map(o => {
       const solo = c.mod === 'medio' ? precioMedio(o.e.dia) : o.e.dia;
       const porUnidad = Math.round(o.mas / c.qty);
+      if(o.on) return `<button type="button" class="cot-ofi on" onclick="cotMarcar('${o.e.id}',false)">
+        <span class="n">${cotEsc(o.e.nom)}</span>
+        <span class="p"><b>ya está</b></span>
+        <span class="mas" aria-hidden="true">✓</span>
+      </button>`;
       return `<button type="button" class="cot-ofi" onclick="cotMarcar('${o.e.id}',true)">
         <span class="n">${cotEsc(o.e.nom)}</span>
         <span class="p">${o.mas <= 0 ? '<b>gratis</b>'

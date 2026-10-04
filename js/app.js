@@ -801,17 +801,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=23705374';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=584c1f30';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=23705374';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=584c1f30';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=23705374','js/06-tablero.js?v=23705374'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=584c1f30','js/06-tablero.js?v=584c1f30'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=23705374'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=584c1f30'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2348,17 +2348,20 @@ function cotSimular(id){
   COT.sel = antes;
   return c;
 }
-function cotOfertas(c, cuantas){
+function cotOfertas(c){
   if(!c.sel.length || c.largo || c.faltaCiudad) return [];
   const yaEstan = new Set(c.sel.map(e => e.id));
+  /* Todos los instrumentos, los grandes primero y las herramientas de
+     apoyo al final. Los que ya eligió se quedan en la lista, marcados:
+     así ve de un vistazo lo que lleva y puede quitarlo. */
   return cotLista()
-    .filter(e => !yaEstan.has(e.id))
+    .slice()
+    .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
+      if(yaEstan.has(e.id)) return {e: e, on: true, mas: 0};
       const sim = cotSimular(e.id);
-      return {e: e, mas: Math.max(0, sim.total - c.total), suelto: sim.unit - c.unit};
-    })
-    .sort((a, b) => a.mas - b.mas)
-    .slice(0, cuantas || 99);
+      return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
+    });
 }
 
 /* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
@@ -2372,17 +2375,20 @@ function cotSimular(id){
   COT.sel = antes;
   return c;
 }
-function cotOfertas(c, cuantas){
+function cotOfertas(c){
   if(!c.sel.length || c.largo || c.faltaCiudad) return [];
   const yaEstan = new Set(c.sel.map(e => e.id));
+  /* Todos los instrumentos, los grandes primero y las herramientas de
+     apoyo al final. Los que ya eligió se quedan en la lista, marcados:
+     así ve de un vistazo lo que lleva y puede quitarlo. */
   return cotLista()
-    .filter(e => !yaEstan.has(e.id))
+    .slice()
+    .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
+      if(yaEstan.has(e.id)) return {e: e, on: true, mas: 0};
       const sim = cotSimular(e.id);
-      return {e: e, mas: Math.max(0, sim.total - c.total), suelto: sim.unit - c.unit};
-    })
-    .sort((a, b) => a.mas - b.mas)
-    .slice(0, cuantas || 99);
+      return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
+    });
 }
 
 /* «1 medio día», «2 medios días», «3 días». */
@@ -2615,10 +2621,16 @@ function cotOfertasHTML(c){
   const u = COT_UNI[c.mod];
   return `<div class="cot-of">
     <div class="cot-ofh">Agrega por un poco más</div>
-    <p class="cot-ofs">Precio de cada uno si lo sumas a lo que ya elegiste, por ${u}.</p>
+    <p class="cot-ofs">Lo que cuesta cada uno si lo sumas a lo que ya elegiste, por ${u}.
+      Toca para agregarlo o quitarlo.</p>
     ${of.map(o => {
       const solo = c.mod === 'medio' ? precioMedio(o.e.dia) : o.e.dia;
       const porUnidad = Math.round(o.mas / c.qty);
+      if(o.on) return `<button type="button" class="cot-ofi on" onclick="cotMarcar('${o.e.id}',false)">
+        <span class="n">${cotEsc(o.e.nom)}</span>
+        <span class="p"><b>ya está</b></span>
+        <span class="mas" aria-hidden="true">✓</span>
+      </button>`;
       return `<button type="button" class="cot-ofi" onclick="cotMarcar('${o.e.id}',true)">
         <span class="n">${cotEsc(o.e.nom)}</span>
         <span class="p">${o.mas <= 0 ? '<b>gratis</b>'
