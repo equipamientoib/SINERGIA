@@ -920,6 +920,7 @@ function route(sinMover){
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
   /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
      cotizador todo vuelve a su sitio. */
+  seguro('barra venta', () => { if(typeof vcBarra === 'function') vcBarra(); });
   document.body.classList.toggle('cot-conbarra',
     pageId === 'page-cotizador' && !!(document.getElementById('cotBarra') || {}).innerHTML);
   /* Sección activa: decide qué menú se ve (venta o alquiler). Las páginas
