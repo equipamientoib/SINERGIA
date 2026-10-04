@@ -27,6 +27,12 @@ const COT_LARGO = 7;
 const cotEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
   ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
+/* Un solo formato de dinero en pantalla: «S/ 1,234», sin decimales. El
+   neto se redondea y el IGV sale de restarlo, así subtotal + IGV da
+   exactamente el total que ve el cliente. */
+const soles = n => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
+const cotNeto = total => Math.round(Number(total || 0) / 1.18);
+
 /* Instrumentos que se pueden cotizar (las complementarias van incluidas). */
 const cotLista = () => EQUIPOS.filter(e => !esComplemento(e) && e.dia > 0);
 
@@ -197,7 +203,7 @@ function cotBarra(c){
     ? `<div><span>${c.qty} días</span><b>Conversémoslo</b></div>
        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Escríbenos</button>`
     : `<div><span>${cuantos} · ${cotPeriodo(c.mod, c.qty)}</span>
-         <b>S/ ${c.total.toFixed(2)}</b></div>
+         <b>${soles(c.total)}</b></div>
        <button class="btn" onclick="cotVista()">Ver</button>
        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar</button>`;
 }
@@ -334,7 +340,7 @@ function cotResumen(){
        </div>`
     : `<div class="cot-top">
          <span>Tu cotización · ${cotPeriodo(c.mod, c.qty)}${c.prov ? ' · provincia' : ''}</span>
-         <b>S/ ${c.total.toFixed(2)}</b>
+         <b>${soles(c.total)}</b>
          <small>IGV incluido${c.garantia ? ' · + S/ ' + fmt(c.garantia) + ' de garantía que se devuelve' : ''}</small>
          <div class="cot-acc">
            <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
@@ -370,14 +376,14 @@ function cotResumen(){
       Para una semana o más lo vemos contigo: escríbenos y te pasamos el precio del plazo completo.</p>`
     : `<div class="cot-cuenta">
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
-      <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
-      ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
-      ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>S/ ${c.pasaje.toFixed(2)}</span></div>
+      <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>${soles(c.alquiler)}</span></div>
+      ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>${soles(c.tecnico)}</span></div>` : ''}
+      ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>${soles(c.pasaje)}</span></div>
         <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
-          ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>S/ ${c.viatico.toFixed(2)}</span></div>` : ''}
-      <div class="sub"><span>Subtotal (S/)</span><span>${(c.total / 1.18).toFixed(2)}</span></div>
-      <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total / 1.18 * 0.18).toFixed(2)}</span></div>
-      <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
+          ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>${soles(c.viatico)}</span></div>` : ''}
+      <div class="sub"><span>Subtotal</span><span>${soles(cotNeto(c.total))}</span></div>
+      <div class="sub"><span>IGV (18 %)</span><span>${soles(c.total - cotNeto(c.total))}</span></div>
+      <div class="gran"><span>Total con IGV</span><span>${soles(c.total)}</span></div>
     </div>`}
     ${c.faltaCiudad ? `<p class="cot-aviso"><b>Elige tu ciudad para ver el total.</b>
       El pasaje del instrumentista cambia con la distancia, así que el precio se calcula recién

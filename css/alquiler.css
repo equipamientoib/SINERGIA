@@ -214,3 +214,7 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .prod-btns:has(.uno){grid-template-columns:1fr}
 .calc-link{background:var(--cobre-d);border-color:var(--cobre-d);color:#fff}
 .calc-link:hover{filter:brightness(1.08)}
+
+/* El botón verde flotante tapaba el botón principal de la ficha: en las
+   páginas que ya tienen su propio WhatsApp a la vista, no se muestra. */
+body.wa-propio .wafab{display:none}

@@ -279,8 +279,10 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 <link rel="stylesheet" href="/css/alquiler.css?v={sello_css()}">
 <script type="application/ld+json">{json.dumps(graph, ensure_ascii=False)}</script>
 </head>
-<body>
-<!-- Generado por scripts/generar_paginas.py a partir de data/seo-tipos.json
+<body class="wa-propio">
+<!-- wa-propio: la página ya tiene su botón de WhatsApp a la vista, así que
+     el botón verde flotante se esconde y no tapa «Agregar al carrito».
+     Generado por scripts/generar_paginas.py a partir de data/seo-tipos.json
      y del catálogo. No editar a mano: se sobrescribe. -->
 <header class="top"><div class="wrap">
   <a href="/" aria-label="Sinergia Biomédica — inicio">{LOGO}</a>
@@ -606,7 +608,7 @@ def pagina_hub(hub, publicados, cfg, locales):
       <li><b>Te enviamos la cotización</b> con la disponibilidad, con IGV incluido.</li>
       <li><b>Coordinamos la entrega</b> en Lima o provincias, con técnico si lo pides.</li>
     </ol>
-    <p><a class="btn fill" href="/#/catalogo/paquetes">Ver paquetes por tipo de equipo médico →</a></p>
+    <p><a class="btn fill" href="/#/cotizar">Arma tu alquiler y mira el precio →</a></p>
   </section>'''
     jsonld = [{
         '@type': 'ItemList',

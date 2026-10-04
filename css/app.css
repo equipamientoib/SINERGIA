@@ -565,7 +565,7 @@
   .wa:hover{color:#8ee6c4}
   .wa2{color:var(--gris-claro);font-weight:600;font-size:14px;cursor:pointer}
   .wa2:hover{color:var(--cobre-l)}
-  footer .ruc{font-size:12px;color:#5a5e66;margin-top:24px;font-family:var(--ff-d);letter-spacing:1px;padding-top:22px;border-top:1px solid rgba(245,243,238,.08)}
+  footer .ruc{font-size:12px;color:#9aa0a8;margin-top:24px;font-family:var(--ff-d);letter-spacing:1px;padding-top:22px;border-top:1px solid rgba(245,243,238,.08)}
 
 /* ===== css/16-entrada.css ===== */
   /* =====================================================================
@@ -985,6 +985,9 @@
 .cot-acc .btn{width:100%;padding:10px 8px;font-size:13px}
 .cot-acc .btn:not(.btn-fill){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28);color:#fff}
 .cot-acc .btn:not(.btn-fill):hover{background:rgba(255,255,255,.18)}
+/* Sobre el panel oscuro el botón relleno quedaba sin fondo visible. */
+.cot-acc .btn-fill{background:#fff;border-color:#fff;color:var(--onix,#17191d)}
+.cot-acc .btn-fill:hover{background:var(--cobre-l,#d8c39b);border-color:var(--cobre-l,#d8c39b)}
 @media(max-width:560px){.cot-acc{grid-template-columns:1fr}}
 
 /* página de la cotización compartida (#/cotizacion/…) */
@@ -1083,8 +1086,10 @@ body.cot-bloq .wafab{display:none}
 .cot-barra{display:none}
 @media(max-width:900px){
   /* El total vive en la barra de abajo, que acompaña todo el rato: el
-     bloque oscuro del panel repetiría el mismo precio más abajo. */
-  .cot-res>.cot-top{display:none}
+     bloque oscuro del panel repetiría el mismo precio más abajo. Solo en
+     el cotizador de ALQUILER: la cotización de venta no tiene esa barra,
+     y ocultarlo dejaba al cliente sin total y sin botón de enviar. */
+  #page-cotizador .cot-res>.cot-top{display:none}
   .cot-barra[hidden]{display:none}
   .cot-barra{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;align-items:center;
     justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
@@ -1189,4 +1194,13 @@ body.vc-conbarra .wafab{bottom:88px}
   .vc-q{grid-column:2}
   .vc-p{grid-column:3;grid-row:2}
   .vc-x{grid-column:3;grid-row:1;justify-self:end}
+}
+
+/* El botón verde flotante tapaba «Agregar al carrito» y los precios. En las
+   páginas que ya tienen su propio botón de WhatsApp a la vista no hace
+   falta; en las demás se corre hacia arriba para no pisar nada. */
+body.wa-propio .wafab{display:none}
+@media(max-width:900px){
+  .wafab{right:12px;bottom:76px}
+  body.vc-conbarra .wafab,body.cot-conbarra .wafab{bottom:98px}
 }

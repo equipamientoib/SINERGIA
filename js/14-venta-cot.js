@@ -62,6 +62,9 @@ function vcCalcular(){
 
 /* ── Página ─────────────────────────────────────────────────────────── */
 function vcAbrir(){
+  /* La página ya tiene su botón de WhatsApp: el verde flotante sobraba y
+     encima tapaba el formulario. */
+  document.body.classList.add('wa-propio');
   vcPintarTodo();
   /* Si se vino del carrito tocando «Enviar por WhatsApp», se baja al
      formulario y se intenta enviar de una vez. */
@@ -112,7 +115,7 @@ function vcPintar(){
     </div>`;
     return;
   }
-  const neto = c.total / 1.18;
+  const neto = Math.round(c.total / 1.18);
   caja.innerHTML = `
     <div class="wrap pagehead"><div class="k">Venta de equipos</div>
       <h1>Tu cotización</h1>
@@ -141,9 +144,9 @@ function vcPintar(){
           `<li><span>${vEsc(x.p.nom)}${x.q > 1 ? ' × ' + x.q : ''}</span><span>${vSoles(x.total)}</span></li>`).join('')}
         </ul>
         <div class="cot-cuenta">
-          <div class="sub"><span>Subtotal (S/)</span><span>${neto.toFixed(2)}</span></div>
-          <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total - neto).toFixed(2)}</span></div>
-          <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
+  <div class="sub"><span>Subtotal</span><span>${vSoles(neto)}</span></div>
+          <div class="sub"><span>IGV (18 %)</span><span>${vSoles(c.total - neto)}</span></div>
+          <div class="gran"><span>Total con IGV</span><span>${vSoles(c.total)}</span></div>
         </div>
         <p class="cot-aviso"><b>Es un precio referencial.</b> Lo confirmamos al emitir la cotización
           formal, junto con el stock y el plazo de entrega de cada equipo.</p>

@@ -59,3 +59,12 @@ body.vc-conbarra .wafab{bottom:88px}
   .vc-p{grid-column:3;grid-row:2}
   .vc-x{grid-column:3;grid-row:1;justify-self:end}
 }
+
+/* El botón verde flotante tapaba «Agregar al carrito» y los precios. En las
+   páginas que ya tienen su propio botón de WhatsApp a la vista no hace
+   falta; en las demás se corre hacia arriba para no pisar nada. */
+body.wa-propio .wafab{display:none}
+@media(max-width:900px){
+  .wafab{right:12px;bottom:76px}
+  body.vc-conbarra .wafab,body.cot-conbarra .wafab{bottom:98px}
+}

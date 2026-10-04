@@ -232,8 +232,9 @@
     var n = C.cuenta();
     var b = botonCabecera();
     if(b){
-      /* En alquiler el carrito solo aparece si ya hay algo dentro. */
-      b.hidden = !n && !enVenta();
+      /* El carrito es de la tienda de venta: fuera de ella no se muestra,
+         aunque tenga equipos dentro (no se pierde nada, sigue guardado). */
+      b.hidden = !enVenta();
       var i = b.querySelector('.sb-cart-n');
       i.textContent = n ? String(n) : '';
       i.hidden = !n;

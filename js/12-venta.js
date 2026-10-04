@@ -138,10 +138,13 @@ function vBuscar(q){
 }
 function vBuscarEn(q, destino){
   const caja = document.getElementById(destino); if(!caja) return;
-  const r = vBuscar(q);
+  /* Con una sola letra todavía no se busca: antes salía «no encontramos
+     «a»» apenas el cliente empezaba a escribir. */
+  const corta = q.trim().length < 2;
+  const r = corta ? [] : vBuscar(q);
   const otros = document.querySelectorAll('[data-sin-busqueda]');
-  otros.forEach(e => e.hidden = !!q.trim());
-  caja.innerHTML = !q.trim() ? '' : (r.length
+  otros.forEach(e => e.hidden = !corta);
+  caja.innerHTML = corta ? '' : (r.length
     ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid">${r.map(vCard).join('')}</div>`
     : `<div class="v-vacio"><h3>No encontramos «${vEsc(q)}» en el catálogo publicado</h3><p>Igual podemos conseguirlo. Escríbenos con el nombre o el código de tu listado y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+q)}" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div></div>`);
 }
