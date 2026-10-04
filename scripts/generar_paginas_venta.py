@@ -110,6 +110,16 @@ def fotos(p, base, fijas):
     return out
 
 
+def boton_carrito(p, foto):
+    """Botón «Agregar al carrito» con los datos del equipo: la página suelta
+    no carga el catálogo, así que los lleva encima."""
+    return ('<button type="button" class="btn fill" data-add="%s" data-nom="%s" data-mm="%s" '
+            'data-nts="%s" data-precio="%s" data-foto="%s">Agregar al carrito</button>'
+            % (e(p['id']), e(p['nom']),
+               e(' '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
+               e(p.get('clave') or ''), int(p.get('precio') or 0), e(foto or '')))
+
+
 def ficha_venta(pid):
     ruta = os.path.join(FICHAS_VENTA, pid + '.json')
     return gp.leer_json(ruta) if os.path.exists(ruta) else None
@@ -138,14 +148,25 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
     doc = doc.replace('quiero%20cotizar%20un%20alquiler.', 'quiero%20cotizar%20un%20equipo.')
     doc = doc.replace('scripts/generar_paginas.py a partir de data/seo-tipos.json\n     y del catálogo',
                       'scripts/generar_paginas_venta.py a partir de la hoja de venta')
-    doc = doc.replace('</head>', '<link rel="stylesheet" href="/css/venta-paginas.css?v=%s">\n</head>'
-                      % sello('venta-paginas.css'), 1)
+    doc = doc.replace('</head>', '<link rel="stylesheet" href="/css/venta-paginas.css?v=%s">\n'
+                      '<link rel="stylesheet" href="/css/carrito.css?v=%s">\n</head>'
+                      % (sello('venta-paginas.css'), sello('carrito.css')), 1)
+    doc = doc.replace('</body>', '<script defer src="/js/carrito.js?v=%s"></script>\n</body>'
+                      % sello_js('carrito.js'), 1)
     return doc
 
 
 def sello(css):
+    return _sello(os.path.join(ROOT, 'css', css))
+
+
+def sello_js(js):
+    return _sello(os.path.join(ROOT, 'js', js))
+
+
+def _sello(ruta):
     import hashlib
-    with open(os.path.join(ROOT, 'css', css), 'rb') as f:
+    with open(ruta, 'rb') as f:
         return hashlib.sha256(f.read()).hexdigest()[:8]
 
 
@@ -186,6 +207,7 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
     correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote('Cotización: ' + p['nom']),
                                                 urllib.parse.quote(texto))
+    add = boton_carrito(p, fts[0][0] if fts else '')
     # Precio con vigencia (14 días desde la última actualización con el proveedor)
     caja = ''
     stock = p.get('stock')
@@ -271,8 +293,8 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
         {franja(p)}
         {caja}
         <div class="prod-btns">
-          <a class="btn fill" href="{wa}" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-          <a class="btn" href="{correo}">Cotizar por correo</a>
+          {add}
+          <a class="btn" href="{wa}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         {doc}
       </div>

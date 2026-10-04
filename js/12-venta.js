@@ -223,6 +223,15 @@ function vNotaPrecio(larga){
 function vPagina(id){ return (window.PAGINA_VENTA || {})[id] || ''; }
 function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/venta/p/' + id); }
 
+/* Botón de carrito con los datos del equipo pegados: así funciona igual
+   en la web y en las páginas sueltas de producto. */
+function vBotonAdd(p, clase, texto){
+  return `<button type="button" class="${clase}" data-add="${vEsc(p.id)}"
+    data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
+    data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
+    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar al carrito'}</button>`;
+}
+
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
@@ -244,7 +253,7 @@ function vCard(p){
       ${vMarcaModelo(p)}
       ${p.clave?`<div class="v-exp" title="${vEsc(p.expediente||'Código NTS 113-MINSA')}">Código NTS ${vEsc(p.clave)}</div>`:''}
       <div class="desc">${vEsc(p.resumen||'')}</div>
-      <div class="foot">${pie}<button type="button" class="btn v-add" onclick="vcAgregar('${p.id}')">Cotizar</button></div>
+      <div class="foot">${pie}${vBotonAdd(p, 'btn v-add')}</div>
     </div>
   </div>`;
 }
@@ -486,6 +495,10 @@ function vtFiltrados(){
   else l = vOrdenTienda(l);
   return l;
 }
+function vCarritoEngancha(){
+  if(window.SBCarrito) setTimeout(() => { SBCarrito.enganchar(); SBCarrito.pintar(); }, 0);
+}
+
 function vtPintar(){
   const g = document.getElementById('vtGrid'); if(!g) return;
   const l = vtFiltrados();
@@ -499,6 +512,7 @@ function vtPintar(){
     `<button onclick="vtMarcar('${k}','${vEsc(v)}',false,true)">${vEsc(t)} ✕</button>`).join('');
   const html = l.map(vCard).join('');
   g.innerHTML = l.length ? html : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
+  vCarritoEngancha();
 }
 function vtMarcar(clave, v, on, desmarcar){
   on ? VT[clave].add(v) : VT[clave].delete(v);
@@ -548,7 +562,7 @@ function vProducto(id){
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
-          <button type="button" class="btn btn-fill btn-lg v-add" onclick="vcAgregar('${p.id}')">Agregar a mi cotización</button>
+          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar al carrito')}
           <a class="btn btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         ${p.ficha_pdf?`<a class="v-doc" href="${vEsc(p.ficha_pdf)}" target="_blank" rel="noopener"><span class="doc-ico">PDF</span><span><b>Ficha técnica</b><small>Ver o descargar</small></span></a>`:''}
@@ -586,4 +600,5 @@ function renderVenta(parte){
   if(parte[0]==='p' && vPagina(parte[1])){ location.replace(vPagina(parte[1])); return; }   // enlaces viejos → página propia
   el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null, parte[0]==='precio' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
   if(tienda) vtPintar();
+  vCarritoEngancha();
 }
