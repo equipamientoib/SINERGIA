@@ -70,10 +70,11 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
     if(d.descuentos) DESC_COMB = d.descuentos;
     if(d.garantiaProvincia > 0) GARANTIA_PROV = d.garantiaProvincia;
     if(d.viaje){
-      if(d.viaje.pasajeMin > 0) VIAJE_PASAJE_MIN = d.viaje.pasajeMin;
-      if(d.viaje.pasaje > 0) VIAJE_PASAJE = d.viaje.pasaje;
-      if(d.viaje.viaticoDia > 0) VIAJE_VIATICO = d.viaje.viaticoDia;
+      if(d.viaje.viaticoDia > 0) VIAJE.viaticoDia = d.viaje.viaticoDia;
+      if(d.viaje.hospedajeNoche > 0) VIAJE.hospedajeNoche = d.viaje.hospedajeNoche;
+      if(d.viaje.zonas) VIAJE.zonas = d.viaje.zonas;
     }
+    if(Array.isArray(d.ciudades) && d.ciudades.length) CIUDADES = d.ciudades;
     if(d.dia){ TARIFAS = d.dia; aplicarTarifas();
     if(typeof repintarTodo === 'function') repintarTodo(); } }).catch(() => {});
 /* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
@@ -91,9 +92,36 @@ let SIN_TECNICO = {manometro:100, luxometro:100, tacometro:100};
 /* Garantía en depósito de los instrumentos que normalmente van con
    instrumentista, cuando viajan solos a provincia. */
 let GARANTIA_PROV = 300;
-/* Viaje del instrumentista a provincia: el pasaje de ida y vuelta se cobra
-   una sola vez (varía con la distancia) y la alimentación, por cada día. */
-let VIAJE_PASAJE_MIN = 80, VIAJE_PASAJE = 100, VIAJE_VIATICO = 50;
+/* ── Viaje del instrumentista a provincia ─────────────────────────────
+   El pasaje de ida y vuelta se cobra una sola vez y depende de la ciudad:
+   no cuesta lo mismo Ica que Iquitos. Las ciudades están agrupadas en
+   cuatro zonas, y cada zona tiene su pasaje estimado de ida y vuelta.
+   La alimentación se cobra por día de trabajo y el hospedaje por noche:
+   si el trabajo dura un día, el instrumentista no se queda a dormir. */
+let VIAJE = {
+  viaticoDia: 50,        // alimentación por día de trabajo
+  hospedajeNoche: 90,    // hospedaje por noche (noches = días − 1)
+  zonas: {1: 80, 2: 150, 3: 260, 4: 700}
+};
+const VIAJE_ZONAS = {
+  1: 'Cerca de Lima (bus, hasta 5 h)',
+  2: 'Costa y sierra centro (bus, 5 a 10 h)',
+  3: 'Norte, sur y selva (bus, más de 10 h)',
+  4: 'Solo por avión'
+};
+let CIUDADES = [
+  {n:'Barranca', z:1}, {n:'Huacho', z:1}, {n:'Cañete', z:1}, {n:'Chincha', z:1},
+  {n:'Pisco', z:1}, {n:'Ica', z:1},
+  {n:'Nazca', z:2}, {n:'Huaraz', z:2}, {n:'Chimbote', z:2}, {n:'Trujillo', z:2},
+  {n:'Huancayo', z:2}, {n:'Huánuco', z:2}, {n:'Ayacucho', z:2},
+  {n:'Chiclayo', z:3}, {n:'Piura', z:3}, {n:'Sullana', z:3}, {n:'Tumbes', z:3},
+  {n:'Cajamarca', z:3}, {n:'Jaén', z:3}, {n:'Tarapoto', z:3}, {n:'Moyobamba', z:3},
+  {n:'Pucallpa', z:3}, {n:'Arequipa', z:3}, {n:'Moquegua', z:3}, {n:'Tacna', z:3},
+  {n:'Cusco', z:3}, {n:'Abancay', z:3}, {n:'Juliaca', z:3}, {n:'Puno', z:3},
+  {n:'Iquitos', z:4}, {n:'Puerto Maldonado', z:4}, {n:'Otra ciudad (en avión)', z:4}
+];
+const ciudadDe = n => CIUDADES.find(c => c.n === n);
+const pasajeDe = n => { const c = ciudadDe(n); return c ? (VIAJE.zonas[c.z] || 0) : 0; };
 const soloEquipo = id => Object.prototype.hasOwnProperty.call(SIN_TECNICO, id);
 /* Complementarias: no se alquilan solas (herramientas de apoyo). */
 let COMPLEMENTOS = ['set-46', 'destornillador-elec'];

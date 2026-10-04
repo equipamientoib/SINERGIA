@@ -17,7 +17,7 @@
    #/cotizar/<id> entra con ese instrumento ya marcado: es a donde llevan
    los botones «Calcular mi alquiler» de las páginas de cada equipo.
    ===================================================================== */
-var COT = {sel: new Set(), mod: 'medio', qty: 1, sede: 'lima'};
+var COT = {sel: new Set(), mod: 'medio', qty: 1, sede: 'lima', ciudad: ''};
 /* Fuera de Lima el instrumento viaja: sale, se usa y vuelve. Por eso el
    alquiler a provincia parte de varios días y no tiene medio día. */
 const PROV_DIAS = 3;
@@ -35,6 +35,7 @@ function cotMarcar(id, on){
   on ? COT.sel.add(id) : COT.sel.delete(id);
   cotPintar();
 }
+function cotCiudad(v){ COT.ciudad = v; cotPintar(); }
 function cotSede(v){
   COT.sede = v;
   /* Si el instrumento viaja solo por agencia, el mínimo de días manda. */
@@ -43,7 +44,7 @@ function cotSede(v){
 }
 function cotMod(m){ COT.mod = m; cotPintar(); }
 function cotCantidad(v){ COT.qty = Math.max(1, parseInt(v, 10) || 1); cotResumen(); }
-function cotLimpiar(){ COT.sel.clear(); COT.qty = 1; COT.sede = 'lima'; cotPintar(); }
+function cotLimpiar(){ COT.sel.clear(); COT.qty = 1; COT.sede = 'lima'; COT.ciudad = ''; cotPintar(); }
 
 /* ── Cálculo ──────────────────────────────────────────────────────────
    Una sola función con toda la cuenta, para que el resumen y el mensaje
@@ -72,10 +73,17 @@ function cotCalcular(){
   const tunit = mod === 'medio' ? TEC_MIN : TEC_DIA;
   const tecnico = conTecnico ? Math.max(TEC_MIN, tunit * qty) : 0;
   /* Viaje del instrumentista a provincia: el pasaje de ida y vuelta se
-     cobra una sola vez; la alimentación, por cada día de trabajo. */
+     cobra una sola vez y depende de la ciudad; la comida, por cada día de
+     trabajo, y el hospedaje por cada noche (un trabajo de un día no tiene
+     noche: sale de noche y regresa de noche). */
   const viaja = prov && conTecnico;
-  const pasaje = viaja ? VIAJE_PASAJE : 0;
-  const viatico = viaja ? VIAJE_VIATICO * qty : 0;
+  const ciudad = viaja ? ciudadDe(COT.ciudad) : null;
+  const faltaCiudad = viaja && !ciudad;
+  const noches = viaja ? Math.max(0, qty - 1) : 0;
+  const pasaje = ciudad ? pasajeDe(ciudad.n) : 0;
+  const comida = viaja ? VIAJE.viaticoDia * qty : 0;
+  const hospedaje = VIAJE.hospedajeNoche * noches;
+  const viatico = comida + hospedaje;
   /* Garantía: solo cuando los instrumentos se van sin instrumentista. Si
      viajan solos a provincia, también la dejan los que normalmente van
      acompañados. Con instrumentista no hay garantía: él los custodia. */
@@ -84,7 +92,8 @@ function cotCalcular(){
   /* Lo único que ya no se cotiza solo: una semana o más. */
   const largo = mod === 'dia' && qty >= COT_LARGO;
   return {sel, base, desc, dia, mod, hayMedio, unit, qty, alquiler, conTecnico, tecnico, prov,
-          viaja, pasaje, viatico, garantia, total: alquiler + tecnico + pasaje + viatico, largo};
+          viaja, ciudad, faltaCiudad, noches, pasaje, comida, hospedaje, viatico, garantia,
+          total: alquiler + tecnico + pasaje + viatico, largo};
 }
 
 /* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
@@ -233,7 +242,14 @@ function cotResumen(){
      debajo, para quien quiera revisarlo. */
   /* Lo primero que se ve: el total y los botones. Y si pide una semana o
      más, en vez del total va la invitación a conversarlo. */
-  const arriba = c.largo
+  const arriba = c.faltaCiudad
+    ? `<div class="cot-top largo">
+         <span>Provincia · con instrumentista</span>
+         <b>Elige tu ciudad</b>
+         <small>El pasaje del instrumentista cambia con la distancia, así que el total se calcula
+           recién cuando nos dices a qué ciudad va.</small>
+       </div>`
+    : c.largo
     ? `<div class="cot-top largo">
          <span>${c.qty} días · una semana o más</span>
          <b>Conversémoslo</b>
@@ -260,13 +276,23 @@ function cotResumen(){
       <button type="button" class="${c.prov ? '' : 'on'}" onclick="cotSede('lima')">Lima</button>
       <button type="button" class="${c.prov ? 'on' : ''}" onclick="cotSede('provincia')">Provincia</button>
     </div>
+    ${c.prov && c.conTecnico ? `<label class="cot-f1">¿A qué ciudad?
+      <select onchange="cotCiudad(this.value)">
+        <option value="">Elige tu ciudad…</option>
+        ${Object.keys(VIAJE_ZONAS).map(z => `<optgroup label="${VIAJE_ZONAS[z]} · pasaje S/ ${fmt(VIAJE.zonas[z])}">
+          ${CIUDADES.filter(x => String(x.z) === z).map(x =>
+            `<option value="${cotEsc(x.n)}"${COT.ciudad === x.n ? ' selected' : ''}>${cotEsc(x.n)}</option>`).join('')}
+        </optgroup>`).join('')}
+      </select></label>` : ''}
     <p class="cot-ayuda">${!c.prov
       ? 'Retiro y devolución en nuestra oficina de Pueblo Libre, Lima.'
       : c.conTecnico
         ? `Viaja nuestro instrumentista con los instrumentos: sale de noche y regresa de noche, así que
-           solo pagas los días de trabajo. Al total se le suman los pasajes de ida y vuelta (una sola vez)
-           y los viáticos por día. Fuera de Lima no hay medio día.`
-        : `Los instrumentos viajan por agencia; el envío de ida y vuelta lo contrata y lo paga el cliente.
+           solo pagas los días de trabajo. Al total se le suman el pasaje de ida y vuelta (una sola vez,
+           según la ciudad) y los viáticos: comida por día y hospedaje por noche, si se queda más de un
+           día. Fuera de Lima no hay medio día.`
+        : `Estos instrumentos no necesitan instrumentista: te los mandamos por Shalom (o la agencia que
+           prefieras) y el envío de ida y vuelta lo contratas y lo pagas tú, directo con la agencia.
            Como están fuera varios días, el alquiler va desde ${PROV_DIAS} días y sin medio día.`}</p>
 
     <div class="cot-paso"><b>3</b> ¿Por cuánto tiempo?</div>
@@ -295,15 +321,19 @@ function cotResumen(){
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
       <div><span>× ${c.qty} ${cotPlural(u, c.qty)}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
       ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
-      ${c.viaja ? `<div><span>Pasajes ida y vuelta (una sola vez)</span><span>S/ ${c.pasaje.toFixed(2)}</span></div>
-        <div><span>Viáticos · S/ ${fmt(VIAJE_VIATICO)} × ${c.qty} ${c.qty === 1 ? 'día' : 'días'}</span><span>S/ ${c.viatico.toFixed(2)}</span></div>` : ''}
+      ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>S/ ${c.pasaje.toFixed(2)}</span></div>
+        <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
+          ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>S/ ${c.viatico.toFixed(2)}</span></div>` : ''}
       <div class="fino"><span>Incluye IGV 18 %</span><span>S/ ${(c.total / 1.18 * 0.18).toFixed(2)}</span></div>
     </div>`}
     ${cotOfertasHTML(c)}
-    ${c.viaja ? `<p class="cot-aviso"><b>El viaje ya está incluido en el total.</b>
-      Pasajes de ida y vuelta S/ ${fmt(c.pasaje)}, una sola vez, y viáticos de S/ ${fmt(VIAJE_VIATICO)}
-      por día. El pasaje va de S/ ${fmt(VIAJE_PASAJE_MIN)} a S/ ${fmt(VIAJE_PASAJE)} según la distancia:
-      calculamos con el mayor y lo ajustamos al emitir la cotización.</p>` : ''}
+    ${c.viaja && c.ciudad ? `<p class="cot-aviso"><b>El viaje ya está incluido en el total.</b>
+      Pasaje de ida y vuelta a ${cotEsc(c.ciudad.n)}: S/ ${fmt(c.pasaje)}, una sola vez.
+      Viáticos: comida S/ ${fmt(VIAJE.viaticoDia)} por día${c.noches
+        ? ' y hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' por noche (' + c.noches + ')'
+        : '; con un solo día no hay hospedaje'}.
+      ${c.ciudad.z === 4 ? 'El pasaje de avión es referencial: se confirma con el vuelo del día.'
+        : 'Es un estimado de referencia; se confirma al emitir la cotización.'}</p>` : ''}
     ${c.garantia ? `<p class="cot-aviso"><b>Además dejas S/ ${fmt(c.garantia)} de garantía.</b>
       No es un cobro: se te devuelve cuando regreses el equipo. Lo recoges en nuestra oficina con tu DNI.</p>` : ''}
     ${inc.length ? `<p class="cot-aviso ok"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
@@ -377,7 +407,9 @@ function cotTexto(c, nom, mail, tel){
   if(mail) L.push('  Correo: ' + mail);
   if(tel)  L.push('  Teléfono: ' + tel);
   L.push('');
-  L.push('DÓNDE: ' + (c.prov ? 'Provincia (envío por agencia, a cargo del cliente)' : 'Lima'));
+  L.push('DÓNDE: ' + (!c.prov ? 'Lima'
+    : c.ciudad ? ('Provincia · ' + c.ciudad.n + ' (viaja el instrumentista)')
+    : 'Provincia (envío por agencia, a cargo del cliente)'));
   L.push('PERIODO: ' + c.qty + ' ' + uq + (c.mod === 'medio' ? ' (turnos de 4 h)' : ''));
   L.push('');
   L.push('INSTRUMENTOS');
@@ -401,9 +433,11 @@ function cotTexto(c, nom, mail, tel){
   L.push('  Precio por ' + u + ': S/ ' + fmt(c.unit));
   L.push('  Alquiler (' + c.qty + ' ' + uq + '): S/ ' + c.alquiler.toFixed(2));
   if(c.conTecnico) L.push('  Instrumentista metrológico: S/ ' + c.tecnico.toFixed(2));
-  if(c.viaja){
-    L.push('  Pasajes ida y vuelta (una sola vez): S/ ' + c.pasaje.toFixed(2));
-    L.push('  Viáticos: S/ ' + fmt(VIAJE_VIATICO) + ' × ' + c.qty + ' día(s) = S/ ' + c.viatico.toFixed(2));
+  if(c.viaja && c.ciudad){
+    L.push('  Pasajes ida y vuelta a ' + c.ciudad.n + ' (una sola vez): S/ ' + c.pasaje.toFixed(2));
+    L.push('  Viáticos (comida y hospedaje): S/ ' + c.viatico.toFixed(2));
+    L.push('    comida S/ ' + fmt(VIAJE.viaticoDia) + ' × ' + c.qty + (c.noches
+      ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches : ''));
   }
   L.push('  TOTAL (IGV incluido): S/ ' + c.total.toFixed(2));
   if(c.garantia) L.push('  Garantía en depósito (se devuelve): S/ ' + fmt(c.garantia));
@@ -516,7 +550,8 @@ function cotDoc(c, nom, mail, tel, numero){
     mod: c.mod, qty: c.qty, prov: !!c.prov,
     items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia, f: cotFotoAbs(e)})),
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
-    tec: c.tecnico, pas: c.pasaje, via: c.viatico, gar: c.garantia, total: c.total,
+    tec: c.tecnico, pas: c.pasaje, via: c.viatico, noc: c.noches,
+    ciu: c.ciudad ? c.ciudad.n : '', gar: c.garantia, total: c.total,
     inc: (c.conTecnico ? incluidos('') : []).map(x => x.nom)
   };
 }
@@ -564,11 +599,13 @@ function cotTerminos(c){
   T.push(['5. Entrega y devolución.', !c.prov
     ? 'En nuestra oficina de Lima, en el horario indicado.'
     : conTec
-      ? ('El instrumentista metrológico traslada los instrumentos a la ciudad del cliente. Los días de viaje ' +
-         'no se facturan: se cobran únicamente los días de trabajo en sitio. Los pasajes de ida y vuelta se ' +
-         'cobran una sola vez y los viáticos por cada día de trabajo, ambos detallados en el Cuadro N° 1. ' +
-         'El pasaje corresponde a la ciudad indicada por el cliente; una ciudad distinta modifica ese importe.')
-      : ('El envío se realiza por agencia de transporte, de ida y vuelta, contratado y pagado por el cliente. ' +
+      ? ('El instrumentista metrológico traslada los instrumentos a ' + (c.ciu || 'la ciudad del cliente') +
+         '. Los días de viaje no se facturan: se cobran únicamente los días de trabajo en sitio. El pasaje ' +
+         'de ida y vuelta se cobra una sola vez y los viáticos comprenden la alimentación por día' +
+         (c.noc ? ' y el hospedaje por ' + c.noc + (c.noc === 1 ? ' noche' : ' noches') : '') +
+         ', ambos detallados en el Cuadro N° 1. El importe del pasaje corresponde a la ciudad indicada; ' +
+         'una ciudad distinta lo modifica.')
+      : ('El envío se realiza por agencia de transporte (Shalom u otra), de ida y vuelta, contratado y pagado por el cliente. ' +
          'El plazo del alquiler se cuenta desde el despacho en Lima hasta el retorno a nuestra oficina, con un mínimo de ' +
          PROV_DIAS + ' días. Los instrumentos viajan en su maleta original y el cliente responde por el embalaje de retorno.')]);
   if(conTec) T.push(['6. Instrumentista metrológico.',
@@ -620,16 +657,17 @@ function cotHTML(d, formal){
       <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '')
     + (d.pas ? `<tr>
       <td class="c">${d.items.length + 2}</td>
-      <td><b>PASAJES IDA Y VUELTA</b>
+      <td><b>PASAJES IDA Y VUELTA${d.ciu ? ' · ' + cotEsc(d.ciu.toUpperCase()) : ''}</b>
         <span class="det">Traslado del instrumentista y de los instrumentos a la ciudad del cliente.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
       <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${(d.pas / 1.18).toFixed(2)}</td></tr>` : '')
     + (d.via ? `<tr>
       <td class="c">${d.items.length + 3}</td>
       <td><b>VIÁTICOS DEL INSTRUMENTISTA</b>
-        <span class="det">Alimentación durante los días de trabajo en sitio.</span></td>
-      <td class="c">DÍA</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.via / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.via / 1.18).toFixed(2)}</td></tr>` : '');
+        <span class="det">Alimentación por cada día de trabajo en sitio${d.noc
+          ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
+      <td class="c">GLOBAL</td><td class="c">1.00</td>
+      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${(d.via / 1.18).toFixed(2)}</td></tr>` : '');
   const cuadro = `<table>
       <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
         <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
@@ -718,7 +756,9 @@ function cotHTML(d, formal){
           emite ${cotEsc(S.razonSocial || '')} después de confirmar la disponibilidad.</div>
         <div class="meta"><span>Solicitud N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
         <p class="para"><b>Para:</b> ${cotEsc(d.nom || '—')}${d.tel ? ' · ' + cotEsc(d.tel) : ''}${d.mail ? ' · ' + cotEsc(d.mail) : ''}<br>
-          <b>Dónde:</b> ${d.prov ? 'Provincia (envío por agencia, a cargo del cliente)' : 'Lima'}<br>
+          <b>Dónde:</b> ${!d.prov ? 'Lima'
+            : d.ciu ? 'Provincia · ' + cotEsc(d.ciu) + ' (viaja el instrumentista)'
+            : 'Provincia (envío por agencia, a cargo del cliente)'}<br>
           <b>Periodo:</b> ${cotEsc(d.qty + ' ' + uq)}</p>
         <h2>Instrumentos y precio estimado</h2>
         ${cuadro}
@@ -730,8 +770,8 @@ function cotHTML(d, formal){
           ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'
                   : '<li>Retiro y devolución en nuestra oficina de Lima, presentando documento de identidad.</li>'}
           ${(d.inc || []).length ? '<li>Sin costo: ' + cotEsc((d.inc || []).join(', ')) + '.</li>' : ''}
-          ${d.prov && d.tec ? '<li>El instrumentista viaja a tu ciudad: sale de noche y regresa de noche, así que solo pagas los días de trabajo. Los pasajes y los viáticos ya están en el cuadro de arriba.</li>' : ''}
-          ${d.prov && !d.tec ? '<li>Los instrumentos viajan por agencia; el envío de ida y vuelta lo contrata y lo paga el cliente.</li>' : ''}
+          ${d.prov && d.tec ? '<li>El instrumentista viaja a ' + cotEsc(d.ciu || 'tu ciudad') + ': sale de noche y regresa de noche, así que solo pagas los días de trabajo. El pasaje y los viáticos ya están en el cuadro de arriba.</li>' : ''}
+          ${d.prov && !d.tec ? '<li>Los instrumentos viajan por agencia (Shalom o la que prefieras); el envío de ida y vuelta lo contratas y lo pagas tú, directo con la agencia.</li>' : ''}
           <li>${d.mod === 'medio' ? 'Medio día es un turno de 4 horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.'
                                   : 'El día completo son los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.'}</li>
         </ul>
