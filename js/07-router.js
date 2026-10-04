@@ -30,14 +30,11 @@ function route(sinMover){
     setTimeout(() => { if(typeof cotAbrir === 'function') cotAbrir(idc); }, 0);
   }
   else if(h.startsWith('#/equipo/')){renderEquipo(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
-  else if(h.startsWith('#/paquete/')){renderPaquete(h.split('/')[2]);pageId='page-equipo';navKey='#/catalogo';}
   else if(h.startsWith('#/proyecto/')){renderProyecto(h.split('/')[2]);pageId='page-equipo';navKey='#/clientes';}
   else if(h==='#/venta'||h.startsWith('#/venta/')){renderVenta(h.split('/').slice(2));pageId='page-venta';navKey=h==='#/venta'?'#/venta':'#/venta/tienda';}
   else if(h.startsWith('#/catalogo/')){
     const g=h.split('/')[2]||'';pageId='page-catalogo';navKey='#/catalogo';
-    if(g==='paquetes')setView('pk');
-    else if(g==='custom')setView('custom');
-    else{setView('eq');setGrupo(GRUPOS[g]?g:'all');}
+    setGrupo(GRUPOS[g]?g:'all');
   }
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
   /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
@@ -48,7 +45,7 @@ function route(sinMover){
      comunes (servicios, clientes, contacto…) conservan la última sección
      en la que estuvo el visitante. */
   const enVenta = h==='#/venta' || h.startsWith('#/venta/');
-  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|paquete|cotizar|cotizacion|resumen|emitir)\//.test(h) || h==='#/cotizar';
+  const enAlquiler = ['#/alquiler','#/catalogo','#/talleres'].includes(h) || /^#\/(catalogo|equipo|cotizar|cotizacion|resumen|emitir)\//.test(h) || h==='#/cotizar';
   let modo = enVenta ? 'venta' : enAlquiler ? 'alquiler' : null;
   try{ if(modo) sessionStorage.setItem('sb-modo', modo); else modo = sessionStorage.getItem('sb-modo'); }catch(e){}
   modo = modo || 'alquiler';
@@ -155,14 +152,12 @@ function aplicarDatos(d, enVivo){
        filas vacías, y pintarlas dejaba tarjetas en blanco en la web: mejor
        quedarse con lo que ya había.                                     */
     const validos = a => Array.isArray(a) ? a.filter(x => x && x.id && x.nom) : [];
-    const eqOk = validos(d.equipos), pkOk = validos(d.paquetes);
+    const eqOk = validos(d.equipos);
     if(eqOk.length){ EQUIPOS = eqOk; aplicarTarifas(); }
-    if(pkOk.length) PAQUETES = pkOk;
     if(d.modelo){
       const m=d.modelo;
       if(m.instrumentista_dia!=null) TEC_DIA=m.instrumentista_dia;
       if(m.instrumentista_min!=null) TEC_MIN=m.instrumentista_min;
-      if(m.kit_dia!=null) KIT_DIA=m.kit_dia;
       if(m.descuento_combinar) DESC_COMB=m.descuento_combinar;
       /* La hoja manda sobre el interruptor de precios (modelo.mostrar_precios):
          así se encienden o apagan sin tocar el código. */

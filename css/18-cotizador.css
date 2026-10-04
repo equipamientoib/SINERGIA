@@ -26,11 +26,14 @@
 .cot-p small{display:block;font-family:var(--ff-t);font-size:11.5px;font-weight:400;color:var(--gris)}
 
 /* ── cuenta ── */
-.cot-res{position:sticky;top:86px;background:var(--blanco);border:1px solid var(--linea);border-radius:16px;
-  padding:18px;max-height:calc(100vh - 104px);overflow:auto;scrollbar-gutter:stable}
-/* El total y los botones quedan siempre a la vista aunque el resumen sea
-   más largo que la pantalla. */
-.cot-res .cot-top{position:sticky;top:0;z-index:2}
+.cot-res{background:var(--blanco);border:1px solid var(--linea);border-radius:16px;padding:18px}
+/* En pantalla grande el resumen acompaña al scroll y, dentro de él, el
+   total y los botones quedan siempre a la vista. En el celular no: ahí el
+   total vive en la barra fija de abajo y un bloque pegado solo estorba. */
+@media(min-width:901px){
+  .cot-res{position:sticky;top:86px;max-height:calc(100vh - 104px);overflow:auto;scrollbar-gutter:stable}
+  .cot-res .cot-top{position:sticky;top:0;z-index:2}
+}
 .cot-rh{font-family:var(--ff-d);font-size:16px;font-weight:600;color:var(--onix);margin-bottom:12px}
 .cot-vacio{font-size:14px;color:var(--gris);line-height:1.6}
 .cot-sel{list-style:none;padding:0;margin:0 0 14px;font-size:14px}

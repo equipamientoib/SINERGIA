@@ -279,7 +279,7 @@ function cotResumen(){
     ${c.prov && c.conTecnico ? `<label class="cot-f1">¿A qué ciudad?
       <select onchange="cotCiudad(this.value)">
         <option value="">Elige tu ciudad…</option>
-        ${Object.keys(VIAJE_ZONAS).map(z => `<optgroup label="${VIAJE_ZONAS[z]} · pasaje S/ ${fmt(VIAJE.zonas[z])}">
+        ${Object.keys(VIAJE_ZONAS).map(z => `<optgroup label="${VIAJE_ZONAS[z]}">
           ${CIUDADES.filter(x => String(x.z) === z).map(x =>
             `<option value="${cotEsc(x.n)}"${COT.ciudad === x.n ? ' selected' : ''}>${cotEsc(x.n)}</option>`).join('')}
         </optgroup>`).join('')}

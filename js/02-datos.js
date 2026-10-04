@@ -27,23 +27,10 @@ let EQUIPOS = [
 const APOYO = {"multimetro":"Multímetro digital Sanwa","destornillador-elec":"Destornillador eléctrico inalámbrico","set-46":"Set de herramientas 46 pzs"};
 const KIT=["multimetro","destornillador-elec","set-46"];
 
-let PAQUETES = [
-  {"id": "pkg-monitores-cal", "app": "Monitores de paciente", "nivel": "Calibración", "nom": "Pack Monitores de paciente · Calibración", "items": ["esa620", "sp-sim", "ms400", "manometro"], "kit": [], "pe": 108, "ph": 146, "dia": 624, "psem": 2496, "pmes": 7488, "eqh": 1.5, "eqd": 10, "desc": "Instrumentos para calibrar y certificar monitores: seguridad eléctrica + SpO2 + ECG/multiparámetro + presión (NIBP)."},
-  {"id": "pkg-monitores-mant", "app": "Monitores de paciente", "nivel": "Mantenimiento", "nom": "Pack Monitores de paciente · Mantenimiento", "items": ["esa620", "sp-sim", "ms400", "manometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 124, "ph": 168, "dia": 718, "psem": 2872, "pmes": 8616, "eqh": 1.5, "eqd": 10, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-desfib-cal", "app": "Desfibriladores", "nivel": "Calibración", "nom": "Pack Desfibriladores · Calibración", "items": ["esa620", "defib"], "kit": [], "pe": 120, "ph": 162, "dia": 693, "psem": 2772, "pmes": 8316, "eqh": 1.5, "eqd": 10, "desc": "Seguridad eléctrica + energía entregada (joules) y sincronía."},
-  {"id": "pkg-desfib-mant", "app": "Desfibriladores", "nivel": "Mantenimiento", "nom": "Pack Desfibriladores · Mantenimiento", "items": ["esa620", "defib"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 138, "ph": 186, "dia": 797, "psem": 3188, "pmes": 9564, "eqh": 1.5, "eqd": 10, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-centrifugas-cal", "app": "Centrífugas", "nivel": "Calibración", "nom": "Pack Centrífugas · Calibración", "items": ["esa620", "tacometro"], "kit": [], "pe": 100, "ph": 135, "dia": 578, "psem": 2312, "pmes": 6936, "eqh": 2, "eqd": 14, "desc": "Seguridad eléctrica + verificación de rpm."},
-  {"id": "pkg-centrifugas-mant", "app": "Centrífugas", "nivel": "Mantenimiento", "nom": "Pack Centrífugas · Mantenimiento", "items": ["esa620", "tacometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 115, "ph": 155, "dia": 665, "psem": 2660, "pmes": 7980, "eqh": 2, "eqd": 14, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-lamparas-cal", "app": "Lámparas cialíticas", "nivel": "Calibración", "nom": "Pack Lámparas cialíticas · Calibración", "items": ["esa620", "luxometro"], "kit": [], "pe": 120, "ph": 162, "dia": 693, "psem": 2772, "pmes": 8316, "eqh": 2, "eqd": 14, "desc": "Seguridad eléctrica + nivel de iluminación (lux)."},
-  {"id": "pkg-lamparas-mant", "app": "Lámparas cialíticas", "nivel": "Mantenimiento", "nom": "Pack Lámparas cialíticas · Mantenimiento", "items": ["esa620", "luxometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 138, "ph": 186, "dia": 797, "psem": 3188, "pmes": 9564, "eqh": 2, "eqd": 14, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."},
-  {"id": "pkg-dental-cal", "app": "Unidad dental", "nivel": "Calibración", "nom": "Pack Unidad dental · Calibración", "items": ["esa620", "fluke-945", "manometro"], "kit": [], "pe": 90, "ph": 121, "dia": 520, "psem": 2080, "pmes": 6240, "eqh": 1.5, "eqd": 10, "desc": "Seguridad eléctrica + ruido (sonómetro) + presión (manómetro)."},
-  {"id": "pkg-dental-mant", "app": "Unidad dental", "nivel": "Mantenimiento", "nom": "Pack Unidad dental · Mantenimiento", "items": ["esa620", "fluke-945", "manometro"], "kit": ["multimetro", "destornillador-elec", "set-46"], "pe": 103, "ph": 140, "dia": 598, "psem": 2392, "pmes": 7176, "eqh": 1.5, "eqd": 10, "desc": "Todo lo del paquete de Calibración + multímetro y herramientas de apoyo para mantenimiento preventivo/correctivo en sitio."}
-];
 
 /* Parámetros del modelo (se sobreescriben desde la hoja vía loadData) */
 let TEC_DIA=120;         // instrumentista S/ por día
 let TEC_MIN=60;          // mínimo: medio día
-let KIT_DIA=40;          // extra kit en "Arma tu paquete"
 /* Descuento por combinar instrumentos: mientras más lleva, más baja el
    precio del día. Se puede cambiar desde data/tarifas-alquiler.json. */
 let DESC_COMB={"2":0.10,"3":0.14,"4":0.18,"5":0.20};

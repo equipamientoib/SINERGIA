@@ -4,7 +4,6 @@ let actual=null;
 function techRates(){return {medio:TEC_MIN, dia:TEC_DIA, semana:TEC_DIA*4, mes:TEC_DIA*12};}
 const MODLBL={medio:['Precio por medio día','Medios días','Cantidad de medios días (turnos)'],dia:['Precio por día','Días','Días'],semana:['Precio por semana','Semanas','Cantidad de semanas'],mes:['Precio por mes','Meses','Cantidad de meses']};
 const turnos = () => `un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE})`;
-function pkgConds(p){return {medio:`Medio día: ${turnos()}. Es el mínimo de alquiler.`,dia:`Jornada completa: los dos turnos (${HORARIO_MANANA} y ${HORARIO_TARDE}). Hasta ~${p.eqd} equipos.`,semana:'Tarifa semanal: equivale a 4 días (descuento por volumen).',mes:'Tarifa mensual: equivale a 12 días (mayor descuento).'};}
 function eqConds(dia, id){
   if(id && soloEquipo(id)) return {medio:`Medio día: ${turnos()}.`,
     dia:`Lo recoges y lo devuelves en nuestra oficina. No necesita instrumentista: dejas tu DNI y S/ ${fmt(garantiaDe(id))} de garantía, que se te devuelve con el equipo.`,
@@ -64,7 +63,6 @@ function clearCalc(){
   ['cDias','cSub','cIgv','cTot','cTecUnit','cTecQty','cTec','cGrand'].forEach(id=>document.getElementById(id).textContent='—');
   const f=document.getElementById('cMinFila'); if(f) f.hidden=true;
 }
-function abrirPaq(id){const p=PAQUETES.find(x=>x.id===id);openModal(p.nom,'Paquete '+p.nivel+' · IGV incluido',{medio:precioMedio(p.dia),dia:p.dia,semana:p.psem,mes:p.pmes},pkgConds(p),techRates(),true,'dia');}
 function abrir(idx){
   const e=EQUIPOS[idx];
   const pr={dia:e.dia, semana:e.dia*4, mes:e.dia*12};

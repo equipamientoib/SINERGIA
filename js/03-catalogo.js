@@ -9,8 +9,7 @@ const eqBrand=e=>(e&&e.specs&&e.specs.Marca)||'—',
       eqOrigen=e=>(e&&e.specs&&e.specs.Origen)||'—',
       uniq=a=>[...new Set(a)];
 const F={grupo:new Set(),marca:new Set(),tipo:new Set(),origen:new Set()};
-const FP={app:new Set()};
-let curNivel='all', curGrupo='all';
+let curGrupo='all';
 
 function facetSection(title,key,opts,labelFn){
   return `<details class="facet" open><summary>${title}</summary><div class="opts">`+
@@ -29,14 +28,6 @@ function huesoEq(n){
         <span class="ln w35"></span><span class="ln w85"></span>
         <span class="ln w60"></span><span class="ln w85"></span>
       </div>
-    </div>`).join('');
-}
-function huesoPk(n){
-  return Array.from({length:n},()=>`
-    <div class="pkg pkg-hueso">
-      <span class="ln w35"></span><span class="ln w85"></span>
-      <span class="ln w60"></span><span class="ln w85"></span>
-      <span class="ln w60"></span>
     </div>`).join('');
 }
 function huesoFacetas(){
@@ -60,17 +51,8 @@ function buildFacetsEq(){
     facetSection('Procedencia','origen',uniq(eqs.map(eqOrigen)).sort())+
     `<div class="filters-clear"><button onclick="clearF()">Limpiar filtros</button></div>`;
 }
-function buildFacetsPk(){
-  if(!CATALOGO_LISTO){ document.getElementById('filtersSide').innerHTML=huesoFacetas(); return; }
-  document.getElementById('filtersSide').innerHTML=
-    `<details class="facet" open><summary>Aplicación</summary><div class="opts">`+
-    uniq(PAQUETES.map(p=>p.app)).map(a=>`<label><input type="checkbox" value="${a}" onchange="toggleFP(this.value,this.checked)"> ${a}</label>`).join('')+
-    `</div></details><div class="filters-clear"><button onclick="clearFP()">Limpiar filtros</button></div>`;
-}
 function toggleF(k,v,on){on?F[k].add(v):F[k].delete(v);pintar();}
 function clearF(){Object.values(F).forEach(s=>s.clear());document.querySelectorAll('#filtersSide input').forEach(i=>i.checked=false);pintar();}
-function toggleFP(v,on){on?FP.app.add(v):FP.app.delete(v);pintarPaquetes();}
-function clearFP(){FP.app.clear();document.querySelectorAll('#filtersSide input').forEach(i=>i.checked=false);pintarPaquetes();}
 function matchEq(e){
   if(curGrupo!=='all'&&e.g!==curGrupo)return false;
   if(F.marca.size&&!F.marca.has(eqBrand(e)))return false;
@@ -92,7 +74,7 @@ function cardEq(e){
   const foot=esComplemento(e)
     ?`<div class="foot"><div class="price" style="font-size:14px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Sin costo<small style="font-weight:400">va incluida con tu alquiler</small></div><button class="btn" onclick="go('#/equipo/${e.id}')">Ver detalle</button></div>`
     :(VER_PRECIOS
-      ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${fmt(precioDesde(e.dia))}<span>/${unidadDesde(e.dia)} · IGV incl.</span><small>día S/ ${fmt(e.dia)} · sem S/ ${fmt(e.sem)} · mes S/ ${fmt(e.mes)}</small></div><button class="btn" onclick="abrir(${idx})">Reservar</button></div>`
+      ?`<div class="foot"><div class="price"><span class="desde">Desde</span>S/ ${fmt(precioDesde(e.dia))}<span>/${unidadDesde(e.dia)} · IGV incl.</span><small>${tieneMedio(e.dia)?`día S/ ${fmt(e.dia)}`:'desde un día completo'}</small></div><button class="btn" onclick="go('#/cotizar/'+'${e.id}')">Cotizar</button></div>`
       :`<div class="foot"><div class="price" style="font-size:15px;color:var(--gris);font-family:var(--ff-d);font-weight:600">Consultar tarifa<small style="font-weight:400">te respondemos con precio y disponibilidad</small></div><button class="btn" onclick="go('#/contacto')">Cotizar</button></div>`);
   /* Varias fotos: se ve la primera y las flechas pasan a las demás. La primera suele ser la de
      estudio y las siguientes, el instrumento midiendo en un equipo real:
@@ -133,37 +115,6 @@ function pintar(){
   document.getElementById('countEq').textContent=list.length+(list.length===1?' equipo':' equipos');
 }
 
-/* PAQUETES */
-function pintarPaquetes(){
-  const cont=document.getElementById('pkgs');
-  if(!CATALOGO_LISTO){
-    cont.innerHTML=huesoPk(4);
-    document.getElementById('countPk').textContent='';
-    return;
-  }
-  const list=PAQUETES.filter(p=>(curNivel==='all'||p.nivel===curNivel)&&(!FP.app.size||FP.app.has(p.app)));
-  cont.innerHTML=list.map(p=>{
-    const items=p.items.map(id=>byId(id));
-    const kitLine=p.kit.length?`<li style="opacity:.7">+ Kit de intervención: ${p.kit.map(k=>APOYO[k]).join(', ')}</li>`:'';
-    const badge=p.nivel==='Calibración'?`<span class="ptag">CALIBRACIÓN</span>`:`<span class="ptag" style="background:var(--onix)">MANTENIMIENTO</span>`;
-    const pkFoto=(p.fotos&&p.fotos.length)?p.fotos[0]:(p.foto||'');
-    const pkImg=pkFoto?`<div class="pkimg" onclick="go('#/paquete/${p.id}')" style="height:172px;margin:0 0 16px;overflow:hidden;border-radius:12px;border:1px solid var(--linea);cursor:pointer;background:var(--blanco)"><img src="${fotoURL(pkFoto,600,true)}" alt="${p.nom}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:'';
-    return `<div class="pkg">
-      ${badge}
-      ${pkImg}
-      <h3 onclick="go('#/paquete/${p.id}')">${p.nom}</h3>
-      <div class="pdesc">${p.desc}</div>
-      <ul class="inc">${items.map(e=>`<li>${e.nom}</li>`).join('')}${kitLine}</ul>
-      ${VER_PRECIOS?`<div class="pfoot">
-        <div class="pprice">S/ ${p.dia}<span>/día · IGV incluido</span></div>
-        <div class="pmod">Otras modalidades: medio día S/ ${fmt(precioMedio(p.dia))} · semana S/ ${fmt(p.psem)} · mes S/ ${fmt(p.pmes)}</div>
-      </div>`:`<div class="pfoot"><div class="pprice" style="font-size:17px;color:var(--gris)">Consultar tarifa<span style="display:block">te respondemos con precio y disponibilidad</span></div></div>`}
-      <div class="pbtns">${VER_PRECIOS?`<button class="btn btn-fill" onclick="abrirPaq('${p.id}')">Reservar paquete</button>`:`<button class="btn btn-fill" onclick="go('#/contacto')">Solicitar cotización</button>`}<a class="btn" onclick="go('#/paquete/${p.id}')">Ver detalle</a></div>
-    </div>`;
-  }).join('')||'<p style="color:var(--gris);grid-column:1/-1">No hay paquetes con esos filtros.</p>';
-  document.getElementById('countPk').textContent=list.length+(list.length===1?' paquete':' paquetes');
-}
-function setNivel(n){curNivel=n;document.querySelectorAll('#subPk button').forEach(b=>b.classList.toggle('on',b.dataset.niv===n));pintarPaquetes();}
 function setGrupo(g){curGrupo=g;document.querySelectorAll('#subEq button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));pintar();}
 
 const DESTACADOS=["esa620","sp-sim","defib"];
@@ -174,20 +125,7 @@ function pintarDestacados(){
 }
 /* Primer pintado: solo marcadores. Los datos reales los pinta
    aplicarDatos() en js/07-router.js cuando llega la primera fuente buena. */
-buildFacetsEq();pintar();pintarPaquetes();pintarDestacados();
-function setView(v){
-  const eq=v==='eq', pk=v==='pk', cu=v==='custom';
-  document.getElementById('viewEq').style.display=eq?'':'none';
-  document.getElementById('viewPk').style.display=pk?'':'none';
-  document.getElementById('viewCustom').style.display=cu?'':'none';
-  document.getElementById('segEq').classList.toggle('on',eq);
-  document.getElementById('segPk').classList.toggle('on',pk);
-  document.getElementById('segCustom').classList.toggle('on',cu);
-  const side=document.getElementById('filtersSide'), lay=document.getElementById('catLayout');
-  if(cu){side.style.display='none';lay.classList.add('nofilters');buildCustom();}
-  else{side.style.display='';lay.classList.remove('nofilters');if(eq){buildFacetsEq();pintar();}else{buildFacetsPk();pintarPaquetes();}}
-  side.classList.remove('open');
-}
+buildFacetsEq();pintar();pintarDestacados();
 function toggleFiltros(){document.getElementById('filtersSide').classList.toggle('open');}
 
 
