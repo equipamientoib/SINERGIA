@@ -1,0 +1,306 @@
+/* =====================================================================
+   14-venta-cot.js — Cotizador de venta (#/cotizar-venta)
+
+   El cliente arma su lista de equipos desde la tienda, con cantidades, y
+   ve el total al instante. Después manda el pedido por WhatsApp con el
+   enlace de su solicitud; la cotización formal, con membrete y firma, la
+   emite la empresa desde #/emitir, igual que en alquiler.
+
+   La lista se guarda en el navegador del cliente, así no se pierde
+   mientras recorre la tienda ni al volver después.
+   ===================================================================== */
+var VCOT = {items: {}};          // {idProducto: cantidad}
+const VCOT_LLAVE = 'sb-venta-cot';
+
+function vcCargar(){
+  try{
+    const g = JSON.parse(localStorage.getItem(VCOT_LLAVE) || '{}');
+    if(g && typeof g === 'object') VCOT.items = g;
+  }catch(e){}
+}
+function vcGuardar(){
+  try{ localStorage.setItem(VCOT_LLAVE, JSON.stringify(VCOT.items)); }catch(e){}
+}
+vcCargar();
+
+/* Términos de la cotización de venta: se pueden cambiar sin tocar código. */
+var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
+  plazoPedido: 'se confirma al emitir la cotización', garantiaMeses: 12,
+  pago: '50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.',
+  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.'};
+fetch('data/terminos-venta.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null)
+  .then(d => { if(d) Object.keys(VCOT_TERM).forEach(k => { if(d[k] != null) VCOT_TERM[k] = d[k]; }); })
+  .catch(() => {});
+
+/* ── Carrito ────────────────────────────────────────────────────────── */
+const vcProducto = id => ((VENTA && VENTA.productos) || []).find(p => p.id === id);
+const vcCuenta = () => Object.values(VCOT.items).reduce((s, q) => s + Number(q || 0), 0);
+
+function vcAgregar(id, cuantos){
+  const n = Number(cuantos || 1);
+  VCOT.items[id] = Math.max(1, Number(VCOT.items[id] || 0) + n);
+  vcGuardar(); vcPintarTodo();
+  avisarVc(vcProducto(id));
+}
+function vcCantidad(id, v){
+  const n = Math.max(0, parseInt(v, 10) || 0);
+  if(n === 0) delete VCOT.items[id]; else VCOT.items[id] = n;
+  vcGuardar(); vcPintarTodo();
+}
+function vcQuitar(id){ delete VCOT.items[id]; vcGuardar(); vcPintarTodo(); }
+function vcVaciar(){ VCOT.items = {}; vcGuardar(); vcPintarTodo(); }
+
+/* Aviso corto cuando se agrega algo desde la tienda. */
+function avisarVc(p){
+  if(!p) return;
+  let t = document.getElementById('vcToast');
+  if(!t){
+    t = document.createElement('div'); t.id = 'vcToast'; t.className = 'vc-toast';
+    document.body.appendChild(t);
+  }
+  t.innerHTML = `<span>Agregado: <b>${vEsc(p.nom)}</b></span>
+    <a class="btn btn-fill" onclick="go('#/cotizar-venta')">Ver mi cotización</a>`;
+  t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 4000);
+}
+
+/* ── Cuenta ─────────────────────────────────────────────────────────── */
+function vcCalcular(){
+  const items = Object.keys(VCOT.items)
+    .map(id => ({p: vcProducto(id), q: Number(VCOT.items[id] || 0)}))
+    .filter(x => x.p && x.q > 0)
+    .map(x => ({p: x.p, q: x.q, precio: Number(x.p.precio || 0), total: Number(x.p.precio || 0) * x.q}));
+  const total = items.reduce((s, x) => s + x.total, 0);
+  const sinPrecio = items.filter(x => !x.precio).length;
+  return {items, total, sinPrecio, unidades: items.reduce((s, x) => s + x.q, 0)};
+}
+
+/* ── Página ─────────────────────────────────────────────────────────── */
+function vcAbrir(){ vcPintarTodo(); }
+
+function vcPintarTodo(){
+  vcPintar();
+  vcBarra();
+  vcChip();
+}
+
+/* Contador en el menú de venta, para volver a la lista desde cualquier sitio. */
+function vcChip(){
+  document.querySelectorAll('[data-vc-cuenta]').forEach(el => {
+    const n = vcCuenta();
+    el.textContent = n ? String(n) : '';
+    el.hidden = !n;
+  });
+}
+
+function vcBarra(){
+  const b = document.getElementById('vcBarra');
+  if(!b) return;
+  const c = vcCalcular();
+  const fuera = location.hash.indexOf('#/cotizar-venta') !== 0;
+  b.hidden = !c.items.length || !fuera;
+  document.body.classList.toggle('vc-conbarra', !b.hidden);
+  if(b.hidden){ b.innerHTML = ''; return; }
+  b.innerHTML = `<div><span>${c.unidades} ${c.unidades === 1 ? 'equipo' : 'equipos'} en tu cotización</span>
+      <b>${vSoles(c.total)}</b></div>
+    <button class="btn btn-fill" onclick="go('#/cotizar-venta')">Ver</button>`;
+}
+
+function vcPintar(){
+  const caja = document.getElementById('vcBody');
+  if(!caja) return;
+  if(!VENTA || !VENTA.productos){ caja.innerHTML = '<div class="wrap"><p class="cot-vacio">Cargando el catálogo…</p></div>'; return; }
+  const c = vcCalcular();
+  if(!c.items.length){
+    caja.innerHTML = `<div class="wrap vc-vacio">
+      <h1>Tu cotización está vacía</h1>
+      <p>Entra a la tienda, abre los equipos que te interesan y toca «Agregar a mi cotización».
+        Puedes poner cuántas unidades necesitas de cada uno y aquí verás el total al instante.</p>
+      <a class="btn btn-fill btn-lg" onclick="go('#/venta/tienda')">Ver la tienda</a>
+    </div>`;
+    return;
+  }
+  const neto = c.total / 1.18;
+  caja.innerHTML = `
+    <div class="wrap pagehead"><div class="k">Venta de equipos</div>
+      <h1>Tu cotización</h1>
+      <p>Revisa las cantidades, déjanos tus datos y te respondemos con la cotización formal,
+        la disponibilidad y el plazo de entrega. Todos los precios incluyen IGV.</p>
+    </div>
+    <div class="wrap vc-grid">
+      <div>
+        <div class="cot-paso uno"><b>1</b> Tus equipos <i>${c.unidades} ${c.unidades === 1 ? 'unidad' : 'unidades'}</i></div>
+        <div class="vc-lista">${c.items.map(vcFila).join('')}</div>
+        <button type="button" class="cot-limpiar" onclick="vcVaciar()">Vaciar la lista</button>
+      </div>
+      <aside class="cot-res">
+        <div class="cot-top">
+          <span>Tu cotización · ${c.items.length} ${c.items.length === 1 ? 'equipo' : 'equipos'}</span>
+          <b>${vSoles(c.total)}</b>
+          <small>IGV incluido · precios referenciales</small>
+          <div class="cot-acc">
+            <button class="btn btn-fill" onclick="vcEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
+            <button class="btn" onclick="vcVista()">Ver el resumen</button>
+          </div>
+        </div>
+
+        <div class="cot-paso"><b>2</b> El detalle</div>
+        <ul class="cot-sel">${c.items.map(x =>
+          `<li><span>${vEsc(x.p.nom)}${x.q > 1 ? ' × ' + x.q : ''}</span><span>${vSoles(x.total)}</span></li>`).join('')}
+        </ul>
+        <div class="cot-cuenta">
+          <div class="sub"><span>Subtotal (S/)</span><span>${neto.toFixed(2)}</span></div>
+          <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total - neto).toFixed(2)}</span></div>
+          <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
+        </div>
+        <p class="cot-aviso"><b>Es un precio referencial.</b> Lo confirmamos al emitir la cotización
+          formal, junto con el stock y el plazo de entrega de cada equipo.</p>
+
+        <div class="cot-paso"><b>3</b> Tus datos</div>
+        <div class="cot-form" id="vcForm">
+          <label>Nombre o institución<input id="vcNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></label>
+          <div class="cot-f2">
+            <label>Correo<input id="vcMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
+            <label>Teléfono<input id="vcTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></label>
+          </div>
+          <label>¿Algo que debamos saber?<textarea id="vcMsg" rows="2" placeholder="Para qué área, si es para un expediente, fechas…"></textarea></label>
+          <div class="form-msg" id="vcAviso" role="status" aria-live="polite"></div>
+          <p class="cot-mail">Con tus datos listos, toca «Enviar mi pedido por WhatsApp».
+            ¿Prefieres correo? <button type="button" onclick="vcEnviar('correo')">Enviar por correo</button></p>
+        </div>
+        <p class="cot-nota">Entrega en Lima. A provincia se envía por agencia de transporte; el envío
+          lo contrata y lo paga el cliente.</p>
+      </aside>
+    </div>`;
+  vcRestaurar();
+}
+
+function vcFila(x){
+  const p = x.p, foto = vFoto(p, 0, true);
+  return `<div class="vc-i">
+    ${foto ? `<img class="vc-f" src="${foto}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
+    <div class="vc-n">
+      <b>${vEsc(p.nom)}</b>
+      <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
+      ${vStock(p)}
+    </div>
+    <div class="vc-q">
+      <button type="button" onclick="vcCantidad('${p.id}',${x.q - 1})" aria-label="Quitar uno">−</button>
+      <input type="number" min="1" step="1" value="${x.q}" onchange="vcCantidad('${p.id}',this.value)" aria-label="Cantidad">
+      <button type="button" onclick="vcCantidad('${p.id}',${x.q + 1})" aria-label="Agregar uno">+</button>
+    </div>
+    <div class="vc-p"><b>${vSoles(x.total)}</b>${x.q > 1 ? `<small>${vSoles(x.precio)} c/u</small>` : ''}</div>
+    <button type="button" class="vc-x" onclick="vcQuitar('${p.id}')" aria-label="Quitar de la lista">✕</button>
+  </div>`;
+}
+
+/* Los datos del cliente no se pierden al repintar. */
+var VCOT_DATOS = {nom: '', mail: '', tel: '', msg: ''};
+function vcDatos(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  return {nom: v('vcNom') || VCOT_DATOS.nom, mail: v('vcMail') || VCOT_DATOS.mail,
+          tel: v('vcTel') || VCOT_DATOS.tel, msg: v('vcMsg') || VCOT_DATOS.msg};
+}
+function vcRestaurar(){
+  [['vcNom','nom'],['vcMail','mail'],['vcTel','tel'],['vcMsg','msg']].forEach(([id, k]) => {
+    const el = document.getElementById(id); if(!el) return;
+    if(VCOT_DATOS[k]) el.value = VCOT_DATOS[k];
+    el.addEventListener('input', () => { VCOT_DATOS[k] = el.value; });
+  });
+}
+
+/* ── Documento de venta ──────────────────────────────────────────────
+   Mismo motor que el alquiler (cotHTML), con el cuadro armado por
+   unidades y sus propios términos. Así el resumen del cliente y la
+   cotización formal salen con el mismo formato de la empresa. */
+function vcDoc(c, d){
+  return {
+    tipo: 'venta',
+    num: vcNumero(), fecha: new Date().toLocaleDateString('es-PE'),
+    nom: d.nom, mail: d.mail, tel: d.tel, nota: d.msg || '',
+    items: c.items.map(x => ({
+      n: x.p.nom, m: [x.p.marca, x.p.modelo].filter(Boolean).join(' · '),
+      q: x.q, pu: x.precio, t: x.total, nts: x.p.clave || '',
+      f: cotFotoAbs ? cotFotoAbs({photo: (x.p.fotos || [])[0]}) : ''
+    })),
+    total: c.total, gar: 0, tec: 0, pas: 0, via: 0, inc: []
+  };
+}
+function vcNumero(){
+  const d = new Date(), z = n => String(n).padStart(2, '0');
+  return 'SOL-V-' + String(d.getFullYear()).slice(2) + z(d.getMonth() + 1) + z(d.getDate()) +
+         '-' + z(d.getHours()) + z(d.getMinutes());
+}
+
+/* Términos de la cotización de venta. */
+function vcTerminos(d){
+  const T = VCOT_TERM, L = [];
+  L.push(['1. Precio de la oferta.', 'Importes en Soles (S/), con IGV incluido. Corresponden a los equipos ' +
+    'detallados en el Cuadro N° 1, en las cantidades indicadas.']);
+  L.push(['2. Vigencia de la oferta.', T.vigenciaDias + ' días calendario contados desde la emisión de esta cotización.']);
+  L.push(['3. Plazo de entrega.', 'Equipos en stock: ' + T.plazoStock + ' desde la conformidad de la orden de compra. ' +
+    'Equipos a pedido: ' + T.plazoPedido + '.']);
+  L.push(['4. Entrega.', 'En Lima Metropolitana, en el domicilio indicado por el cliente. Para provincias el envío ' +
+    'se realiza por agencia de transporte y su costo lo asume el cliente.']);
+  L.push(['5. Garantía.', T.garantiaMeses + ' meses de garantía del fabricante contra defectos de fabricación, ' +
+    'con atención en nuestro taller de Lima. No cubre el daño por mal uso ni el desgaste de los consumibles.']);
+  L.push(['6. Incluye.', T.incluye]);
+  L.push(['7. Forma de pago.', T.pago]);
+  L.push(['8. Comprobante.', 'Se emite factura electrónica a nombre de la razón social indicada por el cliente.']);
+  return L;
+}
+
+/* ── Mensaje y envío ────────────────────────────────────────────────── */
+function vcTexto(c, d){
+  const L = [];
+  L.push('SOLICITUD DE COTIZACIÓN — ' + ((typeof SITE !== 'undefined' && SITE.nombre) || 'Sinergia Biomédica'));
+  L.push('N.º ' + vcNumero() + ' · ' + new Date().toLocaleDateString('es-PE'));
+  L.push('');
+  L.push('CLIENTE');
+  L.push('  Nombre: ' + (d.nom || '—'));
+  if(d.mail) L.push('  Correo: ' + d.mail);
+  if(d.tel)  L.push('  Teléfono: ' + d.tel);
+  L.push('');
+  L.push('EQUIPOS');
+  c.items.forEach((x, i) => {
+    L.push((i + 1) + '. ' + x.p.nom + (x.q > 1 ? ' × ' + x.q : ''));
+    L.push('   ' + [x.p.marca, x.p.modelo].filter(Boolean).join(' ') +
+           (x.p.clave ? ' · NTS ' + x.p.clave : '') + ' · ' + vSoles(x.precio) + ' c/u');
+  });
+  L.push('');
+  L.push('  TOTAL REFERENCIAL (IGV incluido): ' + vSoles(c.total));
+  if(d.msg){ L.push(''); L.push('NOTA DEL CLIENTE'); L.push('  ' + d.msg); }
+  L.push('');
+  L.push('Entrega en Lima. A provincia, envío por agencia a cargo del cliente.');
+  return L.join('\n');
+}
+
+function vcEnviar(via){
+  const c = vcCalcular();
+  if(!c.items.length) return;
+  const d = vcDatos();
+  const error = (typeof validarContacto === 'function') ? validarContacto(d.nom, d.mail, d.tel) : '';
+  if(error){
+    const f = document.getElementById('vcForm');
+    if(f) f.scrollIntoView({behavior: 'smooth', block: 'center'});
+    avisar('vcAviso', error, 'err');
+    const el = document.getElementById('vcNom'); if(el && !d.nom) setTimeout(() => el.focus(), 350);
+    return;
+  }
+  const doc = vcDoc(c, d);
+  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + cotEnlace(doc);
+  if(typeof enviarAlEndpoint === 'function')
+    enviarAlEndpoint({tipo: 'venta-cotizador', equipo: c.items.map(x => x.p.nom).join(' + '),
+                      total: vSoles(c.total), nombre: d.nom, correo: d.mail, telefono: d.tel, mensaje: d.msg});
+  avisar('vcAviso', via === 'correo'
+    ? 'Abriendo tu correo con el resumen de tu pedido…'
+    : 'Abriendo WhatsApp con el resumen de tu pedido…', 'ok');
+  abrirCanal(via, texto, 'Solicitud de cotización · venta');
+}
+
+/* Vista previa, en una ventana flotante: no descarga nada. */
+function vcVista(){
+  const c = vcCalcular();
+  if(!c.items.length) return;
+  cotModal(vcDoc(c, vcDatos()));
+}

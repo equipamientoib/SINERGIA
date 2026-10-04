@@ -23,6 +23,10 @@ function route(sinMover){
     const cod = h.slice('#/emitir/'.length);
     setTimeout(() => { if(typeof cotEmitir === 'function') cotEmitir(cod); }, 0);
   }
+  else if(h === '#/cotizar-venta'){
+    pageId='page-vcot'; navKey='#/venta/tienda';
+    setTimeout(() => { if(typeof vcAbrir === 'function') vcAbrir(); }, 0);
+  }
   else if(h==='#/cotizar' || h.startsWith('#/cotizar/')){
     pageId='page-cotizador'; navKey='#/catalogo';
     /* Diferido: route() puede correr mientras el paquete aún se evalúa. */
@@ -39,6 +43,7 @@ function route(sinMover){
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
   /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
      cotizador todo vuelve a su sitio. */
+  seguro('barra venta', () => { if(typeof vcBarra === 'function') vcBarra(); });
   document.body.classList.toggle('cot-conbarra',
     pageId === 'page-cotizador' && !!(document.getElementById('cotBarra') || {}).innerHTML);
   /* Sección activa: decide qué menú se ve (venta o alquiler). Las páginas
