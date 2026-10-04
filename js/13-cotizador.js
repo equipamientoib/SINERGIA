@@ -698,11 +698,13 @@ function cotHTML(d, formal){
   /* Venta: cada equipo con su cantidad y su precio unitario. */
   const filasVenta = () => d.items.map((e, i) => {
     const pu = e.pu / 1.18, pt = e.t / 1.18;
+    const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
+      : {nom: e.n || e.i || 'Equipo', mm: e.m || '', nts: e.nts || '', foto: e.f || ''};
     return `<tr>
       <td class="c">${i + 1}</td>
-      <td><b>${cotEsc(e.n.toUpperCase())}</b>
-        ${e.f ? `<img class="mini" src="${cotEsc(e.f)}" alt="">` : ''}
-        <span class="det">${cotEsc(e.m || '—')}${e.nts ? '<br>Código NTS ' + cotEsc(e.nts) + ' (NTS 113-MINSA)' : ''}
+      <td><b>${cotEsc(inf.nom.toUpperCase())}</b>
+        ${inf.foto ? `<img class="mini" src="${cotEsc(inf.foto)}" alt="">` : ''}
+        <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Código NTS ' + cotEsc(inf.nts) + ' (NTS 113-MINSA)' : ''}
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
