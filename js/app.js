@@ -803,17 +803,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=cfde3090';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=452975f2';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=cfde3090';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=452975f2';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=cfde3090','js/06-tablero.js?v=cfde3090'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=452975f2','js/06-tablero.js?v=452975f2'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=cfde3090'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=452975f2'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -920,7 +920,6 @@ function route(sinMover){
   else{pageId=PAGES[h]||'page-entrada';navKey=h;}
   /* La barra fija del cotizador sube el botón de WhatsApp; fuera del
      cotizador todo vuelve a su sitio. */
-  seguro('barra venta', () => { if(typeof vcBarra === 'function') vcBarra(); });
   document.body.classList.toggle('cot-conbarra',
     pageId === 'page-cotizador' && !!(document.getElementById('cotBarra') || {}).innerHTML);
   /* Sección activa: decide qué menú se ve (venta o alquiler). Las páginas
@@ -1879,6 +1878,15 @@ function vNotaPrecio(larga){
 function vPagina(id){ return (window.PAGINA_VENTA || {})[id] || ''; }
 function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/venta/p/' + id); }
 
+/* Botón de carrito con los datos del equipo pegados: así funciona igual
+   en la web y en las páginas sueltas de producto. */
+function vBotonAdd(p, clase, texto){
+  return `<button type="button" class="${clase}" data-add="${vEsc(p.id)}"
+    data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
+    data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
+    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar al carrito'}</button>`;
+}
+
 function vCard(p){
   const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
@@ -1900,7 +1908,7 @@ function vCard(p){
       ${vMarcaModelo(p)}
       ${p.clave?`<div class="v-exp" title="${vEsc(p.expediente||'Código NTS 113-MINSA')}">Código NTS ${vEsc(p.clave)}</div>`:''}
       <div class="desc">${vEsc(p.resumen||'')}</div>
-      <div class="foot">${pie}<button type="button" class="btn v-add" onclick="vcAgregar('${p.id}')">Cotizar</button></div>
+      <div class="foot">${pie}${vBotonAdd(p, 'btn v-add')}</div>
     </div>
   </div>`;
 }
@@ -2142,6 +2150,10 @@ function vtFiltrados(){
   else l = vOrdenTienda(l);
   return l;
 }
+function vCarritoEngancha(){
+  if(window.SBCarrito) setTimeout(() => { SBCarrito.enganchar(); SBCarrito.pintar(); }, 0);
+}
+
 function vtPintar(){
   const g = document.getElementById('vtGrid'); if(!g) return;
   const l = vtFiltrados();
@@ -2155,6 +2167,7 @@ function vtPintar(){
     `<button onclick="vtMarcar('${k}','${vEsc(v)}',false,true)">${vEsc(t)} ✕</button>`).join('');
   const html = l.map(vCard).join('');
   g.innerHTML = l.length ? html : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
+  vCarritoEngancha();
 }
 function vtMarcar(clave, v, on, desmarcar){
   on ? VT[clave].add(v) : VT[clave].delete(v);
@@ -2204,7 +2217,7 @@ function vProducto(id){
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
-          <button type="button" class="btn btn-fill btn-lg v-add" onclick="vcAgregar('${p.id}')">Agregar a mi cotización</button>
+          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar al carrito')}
           <a class="btn btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         ${p.ficha_pdf?`<a class="v-doc" href="${vEsc(p.ficha_pdf)}" target="_blank" rel="noopener"><span class="doc-ico">PDF</span><span><b>Ficha técnica</b><small>Ver o descargar</small></span></a>`:''}
@@ -2242,6 +2255,7 @@ function renderVenta(parte){
   if(parte[0]==='p' && vPagina(parte[1])){ location.replace(vPagina(parte[1])); return; }   // enlaces viejos → página propia
   el.innerHTML = tienda ? vTienda(parte[0]==='cat' ? parte[1] : null, parte[0]==='precio' ? parte[1] : null) : parte[0]==='p' ? vProducto(parte[1]) : vPortada();
   if(tienda) vtPintar();
+  vCarritoEngancha();
 }
 
 ;
@@ -3414,19 +3428,9 @@ function cotAbrir(id, intento){
    La lista se guarda en el navegador del cliente, así no se pierde
    mientras recorre la tienda ni al volver después.
    ===================================================================== */
-var VCOT = {items: {}};          // {idProducto: cantidad}
-const VCOT_LLAVE = 'sb-venta-cot';
-
-function vcCargar(){
-  try{
-    const g = JSON.parse(localStorage.getItem(VCOT_LLAVE) || '{}');
-    if(g && typeof g === 'object') VCOT.items = g;
-  }catch(e){}
-}
-function vcGuardar(){
-  try{ localStorage.setItem(VCOT_LLAVE, JSON.stringify(VCOT.items)); }catch(e){}
-}
-vcCargar();
+/* El carrito vive en js/carrito.js, que también usan las páginas sueltas
+   de producto. Aquí solo se lee y se escribe a través de él. */
+const vcItems = () => (window.SBCarrito ? SBCarrito.items() : {});
 
 /* Términos de la cotización de venta: se pueden cambiar sin tocar código. */
 var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
@@ -3439,41 +3443,32 @@ fetch('data/terminos-venta.json', {cache: 'no-cache'}).then(r => r.ok ? r.json()
 
 /* ── Carrito ────────────────────────────────────────────────────────── */
 const vcProducto = id => ((VENTA && VENTA.productos) || []).find(p => p.id === id);
-const vcCuenta = () => Object.values(VCOT.items).reduce((s, q) => s + Number(q || 0), 0);
+const vcCuenta = () => (window.SBCarrito ? SBCarrito.cuenta() : 0);
 
 function vcAgregar(id, cuantos){
-  const n = Number(cuantos || 1);
-  VCOT.items[id] = Math.max(1, Number(VCOT.items[id] || 0) + n);
-  vcGuardar(); vcPintarTodo();
-  avisarVc(vcProducto(id));
+  const p = vcProducto(id);
+  if(window.SBCarrito) SBCarrito.agregar(id, p ? {
+    nom: p.nom, mm: [p.marca, p.modelo].filter(Boolean).join(' '),
+    nts: p.clave || '', precio: Number(p.precio || 0), foto: vFoto(p, 0, true) || ''
+  } : null, cuantos || 1);
+  vcPintarTodo();
 }
-function vcCantidad(id, v){
-  const n = Math.max(0, parseInt(v, 10) || 0);
-  if(n === 0) delete VCOT.items[id]; else VCOT.items[id] = n;
-  vcGuardar(); vcPintarTodo();
-}
-function vcQuitar(id){ delete VCOT.items[id]; vcGuardar(); vcPintarTodo(); }
-function vcVaciar(){ VCOT.items = {}; vcGuardar(); vcPintarTodo(); }
-
-/* Aviso corto cuando se agrega algo desde la tienda. */
-function avisarVc(p){
-  if(!p) return;
-  let t = document.getElementById('vcToast');
-  if(!t){
-    t = document.createElement('div'); t.id = 'vcToast'; t.className = 'vc-toast';
-    document.body.appendChild(t);
-  }
-  t.innerHTML = `<span>Agregado: <b>${vEsc(p.nom)}</b></span>
-    <a class="btn btn-fill" onclick="go('#/cotizar-venta')">Ver mi cotización</a>`;
-  t.classList.add('on');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 4000);
-}
+function vcCantidad(id, v){ if(window.SBCarrito) SBCarrito.cantidad(id, v); vcPintarTodo(); }
+function vcQuitar(id){ if(window.SBCarrito) SBCarrito.quitar(id); vcPintarTodo(); }
+function vcVaciar(){ if(window.SBCarrito) SBCarrito.vaciar(); vcPintarTodo(); }
 
 /* ── Cuenta ─────────────────────────────────────────────────────────── */
+/* Manda el catálogo cuando está cargado; si no (o si el equipo ya no está
+   en la hoja), vale lo que se guardó al agregarlo. */
 function vcCalcular(){
-  const items = Object.keys(VCOT.items)
-    .map(id => ({p: vcProducto(id), q: Number(VCOT.items[id] || 0)}))
-    .filter(x => x.p && x.q > 0)
+  const g = vcItems();
+  const items = Object.keys(g)
+    .map(id => {
+      const y = g[id], p = vcProducto(id) || {id: id, nom: y.nom || id, marca: y.mm || '', clave: y.nts || '',
+        precio: Number(y.precio || 0), fotos: y.foto ? [y.foto] : []};
+      return {p: p, q: Number(y.q || 0)};
+    })
+    .filter(x => x.q > 0)
     .map(x => ({p: x.p, q: x.q, precio: Number(x.p.precio || 0), total: Number(x.p.precio || 0) * x.q}));
   const total = items.reduce((s, x) => s + x.total, 0);
   const sinPrecio = items.filter(x => !x.precio).length;
@@ -3485,8 +3480,8 @@ function vcAbrir(){ vcPintarTodo(); }
 
 function vcPintarTodo(){
   vcPintar();
-  vcBarra();
   vcChip();
+  if(window.SBCarrito) SBCarrito.pintar();
 }
 
 /* Contador en el menú de venta, para volver a la lista desde cualquier sitio. */
@@ -3496,19 +3491,6 @@ function vcChip(){
     el.textContent = n ? String(n) : '';
     el.hidden = !n;
   });
-}
-
-function vcBarra(){
-  const b = document.getElementById('vcBarra');
-  if(!b) return;
-  const c = vcCalcular();
-  const fuera = location.hash.indexOf('#/cotizar-venta') !== 0;
-  b.hidden = !c.items.length || !fuera;
-  document.body.classList.toggle('vc-conbarra', !b.hidden);
-  if(b.hidden){ b.innerHTML = ''; return; }
-  b.innerHTML = `<div><span>${c.unidades} ${c.unidades === 1 ? 'equipo' : 'equipos'} en tu cotización</span>
-      <b>${vSoles(c.total)}</b></div>
-    <button class="btn btn-fill" onclick="go('#/cotizar-venta')">Ver</button>`;
 }
 
 function vcPintar(){
