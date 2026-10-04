@@ -50,8 +50,10 @@ body.sb-cart-open{overflow:hidden}
 .sb-cart-t span{font-size:13px;color:var(--gris,#6f6f6f)}
 .sb-cart-t b{font-family:var(--ff-d,system-ui);font-size:24px}
 .sb-cart-f small{display:block;margin:2px 0 12px;font-size:11.5px;color:var(--gris,#6f6f6f)}
-.sb-cart-ir{display:block;padding:13px;border-radius:999px;background:var(--onix,#17191d);color:#fff;
-  font-weight:600;font-size:14.5px;text-align:center;text-decoration:none}
+.sb-cart-ir{display:block;width:100%;padding:13px;border:0;border-radius:999px;background:var(--onix,#17191d);
+  color:#fff;font:inherit;font-weight:600;font-size:14.5px;text-align:center;text-decoration:none;cursor:pointer}
+.sb-cart-wa{background:#25D366;color:#0b3d20}
+.sb-cart-2{margin-top:8px;background:none;border:1px solid var(--linea,#e3ded4);color:var(--onix,#17191d)}
 .sb-cart-seguir{display:block;width:100%;margin-top:8px;padding:11px;border:0;background:none;
   font:inherit;font-size:13.5px;color:var(--gris,#6f6f6f);text-decoration:underline;cursor:pointer}
 

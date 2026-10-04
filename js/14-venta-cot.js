@@ -57,7 +57,16 @@ function vcCalcular(){
 }
 
 /* ── Página ─────────────────────────────────────────────────────────── */
-function vcAbrir(){ vcPintarTodo(); }
+function vcAbrir(){
+  vcPintarTodo();
+  /* Si se vino del carrito tocando «Enviar por WhatsApp», se baja al
+     formulario y se intenta enviar de una vez. */
+  let ir = '';
+  try{ ir = sessionStorage.getItem('sb-ir-enviar') || ''; sessionStorage.removeItem('sb-ir-enviar'); }catch(e){}
+  if(ir) setTimeout(() => vcEnviar('whatsapp'), 350);
+}
+/* Los botones +/− del panel del carrito también repintan esta página. */
+window.addEventListener('sb-carrito', () => { if(document.getElementById('vcBody')) vcPintar(); });
 
 function vcPintarTodo(){
   vcPintar();
