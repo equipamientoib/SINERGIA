@@ -12,7 +12,6 @@
        instrumento lo lleva;
      · garantía en depósito (se devuelve) cuando el cliente recoge los
        instrumentos en oficina y va sin instrumentista;
-     · herramientas incluidas sin costo cuando va el instrumentista.
 
    #/cotizar/<id> entra con ese instrumento ya marcado: es a donde llevan
    los botones «Calcular mi alquiler» de las páginas de cada equipo.
@@ -117,15 +116,13 @@ function cotOfertas(c){
     .slice()
     .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
-      if(yaEstan.has(e.id)){
-        /* Lo que le toca a este instrumento dentro del alquiler, prorrateado
-           con el descuento ya aplicado: así la suma de la lista cuadra con el
-           subtotal, y cada uno baja de precio cuando se agrega otro. */
-        const parte = c.base ? Number(e.dia || 0) * (c.unit / c.base) : 0;
-        return {e: e, on: true, mas: parte * c.qty};
-      }
-      const sim = cotSimular(e.id);
-      return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
+      /* Siempre el precio prorrateado del instrumento dentro del alquiler,
+         con el descuento aplicado. Al agregarlo, el número no cambia: lo que
+         cambia es que los demás bajan, que es justo lo que se quiere mostrar. */
+      const on = yaEstan.has(e.id);
+      const base = on ? c : cotSimular(e.id);
+      const parte = base.base ? Number(e.dia || 0) * (base.unit / base.base) : 0;
+      return {e: e, on: on, mas: parte * base.qty};
     });
 }
 
@@ -160,15 +157,13 @@ function cotOfertas(c){
     .slice()
     .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
-      if(yaEstan.has(e.id)){
-        /* Lo que le toca a este instrumento dentro del alquiler, prorrateado
-           con el descuento ya aplicado: así la suma de la lista cuadra con el
-           subtotal, y cada uno baja de precio cuando se agrega otro. */
-        const parte = c.base ? Number(e.dia || 0) * (c.unit / c.base) : 0;
-        return {e: e, on: true, mas: parte * c.qty};
-      }
-      const sim = cotSimular(e.id);
-      return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
+      /* Siempre el precio prorrateado del instrumento dentro del alquiler,
+         con el descuento aplicado. Al agregarlo, el número no cambia: lo que
+         cambia es que los demás bajan, que es justo lo que se quiere mostrar. */
+      const on = yaEstan.has(e.id);
+      const base = on ? c : cotSimular(e.id);
+      const parte = base.base ? Number(e.dia || 0) * (base.unit / base.base) : 0;
+      return {e: e, on: on, mas: parte * base.qty};
     });
 }
 
@@ -315,7 +310,6 @@ function cotResumen(){
     `<button type="button" class="${c.mod === m ? 'on' : ''}" onclick="cotMod('${m}')">${t}</button>`).join('');
   const cant = `<label class="cot-f1">${COT_CANT[c.mod]}<input type="number" min="1" step="1" value="${c.qty}"
       oninput="cotCantidad(this.value)" onchange="cotCantidad(this.value)"></label>`;
-  const inc = c.conTecnico ? incluidos('') : [];
   const u = COT_UNI[c.mod];
   /* Lo primero que se ve: el total y los dos botones. El detalle queda
      debajo, para quien quiera revisarlo. */
@@ -350,9 +344,7 @@ function cotResumen(){
   caja.innerHTML = `
     ${arriba}
 
-    ${cotOfertasHTML(c)}
-
-    <div class="cot-paso"><b>4</b> ¿Por cuánto tiempo?</div>
+    <div class="cot-paso"><b>3</b> ¿Por cuánto tiempo?</div>
     <div class="cot-seg">${seg}</div>
     ${c.mod === 'medio'
       ? `<p class="cot-ayuda">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.${
@@ -366,6 +358,8 @@ function cotResumen(){
     ${cant}
     ${(c.largo || c.mod !== 'dia') ? '' : `<p class="cot-ayuda">¿Lo necesitas una semana o más? Ese caso lo vemos
       directamente: pon los días y te aparece cómo escribirnos.</p>`}
+
+    ${cotOfertasHTML(c)}
 
     <div class="cot-paso"><b>5</b> El detalle</div>
     <ul class="cot-sel">${c.sel.map(e =>
@@ -397,7 +391,6 @@ function cotResumen(){
         : 'Es un estimado de referencia; se confirma al emitir la cotización.'}</p>` : ''}
     ${c.garantia ? `<p class="cot-aviso"><b>Además dejas S/ ${fmt(c.garantia)} de garantía.</b>
       No es un cobro: se te devuelve cuando regreses el equipo. Lo recoges en nuestra oficina con tu DNI.</p>` : ''}
-    ${inc.length ? `<p class="cot-aviso ok"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
 
     <div class="cot-paso"><b>6</b> Tus datos</div>
     <div class="cot-form" id="cotForm">
@@ -423,10 +416,10 @@ function cotOfertasHTML(c){
   const of = cotOfertas(c);
   if(!of.length) return '';
   const u = COT_UNI[c.mod];
-  return `<div class="cot-paso"><b>3</b> Agrega por un poco más</div>
+  return `<div class="cot-paso"><b>4</b> Agrega por un poco más</div>
   <div class="cot-of">
-    <p class="cot-ofs">Lo que cuesta cada uno sumado a lo que ya elegiste, por ${u}.
-      Toca para agregarlo o quitarlo; los que ya llevas salen con su check.</p>
+    <p class="cot-ofs">Lo que costaría cada uno dentro de tu alquiler, por ${u}, al lado de su
+      precio suelto. Toca para agregarlo o quitarlo; los que ya llevas salen con su check.</p>
     ${of.map(o => {
       const solo = c.mod === 'medio' ? precioMedio(o.e.dia) : o.e.dia;
       const porUnidad = Math.round(o.mas / c.qty);
@@ -437,8 +430,7 @@ function cotOfertasHTML(c){
       </button>`;
       return `<button type="button" class="cot-ofi" onclick="cotMarcar('${o.e.id}',true)">
         <span class="n">${cotEsc(o.e.nom)}</span>
-        <span class="p">${o.mas <= 0 ? '<b>gratis</b>'
-          : `<b>+S/ ${fmt(porUnidad)}</b>${porUnidad < solo ? ` <s>${fmt(solo)}</s>` : ''}`}</span>
+        <span class="p"><b>S/ ${fmt(porUnidad)}</b>${porUnidad < solo ? ` <s>${fmt(solo)}</s>` : ''}</span>
         <span class="mas" aria-hidden="true">+</span>
       </button>`;
     }).join('')}
@@ -510,8 +502,6 @@ function cotTexto(c, nom, mail, tel){
   L.push('  TOTAL (IGV incluido): S/ ' + c.total.toFixed(2));
   if(c.garantia) L.push('  Garantía en depósito (se devuelve): S/ ' + fmt(c.garantia));
 
-  const inc = c.conTecnico ? incluidos('') : [];
-  if(inc.length){ L.push(''); L.push('INCLUIDO SIN COSTO'); inc.forEach(x => L.push('  · ' + x.nom)); }
   L.push('');
   L.push(c.prov ? 'Envío por agencia a provincia, de ida y vuelta, a cargo del cliente.'
                 : 'Entrega y devolución en oficina (Pueblo Libre, Lima).');
@@ -620,7 +610,7 @@ function cotDoc(c, nom, mail, tel, numero){
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
     tec: c.tecnico, pas: c.pasaje, via: c.viatico, noc: c.noches,
     ciu: c.ciudad ? c.ciudad.n : '', gar: c.garantia, total: c.total,
-    inc: (c.conTecnico ? incluidos('') : []).map(x => x.nom)
+    inc: []
   };
 }
 
@@ -680,13 +670,11 @@ function cotTerminos(c){
     'Se factura aparte, con un mínimo de medio día. Comprende el manejo del instrumento y el registro de las mediciones. No incluye la emisión de informes ni la ejecución de mantenimientos.']);
   else T.push(['6. Garantía en depósito.',
     'S/ ' + fmt(gar) + ' al retiro de los instrumentos, contra presentación del documento de identidad. No constituye un cobro: se devuelve íntegramente al retornar los instrumentos en buen estado y dentro del plazo.']);
-  const inc = c.inc || [];
-  if(inc.length) T.push(['7. Incluido sin costo.', inc.join(', ') + '. Se entregan y se devuelven junto con los instrumentos alquilados.']);
-  T.push([(inc.length ? '8' : '7') + '. Responsabilidad del cliente.',
+  T.push(['7. Responsabilidad del cliente.',
     'La pérdida o el daño de un instrumento durante el alquiler obliga a su reposición, así como a la recalibración cuando el equipo se devuelva fuera de rango.']);
-  T.push([(inc.length ? '9' : '8') + '. Forma de pago.',
+  T.push(['8. Forma de pago.',
     'Íntegro a la entrega de los instrumentos, salvo acuerdo distinto por escrito.']);
-  T.push([(inc.length ? '10' : '9') + '. Ampliación del plazo.',
+  T.push(['9. Ampliación del plazo.',
     'La extensión del alquiler se cotiza por separado antes de ejecutarse y se factura a la tarifa vigente.']);
   return T;
 }
@@ -839,7 +827,6 @@ function cotHTML(d, formal){
           <li>Certificado de calibración vigente de cada instrumento.</li>
           ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'
                   : '<li>Retiro y devolución en nuestra oficina de Lima, presentando documento de identidad.</li>'}
-          ${(d.inc || []).length ? '<li>Sin costo: ' + cotEsc((d.inc || []).join(', ')) + '.</li>' : ''}
           ${d.prov && d.tec ? '<li>El instrumentista viaja a ' + cotEsc(d.ciu || 'tu ciudad') + ': sale de noche y regresa de noche, así que solo pagas los días de trabajo. El pasaje y los viáticos ya están en el cuadro de arriba.</li>' : ''}
           ${d.prov && !d.tec ? '<li>Los instrumentos viajan por agencia (Shalom o la que prefieras); el envío de ida y vuelta lo contratas y lo pagas tú, directo con la agencia.</li>' : ''}
           <li>${d.mod === 'medio' ? 'Medio día es un turno de 4 horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.'

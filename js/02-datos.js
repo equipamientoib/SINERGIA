@@ -115,9 +115,9 @@ let COMPLEMENTOS = ['set-46', 'destornillador-elec'];
 const esComplemento = e => !!e.apoyo || COMPLEMENTOS.indexOf(e.id) >= 0;
 /* Lo que va SIN COSTO en todo alquiler con instrumentista. El multímetro sí
    se alquila solo, pero si ya viene el instrumentista, se incluye. */
-/* Lo que va sin costo cuando acompaña al instrumentista. El multímetro ya
-   no: se ofrece aparte, a precio de combinación. */
-let INCLUIDOS = ['set-46', 'destornillador-elec'];
+/* Ya no se regala nada con el alquiler: cada instrumento tiene su precio
+   y el descuento por combinar es lo que premia llevar varios. */
+let INCLUIDOS = [];
 const incluidos = id => EQUIPOS.filter(e => e.id !== id && INCLUIDOS.indexOf(e.id) >= 0);
 const garantiaDe = id => SIN_TECNICO[id] || 0;
 /* Medio día: el 60 % del día, pero nunca menos de MEDIO_PISO: por debajo,
