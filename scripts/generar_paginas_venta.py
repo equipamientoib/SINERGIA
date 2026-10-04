@@ -93,6 +93,41 @@ def ajustar(p, repo):
     return q
 
 
+def aplicar_promos(productos, promos):
+    """Deja el precio de oferta como precio del equipo, y el de la hoja
+    guardado en «precioLista» para tacharlo.
+
+    Se hace una sola vez, aquí: así la ficha, la tienda, el carrito, la
+    cotización y el feed de Google cobran todos lo mismo, sin que cada
+    uno tenga que acordarse de la promoción.
+    """
+    hoy = datetime.date.today()
+    for p in productos:
+        d = (promos or {}).get(p['id'])
+        if not isinstance(d, dict) or not p.get('precio'):
+            continue
+        ahora = d.get('ahora') or 0
+        try:
+            fin = datetime.date.fromisoformat(d.get('hasta') or '')
+        except ValueError:
+            continue
+        if not (0 < ahora < p['precio']) or fin < hoy:
+            continue
+        p['precioLista'] = p['precio']
+        p['precio'] = ahora
+        p['promoFin'] = fin
+    return productos
+
+
+def promo(p, promos=None):
+    """Lo que hay que mostrar de la promoción de un equipo, o None."""
+    if not p.get('precioLista'):
+        return None
+    return {'antes': p['precioLista'], 'fin': p['promoFin'],
+            'baja': int(round((1 - p['precio'] / p['precioLista']) * 100)),
+            'ahorro': int(round(p['precioLista'] - p['precio']))}
+
+
 def fotos(p, base, fijas, locales=()):
     """[(ligera, grande)] por orden: fija › copia propia › hoja/proveedor › antigua.
 
@@ -206,7 +241,7 @@ def franja(p):
         '<div class="ft-%s"><dt>%s</dt><dd>%s</dd></div>' % (c, k, e(v)) for k, c, v in d)
 
 
-def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
+def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
     texto = 'Hola Sinergia Biomédica, quiero cotizar: %s%s%s.' % (
         p['nom'], ' ' + p['marca'] if p.get('marca') else '', ' ' + p['modelo'] if p.get('modelo') else '')
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
@@ -218,10 +253,15 @@ def producto(p, cat, cfg, fts, vig, prev, sig, mismos):
     stock = p.get('stock')
     badge = ('<span class="st si">En stock · %d %s</span>' % (stock, 'unidad' if stock == 1 else 'unidades')
              if isinstance(stock, (int, float)) and stock > 0 else '')
+    of = promo(p, promos)
     if p.get('precio'):
         nota = ('Incluye IGV · <span>Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización</span>'
                 % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial, se confirma en la cotización'
-        caja = f'''<div class="precio"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{badge}</div>
+        if of:
+            nota = ('Incluye IGV · <b>Promoción válida hasta el %s</b> · se confirma en la cotización'
+                    % of['fin'].strftime('%d/%m/%Y'))
+        antes = ('<s class="pc-antes">%s</s><span class="pc-baja">−%d %%</span>' % (soles(of['antes']), of['baja'])) if of else ''
+        caja = f'''<div class="precio{' con-promo' if of else ''}"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{antes}{badge}</div>
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
         caja = '<div class="precio"><div class="pc-fila"><b class="pc-monto consulta">Consultar precio</b>%s</div></div>' % badge
@@ -328,7 +368,7 @@ VIG_JS = '''<script>
 </script>'''
 
 
-def pagina_producto(p, cats, cfg, base, fijas, locales, vig, prev, sig, mismos):
+def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, mismos):
     cat = cats.get(p.get('cat'), '')
     fts = fotos(p, base, fijas, locales)
     ruta = '/venta/%s/' % p['id']
@@ -338,7 +378,7 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, vig, prev, sig, mismos):
     descripcion = '%s %s%s Venta con ficha técnica, entrega en Lima y provincias y mantenimiento.' % (
         nombre + '.', (p.get('resumen') or '').rstrip('.') + '. ' if p.get('resumen') else '',
         ('%s (%s, NTS 113-MINSA).' % (nts, p['expediente'])) if nts and p.get('expediente') else (nts + '.' if nts else ''))
-    cuerpo = producto(p, cat, cfg, fts, vig, prev, sig, mismos) + VIG_JS
+    cuerpo = producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos) + VIG_JS
     oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
               'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/PreOrder',
               'seller': {'@id': SITIO + '/#negocio'}}
@@ -363,25 +403,55 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, vig, prev, sig, mismos):
                         cuerpo=cuerpo, jsonld=jsonld, imagen=img)
 
 
-def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales):
+def tarjeta_venta(p, base, fijas, locales, promos):
+    """La tarjeta de un equipo en /venta/ (la usan las categorías y la franja
+    de promociones, para que se vean iguales)."""
+    fts = fotos(p, base, fijas, locales)
+    img = ('<img src="%s" alt="%s" loading="lazy" decoding="async">'
+           % (fts[0][0], e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))) if fts else gp.ICONO
+    of = promo(p, promos)
+    return ('<a class="vt%s" href="/venta/%s/"><span class="vt-f">%s%s</span>'
+            '<span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>'
+            % (' en-oferta' if of else '', p['id'], img,
+               '<span class="vt-of">OFERTA</span>' if of else '',
+               e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
+               precio_tarjeta(p, promos)))
+
+
+def precio_tarjeta(p, promos):
+    """El precio de la tarjeta; en promoción, con el de antes tachado."""
+    if not p.get('precio'):
+        return ''
+    of = promo(p, promos)
+    if not of:
+        return '<i>%s</i>' % soles(p['precio'])
+    return ('<i class="oferta">%s <s>%s</s><em>−%d %%</em></i>'
+            % (soles(p['precio']), soles(of['antes']), of['baja']))
+
+
+def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
     ruta = '/venta/'
     secciones = []
     for cid in cats_orden:
         ps = [p for p in productos if p.get('cat') == cid]
         if not ps:
             continue
-        tarjetas = ''.join(
-            '<a class="vt" href="/venta/%s/"><span class="vt-f">%s</span><span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>' % (
-                p['id'],
-                ('<img src="%s" alt="%s" loading="lazy" decoding="async">'
-                 % (fotos(p, base, fijas, locales)[0][0],
-                    e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))
-                 ) if fotos(p, base, fijas, locales) else gp.ICONO,
-                e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
-                ('<i>%s</i>' % soles(p['precio'])) if p.get('precio') else '')
-            for p in ps)
+        tarjetas = ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in ps)
         secciones.append('<section class="vcat" id="%s"><h2>%s <small>%d</small></h2><div class="vts">%s</div></section>'
                          % (e(cid), e(cats.get(cid, cid)), len(ps), tarjetas))
+    # Franja de promociones: va arriba de todo, antes de las categorías.
+    enof = [p for p in productos if promo(p, promos)]
+    franja_promo = ''
+    if enof:
+        hasta = min(promo(p, promos)['fin'] for p in enof)
+        franja_promo = (
+            '<section class="vpromo" id="promociones">'
+            '<h2>En promoción <small>%d</small></h2>'
+            '<p class="vpromo-n">Precios rebajados hasta el %s. Después vuelven a su precio de lista.</p>'
+            '<div class="vts">%s</div></section>'
+            % (len(enof), hasta.strftime('%d/%m/%Y'),
+               ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)))
+
     cuerpo = f'''
   <section class="cabeza">
     <div class="eyebrow">Venta · Equipamiento biomédico · Lima y provincias</div>
@@ -389,6 +459,7 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales):
     <p class="lead">{len(productos)} equipos con stock para hospitales, clínicas y obras de equipamiento: ficha técnica, código NTS y mantenimiento después de la venta.</p>
     <p><a class="btn fill" href="/#/venta/tienda">Abrir la tienda con filtros →</a> <a class="btn" href="/venta/codigos-nts/">Buscar por código NTS</a></p>
   </section>
+  {franja_promo}
   {''.join(secciones)}'''
     jsonld = [{'@type': 'ItemList', 'name': 'Venta de equipos médicos',
                'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
@@ -463,7 +534,7 @@ def sitemap(paginas, cambios):
                 + '\n'.join(otras + nuevas) + '\n</urlset>\n', cambios)
 
 
-def feed_google(productos, cfg, base, fijas, locales, cambios):
+def feed_google(productos, cfg, base, fijas, locales, promos, cambios):
     """feed-google.xml — el archivo que lee Google Merchant Center.
 
     Con él los equipos pueden salir gratis en la pestaña «Compras» con su
@@ -483,6 +554,7 @@ def feed_google(productos, cfg, base, fijas, locales, cambios):
             continue                      # sin foto no entra: Google la exige
         # JPEG antes que WebP: Merchant Center acepta los dos, pero el
         # JPEG no da problemas con ningún revisor.
+        of = promo(p, promos)
         grande = fts[0][1]
         if grande.startswith('/img/') and os.path.exists(
                 os.path.join(ROOT, grande.lstrip('/').rsplit('.', 1)[0] + '.jpg')):
@@ -502,6 +574,7 @@ def feed_google(productos, cfg, base, fijas, locales, cambios):
             '    <g:image_link>%s</g:image_link>\n'
             '    <g:availability>%s</g:availability>\n'
             '    <g:price>%d PEN</g:price>\n'
+            '%s'
             '    <g:condition>new</g:condition>\n'
             '    <g:brand>%s</g:brand>\n'
             '    %s\n'
@@ -515,7 +588,10 @@ def feed_google(productos, cfg, base, fijas, locales, cambios):
                 SITIO.rstrip('/'), e(p['id']),
                 e(grande if grande.startswith('http') else SITIO.rstrip('/') + grande),
                 'in_stock' if (p.get('stock') or 0) else 'backorder',
-                int(round(p['precio'])),
+                int(round(of['antes'] if of else p['precio'])),
+                ('    <g:sale_price>%d PEN</g:sale_price>\n'
+                 '    <g:sale_price_effective_date>%sT00:00:00-0500/%sT23:59:59-0500</g:sale_price_effective_date>\n'
+                 % (int(round(p['precio'])), datetime.date.today().isoformat(), of['fin'].isoformat())) if of else '',
                 e(marca or 'Sinergia Biomédica'),
                 ('<g:mpn>%s</g:mpn>' % e(modelo)) if modelo else '',
                 e(cfg.get('categorias', {}).get(p.get('cat'), p.get('cat') or ''))))
@@ -553,11 +629,14 @@ def main():
     base = {p['id']: p for p in repo.get('productos', [])}
     fijas = {k: v for k, v in (repo.get('fotosFijas') or {}).items() if not k.startswith('_')}
     locales = set(repo.get('fotosLocales') or [])   # fotos ya guardadas en el sitio
+    promos = {k: v for k, v in (repo.get('promociones') or {}).items()
+              if not k.startswith('_')}
+    aplicar_promos(productos, promos)      # el precio de oferta manda en todo
     vig = vigencia(vivo.get('actualizado'))
 
     orden = ordenar(productos)
     cambios, paginas = [], []
-    ruta, doc = pagina_hub(orden, cats_orden, cats, cfg, base, fijas, locales)
+    ruta, doc = pagina_hub(orden, cats_orden, cats, cfg, base, fijas, locales, promos)
     gp.escribir('venta/index.html', doc, cambios)
     paginas.append((ruta, 'venta/index.html'))
     ruta, doc = pagina_nts(orden, cfg)
@@ -567,7 +646,7 @@ def main():
         prev = orden[i - 1] if i > 0 else None
         sig = orden[i + 1] if i + 1 < len(orden) else None
         mismos = [o for o in orden if o.get('cat') == p.get('cat') and o['id'] != p['id']]
-        ruta, doc = pagina_producto(p, cats, cfg, base, fijas, locales, vig, prev, sig, mismos)
+        ruta, doc = pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, mismos)
         rel = 'venta/%s/index.html' % p['id']
         gp.escribir(rel, doc, cambios)
         paginas.append((ruta, rel))
@@ -589,7 +668,17 @@ def main():
 
     mapa_portada(productos, cambios)
     sitemap(paginas, cambios)
-    n_feed = feed_google(orden, {'categorias': cats}, base, fijas, locales, cambios)
+    vivos = {x['id']: x for x in orden}
+    for pid, d in sorted(promos.items()):
+        if pid not in vivos:
+            print('AVISO: la promoción «%s» no corresponde a ningún equipo publicado.' % pid)
+        elif not promo(vivos[pid]):
+            print('AVISO: la promoción «%s» no se muestra: la fecha ya pasó, o el precio '
+                  'de oferta no es menor que el de la hoja (%s).' % (pid, soles(vivos[pid].get('precio') or 0)))
+    activas = [x for x in orden if promo(x)]
+    if activas:
+        print('%d equipos en promoción: %s' % (len(activas), ', '.join(x['id'] for x in activas)))
+    n_feed = feed_google(orden, {'categorias': cats}, base, fijas, locales, promos, cambios)
     print('%d equipos en feed-google.xml (Google Merchant Center).' % n_feed)
     print('%d equipos de venta con página.' % len(productos))
     print('Cambiaron: %d archivos' % len(cambios))

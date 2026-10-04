@@ -832,17 +832,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4ec4ae8e';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2a3110a3';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4ec4ae8e';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2a3110a3';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=4ec4ae8e','js/06-tablero.js?v=4ec4ae8e'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=2a3110a3','js/06-tablero.js?v=2a3110a3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=4ec4ae8e'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=2a3110a3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1810,7 +1810,7 @@ function vMezclar(){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    VENTA.productos = VENTA_VIVO.productos.filter(p => !vBloqueado(p.id)).map(p => {
+    VENTA.productos = vAplicarPromos(VENTA_VIVO.productos.filter(p => !vBloqueado(p.id)).map(p => {
       p = vAjustar(p);
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
@@ -1823,7 +1823,7 @@ function vMezclar(){
          del proveedor (modelo real) › foto antigua del sitio (respaldo). */
       const respaldo = b && b.fotosSitio && b.fotosSitio.length;
       return respaldo && !(p.fotos && p.fotos.length) ? Object.assign({}, p, {fotos: b.fotosSitio}) : p;
-    });
+    }));
     VENTA.actualizado = VENTA_VIVO.actualizado;
   }
 }
@@ -1844,8 +1844,9 @@ function cargarVenta(){
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
                  noPublicar: d.noPublicar||{},
                  locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
+                 promos: Object.fromEntries(Object.entries(d.promociones||{}).filter(([k]) => k[0] !== '_')),
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
-        VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
+        VENTA.productos = vAplicarPromos((d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio}))));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
@@ -1949,6 +1950,28 @@ function vStock(p, detalle){
   return `<span class="v-stock si">En stock${cant}</span>`;
 }
 
+/* Promociones (data/venta.json › promociones). El precio de oferta pasa a
+   ser EL precio del equipo y el de la hoja queda guardado en «precioLista»
+   para tacharlo. Se hace una sola vez, al cargar, para que la tienda, la
+   ficha, el carrito y la cotización cobren todos lo mismo. */
+function vAplicarPromos(ps){
+  const pr = (VENTA && VENTA.promos) || {};
+  const hoy = new Date();
+  return ps.map(p => {
+    const d = pr[p.id];
+    if(!d || !p.precio) return p;
+    const fin = new Date(String(d.hasta) + 'T23:59:59');
+    if(isNaN(fin) || fin < hoy || !(d.ahora > 0 && d.ahora < p.precio)) return p;
+    return Object.assign({}, p, {precio: d.ahora, precioLista: p.precio, promoFin: fin});
+  });
+}
+function vPromo(p){
+  if(!p || !p.precioLista) return null;
+  return {antes: p.precioLista, fin: p.promoFin,
+          baja: Math.round((1 - p.precio / p.precioLista) * 100),
+          ahorro: Math.round(p.precioLista - p.precio)};
+}
+
 /* Foto del producto: la versión ligera (-m) en tarjetas y la grande en la ficha. */
 function vFoto(p, i, ligera){ const u=(p.fotos||[])[i||0]; return u ? fotoURL(u, ligera?700:1200, ligera) : ''; }
 
@@ -2006,9 +2029,13 @@ function vCard(p){
   const url = `#/venta/p/${p.id}`;   // referencia; los clics van por vAbrir()
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
-  const tag = p._top ? '<span class="tier">Más pedido</span>' : '';
+  const of = vPromo(p);
+  const tag = of ? '<span class="tier v-oferta">Oferta −' + of.baja + ' %</span>'
+                 : (p._top ? '<span class="tier">Más pedido</span>' : '');
   const pie = p.precio
-    ? `<div class="price"><span class="desde">Precio referencial</span>${vSoles(p.precio)}<small>Incluye IGV · ${vNotaPrecio(false)}</small></div>`
+    ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? 'Precio en promoción' : 'Precio referencial'}</span>${vSoles(p.precio)}${
+        of ? `<s class="v-antes">${vSoles(of.antes)}</s>` : ''}<small>Incluye IGV · ${
+        of ? 'hasta el ' + of.fin.toLocaleDateString('es-PE') : vNotaPrecio(false)}</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
   return `<div class="eq v-eq">
     <div class="img${foto?' has-photo':''}" onclick="vAbrir('${p.id}')">
@@ -2330,7 +2357,9 @@ function vProducto(id){
         <h1>${vEsc(p.nom)}</h1>
         ${vMarcaModelo(p, true)}
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
-        ${p.precio||vStock(p)?`<div class="v-precio-caja">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${vStock(p,true)}<small>${p.precio?'Incluye IGV · '+vNotaPrecio(true):'Consulta precio y plazo de entrega'}</small></div>`:''}
+        ${p.precio||vStock(p)?(of => `<div class="v-precio-caja${of?' con-promo':''}">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${
+          of?`<s class="v-antes">${vSoles(of.antes)}</s><span class="v-baja">−${of.baja} %</span>`:''}${vStock(p,true)}<small>${
+          p.precio?(of?`Incluye IGV · <b>Promoción válida hasta el ${of.fin.toLocaleDateString('es-PE')}</b>`:'Incluye IGV · '+vNotaPrecio(true)):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">

@@ -1212,3 +1212,14 @@ body.wa-propio .wafab{display:none}
 /* Aviso cuando piden más unidades de las que hay en stock. */
 .v-stock.v-pedido{background:rgba(201,146,47,.12);border:1px solid rgba(201,146,47,.35);color:#8a6312;
   font-size:11px;letter-spacing:0;white-space:nowrap}
+
+/* ── Promociones en la tienda ──────────────────────────────────────────
+   El precio cobrado es el de la hoja; el tachado es el de antes. */
+.tier.v-oferta{background:#c62828;color:#fff;border-color:#c62828}
+.price.con-promo .desde{color:#c62828;font-weight:600}
+.price s.v-antes{margin-left:8px;color:var(--gris);font-weight:500}
+.v-precio-caja.con-promo s.v-antes{margin-left:12px;font-family:var(--ff-d);font-size:19px;
+  color:var(--gris);text-decoration:line-through}
+.v-precio-caja .v-baja{margin-left:8px;padding:3px 9px;border-radius:999px;font-family:var(--ff-d);
+  font-size:12.5px;font-weight:600;background:#c62828;color:#fff}
+.v-precio-caja.con-promo small b{color:#c62828}

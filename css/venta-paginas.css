@@ -77,3 +77,26 @@
 .panel.nts th{width:90px;font-family:var(--ff-d);font-size:16px;color:var(--cobre-d);vertical-align:top;scroll-margin-top:90px}
 .nts-eq{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
 .nts-eq a{font-size:14px;color:var(--grafito);text-decoration:underline;text-underline-offset:3px}
+
+/* ── Promociones ───────────────────────────────────────────────────────
+   El precio que se cobra es el de la hoja; el tachado es el de antes
+   (data/venta.json › promociones). Si la fecha pasa, el generador deja
+   de pintarlo y todo esto desaparece solo. */
+.pc-antes{margin-left:12px;font-family:var(--ff-d);font-size:19px;color:var(--gris);text-decoration:line-through}
+.pc-baja{margin-left:8px;padding:3px 9px;border-radius:999px;font-family:var(--ff-d);font-size:12.5px;
+  font-weight:600;background:#c62828;color:#fff;letter-spacing:.3px}
+.precio.con-promo .pc-nota b{color:#c62828}
+
+.vt.en-oferta{border-color:rgba(198,40,40,.4)}
+.vt-f{position:relative}
+.vt-of{position:absolute;top:3px;left:3px;padding:2px 6px;border-radius:5px;background:#c62828;color:#fff;
+  font-family:var(--ff-d);font-size:9px;font-weight:700;letter-spacing:.6px}
+.vt-t i.oferta s{margin-left:6px;color:var(--gris);font-weight:500}
+.vt-t i.oferta em{margin-left:6px;font-style:normal;color:#c62828}
+
+.vpromo{margin-top:26px;padding:18px;border-radius:16px;scroll-margin-top:90px;
+  background:rgba(198,40,40,.05);border:1px solid rgba(198,40,40,.22)}
+.vpromo h2{margin:0}
+.vpromo h2 small{font-size:13px;color:var(--gris);font-weight:500;margin-left:6px}
+.vpromo-n{margin:4px 0 14px;font-size:13px;color:var(--gris)}
+.vpromo .vts{margin-top:0}
