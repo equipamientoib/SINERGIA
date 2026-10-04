@@ -108,7 +108,7 @@ function cotSimular(id){
   return c;
 }
 function cotOfertas(c, cuantas){
-  if(!c.sel.length || c.largo) return [];
+  if(!c.sel.length || c.largo || c.faltaCiudad) return [];
   const yaEstan = new Set(c.sel.map(e => e.id));
   return cotLista()
     .filter(e => !yaEstan.has(e.id))
@@ -117,7 +117,7 @@ function cotOfertas(c, cuantas){
       return {e: e, mas: Math.max(0, sim.total - c.total), suelto: sim.unit - c.unit};
     })
     .sort((a, b) => a.mas - b.mas)
-    .slice(0, cuantas || 3);
+    .slice(0, cuantas || 99);
 }
 
 /* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
@@ -132,7 +132,7 @@ function cotSimular(id){
   return c;
 }
 function cotOfertas(c, cuantas){
-  if(!c.sel.length || c.largo) return [];
+  if(!c.sel.length || c.largo || c.faltaCiudad) return [];
   const yaEstan = new Set(c.sel.map(e => e.id));
   return cotLista()
     .filter(e => !yaEstan.has(e.id))
@@ -141,7 +141,7 @@ function cotOfertas(c, cuantas){
       return {e: e, mas: Math.max(0, sim.total - c.total), suelto: sim.unit - c.unit};
     })
     .sort((a, b) => a.mas - b.mas)
-    .slice(0, cuantas || 3);
+    .slice(0, cuantas || 99);
 }
 
 /* «1 medio día», «2 medios días», «3 días». */
@@ -329,7 +329,9 @@ function cotResumen(){
       ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>S/ ${c.pasaje.toFixed(2)}</span></div>
         <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
           ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>S/ ${c.viatico.toFixed(2)}</span></div>` : ''}
-      <div class="fino"><span>Incluye IGV 18 %</span><span>S/ ${(c.total / 1.18 * 0.18).toFixed(2)}</span></div>
+      <div class="sub"><span>Subtotal (S/)</span><span>${(c.total / 1.18).toFixed(2)}</span></div>
+      <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total / 1.18 * 0.18).toFixed(2)}</span></div>
+      <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
     </div>`}
     ${cotOfertasHTML(c)}
     ${c.faltaCiudad ? `<p class="cot-aviso"><b>Elige tu ciudad para ver el total.</b>
@@ -367,22 +369,23 @@ function cotResumen(){
 /* Las ofertas, pintadas: el precio normal tachado y lo que cuesta sumarlo
    al pedido que ya tiene. */
 function cotOfertasHTML(c){
-  const of = cotOfertas(c, 3);
+  const of = cotOfertas(c);
   if(!of.length) return '';
   const u = COT_UNI[c.mod];
   return `<div class="cot-of">
-    <div class="cot-ofh">Por un poco más</div>
+    <div class="cot-ofh">Agrega por un poco más</div>
+    <p class="cot-ofs">Precio de cada uno si lo sumas a lo que ya elegiste, por ${u}.</p>
     ${of.map(o => {
       const solo = c.mod === 'medio' ? precioMedio(o.e.dia) : o.e.dia;
       const porUnidad = Math.round(o.mas / c.qty);
       return `<button type="button" class="cot-ofi" onclick="cotMarcar('${o.e.id}',true)">
         <span class="n">${cotEsc(o.e.nom)}</span>
-        <span class="p">${o.mas <= 0 ? '<b>sin costo extra</b>'
-          : `<b>+ S/ ${fmt(porUnidad)}</b> por ${u}${porUnidad < solo ? ` <s>S/ ${fmt(solo)}</s>` : ''}`}</span>
-        <span class="mas">Agregar</span>
+        <span class="p">${o.mas <= 0 ? '<b>gratis</b>'
+          : `<b>+S/ ${fmt(porUnidad)}</b>${porUnidad < solo ? ` <s>${fmt(solo)}</s>` : ''}`}</span>
+        <span class="mas" aria-hidden="true">+</span>
       </button>`;
     }).join('')}
-    <p class="cot-ofn">Al sumar instrumentos baja el precio del día de todos: por eso el segundo
+    <p class="cot-ofn">Al sumar instrumentos baja el precio del día de todos: por eso cada uno
       cuesta menos que si lo alquilaras solo.</p>
   </div>`;
 }

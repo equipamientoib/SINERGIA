@@ -1097,18 +1097,28 @@ body.cot-bloq .wafab{display:none}
   #page-cotizador section{padding-bottom:84px}
 }
 
+/* Cierre de la cuenta, como el cuadro de la cotización: subtotal, IGV y
+   total con IGV destacado. */
+.cot-cuenta .sub{margin-top:0;padding-top:6px;border-top:1px solid var(--linea);font-weight:600}
+.cot-cuenta .sub:first-of-type{margin-top:6px}
+.cot-cuenta .gran{margin:7px -12px -10px;padding:9px 12px;border-radius:0 0 11px 11px;
+  background:var(--cobre-d);color:#fff;font-weight:700;font-size:14.5px}
+.cot-cuenta .gran span{color:#fff}
+
 /* ── «Por un poco más»: ofertas calculadas sobre lo que ya eligió ───── */
 .cot-of{margin:16px 0 0;padding:13px 14px;border-radius:12px;
   background:rgba(46,125,50,.07);border:1px solid rgba(46,125,50,.22)}
 .cot-ofh{font-family:var(--ff-d);font-size:13.5px;font-weight:600;color:#2e7d32;margin-bottom:9px}
-.cot-ofi{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 10px;
-  width:100%;margin-bottom:7px;padding:9px 11px;text-align:left;font:inherit;color:inherit;cursor:pointer;
-  background:var(--blanco);border:1px solid var(--linea);border-radius:10px;transition:border-color .15s}
-.cot-ofi:hover{border-color:#2e7d32}
-.cot-ofi .n{font-size:13.5px;font-weight:600;line-height:1.3}
-.cot-ofi .p{grid-column:1;font-size:12.5px;color:var(--gris)}
-.cot-ofi .p b{color:#2e7d32;font-size:13.5px}
-.cot-ofi .p s{opacity:.7}
-.cot-ofi .mas{grid-row:1/3;grid-column:2;align-self:center;padding:6px 12px;border-radius:999px;
-  font-size:12.5px;font-weight:600;background:#2e7d32;color:#fff}
-.cot-ofn{margin:4px 0 0;font-size:11.5px;color:var(--gris);line-height:1.55}
+.cot-ofs{margin:-4px 0 9px;font-size:11.5px;color:var(--gris);line-height:1.5}
+.cot-ofi{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;
+  width:100%;margin-bottom:5px;padding:7px 8px 7px 11px;text-align:left;font:inherit;color:inherit;
+  cursor:pointer;background:var(--blanco);border:1px solid var(--linea);border-radius:9px;
+  transition:border-color .15s,background .15s}
+.cot-ofi:hover{border-color:#2e7d32;background:rgba(46,125,50,.05)}
+.cot-ofi .n{font-size:12.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cot-ofi .p{font-size:12px;color:var(--gris);white-space:nowrap}
+.cot-ofi .p b{color:#2e7d32;font-size:13px}
+.cot-ofi .p s{opacity:.65;margin-left:2px}
+.cot-ofi .mas{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  font-size:15px;font-weight:700;line-height:1;background:#2e7d32;color:#fff}
+.cot-ofn{margin:7px 0 0;font-size:11.5px;color:var(--gris);line-height:1.55}
