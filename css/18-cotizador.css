@@ -47,9 +47,12 @@
 
 .cot-f1,.cot-f2 label{display:block;font-size:12.5px;color:var(--gris);margin-bottom:12px}
 .cot-f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cot-f1 input,.cot-f2 input,.cot-form input{width:100%;margin-top:4px;padding:10px 12px;font:inherit;font-size:14px;
+.cot-f1 input,.cot-f2 input,.cot-form input,.cot-form textarea,.cot-f1 select{
+  width:100%;margin-top:4px;padding:10px 12px;font:inherit;font-size:14px;
   color:var(--onix);background:#fff;border:1px solid var(--linea);border-radius:10px}
-.cot-f1 input:focus,.cot-f2 input:focus,.cot-form input:focus{outline:0;border-color:var(--cobre-d)}
+.cot-form textarea{resize:vertical;min-height:62px;line-height:1.5}
+.cot-f1 input:focus,.cot-f2 input:focus,.cot-form input:focus,.cot-form textarea:focus,
+.cot-f1 select:focus{outline:0;border-color:var(--cobre-d)}
 
 .cot-cuenta{margin-top:12px;padding:12px 14px;background:var(--crema);border-radius:12px;font-size:13.5px}
 .cot-cuenta>div{display:flex;justify-content:space-between;gap:10px;padding:2px 0;color:var(--gris)}

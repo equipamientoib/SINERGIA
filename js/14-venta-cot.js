@@ -45,12 +45,16 @@ function vcCalcular(){
   const g = vcItems();
   const items = Object.keys(g)
     .map(id => {
-      const y = g[id], p = vcProducto(id) || {id: id, nom: y.nom || id, marca: y.mm || '', clave: y.nts || '',
-        precio: Number(y.precio || 0), fotos: y.foto ? [y.foto] : []};
-      return {p: p, q: Number(y.q || 0)};
+      const y = g[id], v = vcProducto(id);
+      /* Con catálogo manda el catálogo; sin él, lo que se guardó al agregar. */
+      const p = v || {id: id, nom: y.nom || id, marca: y.mm || '', modelo: '', clave: y.nts || '',
+        precio: Number(y.precio || 0)};
+      const foto = v ? (vFoto(v, 0, true) || y.foto || '') : (y.foto || '');
+      return {p: p, q: Number(y.q || 0), foto: foto};
     })
     .filter(x => x.q > 0)
-    .map(x => ({p: x.p, q: x.q, precio: Number(x.p.precio || 0), total: Number(x.p.precio || 0) * x.q}));
+    .map(x => ({p: x.p, q: x.q, foto: x.foto, precio: Number(x.p.precio || 0),
+                total: Number(x.p.precio || 0) * x.q}));
   const total = items.reduce((s, x) => s + x.total, 0);
   const sinPrecio = items.filter(x => !x.precio).length;
   return {items, total, sinPrecio, unidades: items.reduce((s, x) => s + x.q, 0)};
@@ -83,10 +87,21 @@ function vcChip(){
   });
 }
 
+/* El catálogo se pide una sola vez, para refrescar precios y stock; la
+   página NO lo espera, porque el carrito ya guarda lo necesario de cada
+   equipo. Antes, si se entraba directo a esta dirección, se quedaba en
+   «Cargando el catálogo…» para siempre. */
+var VCOT_PEDIDO = false;
+function vcCatalogo(){
+  if(VCOT_PEDIDO || (VENTA && VENTA.productos) || typeof cargarVenta !== 'function') return;
+  VCOT_PEDIDO = true;
+  cargarVenta().then(() => { if(document.getElementById('vcBody')) vcPintar(); }).catch(() => {});
+}
+
 function vcPintar(){
   const caja = document.getElementById('vcBody');
   if(!caja) return;
-  if(!VENTA || !VENTA.productos){ caja.innerHTML = '<div class="wrap"><p class="cot-vacio">Cargando el catálogo…</p></div>'; return; }
+  vcCatalogo();
   const c = vcCalcular();
   if(!c.items.length){
     caja.innerHTML = `<div class="wrap vc-vacio">
@@ -153,13 +168,13 @@ function vcPintar(){
 }
 
 function vcFila(x){
-  const p = x.p, foto = vFoto(p, 0, true);
+  const p = x.p, foto = x.foto;
   return `<div class="vc-i">
     ${foto ? `<img class="vc-f" src="${foto}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
       <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
-      ${vStock(p)}
+      ${p.stock != null ? vStock(p) : ''}
     </div>
     <div class="vc-q">
       <button type="button" onclick="vcCantidad('${p.id}',${x.q - 1})" aria-label="Quitar uno">−</button>
