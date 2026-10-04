@@ -685,7 +685,9 @@ function cotHTML(d, formal){
   /* Estilos comunes a los dos documentos. */
   const base = `
     @page{size:A4 portrait;margin:14mm 16mm 16mm}
-    *{box-sizing:border-box}
+    /* Sin esto, el navegador del celular imprime el PDF sin los fondos de
+       color: la fila del total salía en blanco con el texto blanco. */
+    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     body{margin:0;background:#fff;color:#1a1a1a;font:11px/1.5 "Segoe UI",Calibri,Arial,Helvetica,sans-serif}
     .hoja{position:relative;width:210mm;min-height:297mm;margin:0 auto;padding:14mm 16mm 16mm}
     /* El membrete va en <thead>: el navegador lo repite solo en cada hoja

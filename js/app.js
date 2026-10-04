@@ -801,17 +801,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=bda34ae9';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=c49fd4de';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=bda34ae9';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=c49fd4de';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=bda34ae9','js/06-tablero.js?v=bda34ae9'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=c49fd4de','js/06-tablero.js?v=c49fd4de'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=bda34ae9'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=c49fd4de'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2912,7 +2912,9 @@ function cotHTML(d, formal){
   /* Estilos comunes a los dos documentos. */
   const base = `
     @page{size:A4 portrait;margin:14mm 16mm 16mm}
-    *{box-sizing:border-box}
+    /* Sin esto, el navegador del celular imprime el PDF sin los fondos de
+       color: la fila del total salía en blanco con el texto blanco. */
+    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     body{margin:0;background:#fff;color:#1a1a1a;font:11px/1.5 "Segoe UI",Calibri,Arial,Helvetica,sans-serif}
     .hoja{position:relative;width:210mm;min-height:297mm;margin:0 auto;padding:14mm 16mm 16mm}
     /* El membrete va en <thead>: el navegador lo repite solo en cada hoja
