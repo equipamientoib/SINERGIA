@@ -200,24 +200,31 @@ function vStock(p, detalle){
   return `<span class="v-stock si">En stock${cant}</span>`;
 }
 
-/* Promociones (data/venta.json › promociones). El precio de oferta pasa a
-   ser EL precio del equipo y el de la hoja queda guardado en «precioLista»
-   para tacharlo. Se hace una sola vez, al cargar, para que la tienda, la
-   ficha, el carrito y la cotización cobren todos lo mismo. */
+/* PROMOCIONES. El precio de oferta pasa a ser EL precio del equipo y el de
+   lista queda en «precioLista» para tacharlo. Puede venir de dos sitios: de
+   la hoja (columnas precio_promo, promo_hasta y remate, que es lo normal) o
+   de data/venta.json › promociones. Si están los dos, manda la hoja.
+   Se aplica una sola vez, al cargar, para que la tienda, la ficha, el
+   carrito y la cotización cobren todos lo mismo. */
 function vAplicarPromos(ps){
   const pr = (VENTA && VENTA.promos) || {};
   const hoy = new Date();
   return ps.map(p => {
+    if(p.precioLista) return p;                 // ya viene resuelta de la hoja
     const d = pr[p.id];
     if(!d || !p.precio) return p;
     const fin = new Date(String(d.hasta) + 'T23:59:59');
     if(isNaN(fin) || fin < hoy || !(d.ahora > 0 && d.ahora < p.precio)) return p;
-    return Object.assign({}, p, {precio: d.ahora, precioLista: p.precio, promoFin: fin});
+    const q = Object.assign({}, p, {precio: d.ahora, precioLista: p.precio, promoHasta: d.hasta});
+    if(d.remate) q.remate = 1;
+    return q;
   });
 }
 function vPromo(p){
   if(!p || !p.precioLista) return null;
-  return {antes: p.precioLista, fin: p.promoFin,
+  const fin = new Date(String(p.promoHasta) + 'T23:59:59');
+  if(isNaN(fin) || fin < new Date()) return null;
+  return {antes: p.precioLista, fin, remate: !!p.remate,
           baja: Math.round((1 - p.precio / p.precioLista) * 100),
           ahorro: Math.round(p.precioLista - p.precio)};
 }
@@ -280,7 +287,7 @@ function vCard(p){
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const of = vPromo(p);
-  const tag = of ? '<span class="tier v-oferta">Oferta −' + of.baja + ' %</span>'
+  const tag = of ? `<span class="tier v-oferta">${of.remate ? 'Remate' : 'Oferta'} −${of.baja} %</span>`
                  : (p._top ? '<span class="tier">Más pedido</span>' : '');
   const pie = p.precio
     ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? 'Precio en promoción' : 'Precio referencial'}</span>${vSoles(p.precio)}${
@@ -662,7 +669,9 @@ function vPromoVentana(){
   if(typeof SBPromo === 'undefined' || !VENTA) return;
   const h = location.hash;
   if(h !== '#/venta' && h !== '#/venta/tienda') return;
-  const enof = VENTA.productos.filter(p => vPromo(p));
+  /* Solo los REMATES saludan con la ventana; las demás promociones se ven
+     en la franja y en las tarjetas, sin interrumpir a nadie. */
+  const enof = VENTA.productos.filter(p => { const o = vPromo(p); return o && o.remate; });
   if(!enof.length) return;
   const fin = new Date(Math.min(...enof.map(p => vPromo(p).fin.getTime())));
   setTimeout(() => SBPromo.abrir(enof.map(p => {

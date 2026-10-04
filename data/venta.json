@@ -1,8 +1,8 @@
 {
   "_nota": "Catálogo de VENTA. Cada producto lleva su categoría (cat), marca, modelo y, si aplica, el nombre y código con que aparece en los expedientes técnicos (expediente, clave). Las fotos van en img/venta/<id>-01.jpg (con versiones -m y .webp) y se listan en «fotosSitio» (respaldo: la foto del proveedor, la del modelo real, tiene prioridad). Lo que falte no se muestra.",
   "promociones": {
-    "_nota": "Equipos en promoción. Solo hacen falta dos datos por equipo: «ahora», el precio rebajado que paga el cliente, y «hasta», el día en que termina (AAAA-MM-DD). El precio tachado sale solo de la hoja, no hay que escribirlo. La hoja NO se toca: su columna precio_publicado es una fórmula y escribir encima la rompe. Pasada la fecha, o si «ahora» no es menor que el precio de la hoja, la promoción desaparece sola y el equipo vuelve a su precio de lista.",
-    "_ejemplo": {"ahora": 979, "hasta": "2026-10-31"}
+    "_nota": "PROMOCIONES cargadas desde aquí. Lo normal es manejarlas en la hoja de venta (columnas precio_promo, promo_hasta y remate); esto es el camino alterno, y si un equipo está en los dos sitios manda la hoja. Por equipo: «ahora» es el precio rebajado que paga el cliente, «hasta» el último día (AAAA-MM-DD) y «remate» true para que además salte en la ventana flotante de la tienda. El precio tachado sale solo de la hoja, no se escribe. Pasada la fecha, o si «ahora» no es menor que el precio de la hoja, la promoción desaparece sola.",
+    "_ejemplo": {"ahora": 849, "hasta": "2026-10-31", "remate": true}
   },
   "noPublicar": {
     "_nota": "Equipos que NO se publican aunque la hoja diga publicar = SI. Motivo: en Falabella se vende el mismo modelo más barato que nuestro propio costo de proveedor, así que no hay precio con el que competir (estudio del 4/10/2026 en docs/comparacion-falabella-2026-10-04.md). Para volver a publicar uno, borra su línea de aquí.",

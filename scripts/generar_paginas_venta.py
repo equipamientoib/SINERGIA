@@ -94,15 +94,26 @@ def ajustar(p, repo):
 
 
 def aplicar_promos(productos, promos):
-    """Deja el precio de oferta como precio del equipo, y el de la hoja
-    guardado en «precioLista» para tacharlo.
+    """Deja el precio de oferta como precio del equipo y el de lista en
+    «precioLista», para tacharlo.
+
+    La promoción puede venir de dos sitios: de la hoja (columnas
+    precio_promo, promo_hasta y remate, que es lo normal) o de
+    data/venta.json › promociones, para cargarla desde aquí. Si están las
+    dos, manda la hoja.
 
     Se hace una sola vez, aquí: así la ficha, la tienda, el carrito, la
-    cotización y el feed de Google cobran todos lo mismo, sin que cada
-    uno tenga que acordarse de la promoción.
+    cotización, la ventana de remates y el feed de Google cobran todos lo
+    mismo, sin que cada uno tenga que acordarse de la promoción.
     """
     hoy = datetime.date.today()
     for p in productos:
+        if p.get('precioLista'):                      # ya viene resuelta de la hoja
+            try:
+                p['promoFin'] = datetime.date.fromisoformat(p.get('promoHasta') or '')
+            except ValueError:
+                p.pop('precioLista', None)
+            continue
         d = (promos or {}).get(p['id'])
         if not isinstance(d, dict) or not p.get('precio'):
             continue
@@ -116,14 +127,17 @@ def aplicar_promos(productos, promos):
         p['precioLista'] = p['precio']
         p['precio'] = ahora
         p['promoFin'] = fin
+        if d.get('remate'):
+            p['remate'] = 1
     return productos
 
 
 def promo(p, promos=None):
     """Lo que hay que mostrar de la promoción de un equipo, o None."""
-    if not p.get('precioLista'):
+    if not p.get('precioLista') or not p.get('promoFin'):
         return None
     return {'antes': p['precioLista'], 'fin': p['promoFin'],
+            'remate': bool(p.get('remate')),
             'baja': int(round((1 - p['precio'] / p['precioLista']) * 100)),
             'ahorro': int(round(p['precioLista'] - p['precio']))}
 
@@ -425,7 +439,8 @@ def tarjeta_venta(p, base, fijas, locales, promos):
     return ('<a class="vt%s" href="/venta/%s/"><span class="vt-f">%s%s</span>'
             '<span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>'
             % (' en-oferta' if of else '', p['id'], img,
-               '<span class="vt-of">OFERTA</span>' if of else '',
+               ('<span class="vt-of%s">%s</span>' % (' es-remate' if of['remate'] else '',
+                                                     'REMATE' if of['remate'] else 'OFERTA')) if of else '',
                e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
                precio_tarjeta(p, promos)))
 
@@ -464,10 +479,14 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
             % (len(enof), hasta.strftime('%d/%m/%Y'),
                ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)))
         # La ventana flotante de bienvenida lee esto (js/promo-ventana.js).
-        franja_promo += ('<script>window.SB_PROMOS=%s</script>'
-                         % json.dumps({'hasta': hasta.isoformat(),
-                                       'lista': [promo_item(p, base, fijas, locales) for p in enof]},
-                                      ensure_ascii=False))
+        # La ventana flotante solo saluda con los REMATES, no con todas
+        # las promociones: lo demás se ve en la franja sin interrumpir.
+        rem = [p for p in enof if promo(p)['remate']]
+        if rem:
+            franja_promo += ('<script>window.SB_PROMOS=%s</script>'
+                             % json.dumps({'hasta': min(promo(p)['fin'] for p in rem).isoformat(),
+                                           'lista': [promo_item(p, base, fijas, locales) for p in rem]},
+                                          ensure_ascii=False))
 
     cuerpo = f'''
   <section class="cabeza">
