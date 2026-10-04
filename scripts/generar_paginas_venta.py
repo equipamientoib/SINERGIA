@@ -366,7 +366,10 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas):
         tarjetas = ''.join(
             '<a class="vt" href="/venta/%s/"><span class="vt-f">%s</span><span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>' % (
                 p['id'],
-                ('<img src="%s" alt="" loading="lazy" decoding="async">' % fotos(p, base, fijas)[0][0]) if fotos(p, base, fijas) else gp.ICONO,
+                ('<img src="%s" alt="%s" loading="lazy" decoding="async">'
+                 % (fotos(p, base, fijas)[0][0],
+                    e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))
+                 ) if fotos(p, base, fijas) else gp.ICONO,
                 e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
                 ('<i>%s</i>' % soles(p['precio'])) if p.get('precio') else '')
             for p in ps)

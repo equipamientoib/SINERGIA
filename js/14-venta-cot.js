@@ -171,6 +171,17 @@ function vcPintar(){
   vcRestaurar();
 }
 
+/* Pedir mas unidades de las que hay: antes seguia diciendo «En stock» y
+   cotizaba igual. Ahora se avisa que es un pedido especial. */
+function vcSobraStock(p, q){
+  const n = Number(p && p.stock);
+  return n > 0 && Number(q) > n ? n : 0;
+}
+function vcAviso(p, q){
+  const n = vcSobraStock(p, q);
+  return n ? `<span class="v-stock v-pedido">Pedido especial · ${n} en stock</span>` : '';
+}
+
 function vcFila(x){
   const p = x.p, foto = x.foto;
   return `<div class="vc-i">
@@ -178,7 +189,7 @@ function vcFila(x){
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
       <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
-      ${p.stock != null ? vStock(p) : ''}
+      ${vcAviso(p, x.q) || (p.stock != null ? vStock(p) : '')}
     </div>
     <div class="vc-q">
       <button type="button" onclick="vcCantidad('${p.id}',${x.q - 1})" aria-label="Quitar uno">−</button>
@@ -281,8 +292,10 @@ function vcTexto(c, d){
   L.push('');
   L.push('EQUIPOS');
   c.items.forEach((x, i) => {
+    const hay = vcSobraStock(x.p, x.q);
     L.push((i + 1) + '. ' + x.p.nom + ' · ' + [x.p.marca, x.p.modelo].filter(Boolean).join(' ') +
-           (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total));
+           (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total) +
+           (hay ? '  [PEDIDO ESPECIAL: en stock ' + hay + ']' : ''));
   });
   L.push('');
   L.push('  TOTAL REFERENCIAL (IGV incluido): ' + vSoles(c.total));

@@ -503,6 +503,10 @@
   .k{font-family:var(--ff-d);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--cobre-d)}
   .skip{position:absolute;left:-9999px;top:0;background:var(--onix);color:var(--hueso);padding:10px 16px;border-radius:0 0 10px 0;z-index:200;font-weight:600;font-size:14px}
   .skip:focus{left:0}
+  /* Títulos que ordenan la página para Google y los lectores de
+     pantalla, sin ocupar sitio en el diseño. */
+  .solo-lectores{position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   /* Zonas de interfaz no seleccionables (el contenido y los datos de contacto sí se pueden copiar) */
   header,.mobile-menu,.logo-svg,.seg,.subseg,.side .chip,.chip,.btn,.lockbtn,.band,.toTop,.wafab,.fnav,.flab,.copy,.band-x,.modal .modseg,.crumb{-webkit-user-select:none;user-select:none}
   :focus-visible{outline:2px solid var(--bronce);outline-offset:2px;border-radius:4px}
@@ -1204,3 +1208,7 @@ body.wa-propio .wafab{display:none}
   .wafab{right:12px;bottom:76px}
   body.vc-conbarra .wafab,body.cot-conbarra .wafab{bottom:98px}
 }
+
+/* Aviso cuando piden más unidades de las que hay en stock. */
+.v-stock.v-pedido{background:rgba(201,146,47,.12);border:1px solid rgba(201,146,47,.35);color:#8a6312;
+  font-size:11px;letter-spacing:0;white-space:nowrap}

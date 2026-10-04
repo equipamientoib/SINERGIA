@@ -195,6 +195,12 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
   .dv-caja{height:100%;border-radius:0}
   .dv-tit{font-size:13px}
 }
+/* En tablet (768 px) el menú medía 774 px: «Contacto» quedaba cortado y
+   la página se corría de lado. Con menos separación entra justo. */
+@media(max-width:860px){
+  .top nav{gap:13px;font-size:13px}
+  .top .wrap{gap:12px}
+}
 @media(max-width:700px){
   .top nav{gap:14px;font-size:13px}
   .top nav > a{display:none}
