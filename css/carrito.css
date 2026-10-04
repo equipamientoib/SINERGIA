@@ -3,6 +3,13 @@
    páginas sueltas de producto, así que no depende de las variables del
    resto: solo usa las que existen en los dos sitios, con respaldo.
    ===================================================================== */
+/* Botón de volver, arriba del todo en la ficha del equipo */
+.sb-atras{display:inline-flex;align-items:center;gap:7px;margin:14px 0 -6px;padding:8px 14px 8px 10px;
+  border:1px solid var(--linea,#e3ded4);border-radius:999px;background:var(--blanco,#fff);
+  font:inherit;font-size:13.5px;font-weight:600;color:var(--grafito,#3a3a3a);cursor:pointer}
+.sb-atras:hover{border-color:var(--cobre,#9A7F4E);color:var(--cobre-d,#7d6539)}
+.sb-atras svg{flex:none}
+
 .sb-cart-btn{position:relative;display:inline-grid;place-items:center;width:40px;height:40px;margin-left:8px;
   border:1px solid var(--linea,#e3ded4);border-radius:12px;background:var(--blanco,#fff);
   color:var(--onix,#17191d);cursor:pointer;transition:border-color .15s,color .15s}
@@ -58,10 +65,12 @@ body.sb-cart-open{overflow:hidden}
 .sb-toast button{flex:none;padding:8px 14px;border:0;border-radius:999px;background:#fff;
   color:var(--onix,#17191d);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 
-/* botón «Agregar al carrito» ya agregado */
-[data-add].on{background:rgba(46,125,50,.12);border-color:#2e7d32;color:#2e7d32}
+/* botón «Agregar al carrito» ya agregado (gana a .btn.fill) */
+[data-add].on,.btn.fill[data-add].on,.btn.btn-fill[data-add].on{
+  background:rgba(46,125,50,.12);border:1px solid #2e7d32;color:#2e7d32}
 
-@media(max-width:560px){
+@media(max-width:700px){
   .sb-cart-p{width:100%}
   .sb-cart-btn{width:38px;height:38px;margin-left:6px}
+  .sb-atras{margin:12px 0 -4px}
 }
