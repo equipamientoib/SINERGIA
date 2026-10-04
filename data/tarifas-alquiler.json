@@ -1,5 +1,5 @@
 {
-  "_nota": "Tarifas de alquiler acordadas (S/ por día, IGV incluido). Mandan sobre lo que venga de la hoja. medioDiaDesde: precio por día desde el cual el instrumento se puede alquilar por medio día. medioDiaMinimo: lo menos que puede costar un medio día. instrumentistaMedioDia: lo que cuesta el instrumentista por medio día. descuentos: lo que baja el precio del dia segun cuantos instrumentos se lleven juntos. garantiaProvincia: garantia en deposito de cada instrumento que viaja solo a provincia.",
+  "_nota": "Tarifas de alquiler acordadas (S/ por día, IGV incluido). Mandan sobre lo que venga de la hoja. medioDiaDesde: precio por día desde el cual el instrumento se puede alquilar por medio día. medioDiaMinimo: lo menos que puede costar un medio día. instrumentistaMedioDia: lo que cuesta el instrumentista por medio día. descuentos: lo que baja el precio del dia segun cuantos instrumentos se lleven juntos. garantiaProvincia: garantia en deposito de cada instrumento que viaja solo a provincia. viaje: pasaje de ida y vuelta del instrumentista a provincia (pasajeMin-pasaje, segun la distancia) y viatico por dia.",
   "dia": {
     "esa620": 180,
     "defib": 150,
@@ -22,5 +22,10 @@
     "4": 0.18,
     "5": 0.2
   },
-  "garantiaProvincia": 300
+  "garantiaProvincia": 300,
+  "viaje": {
+    "pasajeMin": 80,
+    "pasaje": 100,
+    "viaticoDia": 50
+  }
 }

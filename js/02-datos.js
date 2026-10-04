@@ -69,6 +69,11 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
     if(d.descuentos) DESC_COMB = d.descuentos;
     if(d.garantiaProvincia > 0) GARANTIA_PROV = d.garantiaProvincia;
+    if(d.viaje){
+      if(d.viaje.pasajeMin > 0) VIAJE_PASAJE_MIN = d.viaje.pasajeMin;
+      if(d.viaje.pasaje > 0) VIAJE_PASAJE = d.viaje.pasaje;
+      if(d.viaje.viaticoDia > 0) VIAJE_VIATICO = d.viaje.viaticoDia;
+    }
     if(d.dia){ TARIFAS = d.dia; aplicarTarifas();
     if(typeof repintarTodo === 'function') repintarTodo(); } }).catch(() => {});
 /* Medio día = un turno de 4 h (9:00–13:00 o 14:00–18:00). Cuesta el 60 % del
@@ -86,6 +91,9 @@ let SIN_TECNICO = {manometro:100, luxometro:100, tacometro:100};
 /* Garantía en depósito de los instrumentos que normalmente van con
    instrumentista, cuando viajan solos a provincia. */
 let GARANTIA_PROV = 300;
+/* Viaje del instrumentista a provincia: el pasaje de ida y vuelta se cobra
+   una sola vez (varía con la distancia) y la alimentación, por cada día. */
+let VIAJE_PASAJE_MIN = 80, VIAJE_PASAJE = 100, VIAJE_VIATICO = 50;
 const soloEquipo = id => Object.prototype.hasOwnProperty.call(SIN_TECNICO, id);
 /* Complementarias: no se alquilan solas (herramientas de apoyo). */
 let COMPLEMENTOS = ['set-46', 'destornillador-elec'];
