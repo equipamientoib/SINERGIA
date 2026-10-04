@@ -47,12 +47,20 @@ function vAjustar(p){
   if(q.clave && !q.expediente) q.expediente = ((VENTA && VENTA.ntsNom) || {})[q.clave] || '';
   return q;
 }
+/* Equipos retirados a mano (data/venta.json › noPublicar): siguen con
+   publicar = SI en la hoja, pero no se muestran ni se cotizan. Motivo
+   anotado en el propio archivo (precio por encima de la competencia). */
+function vBloqueado(id){
+  const no = (VENTA && VENTA.noPublicar) || {};
+  return !!id && id !== '_nota' && Object.prototype.hasOwnProperty.call(no, id);
+}
+
 function vMezclar(){
   if(VENTA && VENTA_VIVO){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    VENTA.productos = VENTA_VIVO.productos.map(p => {
+    VENTA.productos = VENTA_VIVO.productos.filter(p => !vBloqueado(p.id)).map(p => {
       p = vAjustar(p);
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
@@ -80,8 +88,9 @@ function cargarVenta(){
       .then(d => copia.then(c => { if(c && !VENTA_VIVO) ventaEnVivo(c); return d; }))
       .then(d => {
         VENTA = {categorias: d.categorias||[], fijas: d.fotosFijas||{}, primeros: d.primerosWeb||[],
+                 noPublicar: d.noPublicar||{},
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
-        VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
+        VENTA.productos = (d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';

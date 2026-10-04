@@ -460,7 +460,14 @@ def main():
     cfg = gp.config_sitio()
     vivo = gp.leer_json(args.datos)
     repo = gp.leer_json(VENTA)
-    productos = [ajustar(p, repo) for p in vivo.get('productos', []) if p.get('id') and p.get('nom')]
+    # Equipos retirados a mano (venta.json › noPublicar): la hoja los sigue
+    # mandando con publicar = SI, pero aquí no se publican ni se cotizan.
+    bloq = {k for k in (repo.get('noPublicar') or {}) if k != '_nota'}
+    productos = [ajustar(p, repo) for p in vivo.get('productos', [])
+                 if p.get('id') and p.get('nom') and p['id'] not in bloq]
+    fuera = [p['id'] for p in vivo.get('productos', []) if p.get('id') in bloq]
+    if fuera:
+        print('Retirados a mano (noPublicar): %s' % ', '.join(sorted(fuera)))
     if not productos:
         sys.exit('No hay equipos en los datos: no se genera nada.')
     cats = {c['id']: c['nombre'] for c in repo.get('categorias', [])}
@@ -497,7 +504,8 @@ def main():
 
     # Copia de los datos en vivo para la tienda: abre con esto si Google tarda.
     copia = {'actualizado': vivo.get('actualizado', ''),
-             'productos': [p for p in vivo.get('productos', []) if p.get('id') and p.get('nom')]}
+             'productos': [p for p in vivo.get('productos', [])
+                           if p.get('id') and p.get('nom') and p['id'] not in bloq]}
     gp.escribir('data/venta-vivo.json', json.dumps(copia, ensure_ascii=False, separators=(',', ':')) + '\n', cambios)
 
     mapa_portada(productos, cambios)

@@ -1,5 +1,11 @@
 {
   "_nota": "Catálogo de VENTA. Cada producto lleva su categoría (cat), marca, modelo y, si aplica, el nombre y código con que aparece en los expedientes técnicos (expediente, clave). Las fotos van en img/venta/<id>-01.jpg (con versiones -m y .webp) y se listan en «fotosSitio» (respaldo: la foto del proveedor, la del modelo real, tiene prioridad). Lo que falte no se muestra.",
+  "noPublicar": {
+    "_nota": "Equipos que NO se publican aunque la hoja diga publicar = SI. Motivo: su precio queda por encima del mismo modelo que ya se vende en Saga Falabella y el cliente puede compararlo (estudio del 4/10/2026 en docs/comparacion-falabella-2026-10-04.md). Para volver a publicar uno, borra su línea de aquí.",
+    "riester-exacta": "S/ 401 frente a S/ 280 en Falabella (+43 %)",
+    "riester-ri-champion-n": "S/ 740 frente a S/ 426 en Falabella (+74 %)",
+    "riester-ri-standard": "S/ 1 148 frente a S/ 1 060 en Falabella (+8 %)"
+  },
   "categorias": [
     {
       "id": "monitoreo",
