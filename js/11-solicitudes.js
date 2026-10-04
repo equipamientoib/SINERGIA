@@ -63,9 +63,20 @@ function abrirCanal(via, texto, asunto){
     return;
   }
   const a = document.createElement('a');
-  a.href = 'https://wa.me/' + n + '?text=' + encodeURIComponent(texto);
+  a.href = urlWhatsApp(n, texto);
   a.target = '_blank'; a.rel = 'noopener';
   document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* En el celular, wa.me abre la aplicación. En la computadora, wa.me pasa
+   por una página intermedia de WhatsApp que con mensajes largos se ve
+   rota y descuadrada: ahí se va directo a WhatsApp Web, que pega el
+   mensaje en el chat. */
+function urlWhatsApp(numero, texto){
+  const movil = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent || '');
+  const base = movil ? 'https://wa.me/' + numero + '?text='
+                     : 'https://web.whatsapp.com/send?phone=' + numero + '&text=';
+  return base + encodeURIComponent(texto);
 }
 
 /* ── formulario de contacto ─────────────────────────────────────────── */

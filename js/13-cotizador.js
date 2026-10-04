@@ -1005,7 +1005,7 @@ function cotVer(codigo){
     return;
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
-  const wa = 'https://wa.me/' + (S.whatsapp || '') + '?text=' + encodeURIComponent(
+  const wa = urlWhatsApp(String(S.whatsapp || '').replace(/\D/g, ''),
     'Hola, quiero confirmar la solicitud ' + d.num + ' por S/ ' + d.total.toFixed(2) +
     ' y recibir la cotización formal.\n\n' + location.href);
   caja.innerHTML = `
