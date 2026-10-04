@@ -803,17 +803,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=63f2a45b';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=92f56422';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=63f2a45b';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=92f56422';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=63f2a45b','js/06-tablero.js?v=63f2a45b'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=92f56422','js/06-tablero.js?v=92f56422'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=63f2a45b'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=92f56422'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1555,9 +1555,20 @@ function abrirCanal(via, texto, asunto){
     return;
   }
   const a = document.createElement('a');
-  a.href = 'https://wa.me/' + n + '?text=' + encodeURIComponent(texto);
+  a.href = urlWhatsApp(n, texto);
   a.target = '_blank'; a.rel = 'noopener';
   document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* En el celular, wa.me abre la aplicación. En la computadora, wa.me pasa
+   por una página intermedia de WhatsApp que con mensajes largos se ve
+   rota y descuadrada: ahí se va directo a WhatsApp Web, que pega el
+   mensaje en el chat. */
+function urlWhatsApp(numero, texto){
+  const movil = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent || '');
+  const base = movil ? 'https://wa.me/' + numero + '?text='
+                     : 'https://web.whatsapp.com/send?phone=' + numero + '&text=';
+  return base + encodeURIComponent(texto);
 }
 
 /* ── formulario de contacto ─────────────────────────────────────────── */
@@ -1819,7 +1830,8 @@ function vListaEnviar(via){
 
 function vWA(texto){
   const n = String(SITE.whatsapp||'').replace(/\D/g,'');
-  return `https://wa.me/${n}?text=${encodeURIComponent(texto)}`;
+  return (typeof urlWhatsApp === 'function') ? urlWhatsApp(n, texto)
+       : `https://wa.me/${n}?text=${encodeURIComponent(texto)}`;
 }
 function vMail(asunto){
   return `mailto:${SITE.email}?subject=${encodeURIComponent(asunto)}`;
@@ -3272,7 +3284,7 @@ function cotVer(codigo){
     return;
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
-  const wa = 'https://wa.me/' + (S.whatsapp || '') + '?text=' + encodeURIComponent(
+  const wa = urlWhatsApp(String(S.whatsapp || '').replace(/\D/g, ''),
     'Hola, quiero confirmar la solicitud ' + d.num + ' por S/ ' + d.total.toFixed(2) +
     ' y recibir la cotización formal.\n\n' + location.href);
   caja.innerHTML = `

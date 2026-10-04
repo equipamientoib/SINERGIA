@@ -163,7 +163,8 @@ function vListaEnviar(via){
 
 function vWA(texto){
   const n = String(SITE.whatsapp||'').replace(/\D/g,'');
-  return `https://wa.me/${n}?text=${encodeURIComponent(texto)}`;
+  return (typeof urlWhatsApp === 'function') ? urlWhatsApp(n, texto)
+       : `https://wa.me/${n}?text=${encodeURIComponent(texto)}`;
 }
 function vMail(asunto){
   return `mailto:${SITE.email}?subject=${encodeURIComponent(asunto)}`;
