@@ -962,7 +962,7 @@ function cotModal(doc){
     </div>
     <div class="cotm-h"><iframe title="Vista previa de la solicitud"></iframe></div>
     <div class="cotm-a">
-      <button class="btn btn-fill" onclick="cotModalCerrar();cotEnviar('whatsapp')">Enviar mi pedido por WhatsApp</button>
+      <button class="btn btn-fill" onclick="cotModalCerrar();cotEnviarDoc('${doc.tipo === 'venta' ? 'venta' : 'alquiler'}')">Enviar mi pedido por WhatsApp</button>
       <button class="btn" onclick="cotModalCerrar()">Seguir editando</button>
     </div>
   </div>`;
@@ -971,6 +971,12 @@ function cotModal(doc){
   f.onload = () => cotAjustarHoja(f);
   document.body.classList.add('cot-bloq');
   m.classList.add('on');
+}
+/* La misma ventana sirve para el alquiler y para la venta: cada una
+   manda su pedido con su propia función. */
+function cotEnviarDoc(tipo){
+  if(tipo === 'venta' && typeof vcEnviar === 'function') vcEnviar('whatsapp');
+  else cotEnviar('whatsapp');
 }
 function cotModalCerrar(){
   const m = document.getElementById('cotModal');
