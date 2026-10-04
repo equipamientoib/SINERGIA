@@ -117,7 +117,13 @@ function cotOfertas(c){
     .slice()
     .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
-      if(yaEstan.has(e.id)) return {e: e, on: true, mas: 0};
+      if(yaEstan.has(e.id)){
+        /* Lo que le toca a este instrumento dentro del alquiler, prorrateado
+           con el descuento ya aplicado: así la suma de la lista cuadra con el
+           subtotal, y cada uno baja de precio cuando se agrega otro. */
+        const parte = c.base ? Number(e.dia || 0) * (c.unit / c.base) : 0;
+        return {e: e, on: true, mas: parte * c.qty};
+      }
       const sim = cotSimular(e.id);
       return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
     });
@@ -134,6 +140,16 @@ function cotSimular(id){
   COT.sel = antes;
   return c;
 }
+/* Lo mismo al revés: cuánto bajaría el total si lo quitara. Es lo que ese
+   instrumento está aportando hoy al precio. */
+function cotSimularSin(id){
+  const antes = COT.sel;
+  const s = new Set(antes); s.delete(id);
+  COT.sel = s;
+  const c = cotCalcular();
+  COT.sel = antes;
+  return c;
+}
 function cotOfertas(c){
   if(!c.sel.length || c.largo || c.faltaCiudad) return [];
   const yaEstan = new Set(c.sel.map(e => e.id));
@@ -144,7 +160,13 @@ function cotOfertas(c){
     .slice()
     .sort((a, b) => Number(b.dia || 0) - Number(a.dia || 0))
     .map(e => {
-      if(yaEstan.has(e.id)) return {e: e, on: true, mas: 0};
+      if(yaEstan.has(e.id)){
+        /* Lo que le toca a este instrumento dentro del alquiler, prorrateado
+           con el descuento ya aplicado: así la suma de la lista cuadra con el
+           subtotal, y cada uno baja de precio cuando se agrega otro. */
+        const parte = c.base ? Number(e.dia || 0) * (c.unit / c.base) : 0;
+        return {e: e, on: true, mas: parte * c.qty};
+      }
       const sim = cotSimular(e.id);
       return {e: e, on: false, mas: Math.max(0, sim.total - c.total)};
     });
@@ -152,6 +174,12 @@ function cotOfertas(c){
 
 /* «1 medio día», «2 medios días», «3 días». */
 const cotPlural = (u, q) => q === 1 ? u : (u === 'medio día' ? 'medios días' : u + 's');
+/* El periodo, escrito como se habla: «medio día», no «1 medio día», que
+   se lee como si fuera un día entero. */
+function cotPeriodo(mod, qty){
+  const u = COT_UNI[mod];
+  return qty === 1 ? (mod === 'medio' ? u : '1 ' + u) : qty + ' ' + cotPlural(u, qty);
+}
 
 /* Solo medio día y día: de una semana en adelante se habla directamente. */
 const COT_MOD = [['medio', 'Medio día'], ['dia', 'Por día']];
@@ -173,13 +201,53 @@ function cotBarra(c){
     : c.largo
     ? `<div><span>${c.qty} días</span><b>Conversémoslo</b></div>
        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Escríbenos</button>`
-    : `<div><span>${cuantos} · ${c.qty} ${cotPlural(COT_UNI[c.mod], c.qty)}</span>
+    : `<div><span>${cuantos} · ${cotPeriodo(c.mod, c.qty)}</span>
          <b>S/ ${c.total.toFixed(2)}</b></div>
        <button class="btn" onclick="cotVista()">Ver</button>
        <button class="btn btn-fill" onclick="cotEnviar('whatsapp')">Enviar</button>`;
 }
 
+/* Paso 1: dónde se va a usar. Va arriba de los instrumentos, porque el
+   lugar cambia las modalidades y el precio de todo lo que viene después. */
+function cotSedePintar(){
+  const caja = document.getElementById('cotSede');
+  if(!caja) return;
+  const c = cotCalcular();
+  caja.innerHTML = `
+    <div class="cot-seg">
+      <button type="button" class="${c.prov ? '' : 'on'}" onclick="cotSede('lima')">Lima</button>
+      <button type="button" class="${c.prov ? 'on' : ''}" onclick="cotSede('provincia')">Provincia</button>
+    </div>
+    ${c.prov && c.conTecnico ? `<label class="cot-f1">¿A qué ciudad?
+      <select onchange="cotCiudad(this.value)">
+        <option value="">Elige tu ciudad…</option>
+        ${Object.keys(VIAJE_ZONAS).map(z => `<optgroup label="${VIAJE_ZONAS[z]}">
+          ${CIUDADES.filter(x => String(x.z) === z).map(x =>
+            `<option value="${cotEsc(x.n)}"${COT.ciudad === x.n ? ' selected' : ''}>${cotEsc(x.n)}</option>`).join('')}
+        </optgroup>`).join('')}
+      </select></label>` : ''}
+    <p class="cot-ayuda">${!c.prov
+      ? 'Retiro y devolución en nuestra oficina de Pueblo Libre, Lima.'
+      : c.conTecnico
+        ? `Viaja nuestro instrumentista con los instrumentos: sale de noche y regresa de noche, así que
+           solo pagas los días de trabajo. Al total se le suman el pasaje de ida y vuelta (una sola vez,
+           según la ciudad) y los viáticos: comida por día y hospedaje por noche, si se queda más de un
+           día. Fuera de Lima no hay medio día.`
+        : `Estos instrumentos no necesitan instrumentista: te los mandamos por Shalom (o la agencia que
+           prefieras) y el envío de ida y vuelta lo contratas y lo pagas tú, directo con la agencia.
+           Como están fuera varios días, el alquiler va desde ${PROV_DIAS} días y sin medio día.`}</p>`;
+}
+
+/* Lleva al desplegable de la ciudad, en el paso 1, y lo abre. */
+function cotIrCiudad(){
+  const sel = document.querySelector('#cotSede select');
+  if(!sel) return;
+  sel.scrollIntoView({behavior: 'smooth', block: 'center'});
+  setTimeout(() => sel.focus(), 400);
+}
+
 function cotPintar(){
+  cotSedePintar();
   const lista = document.getElementById('cotEq');
   if(!lista) return;
   const grupos = [['ansim', 'Analizadores y simuladores'], ['med', 'Instrumentos de medición'],
@@ -271,7 +339,7 @@ function cotResumen(){
          </div>
        </div>`
     : `<div class="cot-top">
-         <span>Tu cotización · ${c.qty} ${cotPlural(u, c.qty)}${c.prov ? ' · provincia' : ''}</span>
+         <span>Tu cotización · ${cotPeriodo(c.mod, c.qty)}${c.prov ? ' · provincia' : ''}</span>
          <b>S/ ${c.total.toFixed(2)}</b>
          <small>IGV incluido${c.garantia ? ' · + S/ ' + fmt(c.garantia) + ' de garantía que se devuelve' : ''}</small>
          <div class="cot-acc">
@@ -282,31 +350,9 @@ function cotResumen(){
   caja.innerHTML = `
     ${arriba}
 
-    <div class="cot-paso"><b>2</b> ¿Dónde lo vas a usar?</div>
-    <div class="cot-seg">
-      <button type="button" class="${c.prov ? '' : 'on'}" onclick="cotSede('lima')">Lima</button>
-      <button type="button" class="${c.prov ? 'on' : ''}" onclick="cotSede('provincia')">Provincia</button>
-    </div>
-    ${c.prov && c.conTecnico ? `<label class="cot-f1">¿A qué ciudad?
-      <select onchange="cotCiudad(this.value)">
-        <option value="">Elige tu ciudad…</option>
-        ${Object.keys(VIAJE_ZONAS).map(z => `<optgroup label="${VIAJE_ZONAS[z]}">
-          ${CIUDADES.filter(x => String(x.z) === z).map(x =>
-            `<option value="${cotEsc(x.n)}"${COT.ciudad === x.n ? ' selected' : ''}>${cotEsc(x.n)}</option>`).join('')}
-        </optgroup>`).join('')}
-      </select></label>` : ''}
-    <p class="cot-ayuda">${!c.prov
-      ? 'Retiro y devolución en nuestra oficina de Pueblo Libre, Lima.'
-      : c.conTecnico
-        ? `Viaja nuestro instrumentista con los instrumentos: sale de noche y regresa de noche, así que
-           solo pagas los días de trabajo. Al total se le suman el pasaje de ida y vuelta (una sola vez,
-           según la ciudad) y los viáticos: comida por día y hospedaje por noche, si se queda más de un
-           día. Fuera de Lima no hay medio día.`
-        : `Estos instrumentos no necesitan instrumentista: te los mandamos por Shalom (o la agencia que
-           prefieras) y el envío de ida y vuelta lo contratas y lo pagas tú, directo con la agencia.
-           Como están fuera varios días, el alquiler va desde ${PROV_DIAS} días y sin medio día.`}</p>
+    ${cotOfertasHTML(c)}
 
-    <div class="cot-paso"><b>3</b> ¿Por cuánto tiempo?</div>
+    <div class="cot-paso"><b>4</b> ¿Por cuánto tiempo?</div>
     <div class="cot-seg">${seg}</div>
     ${c.mod === 'medio'
       ? `<p class="cot-ayuda">Un turno de 4 h: ${HORARIO_MANANA} o ${HORARIO_TARDE}.${
@@ -321,7 +367,7 @@ function cotResumen(){
     ${(c.largo || c.mod !== 'dia') ? '' : `<p class="cot-ayuda">¿Lo necesitas una semana o más? Ese caso lo vemos
       directamente: pon los días y te aparece cómo escribirnos.</p>`}
 
-    <div class="cot-paso"><b>4</b> El detalle</div>
+    <div class="cot-paso"><b>5</b> El detalle</div>
     <ul class="cot-sel">${c.sel.map(e =>
       `<li><span>${cotEsc(e.nom)}</span><span>S/ ${fmt(e.dia)}</span></li>`).join('')}
       ${c.desc ? `<li class="des"><span>Descuento por combinar ${n} (${Math.round(c.desc * 100)} %)</span><span>− S/ ${fmt(Math.round(c.base * c.desc))}</span></li>` : ''}
@@ -330,7 +376,7 @@ function cotResumen(){
       Para una semana o más lo vemos contigo: escríbenos y te pasamos el precio del plazo completo.</p>`
     : `<div class="cot-cuenta">
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
-      <div><span>× ${c.qty} ${cotPlural(u, c.qty)}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
+      <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>S/ ${c.alquiler.toFixed(2)}</span></div>
       ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>S/ ${c.tecnico.toFixed(2)}</span></div>` : ''}
       ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>S/ ${c.pasaje.toFixed(2)}</span></div>
         <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
@@ -339,7 +385,6 @@ function cotResumen(){
       <div class="sub"><span>IGV (18 %) (S/)</span><span>${(c.total / 1.18 * 0.18).toFixed(2)}</span></div>
       <div class="gran"><span>Total con IGV (S/)</span><span>${c.total.toFixed(2)}</span></div>
     </div>`}
-    ${cotOfertasHTML(c)}
     ${c.faltaCiudad ? `<p class="cot-aviso"><b>Elige tu ciudad para ver el total.</b>
       El pasaje del instrumentista cambia con la distancia, así que el precio se calcula recién
       cuando nos dices a qué ciudad va.</p>` : ''}
@@ -354,7 +399,7 @@ function cotResumen(){
       No es un cobro: se te devuelve cuando regreses el equipo. Lo recoges en nuestra oficina con tu DNI.</p>` : ''}
     ${inc.length ? `<p class="cot-aviso ok"><b>Incluido sin costo:</b> ${inc.map(x => cotEsc(x.nom)).join(' · ')}.</p>` : ''}
 
-    <div class="cot-paso"><b>5</b> Tus datos</div>
+    <div class="cot-paso"><b>6</b> Tus datos</div>
     <div class="cot-form" id="cotForm">
       <label>Nombre o institución<input id="cotNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></label>
       <div class="cot-f2">
@@ -378,16 +423,16 @@ function cotOfertasHTML(c){
   const of = cotOfertas(c);
   if(!of.length) return '';
   const u = COT_UNI[c.mod];
-  return `<div class="cot-of">
-    <div class="cot-ofh">Agrega por un poco más</div>
-    <p class="cot-ofs">Lo que cuesta cada uno si lo sumas a lo que ya elegiste, por ${u}.
-      Toca para agregarlo o quitarlo.</p>
+  return `<div class="cot-paso"><b>3</b> Agrega por un poco más</div>
+  <div class="cot-of">
+    <p class="cot-ofs">Lo que cuesta cada uno sumado a lo que ya elegiste, por ${u}.
+      Toca para agregarlo o quitarlo; los que ya llevas salen con su check.</p>
     ${of.map(o => {
       const solo = c.mod === 'medio' ? precioMedio(o.e.dia) : o.e.dia;
       const porUnidad = Math.round(o.mas / c.qty);
       if(o.on) return `<button type="button" class="cot-ofi on" onclick="cotMarcar('${o.e.id}',false)">
         <span class="n">${cotEsc(o.e.nom)}</span>
-        <span class="p"><b>ya está</b></span>
+        <span class="p"><b>S/ ${fmt(porUnidad)}</b>${porUnidad < solo ? ` <s>${fmt(solo)}</s>` : ''}</span>
         <span class="mas" aria-hidden="true">✓</span>
       </button>`;
       return `<button type="button" class="cot-ofi" onclick="cotMarcar('${o.e.id}',true)">
@@ -417,7 +462,7 @@ function cotRestaurar(){
 /* Mensaje de la solicitud: numerado y con el detalle de cada instrumento,
    para que se pueda pasar tal cual a la cotización formal. */
 function cotTexto(c, nom, mail, tel){
-  const u = COT_UNI[c.mod], uq = cotPlural(u, c.qty);
+  const u = COT_UNI[c.mod], per = cotPeriodo(c.mod, c.qty);
   const L = [];
   L.push((!c.largo ? 'SOLICITUD DE ALQUILER — '
           : (c.prov && c.conTecnico) ? 'ALQUILER EN PROVINCIA CON INSTRUMENTISTA — '
@@ -433,7 +478,7 @@ function cotTexto(c, nom, mail, tel){
   L.push('DÓNDE: ' + (!c.prov ? 'Lima'
     : c.ciudad ? ('Provincia · ' + c.ciudad.n + ' (viaja el instrumentista)')
     : 'Provincia (envío por agencia, a cargo del cliente)'));
-  L.push('PERIODO: ' + c.qty + ' ' + uq + (c.mod === 'medio' ? ' (turnos de 4 h)' : ''));
+  L.push('PERIODO: ' + per + (c.mod === 'medio' ? ' (turno de 4 h)' : ''));
   L.push('');
   L.push('INSTRUMENTOS');
   c.sel.forEach((e, i) => {
@@ -454,7 +499,7 @@ function cotTexto(c, nom, mail, tel){
   if(c.desc) L.push('  Suma por día: S/ ' + fmt(c.base));
   if(c.desc) L.push('  Descuento por combinar ' + c.sel.length + ': −' + Math.round(c.desc * 100) + ' % (S/ ' + fmt(Math.round(c.base * c.desc)) + ')');
   L.push('  Precio por ' + u + ': S/ ' + fmt(c.unit));
-  L.push('  Alquiler (' + c.qty + ' ' + uq + '): S/ ' + c.alquiler.toFixed(2));
+  L.push('  Alquiler (' + per + '): S/ ' + c.alquiler.toFixed(2));
   if(c.conTecnico) L.push('  Instrumentista metrológico: S/ ' + c.tecnico.toFixed(2));
   if(c.viaja && c.ciudad){
     L.push('  Pasajes ida y vuelta a ' + c.ciudad.n + ' (una sola vez): S/ ' + c.pasaje.toFixed(2));
@@ -608,11 +653,11 @@ function cotEnlace(doc, ruta){
 
 /* Términos y condiciones, numerados como en las cotizaciones de la empresa. */
 function cotTerminos(c){
-  const u = COT_UNI[c.mod], uq = cotPlural(u, c.qty);
+  const u = COT_UNI[c.mod], per = cotPeriodo(c.mod, c.qty);
   const conTec = !!c.tec, gar = c.gar || 0;
   const T = [];
   T.push(['1. Precio de la oferta.', 'Importes en Soles (S/), con IGV incluido. Comprenden el alquiler ' +
-    'de los instrumentos por ' + c.qty + ' ' + uq +
+    'de los instrumentos por ' + per +
     (conTec ? ' y el servicio de instrumentista metrológico.' : '.')]);
   T.push(['2. Vigencia de la oferta.', 'Quince (15) días calendario contados desde la emisión de esta cotización.']);
   T.push(['3. Calibración.', 'Todos los instrumentos se entregan con su certificado de calibración vigente, emitido por laboratorio acreditado, y se devuelven con el mismo certificado.']);
@@ -654,7 +699,7 @@ function cotTerminos(c){
    El cliente nunca genera la segunda: eso lo decide la empresa. */
 function cotHTML(d, formal){
   const S = (typeof SITE !== 'undefined') ? SITE : {};
-  const u = COT_UNI[d.mod], uq = cotPlural(u, d.qty);
+  const u = COT_UNI[d.mod], per = cotPeriodo(d.mod, d.qty);
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
   const neto = d.total / 1.18, igv = d.total - neto;
@@ -784,7 +829,7 @@ function cotHTML(d, formal){
           <b>Dónde:</b> ${!d.prov ? 'Lima'
             : d.ciu ? 'Provincia · ' + cotEsc(d.ciu) + ' (viaja el instrumentista)'
             : 'Provincia (envío por agencia, a cargo del cliente)'}<br>
-          <b>Periodo:</b> ${cotEsc(d.qty + ' ' + uq)}</p>
+          <b>Periodo:</b> ${cotEsc(per)}</p>
         <h2>Instrumentos y precio estimado</h2>
         ${cuadro}
         <p class="nota">Importes en Soles (S/), con IGV incluido. ${cotMontoLetras(d.total)}${d.gar
@@ -848,7 +893,7 @@ function cotHTML(d, formal){
         ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
         ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
       <p class="campo"><b>Asunto:</b> Alquiler de instrumentos de metrología biomédica con certificado de
-        calibración vigente, por ${cotEsc(d.qty + ' ' + uq)}.</p>
+        calibración vigente, por ${cotEsc(per)}.</p>
       <p class="intro">Es grato dirigirnos a ustedes para saludarlos cordialmente y, en atención a su
         requerimiento, alcanzarles nuestra propuesta económica por el alquiler de los instrumentos
         detallados en el Cuadro N° 1.</p>
