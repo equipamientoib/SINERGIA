@@ -290,14 +290,14 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
                 % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial, se confirma en la cotización'
         if of:
             nota = ('Incluye IGV · <b>%s hasta el %s</b> · se confirma en la cotización'
-                    % ('Remate válido' if of['remate'] else 'Promoción válida',
+                    % ('Promoción válida',
                        of['fin'].strftime('%d/%m/%Y'))) if of['fin'] else (
                    'Incluye IGV · <b>%s, hasta agotar stock</b> · se confirma en la cotización'
-                    % ('Precio de remate' if of['remate'] else 'Precio especial'))
+                    % 'Precio especial')
         # Nunca se muestra el precio anterior ni el porcentaje: el cliente
         # de este negocio vuelve a comprar y negocia, y anunciar la rebaja
         # deja la sensación de que el precio de lista estaba inflado.
-        antes = ('<span class="pc-of">%s</span>' % ('Remate de stock' if of['remate'] else 'Precio especial')) if of else ''
+        antes = '<span class="pc-of">Precio especial</span>' if of else ''
         caja = f'''<div class="precio{' con-promo' if of else ''}"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{antes}{badge}</div>
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
@@ -459,8 +459,7 @@ def tarjeta_venta(p, base, fijas, locales, promos):
     return ('<a class="vt%s" href="/venta/%s/"><span class="vt-f">%s%s</span>'
             '<span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>'
             % (' en-oferta' if of else '', p['id'], img,
-               ('<span class="vt-of%s">%s</span>' % (' es-remate' if of['remate'] else '',
-                                                     'REMATE' if of['remate'] else 'OFERTA')) if of else '',
+               ('<span class="vt-of%s">PROMOCIÓN</span>' % (' es-remate' if of['remate'] else '')) if of else '',
                e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
                precio_tarjeta(p, promos)))
 
@@ -473,7 +472,7 @@ def precio_tarjeta(p, promos):
     if not of:
         return '<i>%s</i>' % soles(p['precio'])
     return ('<i class="oferta">%s <em>%s</em></i>'
-            % (soles(p['precio']), 'Remate' if of['remate'] else 'Precio especial'))
+            % (soles(p['precio']), 'Precio especial'))
 
 
 def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
@@ -561,7 +560,7 @@ def pm_tarjeta(p, cfg, base, fijas, locales, promos):
             '<a class="btn" href="%s" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div>'
             '</div></article>'
             % (p['id'], img,
-               e(of.get('remate') and 'Remate de stock' or 'Precio especial'),
+               'Precio especial',
                p['id'], e(p['nom']),
                ('<p class="pm-mm">%s</p>' % e(mm)) if mm else '',
                extra,
@@ -593,7 +592,6 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
                             migas=[('Inicio', '/'), ('Promociones', ruta)], cuerpo=cuerpo, jsonld=[])
     fechas = [promo(p)['fin'] for p in enof if promo(p)['fin']]
     hasta = min(fechas) if fechas else None
-    todos = all(promo(p)['remate'] for p in enof)
     # Una sola rejilla: el aviso diseñado arriba y, debajo, lo que el
     # comprador necesita para decidir (nombre, marca, precio, stock) y un
     # botón. Antes los mismos cuatro equipos salían dos veces, el aviso sin
@@ -601,8 +599,8 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
     tarjetas = ''.join(pm_tarjeta(p, cfg, base, fijas, locales, promos) for p in enof)
     cuerpo = f'''
   <section class="cabeza">
-    <div class="eyebrow">Venta · {'Remate de stock' if todos else 'Promociones'}</div>
-    <h1>{'Equipos en remate' if todos else 'Equipos en promoción'}</h1>
+    <div class="eyebrow">Venta · Precio especial</div>
+    <h1>Equipos en promoción</h1>
     <p class="lead">{len(enof)} equipos a precio especial{(', hasta el ' + hasta.strftime('%d/%m/%Y')) if hasta else ', hasta agotar stock'}.
       Son unidades contadas: cuando se van, vuelve el precio de siempre.</p>
     <p><a class="btn fill" href="/venta/">Ver toda la tienda →</a></p>
@@ -612,7 +610,7 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
                'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
                                     'url': SITIO + '/venta/%s/' % p['id']} for i, p in enumerate(enof)]}]
     return ruta, pagina(cfg, ruta=ruta,
-                        title='Equipos biomédicos en promoción y remate | Sinergia Biomédica',
+                        title='Equipos biomédicos en promoción | Sinergia Biomédica',
                         descripcion='Equipos médicos a precio especial por tiempo limitado: autoclaves, '
                                     'monitores y más, con stock listo para entrega en Lima y provincias.',
                         migas=[('Inicio', '/'), ('Promociones', ruta)], cuerpo=cuerpo, jsonld=jsonld)

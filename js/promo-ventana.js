@@ -85,20 +85,20 @@
                   : '<span class="sbp-sinfoto"></span>') +
           '<span class="sbp-t"><b>' + esc(x.nom) + '</b>' +
             '<small>' + esc(x.mm || '') + '</small>' +
-            '<i>' + soles(x.precio) + ' <em>Precio de remate</em></i></span></a>';
+            '<i>' + soles(x.precio) + ' <em>Precio especial</em></i></span></a>';
 
     var v = document.createElement('div');
     v.id = 'sbPromo';
     v.className = 'sbp' + (x.aviso ? ' con-aviso' : '');
     v.setAttribute('role', 'dialog');
     v.setAttribute('aria-modal', 'true');
-    v.setAttribute('aria-label', 'Equipo en remate');
+    v.setAttribute('aria-label', 'Equipo en promoción');
     v.innerHTML =
       '<div class="sbp-fondo" data-x></div>' +
       '<div class="sbp-caja">' +
         '<button type="button" class="sbp-x" data-x aria-label="Cerrar">&#10005;</button>' +
         (x.aviso ? '' :
-          '<div class="sbp-cab"><span class="sbp-k">Remate de stock</span>' +
+          '<div class="sbp-cab"><span class="sbp-k">Promoción</span>' +
             '<h2>Precio especial</h2>' +
             '<p>Por tiempo limitado' + esc(fin) + '. Lo que se va, se va.</p></div>') +
         cuerpo +
