@@ -520,11 +520,18 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
 TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promociones»
 
 
-def pm_tarjeta(p, base, fijas, locales, promos):
-    """Una tarjeta de /promociones/: aviso (o foto), datos y botón.
+def pm_tarjeta(p, cfg, base, fijas, locales, promos):
+    """Una tarjeta de /promociones/, en horizontal: aviso a la izquierda y
+    la información a la derecha.
 
-    Si el equipo no tiene aviso diseñado se usa su foto normal, para que la
-    rejilla no quede coja cuando se rebaje algo del catálogo del proveedor.
+    En horizontal y no apilada a propósito. El aviso es vertical (9:16): si
+    va encima del texto la tarjeta queda larguísima, y en una rejilla de
+    cuatro parecían cuatro carteles pegados. Al lado, el aviso se ve entero
+    y queda sitio para lo que un comprador necesita leer.
+
+    Tampoco se repite lo que el aviso ya dice impreso en grande —precio y
+    stock—: eso era lo que hacía que la vista se sintiera recargada. Aquí
+    van las características, que el aviso no trae, y los dos botones.
     """
     of = promo(p, promos) or {}
     av = aviso_de(p)
@@ -533,21 +540,34 @@ def pm_tarjeta(p, base, fijas, locales, promos):
     img = ('<img class="pm-aviso" src="%s" alt="%s" loading="lazy" decoding="async">' % (av, alt)) if av else (
           ('<img class="pm-foto" src="%s" alt="%s" loading="lazy" decoding="async">' % (fts[0][0], alt)) if fts
           else '<span class="pm-foto pm-sinfoto">%s</span>' % gp.ICONO)
+    # El precio va siempre en el texto, aunque el aviso lo lleve impreso: a
+    # este tamaño la cifra del aviso no se alcanza a leer, y el precio es
+    # justo lo que se viene a mirar a esta página.
     stock = p.get('stock')
-    badge = ('<span class="pm-st">%d %s</span>' % (stock, 'unidad' if stock == 1 else 'unidades')
-             if isinstance(stock, (int, float)) and stock > 0 else '')
+    chip = ('<span class="pm-st">En stock · %d %s</span>'
+            % (stock, 'unidad' if stock == 1 else 'unidades')) if isinstance(stock, (int, float)) and stock > 0 else ''
+    extra = ('<p class="pm-p">%s%s</p>' % (soles(p['precio']), chip)) if p.get('precio') else chip
     mm = ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
-    # El cintillo solo cuando NO hay aviso: el aviso ya lleva el logo y el
-    # stock impresos, y una etiqueta encima los taparía.
-    k = '' if av else '<span class="pm-k">%s</span>' % ('Remate de stock' if of.get('remate') else 'Precio especial')
+    cars = ''.join('<li>%s</li>' % e(c) for c in (p.get('caracteristicas') or [])[:4])
+    texto = 'Hola Sinergia Biomédica, vi %s%s en promoción y quiero cotizarlo.' % (
+        p['nom'], ' ' + p['modelo'] if p.get('modelo') else '')
+    wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
     return ('<article class="pm-c">'
-            '<a class="pm-img" href="/venta/%s/">%s%s</a>'
-            '<div class="pm-d"><h3>%s</h3>%s'
-            '<p class="pm-p">%s %s</p>'
-            '<a class="btn fill" href="/venta/%s/">Ver el equipo →</a></div></article>'
-            % (p['id'], img, k,
-               e(p['nom']), ('<p class="pm-mm">%s</p>' % e(mm)) if mm else '',
-               soles(p['precio']) if p.get('precio') else '', badge, p['id']))
+            '<a class="pm-img" href="/venta/%s/" tabindex="-1" aria-hidden="true">%s</a>'
+            '<div class="pm-d">'
+            '<div class="pm-cab"><p class="pm-cat">%s</p><h3><a href="/venta/%s/">%s</a></h3>%s</div>'
+            '%s%s%s'
+            '<div class="pm-bot"><a class="btn fill" href="/venta/%s/">Ver el equipo</a>'
+            '<a class="btn" href="%s" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div>'
+            '</div></article>'
+            % (p['id'], img,
+               e(of.get('remate') and 'Remate de stock' or 'Precio especial'),
+               p['id'], e(p['nom']),
+               ('<p class="pm-mm">%s</p>' % e(mm)) if mm else '',
+               extra,
+               ('<p class="pm-r">%s</p>' % e(p['resumen'])) if p.get('resumen') else '',
+               ('<ul class="pm-l">%s</ul>' % cars) if cars else '',
+               p['id'], e(wa)))
 
 
 def pagina_promos(enof, cfg, base, fijas, locales, promos):
@@ -578,7 +598,7 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
     # comprador necesita para decidir (nombre, marca, precio, stock) y un
     # botón. Antes los mismos cuatro equipos salían dos veces, el aviso sin
     # botón y la tarjeta sin aviso; no ayudaba a nadie.
-    tarjetas = ''.join(pm_tarjeta(p, base, fijas, locales, promos) for p in enof)
+    tarjetas = ''.join(pm_tarjeta(p, cfg, base, fijas, locales, promos) for p in enof)
     cuerpo = f'''
   <section class="cabeza">
     <div class="eyebrow">Venta · {'Remate de stock' if todos else 'Promociones'}</div>
