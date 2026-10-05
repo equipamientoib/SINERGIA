@@ -520,53 +520,42 @@ TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promocio
 
 
 def pm_tarjeta(p, cfg, base, fijas, locales, promos):
-    """Una tarjeta de /promociones/, en horizontal: aviso a la izquierda y
-    la información a la derecha.
+    """Una tarjeta de /promociones/: el aviso diseñado y nada más.
 
-    En horizontal y no apilada a propósito. El aviso es vertical (9:16): si
-    va encima del texto la tarjeta queda larguísima, y en una rejilla de
-    cuatro parecían cuatro carteles pegados. Al lado, el aviso se ve entero
-    y queda sitio para lo que un comprador necesita leer.
+    El aviso ya lleva impreso el nombre, la marca, el modelo, la capacidad,
+    el precio, el stock y el teléfono. Repetir todo eso al costado hacía la
+    página redundante: el visitante leía dos veces lo mismo. Aquí se
+    muestra el aviso entero y, al tocarlo, se abre la ficha con la
+    descripción, las características y los botones de compra.
 
-    Tampoco se repite lo que el aviso ya dice impreso en grande —precio y
-    stock—: eso era lo que hacía que la vista se sintiera recargada. Aquí
-    van las características, que el aviso no trae, y los dos botones.
+    El nombre oficial va en el «alt» de la imagen, no a la vista: quien no
+    puede ver la imagen (un lector de pantalla, o Google) sí lo necesita.
+
+    Si un equipo no tiene aviso diseñado se arma una tarjeta con su foto,
+    nombre y precio, porque sin imagen no habría nada que mirar.
     """
     of = promo(p, promos) or {}
     av = aviso_de(p)
-    fts = fotos(p, base, fijas, locales)
     alt = e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x))
-    img = ('<img class="pm-aviso" src="%s" alt="%s" loading="lazy" decoding="async">' % (av, alt)) if av else (
-          ('<img class="pm-foto" src="%s" alt="%s" loading="lazy" decoding="async">' % (fts[0][0], alt)) if fts
-          else '<span class="pm-foto pm-sinfoto">%s</span>' % gp.ICONO)
-    # El precio va siempre en el texto, aunque el aviso lo lleve impreso: a
-    # este tamaño la cifra del aviso no se alcanza a leer, y el precio es
-    # justo lo que se viene a mirar a esta página.
+    pie = '<span class="pm-ir">Ver el equipo <i>→</i></span>'
+    if av:
+        return ('<a class="pm-c con-aviso" href="/venta/%s/">'
+                '<img class="pm-aviso" src="%s" alt="%s" loading="lazy" decoding="async">'
+                '%s</a>' % (p['id'], av, alt, pie))
+    # Sin aviso: la tarjeta de siempre, que sí necesita texto.
+    fts = fotos(p, base, fijas, locales)
+    img = ('<img class="pm-foto" src="%s" alt="%s" loading="lazy" decoding="async">' % (fts[0][0], alt)) if fts \
+        else '<span class="pm-foto pm-sinfoto">%s</span>' % gp.ICONO
     stock = p.get('stock')
     chip = ('<span class="pm-st">En stock · %d %s</span>'
             % (stock, 'unidad' if stock == 1 else 'unidades')) if isinstance(stock, (int, float)) and stock > 0 else ''
-    extra = ('<p class="pm-p">%s%s</p>' % (soles(p['precio']), chip)) if p.get('precio') else chip
     mm = ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
-    cars = ''.join('<li>%s</li>' % e(c) for c in (p.get('caracteristicas') or [])[:4])
-    texto = 'Hola Sinergia Biomédica, vi %s%s en promoción y quiero cotizarlo.' % (
-        p['nom'], ' ' + p['modelo'] if p.get('modelo') else '')
-    wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
-    return ('<article class="pm-c">'
-            '<a class="pm-img" href="/venta/%s/" tabindex="-1" aria-hidden="true">%s</a>'
-            '<div class="pm-d">'
-            '<div class="pm-cab"><p class="pm-cat">%s</p><h3><a href="/venta/%s/">%s</a></h3>%s</div>'
-            '%s%s%s'
-            '<div class="pm-bot"><a class="btn fill" href="/venta/%s/">Ver el equipo</a>'
-            '<a class="btn" href="%s" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div>'
-            '</div></article>'
-            % (p['id'], img,
-               'Precio especial',
-               p['id'], e(p['nom']),
-               ('<p class="pm-mm">%s</p>' % e(mm)) if mm else '',
-               extra,
-               ('<p class="pm-r">%s</p>' % e(p['resumen'])) if p.get('resumen') else '',
-               ('<ul class="pm-l">%s</ul>' % cars) if cars else '',
-               p['id'], e(wa)))
+    return ('<a class="pm-c sin-aviso" href="/venta/%s/">%s'
+            '<span class="pm-d"><span class="pm-cat">Precio especial</span>'
+            '<b>%s</b>%s<span class="pm-p">%s%s</span>%s</span></a>'
+            % (p['id'], img, e(p['nom']),
+               ('<span class="pm-mm">%s</span>' % e(mm)) if mm else '',
+               soles(p['precio']) if p.get('precio') else '', chip, pie))
 
 
 def pagina_promos(enof, cfg, base, fijas, locales, promos):
