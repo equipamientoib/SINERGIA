@@ -832,17 +832,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4474ab5d';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=24fd381b';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4474ab5d';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=24fd381b';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=4474ab5d','js/06-tablero.js?v=4474ab5d'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=24fd381b','js/06-tablero.js?v=24fd381b'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=4474ab5d'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=24fd381b'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2062,7 +2062,7 @@ function vCard(p){
   return `<div class="eq v-eq">
     <div class="img${foto?' has-photo':''}" onclick="vAbrir('${p.id}')">
       ${foto?'':'<span class="grid-bg"></span>'}${st}${tag}
-      ${foto?`<img class="photo" src="${foto}" alt="${vEsc(p.nom)} ${vEsc(p.marca||'')} ${vEsc(p.modelo||'')}" loading="lazy" decoding="async">`:`<span class="v-sinfoto">${vIco(p.cat,'v-ico-xl')}</span>`}
+      ${foto?`<img class="photo" src="${vEsc(foto)}" alt="${vEsc(p.nom)} ${vEsc(p.marca||'')} ${vEsc(p.modelo||'')}" loading="lazy" decoding="async">`:`<span class="v-sinfoto">${vIco(p.cat,'v-ico-xl')}</span>`}
     </div>
     <div class="body">
       <div class="cat">${vEsc(c?c.nombre:'')}</div>
@@ -2140,7 +2140,7 @@ function vPortada(){
       </div>
     </div>
     <div class="hero-stage v-mosaico">
-      <div class="v-mos">${mosaico.map(p => `<a onclick="vAbrir('${p.id}')" title="${vEsc(p.nom)}"><img src="${vFoto(p,0,true)}" alt="${vEsc(p.nom)}"></a>`).join('')}</div>
+      <div class="v-mos">${mosaico.map(p => `<a onclick="vAbrir('${p.id}')" title="${vEsc(p.nom)}"><img src="${vEsc(vFoto(p,0,true))}" alt="${vEsc(p.nom)}"></a>`).join('')}</div>
       <div class="cap"><span>Los más comprados por hospitales en 2024 y 2025</span><span><b>VENTA</b></span></div>
     </div>
   </div>
@@ -2391,8 +2391,8 @@ function vProducto(id){
     <div class="crumb"><a onclick="go('#/venta')">Venta</a> &nbsp;/&nbsp; ${c?`<a onclick="go('#/venta/cat/${c.id}')">${vEsc(c.nombre)}</a> &nbsp;/&nbsp; `:''}${vEsc(p.nom)}</div>
     <div class="v-prod">
       <div class="v-gal${fotos.length<2?' una':''}">
-        ${fotos.length>1?`<div class="v-minis">${minis.map((m,i)=>`<button type="button" class="${i?'':'on'}" onclick="vVerFoto(${i})"><img src="${m}" alt="" loading="lazy"></button>`).join('')}</div>`:''}
-        <div class="v-main${fotos.length?'':' sin'}">${fotos.length?`<img id="vFotoMain" src="${fotos[0]}" alt="${vEsc(p.nom)}" data-fotos='${vEsc(JSON.stringify(fotos))}'>`:vIco(p.cat,'v-ico-xl')}</div>
+        ${fotos.length>1?`<div class="v-minis">${minis.map((m,i)=>`<button type="button" class="${i?'':'on'}" onclick="vVerFoto(${i})"><img src="${vEsc(m)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}
+        <div class="v-main${fotos.length?'':' sin'}">${fotos.length?`<img id="vFotoMain" src="${vEsc(fotos[0])}" alt="${vEsc(p.nom)}" data-fotos='${vEsc(JSON.stringify(fotos))}'>`:vIco(p.cat,'v-ico-xl')}</div>
       </div>
       <div class="v-info">
         <div class="v-k">${vEsc(c?c.nombre:'')}</div>
@@ -3828,7 +3828,7 @@ function vcAviso(p, q){
 function vcFila(x){
   const p = x.p, foto = x.foto;
   return `<div class="vc-i">
-    ${foto ? `<img class="vc-f" src="${foto}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
+    ${foto ? `<img class="vc-f" src="${vEsc(foto)}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
       <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
