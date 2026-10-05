@@ -81,7 +81,7 @@ def ajustar(p, repo):
     q = dict(p)
     sv = repo.get('stockVisible') or {}
     st = q.get('stock')
-    if isinstance(st, (int, float)) and st > 0:
+    if isinstance(st, (int, float)) and st > 0 and not q.get('propio'):
         q['stock'] = min(sv.get('maximo', 10), max(1, int(st * sv.get('porcentaje', 30) // 100)))
     for k, v in ((repo.get('datosFijos') or {}).get(q['id']) or {}).items():
         if not q.get(k):
@@ -108,6 +108,15 @@ def aplicar_promos(productos, promos):
     """
     hoy = datetime.date.today()
     for p in productos:
+        if p.get('remate') and p.get('promoHasta') and not p.get('promoFin'):
+            try:                                      # remate con fecha de fin
+                fin = datetime.date.fromisoformat(p['promoHasta'])
+                if fin < hoy:
+                    p.pop('remate', None)
+                else:
+                    p['promoFin'] = fin
+            except ValueError:
+                p.pop('promoHasta', None)
         if p.get('precioLista'):                      # ya viene resuelta de la hoja
             try:
                 p['promoFin'] = datetime.date.fromisoformat(p.get('promoHasta') or '')
@@ -133,13 +142,18 @@ def aplicar_promos(productos, promos):
 
 
 def promo(p, promos=None):
-    """Lo que hay que mostrar de la promoción de un equipo, o None."""
-    if not p.get('precioLista') or not p.get('promoFin'):
+    """Lo que hay que mostrar de la promoción de un equipo, o None.
+
+    Un REMATE no necesita descuento: son equipos de stock propio que se
+    quieren sacar, y su precio ya es el de remate. Una PROMOCIÓN sí: es un
+    equipo del catálogo al que se le bajó el precio.
+    """
+    rebaja = bool(p.get('precioLista') and p.get('promoFin'))
+    if not rebaja and not p.get('remate'):
         return None
-    return {'antes': p['precioLista'], 'fin': p['promoFin'],
-            'remate': bool(p.get('remate')),
-            'baja': int(round((1 - p['precio'] / p['precioLista']) * 100)),
-            'ahorro': int(round(p['precioLista'] - p['precio']))}
+    return {'antes': p.get('precioLista') or 0, 'fin': p.get('promoFin'),
+            'remate': bool(p.get('remate')), 'rebaja': rebaja,
+            'baja': int(round((1 - p['precio'] / p['precioLista']) * 100)) if rebaja else 0}
 
 
 def fotos(p, base, fijas, locales=()):
@@ -274,8 +288,11 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
         nota = ('Incluye IGV · <span>Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización</span>'
                 % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial, se confirma en la cotización'
         if of:
-            nota = ('Incluye IGV · <b>Promoción válida hasta el %s</b> · se confirma en la cotización'
-                    % of['fin'].strftime('%d/%m/%Y'))
+            nota = ('Incluye IGV · <b>%s hasta el %s</b> · se confirma en la cotización'
+                    % ('Remate válido' if of['remate'] else 'Promoción válida',
+                       of['fin'].strftime('%d/%m/%Y'))) if of['fin'] else (
+                   'Incluye IGV · <b>%s, hasta agotar stock</b> · se confirma en la cotización'
+                    % ('Precio de remate' if of['remate'] else 'Precio especial'))
         # Nunca se muestra el precio anterior ni el porcentaje: el cliente
         # de este negocio vuelve a comprar y negocia, y anunciar la rebaja
         # deja la sensación de que el precio de lista estaba inflado.
@@ -472,21 +489,27 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
     enof = [p for p in productos if promo(p, promos)]
     franja_promo = ''
     if enof:
-        hasta = min(promo(p, promos)['fin'] for p in enof)
+        fechas = [promo(p)['fin'] for p in enof if promo(p)['fin']]
+        hasta = min(fechas) if fechas else None
+        todos_remate = all(promo(p)['remate'] for p in enof)
         franja_promo = (
             '<section class="vpromo" id="promociones">'
-            '<h2>En promoción <small>%d</small></h2>'
-            '<p class="vpromo-n">Precios rebajados hasta el %s. Después vuelven a su precio de lista.</p>'
+            '<h2>%s <small>%d</small></h2>'
+            '<p class="vpromo-n">%s</p>'
             '<div class="vts">%s</div></section>'
-            % (len(enof), hasta.strftime('%d/%m/%Y'),
+            % ('Remate de stock' if todos_remate else 'En promoción', len(enof),
+               ('Precio especial hasta el %s. Después vuelven a su precio de siempre.'
+                % hasta.strftime('%d/%m/%Y')) if hasta else
+               'Precio especial por tiempo limitado. Lo que se va, se va.',
                ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)))
         # La ventana flotante de bienvenida lee esto (js/promo-ventana.js).
         # La ventana flotante solo saluda con los REMATES, no con todas
         # las promociones: lo demás se ve en la franja sin interrumpir.
         rem = [p for p in enof if promo(p)['remate']]
         if rem:
+            fr = [promo(p)['fin'] for p in rem if promo(p)['fin']]
             franja_promo += ('<script>window.SB_PROMOS=%s</script>'
-                             % json.dumps({'hasta': min(promo(p)['fin'] for p in rem).isoformat(),
+                             % json.dumps({'hasta': min(fr).isoformat() if fr else '',
                                            'lista': [promo_item(p, base, fijas, locales) for p in rem]},
                                           ensure_ascii=False))
 
@@ -658,6 +681,17 @@ def main():
     bloq = {k for k in (repo.get('noPublicar') or {}) if k != '_nota'}
     productos = [ajustar(p, repo) for p in vivo.get('productos', [])
                  if p.get('id') and p.get('nom') and p['id'] not in bloq]
+    # Equipos de stock propio (data/venta.json › equiposPropios): no vienen
+    # del proveedor, así que su precio y su stock van tal cual.
+    propios = [p for p in ((repo.get('equiposPropios') or {}).get('equipos') or [])
+               if p.get('id') and p.get('nom') and p['id'] not in bloq]
+    for q in propios:
+        q = dict(q)
+        q['propio'] = 1
+        if q['id'] not in {x['id'] for x in productos}:
+            productos.append(q)
+    if propios:
+        print('%d equipos de stock propio.' % len(propios))
     fuera = [p['id'] for p in vivo.get('productos', []) if p.get('id') in bloq]
     if fuera:
         print('Retirados a mano (noPublicar): %s' % ', '.join(sorted(fuera)))

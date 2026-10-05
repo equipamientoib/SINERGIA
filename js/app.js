@@ -832,17 +832,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=629d9228';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4474ab5d';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=629d9228';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4474ab5d';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=629d9228','js/06-tablero.js?v=629d9228'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=4474ab5d','js/06-tablero.js?v=4474ab5d'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=629d9228'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=4474ab5d'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1788,7 +1788,7 @@ function ventaEnVivo(v){
 function vAjustar(p){
   const q = Object.assign({}, p), sv = (VENTA && VENTA.stockVis) || {};
   const n = Number(q.stock);
-  if(q.stock !== '' && q.stock != null && n > 0)
+  if(q.stock !== '' && q.stock != null && n > 0 && !q.propio)
     q.stock = Math.min(sv.maximo || 10, Math.max(1, Math.floor(n * (sv.porcentaje || 30) / 100)));
   const fx = ((VENTA && VENTA.fijos) || {})[q.id] || {};   // marca/origen que la hoja no trae
   if(!q.marca && fx.marca) q.marca = fx.marca;
@@ -1810,7 +1810,7 @@ function vMezclar(){
     /* Si la hoja aún no tiene fotos de un equipo, se usan las del sitio (img/venta/). */
     const base = new Map((VENTA.base || VENTA.productos).map(p => [p.id, p]));
     VENTA.base = VENTA.base || VENTA.productos;
-    VENTA.productos = vAplicarPromos(VENTA_VIVO.productos.filter(p => !vBloqueado(p.id)).map(p => {
+    VENTA.productos = vPropios(vAplicarPromos(VENTA_VIVO.productos.filter(p => !vBloqueado(p.id)).map(p => {
       p = vAjustar(p);
       const fija = (VENTA.fijas||{})[p.id];          // foto corregida a mano (la del proveedor estaba mal)
       if(Array.isArray(fija) && fija.length) return Object.assign({}, p, {fotos: fija});
@@ -1823,7 +1823,7 @@ function vMezclar(){
          del proveedor (modelo real) › foto antigua del sitio (respaldo). */
       const respaldo = b && b.fotosSitio && b.fotosSitio.length;
       return respaldo && !(p.fotos && p.fotos.length) ? Object.assign({}, p, {fotos: b.fotosSitio}) : p;
-    }));
+    })));
     VENTA.actualizado = VENTA_VIVO.actualizado;
   }
 }
@@ -1845,8 +1845,9 @@ function cargarVenta(){
                  noPublicar: d.noPublicar||{},
                  locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  promos: Object.fromEntries(Object.entries(d.promociones||{}).filter(([k]) => k[0] !== '_')),
+                 propios: ((d.equiposPropios||{}).equipos)||[],
                  stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
-        VENTA.productos = vAplicarPromos((d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio}))));
+        VENTA.productos = vPropios(vAplicarPromos((d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})))));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
     const vu = (typeof CONFIG!=='undefined' && CONFIG.VENTA_URL) || '';
@@ -1956,6 +1957,15 @@ function vStock(p, detalle){
    de data/venta.json › promociones. Si están los dos, manda la hoja.
    Se aplica una sola vez, al cargar, para que la tienda, la ficha, el
    carrito y la cotización cobren todos lo mismo. */
+/* Equipos de stock propio (data/venta.json › equiposPropios): no vienen de
+   la hoja, así que se suman aquí con su precio y su stock tal cual. */
+function vPropios(ps){
+  const mios = ((VENTA && VENTA.propios) || []).filter(p => p && p.id && p.nom && !vBloqueado(p.id));
+  if(!mios.length) return ps;
+  const hay = new Set(ps.map(p => p.id));
+  return ps.concat(mios.filter(p => !hay.has(p.id)).map(p => Object.assign({propio: 1}, p)));
+}
+
 function vAplicarPromos(ps){
   const pr = (VENTA && VENTA.promos) || {};
   const hoy = new Date();
@@ -1971,12 +1981,17 @@ function vAplicarPromos(ps){
   });
 }
 function vPromo(p){
-  if(!p || !p.precioLista) return null;
-  const fin = new Date(String(p.promoHasta) + 'T23:59:59');
-  if(isNaN(fin) || fin < new Date()) return null;
-  return {antes: p.precioLista, fin, remate: !!p.remate,
-          baja: Math.round((1 - p.precio / p.precioLista) * 100),
-          ahorro: Math.round(p.precioLista - p.precio)};
+  if(!p) return null;
+  const rebaja = !!(p.precioLista && p.promoHasta);
+  if(!rebaja && !p.remate) return null;
+  let fin = null;
+  if(p.promoHasta){
+    fin = new Date(String(p.promoHasta) + 'T23:59:59');
+    if(isNaN(fin)) fin = null;
+    else if(fin < new Date()) return null;          // ya venció
+  }
+  return {antes: p.precioLista || 0, fin, remate: !!p.remate, rebaja,
+          baja: rebaja ? Math.round((1 - p.precio / p.precioLista) * 100) : 0};
 }
 
 /* Foto del producto: la versión ligera (-m) en tarjetas y la grande en la ficha. */
@@ -2042,7 +2057,7 @@ function vCard(p){
   const pie = p.precio
     ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? (of.remate ? 'Remate de stock' : 'Precio especial') : 'Precio referencial'}</span>${vSoles(p.precio)}${
         ''}<small>Incluye IGV · ${
-        of ? 'hasta el ' + of.fin.toLocaleDateString('es-PE') : vNotaPrecio(false)}</small></div>`
+        of ? (of.fin ? 'hasta el ' + of.fin.toLocaleDateString('es-PE') : 'hasta agotar stock') : vNotaPrecio(false)}</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
   return `<div class="eq v-eq">
     <div class="img${foto?' has-photo':''}" onclick="vAbrir('${p.id}')">
@@ -2213,11 +2228,14 @@ function vtConteo(campo){
 function vSeccionPromos(){
   const enof = (VENTA.productos || []).filter(p => vPromo(p));
   if(!enof.length) return '';
-  const fin = new Date(Math.min(...enof.map(p => vPromo(p).fin.getTime())));
+  const fechas = enof.map(p => vPromo(p).fin).filter(Boolean);
+  const fin = fechas.length ? new Date(Math.min(...fechas.map(f => f.getTime()))) : null;
+  const todos = enof.every(p => vPromo(p).remate);
   return `<section class="v-promos"><div class="wrap">
     <div class="v-promos-c">
-      <h2>En promoción <small>${enof.length}</small></h2>
-      <p>Precios especiales hasta el ${fin.toLocaleDateString('es-PE')}. Después vuelven a su precio de siempre.</p>
+      <h2>${todos ? 'Remate de stock' : 'En promoción'} <small>${enof.length}</small></h2>
+      <p>${fin ? `Precio especial hasta el ${fin.toLocaleDateString('es-PE')}. Después vuelven a su precio de siempre.`
+               : 'Precio especial por tiempo limitado. Lo que se va, se va.'}</p>
       <div class="grid">${enof.map(vCard).join('')}</div>
     </div>
   </div></section>`;
@@ -2383,7 +2401,7 @@ function vProducto(id){
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
         ${p.precio||vStock(p)?(of => `<div class="v-precio-caja${of?' con-promo':''}">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${
           of?`<span class="v-baja">${of.remate?'Remate de stock':'Precio especial'}</span>`:''}${vStock(p,true)}<small>${
-          p.precio?(of?`Incluye IGV · <b>Promoción válida hasta el ${of.fin.toLocaleDateString('es-PE')}</b>`:'Incluye IGV · '+vNotaPrecio(true)):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
+          p.precio?(of?`Incluye IGV · <b>${of.fin?((of.remate?'Remate válido':'Promoción válida')+' hasta el '+of.fin.toLocaleDateString('es-PE')):((of.remate?'Precio de remate':'Precio especial')+', hasta agotar stock')}</b>`:'Incluye IGV · '+vNotaPrecio(true)):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
@@ -2440,7 +2458,8 @@ function vPromoVentana(){
      en la franja y en las tarjetas, sin interrumpir a nadie. */
   const enof = VENTA.productos.filter(p => { const o = vPromo(p); return o && o.remate; });
   if(!enof.length) return;
-  const fin = new Date(Math.min(...enof.map(p => vPromo(p).fin.getTime())));
+  const fechas = enof.map(p => vPromo(p).fin).filter(Boolean);
+  const fin = fechas.length ? new Date(Math.min(...fechas.map(f => f.getTime()))) : null;
   setTimeout(() => SBPromo.abrir(enof.map(p => {
     return {id: p.id, nom: p.nom,
             mm: [p.marca, p.modelo].filter(Boolean).join(' · '),

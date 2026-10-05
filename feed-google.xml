@@ -1100,6 +1100,21 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
+    <g:id>biobase-bkm-za</g:id>
+    <title>Autoclave de mesa 18 L clase B Biobase BKM-ZA</title>
+    <description>Autoclave de vapor clase B de 18 litros para consultorios y odontología. 18 litros Clase B con prevacío Impresora incorporada 220 V</description>
+    <link>https://sinergiabiomedica.pe/venta/biobase-bkm-za/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-za.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>8000 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Biobase</g:brand>
+    <g:mpn>BKM-ZA</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Esterilización</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
     <g:id>edan-sa-10</g:id>
     <title>Monitor ambulatorio de presión arterial (MAPA) Edan SA-10</title>
     <description>Presurómetro portátil para registro de presión arterial de 24 horas. Registro ambulatorio Incluye software</description>
@@ -1142,6 +1157,21 @@
     <g:mpn>BAS 31 Plus</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>biobase-bkm-zb</g:id>
+    <title>Autoclave de mesa 23 L clase B Biobase BKM-ZB</title>
+    <description>Autoclave de vapor clase B de 23 litros para consultorios, odontología y centros de salud. 23 litros Clase B con prevacío Impresora incorporada Puerto USB 220 V</description>
+    <link>https://sinergiabiomedica.pe/venta/biobase-bkm-zb/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-zb.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>10250 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Biobase</g:brand>
+    <g:mpn>BKM-ZB</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Esterilización</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1622,6 +1652,36 @@
     <g:mpn>Datospir Touch Diagnostic</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>biobase-bkm-z45b</g:id>
+    <title>Autoclave de mesa 45 L clase B Biobase BKM-Z45B</title>
+    <description>Autoclave de vapor clase B de 45 litros para centrales de esterilización y clínicas. 45 litros Clase B con prevacío Generador de vapor Pantalla digital y manómetros 220 V</description>
+    <link>https://sinergiabiomedica.pe/venta/biobase-bkm-z45b/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-z45b.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>24050 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Biobase</g:brand>
+    <g:mpn>BKM-Z45B</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Esterilización</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>biobase-bkm-z60b</g:id>
+    <title>Autoclave de mesa 60 L clase B Biobase BKM-Z60B</title>
+    <description>Autoclave de vapor clase B de 60 litros para centrales de esterilización y clínicas. 60 litros Clase B con prevacío Generador de vapor Pantalla digital y manómetros 220 V</description>
+    <link>https://sinergiabiomedica.pe/venta/biobase-bkm-z60b/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-z60b.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>29350 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Biobase</g:brand>
+    <g:mpn>BKM-Z60B</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Esterilización</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>

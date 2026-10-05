@@ -57,7 +57,7 @@
               : '<span class="sbp-sinfoto"></span>') +
       '<span class="sbp-t"><b>' + esc(x.nom) + '</b>' +
         '<small>' + esc(x.mm || '') + '</small>' +
-        '<i>' + soles(x.precio) + ' <em>Precio especial</em></i>' +
+        '<i>' + soles(x.precio) + ' <em>Precio de remate</em></i>' +
       '</span></a>';
   }
 
@@ -68,7 +68,7 @@
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     var fin = hasta instanceof Date && !isNaN(hasta)
-      ? ' hasta el ' + hasta.toLocaleDateString('es-PE') : '';
+      ? ' hasta el ' + hasta.toLocaleDateString('es-PE') : '';   // sin fecha: solo «por tiempo limitado»
     var v = document.createElement('div');
     v.id = 'sbPromo';
     v.className = 'sbp';
@@ -80,7 +80,7 @@
       '<div class="sbp-caja">' +
         '<button type="button" class="sbp-x" data-x aria-label="Cerrar">&#10005;</button>' +
         '<div class="sbp-cab"><span class="sbp-k">Remate de stock</span>' +
-          '<h2>' + (lista.length === 1 ? 'Un equipo rebajado' : lista.length + ' equipos rebajados') + '</h2>' +
+          '<h2>' + (lista.length === 1 ? 'Un equipo en remate' : lista.length + ' equipos en remate') + '</h2>' +
           '<p>Precio especial por tiempo limitado' + esc(fin) + '. Lo que se va, se va.</p></div>' +
         '<div class="sbp-l">' + lista.slice(0, 6).map(fila).join('') + '</div>' +
         '<div class="sbp-pie">' +
