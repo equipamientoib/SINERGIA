@@ -132,7 +132,21 @@ function pdf_(txt) {
 }
 
 
-function abrirLibro_(id) { return SpreadsheetApp.openById(id); }
+/* Google falla de vez en cuando al abrir una hoja («Service Spreadsheets
+   failed while accessing document with id …»). Casi siempre es un tropiezo
+   pasajero, así que se reintenta un par de veces antes de darse por
+   vencido: evita que una ejecución programada muera —y el correo de aviso
+   que llega detrás— por algo que se arregla en dos segundos. */
+function abrirConReintento_(id) {
+  var ultimo;
+  for (var i = 0; i < 3; i++) {
+    try { return SpreadsheetApp.openById(id); }
+    catch (err) { ultimo = err; Utilities.sleep(1500 * (i + 1)); }
+  }
+  throw ultimo;
+}
+
+function abrirLibro_(id) { return abrirConReintento_(id); }
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);

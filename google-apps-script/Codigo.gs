@@ -168,9 +168,23 @@ var LIM_CABECERA = 40;
 var _hojasLeidas = {};
 var _libros = {};
 
+/* Google falla de vez en cuando al abrir una hoja («Service Spreadsheets
+   failed while accessing document with id …»). Casi siempre es un tropiezo
+   pasajero, así que se reintenta un par de veces antes de darse por
+   vencido: evita que una ejecución programada muera —y el correo de aviso
+   que llega detrás— por algo que se arregla en dos segundos. */
+function abrirConReintento_(id) {
+  var ultimo;
+  for (var i = 0; i < 3; i++) {
+    try { return SpreadsheetApp.openById(id); }
+    catch (err) { ultimo = err; Utilities.sleep(1500 * (i + 1)); }
+  }
+  throw ultimo;
+}
+
 function abrirLibro_(id) {
   if (_libros[id]) return _libros[id];
-  var ss = SpreadsheetApp.openById(id);
+  var ss = abrirConReintento_(id);
   _libros[id] = ss;
   return ss;
 }
