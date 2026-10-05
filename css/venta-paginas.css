@@ -100,9 +100,37 @@
 .vpromo .vts{margin-top:0}
 .vt-of.es-remate{background:#17191d}
 
-/* Avisos completos de los equipos en promoción, en /promociones/ */
-.pm-avisos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:24px}
-.pm-av{display:block;border-radius:14px;overflow:hidden;border:1px solid var(--linea);
-  background:var(--blanco);transition:border-color .15s,transform .15s}
-.pm-av:hover{border-color:#c62828;transform:translateY(-2px)}
-.pm-av img{display:block;width:100%;height:auto}
+/* ── /promociones/ ────────────────────────────────────────────────────
+   Una tarjeta por equipo: arriba el aviso ya diseñado (lleva precio y
+   stock impresos) y debajo los datos y el botón, que es lo que faltaba. */
+.pm-rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-top:28px}
+.pm-c{display:flex;flex-direction:column;border:1px solid var(--linea);border-radius:16px;
+  overflow:hidden;background:var(--blanco);transition:border-color .15s,transform .15s,box-shadow .15s}
+.pm-c:hover{border-color:#c62828;transform:translateY(-3px);box-shadow:0 18px 34px -24px rgba(0,0,0,.45)}
+.pm-img{position:relative;display:block;background:var(--fondo2,#f6f4ef)}
+.pm-aviso{display:block;width:100%;height:auto}
+.pm-foto{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#fff;padding:14px}
+.pm-sinfoto{display:grid;place-items:center;color:var(--linea)}
+.pm-k{position:absolute;left:10px;top:10px;padding:4px 10px;border-radius:999px;background:#c62828;
+  color:#fff;font-family:var(--ff-d,inherit);font-size:10.5px;font-weight:700;letter-spacing:.7px;
+  text-transform:uppercase;box-shadow:0 6px 16px -8px rgba(0,0,0,.6)}
+.pm-d{display:flex;flex-direction:column;gap:6px;padding:16px;flex:1}
+.pm-d h3{margin:0;font-family:var(--ff-d,inherit);font-size:16px;font-weight:600;line-height:1.3}
+.pm-mm{margin:0;font-size:12.5px;color:var(--gris)}
+.pm-p{margin:4px 0 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-family:var(--ff-d,inherit);font-size:19px;font-weight:700;color:var(--onix)}
+.pm-st{padding:3px 9px;border-radius:999px;background:rgba(46,125,50,.1);color:#2e7d32;
+  font-family:var(--ff-t,inherit);font-size:11.5px;font-weight:600;letter-spacing:.2px}
+.pm-d .btn{margin-top:auto;text-align:center}
+
+/* En el celular, dos por fila: con una sola columna cada aviso ocupaba
+   la pantalla entera y había que bajar cuatro pantallas para verlos. */
+@media(max-width:560px){
+  .pm-rejilla{grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}
+  .pm-d{padding:11px;gap:4px}
+  .pm-d h3{font-size:13.5px}
+  .pm-mm{font-size:11.5px}
+  .pm-p{font-size:16px;gap:6px}
+  .pm-st{font-size:10.5px;padding:2px 7px}
+  .pm-d .btn{padding:9px 10px;font-size:12.5px}
+}

@@ -20,6 +20,12 @@ SELLO = re.compile(r'\?v=[0-9a-f]+')
 # Los que 06-portal.js carga aparte, fuera del paquete.
 PORTAL = ['css/13-clientes.css', 'css/15-expediente.css',
           'js/06-expediente.js', 'js/06-tablero.js', 'js/06-clientes.js']
+# Sueltos: index.html los pide con su propia etiqueta, fuera del paquete,
+# porque las páginas estáticas también los usan. Entran igual en el sello y
+# se les pone el ?v= en index.html; si no, un cambio en ellos no llega nunca
+# al navegador de quien ya visitó el sitio.
+SUELTOS = ['css/carrito.css', 'css/promo-ventana.css',
+           'js/carrito.js', 'js/promo-ventana.js']
 
 
 def leer(ruta):
@@ -48,7 +54,7 @@ def main():
     css, js = lista(html, 'CSS'), lista(html, 'JS')
 
     h = hashlib.sha256()
-    for f in css + js + PORTAL:
+    for f in css + js + PORTAL + SUELTOS:
         h.update(f.encode())
         h.update(SELLO.sub('', leer(f)).encode())
     v = '?v=' + h.hexdigest()[:8]
@@ -60,8 +66,10 @@ def main():
     escribir('css/app.css', unir(css, '\n'))
     # El ';' separa los guiones por si uno termina sin punto y coma.
     escribir('js/app.js', unir(js, '\n;\n'))
-    escribir('index.html', re.sub(r'((?:css/app\.css|js/app\.js))\?v=[0-9a-f]+',
-                                  lambda m: m.group(1) + v, html))
+    sueltos = '|'.join(re.escape(f) for f in SUELTOS)
+    html = re.sub(r'((?:css/app\.css|js/app\.js|%s))(\?v=[0-9a-f]+)?' % sueltos,
+                  lambda m: m.group(1) + v, html)
+    escribir('index.html', html)
 
 
 if __name__ == '__main__':

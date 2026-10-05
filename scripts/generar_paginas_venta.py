@@ -371,7 +371,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
       Seguir viendo equipos</button>
     <article class="prod venta" id="{e(p['id'])}">
-      {galeria(p, fts)}
+      {galeria(p, fts + ([aviso_foto(p)] if aviso_foto(p) else []))}
       <div class="prod-info">
         <div class="k">{e(cat)}</div>
         <h1 class="prod-h1">{e(p['nom'])}</h1>
@@ -520,6 +520,36 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
 TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promociones»
 
 
+def pm_tarjeta(p, base, fijas, locales, promos):
+    """Una tarjeta de /promociones/: aviso (o foto), datos y botón.
+
+    Si el equipo no tiene aviso diseñado se usa su foto normal, para que la
+    rejilla no quede coja cuando se rebaje algo del catálogo del proveedor.
+    """
+    of = promo(p, promos) or {}
+    av = aviso_de(p)
+    fts = fotos(p, base, fijas, locales)
+    alt = e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x))
+    img = ('<img class="pm-aviso" src="%s" alt="%s" loading="lazy" decoding="async">' % (av, alt)) if av else (
+          ('<img class="pm-foto" src="%s" alt="%s" loading="lazy" decoding="async">' % (fts[0][0], alt)) if fts
+          else '<span class="pm-foto pm-sinfoto">%s</span>' % gp.ICONO)
+    stock = p.get('stock')
+    badge = ('<span class="pm-st">%d %s</span>' % (stock, 'unidad' if stock == 1 else 'unidades')
+             if isinstance(stock, (int, float)) and stock > 0 else '')
+    mm = ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
+    # El cintillo solo cuando NO hay aviso: el aviso ya lleva el logo y el
+    # stock impresos, y una etiqueta encima los taparía.
+    k = '' if av else '<span class="pm-k">%s</span>' % ('Remate de stock' if of.get('remate') else 'Precio especial')
+    return ('<article class="pm-c">'
+            '<a class="pm-img" href="/venta/%s/">%s%s</a>'
+            '<div class="pm-d"><h3>%s</h3>%s'
+            '<p class="pm-p">%s %s</p>'
+            '<a class="btn fill" href="/venta/%s/">Ver el equipo →</a></div></article>'
+            % (p['id'], img, k,
+               e(p['nom']), ('<p class="pm-mm">%s</p>' % e(mm)) if mm else '',
+               soles(p['precio']) if p.get('precio') else '', badge, p['id']))
+
+
 def pagina_promos(enof, cfg, base, fijas, locales, promos):
     """/promociones/: los equipos rebajados, en su propia página.
 
@@ -544,10 +574,11 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
     fechas = [promo(p)['fin'] for p in enof if promo(p)['fin']]
     hasta = min(fechas) if fechas else None
     todos = all(promo(p)['remate'] for p in enof)
-    avisos = ''.join(
-        '<a class="pm-av" href="/venta/%s/"><img src="%s" alt="%s" loading="lazy" decoding="async"></a>'
-        % (p['id'], aviso_de(p), e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))
-        for p in enof if aviso_de(p))
+    # Una sola rejilla: el aviso diseñado arriba y, debajo, lo que el
+    # comprador necesita para decidir (nombre, marca, precio, stock) y un
+    # botón. Antes los mismos cuatro equipos salían dos veces, el aviso sin
+    # botón y la tarjeta sin aviso; no ayudaba a nadie.
+    tarjetas = ''.join(pm_tarjeta(p, base, fijas, locales, promos) for p in enof)
     cuerpo = f'''
   <section class="cabeza">
     <div class="eyebrow">Venta · {'Remate de stock' if todos else 'Promociones'}</div>
@@ -556,10 +587,7 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
       Son unidades contadas: cuando se van, vuelve el precio de siempre.</p>
     <p><a class="btn fill" href="/venta/">Ver toda la tienda →</a></p>
   </section>
-  {('<section class="pm-avisos">' + avisos + '</section>') if avisos else ''}
-  <section class="vcat"><h2>El detalle <small>{len(enof)}</small></h2>
-    <div class="vts">{''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)}</div>
-  </section>'''
+  <section class="pm-rejilla">{tarjetas}</section>'''
     jsonld = [{'@type': 'ItemList', 'name': 'Equipos en promoción',
                'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
                                     'url': SITIO + '/venta/%s/' % p['id']} for i, p in enumerate(enof)]}]
@@ -568,6 +596,22 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
                         descripcion='Equipos médicos a precio especial por tiempo limitado: autoclaves, '
                                     'monitores y más, con stock listo para entrega en Lima y provincias.',
                         migas=[('Inicio', '/'), ('Promociones', ruta)], cuerpo=cuerpo, jsonld=jsonld)
+
+
+def aviso_foto(p):
+    """El aviso diseñado, como par (ligera, grande) para la galería.
+
+    Va al final de las fotos, nunca primero: la foto limpia del equipo es la
+    que llevan la tienda, el carrito y el feed de Google Shopping, que no
+    admite imágenes con precio ni teléfono encima. El aviso se ve como foto
+    de apoyo, que es donde ayuda: enseña precio y stock de un vistazo.
+    """
+    r = (p.get('aviso') or '').lstrip('/')
+    if not r or not os.path.exists(os.path.join(gp.ROOT, r)):
+        return None
+    lig = gp.foto_local(r, {}, ligera=True)
+    gra = gp.foto_local(r, {}, ligera=False)
+    return (lig, gra or lig) if lig else None
 
 
 def aviso_de(p):

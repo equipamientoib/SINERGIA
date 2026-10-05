@@ -44,6 +44,10 @@
 .sbp-no:hover{color:var(--onix,#17191d)}
 
 body.sb-promo-abierta{overflow:hidden}
+/* Mientras la ventana está abierta, la burbuja verde de WhatsApp se
+   esconde: en el celular se montaba justo encima del botón «Ver todas las
+   promociones» y tapaba media palabra. */
+body.sb-promo-abierta .wafab{display:none}
 
 @media(max-width:560px){
   .sbp{place-items:end center}
@@ -68,6 +72,10 @@ body.sb-promo-abierta{overflow:hidden}
 .sbp.con-aviso .sbp-x{top:0;right:0;background:#fff;border-color:rgba(0,0,0,.12);z-index:2;
   box-shadow:0 6px 18px -6px rgba(0,0,0,.5)}
 .sbp.con-aviso .sbp-pie{margin-top:12px}
+/* Con el aviso, la caja es transparente y el fondo queda oscuro: el botón
+   tiene que ser blanco macizo o se pierde (en el celular casi no se leía). */
+.sbp.con-aviso .sbp-pie .btn{background:#fff;border-color:#fff;color:var(--onix,#17191d);font-weight:600}
+.sbp.con-aviso .sbp-pie .btn:hover{background:#f3efe6;border-color:#f3efe6;color:var(--onix,#17191d)}
 .sbp.con-aviso .sbp-no{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .sbp.con-aviso .sbp-no:hover{color:#fff}
 

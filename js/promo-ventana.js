@@ -20,18 +20,31 @@
 (function () {
   'use strict';
 
-  var CLAVE = 'sb-promo-vista';
+  var CLAVE = 'sb-promo-vista';     // la cerró: no insistir en un día
+  var VISITA = 'sb-promo-visita';   // ya la vio en esta visita: no repetir
   var UN_DIA = 24 * 60 * 60 * 1000;
 
   function vistaHoy() {
+    try { if (sessionStorage.getItem(VISITA)) return true; } catch (e) {}
     try {
       var t = Number(localStorage.getItem(CLAVE) || 0);
       return t && (Date.now() - t) < UN_DIA;
     } catch (e) { return false; }   // navegación privada: se muestra igual
   }
 
+  /* Dos memorias distintas, a propósito:
+     · quien la CIERRA está diciendo «no me interesa»: no vuelve en un día;
+     · quien ENTRA a la promoción sí tiene interés, así que solo se calla
+       durante esa visita y la próxima vez vuelve a saludar. Antes el clic
+       en «Ver todas las promociones» la apagaba un día entero, que es lo
+       contrario de lo que uno quiere con un cliente que mordió el anzuelo. */
   function recordar() {
     try { localStorage.setItem(CLAVE, String(Date.now())); } catch (e) {}
+    soloEstaVisita();
+  }
+
+  function soloEstaVisita() {
+    try { sessionStorage.setItem(VISITA, '1'); } catch (e) {}
   }
 
   var esc = function (s) {
@@ -43,11 +56,11 @@
     return 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
   };
 
-  function cerrar() {
+  function cerrar(sinRecordar) {
     var v = document.getElementById('sbPromo');
     if (!v) return;
     v.classList.remove('on');
-    recordar();
+    if (sinRecordar) soloEstaVisita(); else recordar();
     setTimeout(function () { if (v.parentNode) v.parentNode.removeChild(v); }, 260);
     document.body.classList.remove('sb-promo-abierta');
   }
@@ -98,11 +111,13 @@
     document.body.classList.add('sb-promo-abierta');
     /* Todo lo que saca de la ventana la cierra, también los enlaces: antes,
        al tocar «ver promociones» la ventana se quedaba encima. */
-    v.querySelectorAll('[data-x]').forEach(function (b) {
+    /* Los enlaces se tratan aparte (abajo): si entraran por aquí también,
+       se guardaría el «no insistir en un día» de quien sí tuvo interés. */
+    v.querySelectorAll('[data-x]:not([href])').forEach(function (b) {
       b.addEventListener('click', function () { cerrar(); });
     });
     v.querySelectorAll('a[href]').forEach(function (a) {
-      a.addEventListener('click', function () { recordar(); cerrar(); });
+      a.addEventListener('click', function () { cerrar(true); });   // entró: no se le castiga un día
     });
     requestAnimationFrame(function () { v.classList.add('on'); });
     addEventListener('keydown', function esc2(e) {
@@ -111,7 +126,10 @@
     setTimeout(function () { var b = v.querySelector('.sbp-x'); if (b) b.focus(); }, 300);
   }
 
-  window.SBPromo = {abrir: abrir, cerrar: cerrar, vistaHoy: vistaHoy};
+  window.SBPromo = {abrir: abrir, cerrar: cerrar, vistaHoy: vistaHoy,
+                  olvidar: function () {   // para probar: SBPromo.olvidar() y recargar
+                    try { localStorage.removeItem(CLAVE); sessionStorage.removeItem(VISITA); } catch (e) {}
+                  }};
 
   /* Las páginas sueltas dejan la lista en window.SB_PROMOS y no tienen que
      programar nada más. */
