@@ -208,6 +208,7 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
     <span class="modo-sw" role="group" aria-label="Sección"><a class="on" href="/#/venta">Venta</a><a href="/#/alquiler">Alquiler</a></span>
     <a href="/#/venta">Inicio</a>
     <a href="/#/venta/tienda" class="on">Tienda</a>
+    <a href="/promociones/">Promociones</a>
     <a href="/#/servicios">Servicios</a>
     <a href="/#/clientes">Clientes</a>
     <a href="/#/contacto">Contacto</a>
@@ -444,7 +445,7 @@ def promo_item(p, base, fijas, locales):
     fts = fotos(p, base, fijas, locales)
     return {'id': p['id'], 'nom': p['nom'],
             'mm': ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x),
-            'precio': p['precio'],
+            'precio': p['precio'], 'aviso': aviso_de(p),
             'foto': fts[0][0] if fts else '', 'url': '/venta/%s/' % p['id']}
 
 
@@ -485,33 +486,18 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
         tarjetas = ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in ps)
         secciones.append('<section class="vcat" id="%s"><h2>%s <small>%d</small></h2><div class="vts">%s</div></section>'
                          % (e(cid), e(cats.get(cid, cid)), len(ps), tarjetas))
-    # Franja de promociones: va arriba de todo, antes de las categorías.
-    enof = [p for p in productos if promo(p, promos)]
+    # Las promociones viven en su propia página (/promociones/), no aquí:
+    # la tienda se queda para buscar equipos. Lo único que queda es la
+    # ventana de bienvenida con uno de los remates.
+    enof = [p for p in productos if promo(p)]
     franja_promo = ''
-    if enof:
-        fechas = [promo(p)['fin'] for p in enof if promo(p)['fin']]
-        hasta = min(fechas) if fechas else None
-        todos_remate = all(promo(p)['remate'] for p in enof)
-        franja_promo = (
-            '<section class="vpromo" id="promociones">'
-            '<h2>%s <small>%d</small></h2>'
-            '<p class="vpromo-n">%s</p>'
-            '<div class="vts">%s</div></section>'
-            % ('Remate de stock' if todos_remate else 'En promoción', len(enof),
-               ('Precio especial hasta el %s. Después vuelven a su precio de siempre.'
-                % hasta.strftime('%d/%m/%Y')) if hasta else
-               'Precio especial por tiempo limitado. Lo que se va, se va.',
-               ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)))
-        # La ventana flotante de bienvenida lee esto (js/promo-ventana.js).
-        # La ventana flotante solo saluda con los REMATES, no con todas
-        # las promociones: lo demás se ve en la franja sin interrumpir.
-        rem = [p for p in enof if promo(p)['remate']]
-        if rem:
-            fr = [promo(p)['fin'] for p in rem if promo(p)['fin']]
-            franja_promo += ('<script>window.SB_PROMOS=%s</script>'
-                             % json.dumps({'hasta': min(fr).isoformat() if fr else '',
-                                           'lista': [promo_item(p, base, fijas, locales) for p in rem]},
-                                          ensure_ascii=False))
+    rem = [p for p in enof if promo(p)['remate']]
+    if rem:
+        fr = [promo(p)['fin'] for p in rem if promo(p)['fin']]
+        franja_promo = ('<script>window.SB_PROMOS=%s</script>'
+                        % json.dumps({'hasta': min(fr).isoformat() if fr else '',
+                                      'lista': [promo_item(p, base, fijas, locales) for p in rem]},
+                                     ensure_ascii=False))
 
     cuerpo = f'''
   <section class="cabeza">
@@ -529,6 +515,68 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
                         descripcion='Equipos médicos con stock: monitores, electrocardiógrafos, autoclaves, desfibriladores, '
                                     'ecógrafos y más, con ficha técnica y mantenimiento. Lima y provincias.',
                         migas=[('Inicio', '/'), ('Venta', ruta)], cuerpo=cuerpo, jsonld=jsonld)
+
+
+TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promociones»
+
+
+def pagina_promos(enof, cfg, base, fijas, locales, promos):
+    """/promociones/: los equipos rebajados, en su propia página.
+
+    Va aparte de la tienda a propósito: así se puede enlazar desde el menú
+    y desde la ventana de bienvenida, y la tienda no se llena de avisos.
+    """
+    ruta = '/promociones/'
+    if not enof:
+        cuerpo = '''
+  <section class="cabeza">
+    <div class="eyebrow">Venta · Promociones</div>
+    <h1>Por ahora no hay equipos en promoción</h1>
+    <p class="lead">Cuando rebajemos algún equipo aparecerá aquí. Mientras tanto, en la tienda
+      están los %d equipos con su precio y su stock al día.</p>
+    <p><a class="btn fill" href="/venta/">Ver toda la tienda →</a></p>
+  </section>''' % len(TODOS_PUBLICADOS)
+        return ruta, pagina(cfg, ruta=ruta,
+                            title='Promociones | Sinergia Biomédica',
+                            descripcion='Equipos médicos a precio especial. Por ahora no hay '
+                                        'promociones activas; mira la tienda completa.',
+                            migas=[('Inicio', '/'), ('Promociones', ruta)], cuerpo=cuerpo, jsonld=[])
+    fechas = [promo(p)['fin'] for p in enof if promo(p)['fin']]
+    hasta = min(fechas) if fechas else None
+    todos = all(promo(p)['remate'] for p in enof)
+    avisos = ''.join(
+        '<a class="pm-av" href="/venta/%s/"><img src="%s" alt="%s" loading="lazy" decoding="async"></a>'
+        % (p['id'], aviso_de(p), e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))
+        for p in enof if aviso_de(p))
+    cuerpo = f'''
+  <section class="cabeza">
+    <div class="eyebrow">Venta · {'Remate de stock' if todos else 'Promociones'}</div>
+    <h1>{'Equipos en remate' if todos else 'Equipos en promoción'}</h1>
+    <p class="lead">{len(enof)} equipos a precio especial{(', hasta el ' + hasta.strftime('%d/%m/%Y')) if hasta else ', hasta agotar stock'}.
+      Son unidades contadas: cuando se van, vuelve el precio de siempre.</p>
+    <p><a class="btn fill" href="/venta/">Ver toda la tienda →</a></p>
+  </section>
+  {('<section class="pm-avisos">' + avisos + '</section>') if avisos else ''}
+  <section class="vcat"><h2>El detalle <small>{len(enof)}</small></h2>
+    <div class="vts">{''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)}</div>
+  </section>'''
+    jsonld = [{'@type': 'ItemList', 'name': 'Equipos en promoción',
+               'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
+                                    'url': SITIO + '/venta/%s/' % p['id']} for i, p in enumerate(enof)]}]
+    return ruta, pagina(cfg, ruta=ruta,
+                        title='Equipos biomédicos en promoción y remate | Sinergia Biomédica',
+                        descripcion='Equipos médicos a precio especial por tiempo limitado: autoclaves, '
+                                    'monitores y más, con stock listo para entrega en Lima y provincias.',
+                        migas=[('Inicio', '/'), ('Promociones', ruta)], cuerpo=cuerpo, jsonld=jsonld)
+
+
+def aviso_de(p):
+    """El aviso completo del equipo: el que diga el dato, o el que haya en
+    img/promos/<id>.jpg. Vacío si todavía no está hecho."""
+    if p.get('aviso'):
+        return '/' + str(p['aviso']).lstrip('/')
+    return ('/img/promos/%s.jpg' % p['id']) if os.path.exists(
+        os.path.join(ROOT, 'img', 'promos', p['id'] + '.jpg')) else ''
 
 
 def pagina_nts(productos, cfg):
@@ -715,6 +763,12 @@ def main():
     ruta, doc = pagina_nts(orden, cfg)
     gp.escribir('venta/codigos-nts/index.html', doc, cambios)
     paginas.append((ruta, 'venta/codigos-nts/index.html'))
+    # Promociones: página propia, solo si hay algo que mostrar.
+    TODOS_PUBLICADOS[:] = orden
+    enof = [p for p in orden if promo(p)]
+    ruta, doc = pagina_promos(enof, cfg, base, fijas, locales, promos)
+    gp.escribir('promociones/index.html', doc, cambios)
+    paginas.append((ruta, 'promociones/index.html'))
     for i, p in enumerate(orden):
         prev = orden[i - 1] if i > 0 else None
         sig = orden[i + 1] if i + 1 < len(orden) else None

@@ -57,6 +57,7 @@ const SITE = {
   nav: [
     { t: "Inicio",        r: "#/venta",     modo: "venta",    pieT: "Venta de equipos" },
     { t: "Tienda",        r: "#/venta/tienda", modo: "venta", pieT: "Tienda de venta" },
+    { t: "Promociones",   r: "/promociones/",  modo: "venta", pieT: "Promociones" },
     { t: "Inicio",        r: "#/alquiler",  modo: "alquiler", pieT: "Alquiler de equipos" },
     { t: "Catálogo",      r: "#/catalogo",  modo: "alquiler", pieT: "Catálogo de alquiler" },
     { t: "Servicios",     r: "#/servicios" },
@@ -169,7 +170,10 @@ const LOGO_FOOTER = `<svg class="footer-logo logo-svg" width="250" viewBox="0 0 
 function navLinks(indent){
   /* El header muestra solo las entradas principales; el pie las muestra todas. */
   const menu=SITE.nav.filter(n=>!n.pie);
-  return menu.map(n=>`${indent}<a data-route="${n.r}"${n.modo?` data-modo="${n.modo}"`:''} onclick="go('${n.r}')">${n.t}</a>`).join('\n');
+  /* Una entrada puede apuntar a una página suelta (/promociones/) en vez de
+     a una ruta con #. En ese caso es un enlace normal, no una llamada a go(). */
+  return menu.map(n=>`${indent}<a data-route="${n.r}"${n.modo?` data-modo="${n.modo}"`:''} ${
+    n.r.charAt(0)==='#' ? `onclick="go('${n.r}')"` : `href="${n.r}"`}>${n.t}</a>`).join('\n');
 }
 
 /* Selector de sección: Venta | Alquiler. El activo lo marca la clase del
@@ -832,17 +836,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=24fd381b';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=8b87a03b';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=24fd381b';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=8b87a03b';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=24fd381b','js/06-tablero.js?v=24fd381b'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=8b87a03b','js/06-tablero.js?v=8b87a03b'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=24fd381b'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=8b87a03b'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2222,25 +2226,6 @@ function vtConteo(campo){
   VENTA.productos.forEach(p => { const v = p[campo]; if(v) m.set(v, (m.get(v)||0)+1); });
   return m;
 }
-/* Sección de promociones, arriba de los filtros de la tienda. Es la misma
-   que lleva la página /venta/: los equipos con precio especial, con su
-   etiqueta y hasta cuándo. Si no hay ninguno, no ocupa nada. */
-function vSeccionPromos(){
-  const enof = (VENTA.productos || []).filter(p => vPromo(p));
-  if(!enof.length) return '';
-  const fechas = enof.map(p => vPromo(p).fin).filter(Boolean);
-  const fin = fechas.length ? new Date(Math.min(...fechas.map(f => f.getTime()))) : null;
-  const todos = enof.every(p => vPromo(p).remate);
-  return `<section class="v-promos"><div class="wrap">
-    <div class="v-promos-c">
-      <h2>${todos ? 'Remate de stock' : 'En promoción'} <small>${enof.length}</small></h2>
-      <p>${fin ? `Precio especial hasta el ${fin.toLocaleDateString('es-PE')}. Después vuelven a su precio de siempre.`
-               : 'Precio especial por tiempo limitado. Lo que se va, se va.'}</p>
-      <div class="grid">${enof.map(vCard).join('')}</div>
-    </div>
-  </div></section>`;
-}
-
 function vTienda(catInicial, precioInicial){
   VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='dest';
   if(precioInicial != null && precioInicial !== '') VT.precio.add(String(precioInicial));
@@ -2261,7 +2246,6 @@ function vTienda(catInicial, precioInicial){
     <h1>${c1 ? vEsc(c1.nombre) : 'Todos los equipos'}</h1>
     <p>Filtra por categoría, marca o procedencia. Cada equipo tiene su ficha con marca, modelo y el nombre con que aparece en los expedientes técnicos.</p>
   </div>
-  ${vSeccionPromos()}
   <section style="padding-top:30px"><div class="wrap">
     <button class="filtros-btn" onclick="document.getElementById('vtSide').classList.toggle('open')">Filtros ▾</button>
     <div class="catalog-layout">
@@ -2464,6 +2448,7 @@ function vPromoVentana(){
     return {id: p.id, nom: p.nom,
             mm: [p.marca, p.modelo].filter(Boolean).join(' · '),
             precio: p.precio,
+            aviso: p.aviso ? ('/' + String(p.aviso).replace(/^\//, '')) : '',
             foto: vFoto(p, 0, true) || '', url: vPagina(p.id) || ('#/venta/p/' + p.id)};
   }), fin), 700);
 }

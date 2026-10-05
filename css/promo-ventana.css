@@ -53,3 +53,27 @@ body.sb-promo-abierta{overflow:hidden}
   .sbp-cab h2{font-size:19px}
 }
 @media print{.sbp{display:none}}
+
+/* ── Ventana con el aviso completo del equipo ──────────────────────────
+   El aviso es vertical (9:16). Se muestra entero, a la altura que quepa
+   en la pantalla, y la caja se ciñe a él: nada de marcos sobrantes. */
+.sbp.con-aviso .sbp-caja{width:auto;max-width:min(420px,calc(100vw - 28px));padding:0;
+  overflow:hidden;background:transparent;box-shadow:none}
+.sbp-aviso{display:block;border-radius:16px;overflow:hidden;background:var(--blanco,#fff);
+  box-shadow:0 30px 70px -22px rgba(0,0,0,.55)}
+.sbp-aviso img{display:block;width:100%;height:auto;max-height:calc(100vh - 170px);
+  object-fit:contain}
+/* La ✕ va encima del aviso, no sobre él: tapaba el «Stock: 2 unidades». */
+.sbp.con-aviso .sbp-caja{padding-top:42px}
+.sbp.con-aviso .sbp-x{top:0;right:0;background:#fff;border-color:rgba(0,0,0,.12);z-index:2;
+  box-shadow:0 6px 18px -6px rgba(0,0,0,.5)}
+.sbp.con-aviso .sbp-pie{margin-top:12px}
+.sbp.con-aviso .sbp-no{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.sbp.con-aviso .sbp-no:hover{color:#fff}
+
+@media(max-width:560px){
+  .sbp.con-aviso{place-items:center}
+  .sbp.con-aviso .sbp-caja{width:auto;max-height:none;border-radius:0;transform:translateY(14px) scale(.98)}
+  .sbp.on.con-aviso .sbp-caja{transform:none}
+  .sbp-aviso img{max-height:calc(100vh - 160px)}
+}

@@ -24,7 +24,10 @@ const LOGO_FOOTER = `<svg class="footer-logo logo-svg" width="250" viewBox="0 0 
 function navLinks(indent){
   /* El header muestra solo las entradas principales; el pie las muestra todas. */
   const menu=SITE.nav.filter(n=>!n.pie);
-  return menu.map(n=>`${indent}<a data-route="${n.r}"${n.modo?` data-modo="${n.modo}"`:''} onclick="go('${n.r}')">${n.t}</a>`).join('\n');
+  /* Una entrada puede apuntar a una página suelta (/promociones/) en vez de
+     a una ruta con #. En ese caso es un enlace normal, no una llamada a go(). */
+  return menu.map(n=>`${indent}<a data-route="${n.r}"${n.modo?` data-modo="${n.modo}"`:''} ${
+    n.r.charAt(0)==='#' ? `onclick="go('${n.r}')"` : `href="${n.r}"`}>${n.t}</a>`).join('\n');
 }
 
 /* Selector de sección: Venta | Alquiler. El activo lo marca la clase del
