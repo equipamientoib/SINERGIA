@@ -99,3 +99,10 @@
 .vpromo-n{margin:4px 0 14px;font-size:13px;color:var(--gris)}
 .vpromo .vts{margin-top:0}
 .vt-of.es-remate{background:#17191d}
+
+/* Avisos completos de los equipos en promoción, en /promociones/ */
+.pm-avisos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:24px}
+.pm-av{display:block;border-radius:14px;overflow:hidden;border:1px solid var(--linea);
+  background:var(--blanco);transition:border-color .15s,transform .15s}
+.pm-av:hover{border-color:#c62828;transform:translateY(-2px)}
+.pm-av img{display:block;width:100%;height:auto}

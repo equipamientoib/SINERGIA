@@ -714,6 +714,7 @@ function vPromoVentana(){
     return {id: p.id, nom: p.nom,
             mm: [p.marca, p.modelo].filter(Boolean).join(' · '),
             precio: p.precio,
+            aviso: p.aviso ? ('/' + String(p.aviso).replace(/^\//, '')) : '',
             foto: vFoto(p, 0, true) || '', url: vPagina(p.id) || ('#/venta/p/' + p.id)};
   }), fin), 700);
 }
