@@ -290,14 +290,14 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
                 % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial, se confirma en la cotización'
         if of:
             nota = ('Incluye IGV · <b>%s hasta el %s</b> · se confirma en la cotización'
-                    % ('Remate válido' if of['remate'] else 'Promoción válida',
+                    % ('Promoción válida',
                        of['fin'].strftime('%d/%m/%Y'))) if of['fin'] else (
                    'Incluye IGV · <b>%s, hasta agotar stock</b> · se confirma en la cotización'
-                    % ('Precio de remate' if of['remate'] else 'Precio especial'))
+                    % 'Precio especial')
         # Nunca se muestra el precio anterior ni el porcentaje: el cliente
         # de este negocio vuelve a comprar y negocia, y anunciar la rebaja
         # deja la sensación de que el precio de lista estaba inflado.
-        antes = ('<span class="pc-of">%s</span>' % ('Remate de stock' if of['remate'] else 'Precio especial')) if of else ''
+        antes = '<span class="pc-of">Precio especial</span>' if of else ''
         caja = f'''<div class="precio{' con-promo' if of else ''}"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{antes}{badge}</div>
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
@@ -371,7 +371,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
       Seguir viendo equipos</button>
     <article class="prod venta" id="{e(p['id'])}">
-      {galeria(p, fts)}
+      {galeria(p, fts + ([aviso_foto(p)] if aviso_foto(p) else []))}
       <div class="prod-info">
         <div class="k">{e(cat)}</div>
         <h1 class="prod-h1">{e(p['nom'])}</h1>
@@ -459,8 +459,7 @@ def tarjeta_venta(p, base, fijas, locales, promos):
     return ('<a class="vt%s" href="/venta/%s/"><span class="vt-f">%s%s</span>'
             '<span class="vt-t"><b>%s</b><small>%s</small>%s</span></a>'
             % (' en-oferta' if of else '', p['id'], img,
-               ('<span class="vt-of%s">%s</span>' % (' es-remate' if of['remate'] else '',
-                                                     'REMATE' if of['remate'] else 'OFERTA')) if of else '',
+               ('<span class="vt-of%s">PROMOCIÓN</span>' % (' es-remate' if of['remate'] else '')) if of else '',
                e(p['nom']), e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
                precio_tarjeta(p, promos)))
 
@@ -473,7 +472,7 @@ def precio_tarjeta(p, promos):
     if not of:
         return '<i>%s</i>' % soles(p['precio'])
     return ('<i class="oferta">%s <em>%s</em></i>'
-            % (soles(p['precio']), 'Remate' if of['remate'] else 'Precio especial'))
+            % (soles(p['precio']), 'Precio especial'))
 
 
 def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
@@ -520,6 +519,56 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
 TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promociones»
 
 
+def pm_tarjeta(p, cfg, base, fijas, locales, promos):
+    """Una tarjeta de /promociones/, en horizontal: aviso a la izquierda y
+    la información a la derecha.
+
+    En horizontal y no apilada a propósito. El aviso es vertical (9:16): si
+    va encima del texto la tarjeta queda larguísima, y en una rejilla de
+    cuatro parecían cuatro carteles pegados. Al lado, el aviso se ve entero
+    y queda sitio para lo que un comprador necesita leer.
+
+    Tampoco se repite lo que el aviso ya dice impreso en grande —precio y
+    stock—: eso era lo que hacía que la vista se sintiera recargada. Aquí
+    van las características, que el aviso no trae, y los dos botones.
+    """
+    of = promo(p, promos) or {}
+    av = aviso_de(p)
+    fts = fotos(p, base, fijas, locales)
+    alt = e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x))
+    img = ('<img class="pm-aviso" src="%s" alt="%s" loading="lazy" decoding="async">' % (av, alt)) if av else (
+          ('<img class="pm-foto" src="%s" alt="%s" loading="lazy" decoding="async">' % (fts[0][0], alt)) if fts
+          else '<span class="pm-foto pm-sinfoto">%s</span>' % gp.ICONO)
+    # El precio va siempre en el texto, aunque el aviso lo lleve impreso: a
+    # este tamaño la cifra del aviso no se alcanza a leer, y el precio es
+    # justo lo que se viene a mirar a esta página.
+    stock = p.get('stock')
+    chip = ('<span class="pm-st">En stock · %d %s</span>'
+            % (stock, 'unidad' if stock == 1 else 'unidades')) if isinstance(stock, (int, float)) and stock > 0 else ''
+    extra = ('<p class="pm-p">%s%s</p>' % (soles(p['precio']), chip)) if p.get('precio') else chip
+    mm = ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
+    cars = ''.join('<li>%s</li>' % e(c) for c in (p.get('caracteristicas') or [])[:4])
+    texto = 'Hola Sinergia Biomédica, vi %s%s en promoción y quiero cotizarlo.' % (
+        p['nom'], ' ' + p['modelo'] if p.get('modelo') else '')
+    wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
+    return ('<article class="pm-c">'
+            '<a class="pm-img" href="/venta/%s/" tabindex="-1" aria-hidden="true">%s</a>'
+            '<div class="pm-d">'
+            '<div class="pm-cab"><p class="pm-cat">%s</p><h3><a href="/venta/%s/">%s</a></h3>%s</div>'
+            '%s%s%s'
+            '<div class="pm-bot"><a class="btn fill" href="/venta/%s/">Ver el equipo</a>'
+            '<a class="btn" href="%s" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div>'
+            '</div></article>'
+            % (p['id'], img,
+               'Precio especial',
+               p['id'], e(p['nom']),
+               ('<p class="pm-mm">%s</p>' % e(mm)) if mm else '',
+               extra,
+               ('<p class="pm-r">%s</p>' % e(p['resumen'])) if p.get('resumen') else '',
+               ('<ul class="pm-l">%s</ul>' % cars) if cars else '',
+               p['id'], e(wa)))
+
+
 def pagina_promos(enof, cfg, base, fijas, locales, promos):
     """/promociones/: los equipos rebajados, en su propia página.
 
@@ -543,31 +592,44 @@ def pagina_promos(enof, cfg, base, fijas, locales, promos):
                             migas=[('Inicio', '/'), ('Promociones', ruta)], cuerpo=cuerpo, jsonld=[])
     fechas = [promo(p)['fin'] for p in enof if promo(p)['fin']]
     hasta = min(fechas) if fechas else None
-    todos = all(promo(p)['remate'] for p in enof)
-    avisos = ''.join(
-        '<a class="pm-av" href="/venta/%s/"><img src="%s" alt="%s" loading="lazy" decoding="async"></a>'
-        % (p['id'], aviso_de(p), e(' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)))
-        for p in enof if aviso_de(p))
+    # Una sola rejilla: el aviso diseñado arriba y, debajo, lo que el
+    # comprador necesita para decidir (nombre, marca, precio, stock) y un
+    # botón. Antes los mismos cuatro equipos salían dos veces, el aviso sin
+    # botón y la tarjeta sin aviso; no ayudaba a nadie.
+    tarjetas = ''.join(pm_tarjeta(p, cfg, base, fijas, locales, promos) for p in enof)
     cuerpo = f'''
   <section class="cabeza">
-    <div class="eyebrow">Venta · {'Remate de stock' if todos else 'Promociones'}</div>
-    <h1>{'Equipos en remate' if todos else 'Equipos en promoción'}</h1>
+    <div class="eyebrow">Venta · Precio especial</div>
+    <h1>Equipos en promoción</h1>
     <p class="lead">{len(enof)} equipos a precio especial{(', hasta el ' + hasta.strftime('%d/%m/%Y')) if hasta else ', hasta agotar stock'}.
       Son unidades contadas: cuando se van, vuelve el precio de siempre.</p>
     <p><a class="btn fill" href="/venta/">Ver toda la tienda →</a></p>
   </section>
-  {('<section class="pm-avisos">' + avisos + '</section>') if avisos else ''}
-  <section class="vcat"><h2>El detalle <small>{len(enof)}</small></h2>
-    <div class="vts">{''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in enof)}</div>
-  </section>'''
+  <section class="pm-rejilla">{tarjetas}</section>'''
     jsonld = [{'@type': 'ItemList', 'name': 'Equipos en promoción',
                'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
                                     'url': SITIO + '/venta/%s/' % p['id']} for i, p in enumerate(enof)]}]
     return ruta, pagina(cfg, ruta=ruta,
-                        title='Equipos biomédicos en promoción y remate | Sinergia Biomédica',
+                        title='Equipos biomédicos en promoción | Sinergia Biomédica',
                         descripcion='Equipos médicos a precio especial por tiempo limitado: autoclaves, '
                                     'monitores y más, con stock listo para entrega en Lima y provincias.',
                         migas=[('Inicio', '/'), ('Promociones', ruta)], cuerpo=cuerpo, jsonld=jsonld)
+
+
+def aviso_foto(p):
+    """El aviso diseñado, como par (ligera, grande) para la galería.
+
+    Va al final de las fotos, nunca primero: la foto limpia del equipo es la
+    que llevan la tienda, el carrito y el feed de Google Shopping, que no
+    admite imágenes con precio ni teléfono encima. El aviso se ve como foto
+    de apoyo, que es donde ayuda: enseña precio y stock de un vistazo.
+    """
+    r = (p.get('aviso') or '').lstrip('/')
+    if not r or not os.path.exists(os.path.join(gp.ROOT, r)):
+        return None
+    lig = gp.foto_local(r, {}, ligera=True)
+    gra = gp.foto_local(r, {}, ligera=False)
+    return (lig, gra or lig) if lig else None
 
 
 def aviso_de(p):

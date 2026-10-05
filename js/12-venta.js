@@ -302,10 +302,10 @@ function vCard(p){
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const of = vPromo(p);
-  const tag = of ? `<span class="tier v-oferta">${of.remate ? 'Remate' : 'Oferta'}</span>`
+  const tag = of ? '<span class="tier v-oferta">Promoción</span>'
                  : (p._top ? '<span class="tier">Más pedido</span>' : '');
   const pie = p.precio
-    ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? (of.remate ? 'Remate de stock' : 'Precio especial') : 'Precio referencial'}</span>${vSoles(p.precio)}${
+    ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? 'Precio especial' : 'Precio referencial'}</span>${vSoles(p.precio)}${
         ''}<small>Incluye IGV · ${
         of ? (of.fin ? 'hasta el ' + of.fin.toLocaleDateString('es-PE') : 'hasta agotar stock') : vNotaPrecio(false)}</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
@@ -480,10 +480,9 @@ function vSeccionPromos(){
   if(!enof.length) return '';
   const fechas = enof.map(p => vPromo(p).fin).filter(Boolean);
   const fin = fechas.length ? new Date(Math.min(...fechas.map(f => f.getTime()))) : null;
-  const todos = enof.every(p => vPromo(p).remate);
   return `<section class="v-promos"><div class="wrap">
     <div class="v-promos-c">
-      <h2>${todos ? 'Remate de stock' : 'En promoción'} <small>${enof.length}</small></h2>
+      <h2>En promoción <small>${enof.length}</small></h2>
       <p>${fin ? `Precio especial hasta el ${fin.toLocaleDateString('es-PE')}. Después vuelven a su precio de siempre.`
                : 'Precio especial por tiempo limitado. Lo que se va, se va.'}</p>
       <div class="grid">${enof.map(vCard).join('')}</div>
@@ -650,8 +649,8 @@ function vProducto(id){
         ${vMarcaModelo(p, true)}
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
         ${p.precio||vStock(p)?(of => `<div class="v-precio-caja${of?' con-promo':''}">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${
-          of?`<span class="v-baja">${of.remate?'Remate de stock':'Precio especial'}</span>`:''}${vStock(p,true)}<small>${
-          p.precio?(of?`Incluye IGV · <b>${of.fin?((of.remate?'Remate válido':'Promoción válida')+' hasta el '+of.fin.toLocaleDateString('es-PE')):((of.remate?'Precio de remate':'Precio especial')+', hasta agotar stock')}</b>`:'Incluye IGV · '+vNotaPrecio(true)):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
+          of?'<span class="v-baja">Precio especial</span>':''}${vStock(p,true)}<small>${
+          p.precio?(of?`Incluye IGV · <b>${of.fin?('Promoción válida hasta el '+of.fin.toLocaleDateString('es-PE')):'Precio especial, hasta agotar stock'}</b>`:'Incluye IGV · '+vNotaPrecio(true)):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
