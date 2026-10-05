@@ -276,7 +276,10 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
         if of:
             nota = ('Incluye IGV · <b>Promoción válida hasta el %s</b> · se confirma en la cotización'
                     % of['fin'].strftime('%d/%m/%Y'))
-        antes = ('<s class="pc-antes">%s</s><span class="pc-baja">−%d %%</span>' % (soles(of['antes']), of['baja'])) if of else ''
+        # Nunca se muestra el precio anterior ni el porcentaje: el cliente
+        # de este negocio vuelve a comprar y negocia, y anunciar la rebaja
+        # deja la sensación de que el precio de lista estaba inflado.
+        antes = ('<span class="pc-of">%s</span>' % ('Remate de stock' if of['remate'] else 'Precio especial')) if of else ''
         caja = f'''<div class="precio{' con-promo' if of else ''}"><div class="pc-fila"><b class="pc-monto">{soles(p['precio'])}</b>{antes}{badge}</div>
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
@@ -422,10 +425,9 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
 def promo_item(p, base, fijas, locales):
     """Lo que necesita la ventana flotante de un equipo en remate."""
     fts = fotos(p, base, fijas, locales)
-    of = promo(p)
     return {'id': p['id'], 'nom': p['nom'],
             'mm': ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x),
-            'precio': p['precio'], 'antes': of['antes'] if of else 0,
+            'precio': p['precio'],
             'foto': fts[0][0] if fts else '', 'url': '/venta/%s/' % p['id']}
 
 
@@ -452,8 +454,8 @@ def precio_tarjeta(p, promos):
     of = promo(p, promos)
     if not of:
         return '<i>%s</i>' % soles(p['precio'])
-    return ('<i class="oferta">%s <s>%s</s><em>−%d %%</em></i>'
-            % (soles(p['precio']), soles(of['antes']), of['baja']))
+    return ('<i class="oferta">%s <em>%s</em></i>'
+            % (soles(p['precio']), 'Remate' if of['remate'] else 'Precio especial'))
 
 
 def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
@@ -624,10 +626,11 @@ def feed_google(productos, cfg, base, fijas, locales, promos, cambios):
                 SITIO.rstrip('/'), e(p['id']),
                 e(grande if grande.startswith('http') else SITIO.rstrip('/') + grande),
                 'in_stock' if (p.get('stock') or 0) else 'backorder',
-                int(round(of['antes'] if of else p['precio'])),
-                ('    <g:sale_price>%d PEN</g:sale_price>\n'
-                 '    <g:sale_price_effective_date>%sT00:00:00-0500/%sT23:59:59-0500</g:sale_price_effective_date>\n'
-                 % (int(round(p['precio'])), datetime.date.today().isoformat(), of['fin'].isoformat())) if of else '',
+                # Solo el precio que se cobra. Si se mandara también el de
+                # lista (g:sale_price), Google mostraría el tachado, que es
+                # justo lo que no queremos.
+                int(round(p['precio'])),
+                '',
                 e(marca or 'Sinergia Biomédica'),
                 ('<g:mpn>%s</g:mpn>' % e(modelo)) if modelo else '',
                 e(cfg.get('categorias', {}).get(p.get('cat'), p.get('cat') or ''))))

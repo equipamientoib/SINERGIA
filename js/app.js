@@ -832,17 +832,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=57b90d41';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=629d9228';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=57b90d41';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=629d9228';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=57b90d41','js/06-tablero.js?v=57b90d41'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=629d9228','js/06-tablero.js?v=629d9228'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=57b90d41'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=629d9228'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2037,11 +2037,11 @@ function vCard(p){
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
     (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const of = vPromo(p);
-  const tag = of ? `<span class="tier v-oferta">${of.remate ? 'Remate' : 'Oferta'} −${of.baja} %</span>`
+  const tag = of ? `<span class="tier v-oferta">${of.remate ? 'Remate' : 'Oferta'}</span>`
                  : (p._top ? '<span class="tier">Más pedido</span>' : '');
   const pie = p.precio
-    ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? 'Precio en promoción' : 'Precio referencial'}</span>${vSoles(p.precio)}${
-        of ? `<s class="v-antes">${vSoles(of.antes)}</s>` : ''}<small>Incluye IGV · ${
+    ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? (of.remate ? 'Remate de stock' : 'Precio especial') : 'Precio referencial'}</span>${vSoles(p.precio)}${
+        ''}<small>Incluye IGV · ${
         of ? 'hasta el ' + of.fin.toLocaleDateString('es-PE') : vNotaPrecio(false)}</small></div>`
     : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
   return `<div class="eq v-eq">
@@ -2207,6 +2207,22 @@ function vtConteo(campo){
   VENTA.productos.forEach(p => { const v = p[campo]; if(v) m.set(v, (m.get(v)||0)+1); });
   return m;
 }
+/* Sección de promociones, arriba de los filtros de la tienda. Es la misma
+   que lleva la página /venta/: los equipos con precio especial, con su
+   etiqueta y hasta cuándo. Si no hay ninguno, no ocupa nada. */
+function vSeccionPromos(){
+  const enof = (VENTA.productos || []).filter(p => vPromo(p));
+  if(!enof.length) return '';
+  const fin = new Date(Math.min(...enof.map(p => vPromo(p).fin.getTime())));
+  return `<section class="v-promos"><div class="wrap">
+    <div class="v-promos-c">
+      <h2>En promoción <small>${enof.length}</small></h2>
+      <p>Precios especiales hasta el ${fin.toLocaleDateString('es-PE')}. Después vuelven a su precio de siempre.</p>
+      <div class="grid">${enof.map(vCard).join('')}</div>
+    </div>
+  </div></section>`;
+}
+
 function vTienda(catInicial, precioInicial){
   VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='dest';
   if(precioInicial != null && precioInicial !== '') VT.precio.add(String(precioInicial));
@@ -2227,6 +2243,7 @@ function vTienda(catInicial, precioInicial){
     <h1>${c1 ? vEsc(c1.nombre) : 'Todos los equipos'}</h1>
     <p>Filtra por categoría, marca o procedencia. Cada equipo tiene su ficha con marca, modelo y el nombre con que aparece en los expedientes técnicos.</p>
   </div>
+  ${vSeccionPromos()}
   <section style="padding-top:30px"><div class="wrap">
     <button class="filtros-btn" onclick="document.getElementById('vtSide').classList.toggle('open')">Filtros ▾</button>
     <div class="catalog-layout">
@@ -2365,7 +2382,7 @@ function vProducto(id){
         ${vMarcaModelo(p, true)}
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
         ${p.precio||vStock(p)?(of => `<div class="v-precio-caja${of?' con-promo':''}">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${
-          of?`<s class="v-antes">${vSoles(of.antes)}</s><span class="v-baja">−${of.baja} %</span>`:''}${vStock(p,true)}<small>${
+          of?`<span class="v-baja">${of.remate?'Remate de stock':'Precio especial'}</span>`:''}${vStock(p,true)}<small>${
           p.precio?(of?`Incluye IGV · <b>Promoción válida hasta el ${of.fin.toLocaleDateString('es-PE')}</b>`:'Incluye IGV · '+vNotaPrecio(true)):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
@@ -2425,10 +2442,9 @@ function vPromoVentana(){
   if(!enof.length) return;
   const fin = new Date(Math.min(...enof.map(p => vPromo(p).fin.getTime())));
   setTimeout(() => SBPromo.abrir(enof.map(p => {
-    const of = vPromo(p);
     return {id: p.id, nom: p.nom,
             mm: [p.marca, p.modelo].filter(Boolean).join(' · '),
-            precio: p.precio, antes: of.antes,
+            precio: p.precio,
             foto: vFoto(p, 0, true) || '', url: vPagina(p.id) || ('#/venta/p/' + p.id)};
   }), fin), 700);
 }

@@ -52,17 +52,13 @@
   }
 
   function fila(x) {
-    var baja = x.antes && x.antes > x.precio
-      ? Math.round((1 - x.precio / x.antes) * 100) : 0;
     return '<a class="sbp-i" href="' + esc(x.url) + '">' +
       (x.foto ? '<img src="' + esc(x.foto) + '" alt="' + esc(x.nom) + '" loading="lazy" decoding="async">'
               : '<span class="sbp-sinfoto"></span>') +
       '<span class="sbp-t"><b>' + esc(x.nom) + '</b>' +
         '<small>' + esc(x.mm || '') + '</small>' +
-        '<i>' + soles(x.precio) +
-          (x.antes ? ' <s>' + soles(x.antes) + '</s>' : '') +
-          (baja ? ' <em>−' + baja + ' %</em>' : '') +
-        '</i></span></a>';
+        '<i>' + soles(x.precio) + ' <em>Precio especial</em></i>' +
+      '</span></a>';
   }
 
   /* lista: [{id, nom, mm, precio, antes, foto, url}], hasta: Date|null */
