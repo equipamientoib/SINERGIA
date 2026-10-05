@@ -185,7 +185,7 @@ function vcAviso(p, q){
 function vcFila(x){
   const p = x.p, foto = x.foto;
   return `<div class="vc-i">
-    ${foto ? `<img class="vc-f" src="${foto}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
+    ${foto ? `<img class="vc-f" src="${vEsc(foto)}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
       <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>

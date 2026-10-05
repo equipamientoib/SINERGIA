@@ -69,6 +69,25 @@ function fecha_(v) {
   return s_(v);
 }
 
+/* Fechas de la promoción en AAAA-MM-DD, que es como las entiende la web.
+   La hoja puede traer una fecha de verdad o un texto: se aceptan las dos. */
+function fin_(v) {
+  if (v instanceof Date) {
+    var m = v.getMonth() + 1, d = v.getDate();
+    return v.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+  }
+  var t = s_(v).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+  var m2 = t.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);     // 31/10/2026
+  if (m2) return m2[3] + '-' + (m2[2].length < 2 ? '0' : '') + m2[2] + '-' + (m2[1].length < 2 ? '0' : '') + m2[1];
+  return '';
+}
+
+function hoy_() {
+  var d = new Date(), m = d.getMonth() + 1, x = d.getDate();
+  return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (x < 10 ? '0' : '') + x;
+}
+
 var RE_DRIVE_D   = /\/d\/([a-zA-Z0-9_-]{20,})/;
 var RE_DRIVE_ID  = /[?&]id=([a-zA-Z0-9_-]{20,})/;
 var RE_DRIVE_RAW = /^([a-zA-Z0-9_-]{25,})$/;
@@ -113,7 +132,21 @@ function pdf_(txt) {
 }
 
 
-function abrirLibro_(id) { return SpreadsheetApp.openById(id); }
+/* Google falla de vez en cuando al abrir una hoja («Service Spreadsheets
+   failed while accessing document with id …»). Casi siempre es un tropiezo
+   pasajero, así que se reintenta un par de veces antes de darse por
+   vencido: evita que una ejecución programada muera —y el correo de aviso
+   que llega detrás— por algo que se arregla en dos segundos. */
+function abrirConReintento_(id) {
+  var ultimo;
+  for (var i = 0; i < 3; i++) {
+    try { return SpreadsheetApp.openById(id); }
+    catch (err) { ultimo = err; Utilities.sleep(1500 * (i + 1)); }
+  }
+  throw ultimo;
+}
+
+function abrirLibro_(id) { return abrirConReintento_(id); }
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
@@ -178,6 +211,22 @@ function venta_() {
     if (num_(r.ranking)) p.ranking = num_(r.ranking);      // puesto del tipo en el estudio de compras públicas
     if (precio) p.precio = precio;
     if (stock !== null) p.stock = stock;
+
+    /* PROMOCIONES (tres columnas que se llenan a mano en la hoja):
+         precio_promo   el precio rebajado que paga el cliente
+         promo_hasta    el último día de la oferta (fecha)
+         remate         SI para que además salte en la ventana flotante
+       Solo se manda si el precio rebajado es menor que el de lista y la
+       fecha no pasó: así nunca se anuncia un descuento que no existe, y
+       la promoción se apaga sola el día que vence, sin tocar nada.
+       El precio de lista viaja aparte, para tacharlo en la web.        */
+    var promo = num_(r.precio_promo), hasta = fin_(r.promo_hasta);
+    if (promo !== null && precio && promo > 0 && promo < precio && hasta && hasta >= hoy_()) {
+      p.precioLista = precio;
+      p.precio = promo;
+      p.promoHasta = hasta;
+      if (s_(r.remate).toUpperCase() === 'SI') p.remate = 1;
+    }
     var fotos = fotos_(r.fotos);
     var fc = fotoCod[codAtl_(r.codigo_proveedor)];
     if (!fotos.length && fc) { fotos = [foto_(fc)]; p.fotoProv = 1; }   // foto del proveedor (pestaña «Fotos»)
@@ -229,6 +278,50 @@ function prepararHojaVenta() {
   Logger.log('Hoja de venta lista. Productos publicados: %s', venta_().productos.length);
 }
 
+
+
+/* Ejecuta UNA vez desde el editor (▶) para poder manejar las promociones
+   desde la hoja. Crea al final tres columnas que se llenan a mano:
+
+     precio_promo   el precio rebajado que paga el cliente (vacío = sin oferta)
+     promo_hasta    el último día de la oferta
+     remate         SI para que además salte en la ventana flotante de la
+                    tienda; vacío o NO para que solo se vea el precio tachado
+
+   El precio tachado NO se escribe: es el precio_publicado de siempre.
+   Pasada la fecha, o si el precio rebajado no es menor que el de lista, la
+   promoción deja de salir sola y el equipo vuelve a su precio de lista.  */
+function prepararPromociones() {
+  var sh = hojaVenta_(SpreadsheetApp.openById(VENTA_ID));
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
+    if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k + 1; break; }
+  }
+  if (fh < 0) throw new Error('No encuentro la fila de encabezados (la que empieza con «id»).');
+  var heads = vals[fh - 1].map(function (h) { return s_(h); });
+  var nuevas = [];
+  ['precio_promo', 'promo_hasta', 'remate'].forEach(function (c) {
+    if (heads.indexOf(c) < 0) {
+      sh.getRange(fh, heads.length + 1).setValue(c);
+      heads.push(c);
+      nuevas.push(c);
+    }
+  });
+  var col = function (n) { return heads.indexOf(n) + 1; };
+  var ini = fh + 1, n = Math.max(sh.getMaxRows() - fh, 1);
+  sh.getRange(ini, col('precio_promo'), n, 1).setNumberFormat('#,##0');
+  sh.getRange(ini, col('promo_hasta'), n, 1).setNumberFormat('dd/mm/yyyy');
+  sh.getRange(ini, col('remate'), n, 1).setDataValidation(
+    SpreadsheetApp.newDataValidation().requireValueInList(['SI', 'NO'], true).build());
+  [col('precio_promo'), col('promo_hasta'), col('remate')].forEach(function (c) {
+    sh.getRange(fh, c).setFontWeight('bold').setFontColor('#ffffff').setBackground('#c62828').setWrap(true);
+  });
+  Logger.log('Columnas de promoción listas%s. Para poner un equipo en oferta: ' +
+             'escribe el precio rebajado en «precio_promo», la fecha en que termina en ' +
+             '«promo_hasta», y «SI» en «remate» si además quieres que salte en la ventana ' +
+             'de la tienda. Luego corre «Páginas de venta» como siempre.',
+             nuevas.length ? ' (nuevas: ' + nuevas.join(', ') + ')' : ' (ya estaban)');
+}
 
 
 function limpiarCache() {
