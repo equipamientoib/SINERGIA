@@ -221,9 +221,12 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
                       '<link rel="stylesheet" href="/css/carrito.css?v=%s">\n'
                       '<link rel="stylesheet" href="/css/promo-ventana.css?v=%s">\n</head>'
                       % (sello('venta-paginas.css'), sello('carrito.css'), sello('promo-ventana.css')), 1)
-    doc = doc.replace('</body>', '<script defer src="/js/carrito.js?v=%s"></script>\n'
+    # whatsapp.js va primero: los demás guiones pueden pedirle que abra un chat.
+    doc = doc.replace('</body>', '<script defer src="/js/whatsapp.js?v=%s"></script>\n'
+                      '<script defer src="/js/carrito.js?v=%s"></script>\n'
                       '<script defer src="/js/promo-ventana.js?v=%s"></script>\n</body>'
-                      % (sello_js('carrito.js'), sello_js('promo-ventana.js')), 1)
+                      % (sello_js('whatsapp.js'), sello_js('carrito.js'),
+                         sello_js('promo-ventana.js')), 1)
     return doc
 
 

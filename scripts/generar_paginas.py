@@ -229,8 +229,12 @@ def sello_css():
     """Huella de css/alquiler.css: al cambiar los estilos cambia la dirección
     y el navegador no puede quedarse con la copia vieja (GitHub Pages deja
     guardar 10 minutos; con estilos viejos la página nueva se ve rota)."""
+    return huella(os.path.join(ROOT, 'css', 'alquiler.css'))
+
+
+def huella(ruta):
     import hashlib
-    with open(os.path.join(ROOT, 'css', 'alquiler.css'), 'rb') as f:
+    with open(ruta, 'rb') as f:
         return hashlib.sha256(f.read()).hexdigest()[:8]
 
 
@@ -259,6 +263,9 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
     og_img = SITIO + (imagen or '/img/catalogo/defib-05.jpg')
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(
         'Hola Sinergia Biomédica, quiero cotizar un alquiler.'))
+    # js/whatsapp.js: en el celular manda estos enlaces a la aplicación en vez
+    # de a una pestaña del navegador con la página de wa.me.
+    sello_wa = huella(os.path.join(ROOT, 'js', 'whatsapp.js'))
     graph = {'@context': 'https://schema.org', '@graph': [negocio(cfg)] + jsonld + [{
         '@type': 'BreadcrumbList',
         'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': n,
@@ -329,6 +336,7 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
 </div>
 <div class="visor" id="visor" hidden><button type="button" class="v-x" aria-label="Cerrar">&#10005;</button><button type="button" class="v-f izq" aria-label="Anterior">&#8249;</button><img alt=""><button type="button" class="v-f der" aria-label="Siguiente">&#8250;</button><span class="v-n"></span></div>
 <script>{GALERIA_JS}</script>
+<script defer src="/js/whatsapp.js?v={sello_wa}"></script>
 </body>
 </html>
 '''
