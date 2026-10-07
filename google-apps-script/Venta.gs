@@ -171,7 +171,6 @@ function venta_() {
   if (!VENTA_ID) return null;
   var libro = abrirLibro_(VENTA_ID), sh = hojaVenta_(libro);
   var fotoCod = fotosPorCodigo_(libro);
-  var docsCod = docsPorCodigo_(libro);
   var vals = sh.getDataRange().getValues();
   var margen = 35, actualizado = '', fh = -1, soloStock = true;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
@@ -234,11 +233,10 @@ function venta_() {
     if (fotos.length) p.fotos = fotos;
     var fp = pdf_(r.ficha_pdf);
     if (fp.ver) p.ficha_pdf = fp.ver;
-    /* Documentos bajados del portal (pestaña «Documentos»): ficha técnica,
-       catálogo del fabricante y registro sanitario. «NINGUNO» marca que ya
-       se buscaron y no había; no se publica. */
-    var dc = (docsCod[codAtl_(r.codigo_proveedor)] || []).filter(function (d) { return d.t !== 'NINGUNO'; });
-    if (dc.length) p.docs = dc.map(function (d) { return { tipo: d.t, nom: d.n, ver: d.u }; });
+    /* Los documentos del proveedor NO viajan a la web: llevan su logo y su
+       marca. Se quedan en Drive como material de consulta, y lo que se
+       publica es la ficha propia de Sinergia (fichas/venta/). El registro
+       sanitario tampoco se publica. */
     productos.push(p);
   }
   return { actualizado: actualizado, productos: productos };
@@ -701,9 +699,13 @@ function atlFotosPendientes_() {
 
    Igual que con las fotos: el portal solo abre desde Perú, así que los
    baja el navegador de Sinergia y los manda aquí. Van a la carpeta
-   «Sinergia - Documentos venta» y se anotan en la pestaña «Documentos»
-   (codigo | tipo | nombre | enlace | fecha). Un documento se guarda una
-   sola vez; para rehacerlo, se borra su fila. */
+   «Sinergia - Documentos ORIGINALES (proveedor)» y se anotan en la pestaña
+   «Documentos» (codigo | tipo | nombre | enlace | fecha).
+
+   NO SE PUBLICAN. Llevan el logo y la marca del proveedor, y el registro
+   sanitario es material interno. Quedan en Drive como fuente de consulta:
+   lo que ve el cliente es la ficha propia de Sinergia, que el sitio arma
+   solo en fichas/venta/ con el logo de la casa, igual que las de alquiler. */
 var DOC_NOMBRES = { CTR: 'Ficha técnica', COR: 'Catálogo del fabricante', RGS: 'Registro sanitario', OTR: 'Registro sanitario' };
 
 function carpetaDocs_() {
@@ -711,7 +713,7 @@ function carpetaDocs_() {
   if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
   var dest = DriveApp.getFileById(VENTA_ID).getParents();
   var base = dest.hasNext() ? dest.next() : DriveApp.getRootFolder();
-  var f = base.createFolder('Sinergia - Documentos venta');
+  var f = base.createFolder('Sinergia - Documentos ORIGINALES (proveedor)');
   pr.setProperty('DOCS_CARPETA', f.getId());
   return f;
 }

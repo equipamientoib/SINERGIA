@@ -312,27 +312,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
     # Ficha técnica: activa si ya existe el PDF; si no, el espacio listo
     pdf = pdf_venta(p['id'])
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
-    # Documentos bajados del portal del proveedor (hoja «Documentos»): ficha
-    # técnica, catálogo del fabricante y registro sanitario de DIGEMID. Ese
-    # último es el que piden en las licitaciones del Estado, así que va
-    # primero y con su propio color.
-    docs_portal = p.get('docs') or []
-    if docs_portal:
-        orden = {'RGS': 0, 'OTR': 0, 'CTR': 1, 'COR': 2}
-        filas = ''.join(
-            '<div class="doc%s">'
-            '<span class="doc-ico" aria-hidden="true">PDF</span>'
-            '<span class="doc-txt"><b>%s</b><small>%s</small></span>'
-            '<a class="btn fill doc-dl" href="%s" target="_blank" rel="noopener">Ver</a>'
-            '</div>'
-            % (' doc-rs' if d.get('tipo') in ('RGS', 'OTR') else '',
-               e(NOMBRE_DOC.get(d.get('tipo'), d.get('nom') or 'Documento')),
-               'Registro sanitario DIGEMID' if d.get('tipo') in ('RGS', 'OTR') else 'PDF del proveedor',
-               e(d.get('ver') or ''))
-            for d in sorted(docs_portal, key=lambda x: orden.get(x.get('tipo'), 9))
-            if d.get('ver'))
-        doc = filas
-    elif os.path.exists(ruta_pdf):
+    if os.path.exists(ruta_pdf):
         kb = max(1, round(os.path.getsize(ruta_pdf) / 1024))
         doc = f'''<div class="doc">
           <span class="doc-ico" aria-hidden="true">PDF</span>
@@ -583,6 +563,94 @@ def pm_tarjeta(p, cfg, base, fijas, locales, promos):
             % (p['id'], img, e(p['nom']),
                ('<span class="pm-mm">%s</span>' % e(mm)) if mm else '',
                soles(p['precio']) if p.get('precio') else '', chip, pie))
+
+
+def ficha_a4_venta(p, cfg, base, fijas, locales):
+    """La ficha técnica de Sinergia, en A4, lista para imprimir o guardar.
+
+    Se arma con los datos propios —nombre, marca, modelo, origen, código
+    NTS, características y áreas de uso— y lleva el logo de la casa. Los
+    documentos del proveedor NO se publican: llevan su logo y su marca, y
+    quedan en Drive solo como material de consulta. Esta es la que ve el
+    cliente, igual que las once del lado de alquiler.
+
+    De aquí sale el PDF: scripts/generar_pdf_fichas.js la convierte.
+    """
+    fts = fotos(p, base, fijas, locales)
+    foto = fts[0][0] if fts else ''
+    datos = [(k, v) for k, v in (('Marca', p.get('marca')), ('Modelo', p.get('modelo')),
+                                 ('Origen', p.get('origen')), ('Código NTS', p.get('clave'))) if v]
+    tabla = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(v)) for k, v in datos)
+    cars = ''.join('<tr><th>%s</th><td></td></tr>' % e(c) for c in (p.get('caracteristicas') or []))
+    areas = ''.join('<li>%s</li>' % e(a) for a in (p.get('areas') or []))
+    grupos = '<div class="g"><h4>Identificación</h4><table>%s</table></div>' % tabla if tabla else ''
+    if p.get('caracteristicas'):
+        grupos += ('<div class="g"><h4>Características</h4><table>%s</table></div>'
+                   % ''.join('<tr><td colspan="2">%s</td></tr>' % e(c) for c in p['caracteristicas']))
+    return f'''<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha técnica — {e(p['nom'])} | Sinergia Biomédica</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/css/00-fuentes.css">
+<style>
+  @page{{size:A4;margin:0}}
+  *{{box-sizing:border-box;margin:0;padding:0}}
+  body{{font-family:'Titillium Web',system-ui,sans-serif;color:#17191D;background:#e9e7e2;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  .hoja{{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:14mm 14mm 12mm;display:flex;flex-direction:column}}
+  @media screen{{.hoja{{margin:16px auto;box-shadow:0 10px 40px -12px rgba(0,0,0,.3)}}}}
+  header{{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #9A7F4E;padding-bottom:6mm}}
+  .logo{{height:13mm}}.logo text{{font-family:'Chakra Petch',sans-serif}}
+  .tag{{font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:3px;font-size:9pt;color:#9A7F4E;text-align:right}}
+  .tag b{{display:block;font-size:15pt;letter-spacing:1px;color:#17191D}}
+  .top{{display:grid;grid-template-columns:62mm 1fr;gap:7mm;margin-top:7mm}}
+  .foto{{border:1px solid #e3e0d8;border-radius:3mm;height:52mm;display:flex;align-items:center;justify-content:center;overflow:hidden}}
+  .foto img{{max-width:100%;max-height:100%;object-fit:contain}}
+  h1{{font-family:'Chakra Petch',sans-serif;font-size:17pt;line-height:1.15}}
+  .marca{{color:#6E727A;font-size:10pt;margin-top:1mm}}
+  .resumen{{font-size:9.5pt;line-height:1.5;margin-top:3mm}}
+  .grupos{{columns:2;column-gap:7mm;margin-top:6mm}}
+  .g{{break-inside:avoid;margin-bottom:4.5mm}}
+  h4{{font-family:'Chakra Petch',sans-serif;font-size:9pt;letter-spacing:1px;text-transform:uppercase;color:#fff;background:#17191D;padding:1.6mm 2.5mm;border-radius:1.5mm 1.5mm 0 0}}
+  table{{width:100%;border-collapse:collapse;font-size:8.6pt}}
+  th,td{{padding:1.5mm 2.5mm;border-bottom:1px solid #ebe8e1;vertical-align:top;text-align:left}}
+  th{{font-weight:400;color:#6E727A}}td{{font-weight:600}}
+  .g:first-child th{{width:44%}}
+  tr:nth-child(even) th,tr:nth-child(even) td{{background:#FBFAF6}}
+  .incluye{{margin-top:2mm;border:1px solid #e3e0d8;border-radius:2mm;padding:3mm 4mm;font-size:9pt}}
+  .incluye b{{font-family:'Chakra Petch',sans-serif;font-size:9pt;letter-spacing:1px;text-transform:uppercase;color:#9A7F4E}}
+  .incluye ul{{columns:2;margin-top:1.5mm;padding-left:4mm}}
+  footer{{margin-top:auto;padding-top:5mm;border-top:1px solid #e3e0d8;display:flex;justify-content:space-between;gap:6mm;font-size:8pt;color:#6E727A}}
+  footer b{{color:#17191D}}
+  .boton{{position:fixed;right:20px;bottom:20px;font-family:'Chakra Petch',sans-serif;font-weight:600;background:#17191D;color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer}}
+  @media print{{.boton{{display:none}}}}
+</style></head>
+<body>
+<div class="hoja">
+  <header>{gp.LOGO}<div class="tag">FICHA TÉCNICA<b>Venta de equipamiento</b></div></header>
+  <div class="top">
+    <div class="foto">{f'<img src="{foto}" alt="">' if foto else ''}</div>
+    <div>
+      <h1>{e(p['nom'])}</h1>
+      <div class="marca">{e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x))}</div>
+      <p class="resumen">{e(p.get('resumen') or '')}</p>
+    </div>
+  </div>
+  <div class="grupos">{grupos}</div>
+  {f'<div class="incluye"><b>Se usa en</b><ul>{areas}</ul></div>' if areas else ''}
+  <footer>
+    <div><b>Sinergia Biomédica</b> · Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú · {e(cfg['email'])} · {e(cfg['telefono'])}</div>
+    <div style="text-align:right">sinergiabiomedica.pe<br>Precio y disponibilidad: consultar</div>
+  </footer>
+</div>
+<button class="boton" onclick="print()">Guardar como PDF</button>
+<script>
+  if (window.self !== window.top) document.querySelector('.boton').style.display = 'none';
+  function ajustar(){{ var w = document.documentElement.clientWidth, a4 = 210 * 96 / 25.4 + 32;
+    document.body.style.zoom = w < a4 ? (w / a4) : ''; }}
+  ajustar(); addEventListener('resize', ajustar);
+</script>
+</body></html>
+'''
 
 
 def pagina_promos(enof, cfg, base, fijas, locales, promos):
@@ -855,6 +923,11 @@ def main():
         rel = 'venta/%s/index.html' % p['id']
         gp.escribir(rel, doc, cambios)
         paginas.append((ruta, rel))
+        # La hoja A4 con el logo de la casa. De aquí sale el PDF que se
+        # publica (scripts/generar_pdf_fichas.js). No va al sitemap: es
+        # material de apoyo, no una página que Google deba indexar.
+        gp.escribir('fichas/venta/%s/index.html' % p['id'],
+                    ficha_a4_venta(p, cfg, base, fijas, locales), cambios)
 
     # Equipos que ya no se publican (sin stock o despublicados): su página se borra.
     vigentes = {p['id'] for p in productos} | {'codigos-nts'}
