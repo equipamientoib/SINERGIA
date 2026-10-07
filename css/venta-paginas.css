@@ -28,6 +28,15 @@
 
 /* ficha técnica aún sin PDF: una línea discreta (cuando hay PDF, la caja .doc) */
 .prod.venta .prod-btns{margin-top:20px}
+/* ── Documentos del proveedor en la ficha del equipo ──────────────────
+   Varios seguidos: se separan y el registro sanitario se distingue, que es
+   el que un hospital busca primero (lo exigen en las licitaciones). */
+.doc + .doc{margin-top:8px}
+.doc-rs{padding:10px 12px;border-radius:12px;background:rgba(46,125,50,.07);
+  border:1px solid rgba(46,125,50,.25)}
+.doc-rs .doc-ico{background:#2e7d32}
+.doc-rs .doc-txt small{color:#2e7d32;font-weight:600}
+
 .doc-linea{margin-top:14px;font-size:13.5px;line-height:1.6;color:var(--gris)}
 .doc-linea a{color:var(--cobre-d);font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .doc-mini{display:inline-block;margin-right:7px;vertical-align:1px;font-family:var(--ff-d);font-size:9.5px;font-weight:700;color:#fff;background:#B9AE96;border-radius:4px;padding:3px 5px;letter-spacing:.5px}

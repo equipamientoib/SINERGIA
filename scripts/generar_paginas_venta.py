@@ -193,6 +193,10 @@ def ficha_venta(pid):
     return gp.leer_json(ruta) if os.path.exists(ruta) else None
 
 
+NOMBRE_DOC = {'CTR': 'Ficha técnica', 'COR': 'Catálogo del fabricante',
+              'RGS': 'Registro sanitario', 'OTR': 'Registro sanitario'}
+
+
 def pdf_venta(pid):
     return '/fichas/venta/ficha-tecnica-%s.pdf' % pid
 
@@ -308,7 +312,27 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
     # Ficha técnica: activa si ya existe el PDF; si no, el espacio listo
     pdf = pdf_venta(p['id'])
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
-    if os.path.exists(ruta_pdf):
+    # Documentos bajados del portal del proveedor (hoja «Documentos»): ficha
+    # técnica, catálogo del fabricante y registro sanitario de DIGEMID. Ese
+    # último es el que piden en las licitaciones del Estado, así que va
+    # primero y con su propio color.
+    docs_portal = p.get('docs') or []
+    if docs_portal:
+        orden = {'RGS': 0, 'OTR': 0, 'CTR': 1, 'COR': 2}
+        filas = ''.join(
+            '<div class="doc%s">'
+            '<span class="doc-ico" aria-hidden="true">PDF</span>'
+            '<span class="doc-txt"><b>%s</b><small>%s</small></span>'
+            '<a class="btn fill doc-dl" href="%s" target="_blank" rel="noopener">Ver</a>'
+            '</div>'
+            % (' doc-rs' if d.get('tipo') in ('RGS', 'OTR') else '',
+               e(NOMBRE_DOC.get(d.get('tipo'), d.get('nom') or 'Documento')),
+               'Registro sanitario DIGEMID' if d.get('tipo') in ('RGS', 'OTR') else 'PDF del proveedor',
+               e(d.get('ver') or ''))
+            for d in sorted(docs_portal, key=lambda x: orden.get(x.get('tipo'), 9))
+            if d.get('ver'))
+        doc = filas
+    elif os.path.exists(ruta_pdf):
         kb = max(1, round(os.path.getsize(ruta_pdf) / 1024))
         doc = f'''<div class="doc">
           <span class="doc-ico" aria-hidden="true">PDF</span>

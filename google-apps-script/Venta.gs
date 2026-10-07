@@ -171,6 +171,7 @@ function venta_() {
   if (!VENTA_ID) return null;
   var libro = abrirLibro_(VENTA_ID), sh = hojaVenta_(libro);
   var fotoCod = fotosPorCodigo_(libro);
+  var docsCod = docsPorCodigo_(libro);
   var vals = sh.getDataRange().getValues();
   var margen = 35, actualizado = '', fh = -1, soloStock = true;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
@@ -233,6 +234,11 @@ function venta_() {
     if (fotos.length) p.fotos = fotos;
     var fp = pdf_(r.ficha_pdf);
     if (fp.ver) p.ficha_pdf = fp.ver;
+    /* Documentos bajados del portal (pestaña «Documentos»): ficha técnica,
+       catálogo del fabricante y registro sanitario. «NINGUNO» marca que ya
+       se buscaron y no había; no se publica. */
+    var dc = (docsCod[codAtl_(r.codigo_proveedor)] || []).filter(function (d) { return d.t !== 'NINGUNO'; });
+    if (dc.length) p.docs = dc.map(function (d) { return { tipo: d.t, nom: d.n, ver: d.u }; });
     productos.push(p);
   }
   return { actualizado: actualizado, productos: productos };
@@ -687,6 +693,102 @@ function atlFotosPendientes_() {
   return out;
 }
 
+/* ── Documentos del proveedor → Drive ──────────────────────────────
+   El portal guarda, por equipo, hasta tres documentos: el catálogo
+   traducido (la ficha técnica en español), el catálogo original del
+   fabricante y el REGISTRO SANITARIO de DIGEMID. Este último es el que
+   piden en toda licitación del Estado, así que publicarlo vale oro.
+
+   Igual que con las fotos: el portal solo abre desde Perú, así que los
+   baja el navegador de Sinergia y los manda aquí. Van a la carpeta
+   «Sinergia - Documentos venta» y se anotan en la pestaña «Documentos»
+   (codigo | tipo | nombre | enlace | fecha). Un documento se guarda una
+   sola vez; para rehacerlo, se borra su fila. */
+var DOC_NOMBRES = { CTR: 'Ficha técnica', COR: 'Catálogo del fabricante', RGS: 'Registro sanitario', OTR: 'Registro sanitario' };
+
+function carpetaDocs_() {
+  var pr = PropertiesService.getScriptProperties(), id = pr.getProperty('DOCS_CARPETA');
+  if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
+  var dest = DriveApp.getFileById(VENTA_ID).getParents();
+  var base = dest.hasNext() ? dest.next() : DriveApp.getRootFolder();
+  var f = base.createFolder('Sinergia - Documentos venta');
+  pr.setProperty('DOCS_CARPETA', f.getId());
+  return f;
+}
+
+function hojaDocs_(ss) {
+  var sh = ss.getSheetByName('Documentos');
+  if (!sh) {
+    sh = ss.insertSheet('Documentos');
+    sh.getRange(1, 1, 1, 5).setValues([['codigo', 'tipo', 'nombre', 'enlace', 'fecha']])
+      .setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36');
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+/* «codigo|tipo» → {tipo, nombre, enlace}. Se usa para no repetir
+   descargas y para armar la lista que ve la web. */
+function docsPorCodigo_(ss) {
+  var sh = ss.getSheetByName('Documentos'), m = {};
+  if (!sh) return m;
+  sh.getDataRange().getValues().slice(1).forEach(function (r) {
+    var c = codAtl_(r[0]), t = s_(r[1]).toUpperCase(), u = s_(r[3]);
+    if (!c || !t || !u) return;
+    (m[c] = m[c] || []).push({ t: t, n: s_(r[2]) || DOC_NOMBRES[t] || 'Documento', u: u });
+  });
+  return m;
+}
+
+/* Equipos a los que todavía no se les ha buscado documentos. Mismo orden
+   que las fotos: primero los publicados, luego los que tienen stock. */
+function atlDocsPendientes_() {
+  var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss), pv = ss.getSheetByName('Proveedor');
+  if (!pv) return [];
+  var hechos = docsPorCodigo_(ss);
+  var vals = sh.getDataRange().getValues(), fh = -1, prio = {};
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  var heads = vals[fh].map(function (h) { return s_(h); }), col = function (n) { return heads.indexOf(n); };
+  for (var i = fh + 1; i < vals.length; i++) {
+    var cd = codAtl_(vals[i][col('codigo_proveedor')]); if (!cd) continue;
+    if (s_(vals[i][col('publicar')]).toUpperCase() === 'SI') prio[cd] = 1;
+  }
+  var out = [];
+  pv.getDataRange().getValues().slice(1).forEach(function (r) {
+    var cd = codAtl_(r[0]);
+    if (!cd || hechos[cd]) return;
+    out.push({ c: cd, p: prio[cd] || (Number(r[3]) > 0 ? 2 : 3) });
+  });
+  out.sort(function (a, b) { return a.p - b.p; });
+  return out;
+}
+
+function atlGuardarDoc_(d) {
+  var cd = codAtl_(d.c), tipo = s_(d.t).toUpperCase();
+  if (!cd || !tipo) return { ok: false, motivo: 'sin código o tipo' };
+  var ss = SpreadsheetApp.openById(VENTA_ID);
+  var ya = docsPorCodigo_(ss)[cd] || [];
+  for (var i = 0; i < ya.length; i++) if (ya[i].t === tipo) return { ok: true, repetido: true };
+  var nombre = cd.slice(0, 3) + '.' + cd.slice(3) + ' - ' + (DOC_NOMBRES[tipo] || tipo) + '.pdf';
+  var file = carpetaDocs_().createFile(Utilities.newBlob(Utilities.base64Decode(d.b64), d.mime || 'application/pdf', nombre));
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), tipo,
+                           s_(d.n) || DOC_NOMBRES[tipo] || 'Documento',
+                           'https://drive.google.com/file/d/' + file.getId() + '/view', new Date()]);
+  limpiarCache();
+  return { ok: true };
+}
+
+/* Un equipo SIN documentos también se anota, con tipo «NINGUNO», para no
+   volver a preguntarle al portal en cada corrida. */
+function atlSinDocs_(cod) {
+  var cd = codAtl_(cod); if (!cd) return { ok: false };
+  var ss = SpreadsheetApp.openById(VENTA_ID);
+  if ((docsPorCodigo_(ss)[cd] || []).length) return { ok: true, repetido: true };
+  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), 'NINGUNO', '', '', new Date()]);
+  return { ok: true };
+}
+
 function atlGuardarFoto_(f) {
   var cd = codAtl_(f.c);
   if (!cd) return { ok: false, motivo: 'sin código' };
@@ -712,6 +814,7 @@ function doGet(e) {
     if (!claveAtl_() || p.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
     if (p.atl === 'codigos') return json_({ ok: true, codigos: atlCodigos_() });
     if (p.atl === 'fotos') return json_({ ok: true, fotos: atlFotosPendientes_() });
+    if (p.atl === 'docs')  return json_({ ok: true, docs: atlDocsPendientes_() });
     return ContentService.createTextOutput(PropertiesService.getScriptProperties().getProperty('ATL_ULTIMO') || '{"ok":false}')
       .setMimeType(ContentService.MimeType.JSON);
   }
@@ -735,6 +838,12 @@ function doPost(e) {
   if (!claveAtl_() || datos.k !== claveAtl_()) return json_({ ok: false, motivo: 'clave incorrecta' });
   if (datos.foto) {
     try { return json_(atlGuardarFoto_(datos.foto)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
+  }
+  if (datos.doc) {
+    try { return json_(atlGuardarDoc_(datos.doc)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
+  }
+  if (datos.sinDoc) {
+    try { return json_(atlSinDocs_(datos.sinDoc)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
   }
   try { return json_(atlActualizar_(datos)); }
   catch (err) {
