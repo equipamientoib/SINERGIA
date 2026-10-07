@@ -30,7 +30,11 @@
   var PAUSA = 3000;           // ms entre una consulta y la siguiente
   var REUSO_MIN = 60;         // si se usó hace menos de esto, pide confirmar
   var LOTE_FOTOS = 100;       // fotos por clic (una descarga cada ~3 s)
-  var LOTE_DOCS = 40;         // equipos a los que se les piden documentos por clic
+  /* 20 y no más: cada equipo son 1 consulta de lista + hasta 3 descargas,
+     así que 20 equipos ya son ~80 peticiones, parecido a un lote de fotos.
+     Con 40 serían 160, más tráfico del que hemos hecho nunca, y un PDF pesa
+     bastante más que una foto. */
+  var LOTE_DOCS = 20;         // equipos a los que se les piden documentos por clic
   var ESPERA_MAX = 45000;     // ms por bloque
 
   /* ── Panel flotante ─────────────────────────────────────────────── */
