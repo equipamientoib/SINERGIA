@@ -121,6 +121,31 @@
      stock) cuentan para avanzar de página pero no se guardan. */
   var DEC = document.createElement('textarea');
   function texto(t) { DEC.innerHTML = String(t || '').replace(/<[^>]*>/g, ' '); return DEC.value.replace(/\s+/g, ' ').trim(); }
+
+  /* ── Rastreo de documentos ──────────────────────────────────────────
+     Todavía no se descarga nada: solo se mira si en el HTML que YA se
+     descargó para leer precios hay enlaces a fichas técnicas, manuales o
+     catálogos. Cuesta cero consultas al portal y nos dice si vale la pena
+     programar la descarga y con qué forma vienen las direcciones. */
+  var DOCS = {};                       // dirección -> código del equipo
+  var RX_DOC = /href\s*=\s*["']([^"']+\.(?:pdf|docx?|xlsx?)(?:\?[^"']*)?)["']/gi;
+  var RX_PAL = /<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>((?:(?!<\/a>)[\s\S]){0,120})<\/a>/gi;
+  var PALABRAS = /ficha|t[eé]cnic|manual|datasheet|cat[aá]logo|brochure|especificac|instructiv/i;
+
+  function buscarDocs(trozo, codigo) {
+    var m;
+    RX_DOC.lastIndex = 0;
+    while ((m = RX_DOC.exec(trozo))) guardarDoc(m[1], codigo);
+    RX_PAL.lastIndex = 0;
+    while ((m = RX_PAL.exec(trozo))) {
+      if (PALABRAS.test(texto(m[2])) || PALABRAS.test(m[1])) guardarDoc(m[1], codigo);
+    }
+  }
+  function guardarDoc(u, codigo) {
+    if (!u || /^(#|javascript:|mailto:)/i.test(u)) return;
+    try { u = new URL(u, location.href).href; } catch (e) { return; }
+    if (!DOCS[u]) DOCS[u] = codigo || '';
+  }
   function leer(html, mapa) {
     var trozos = String(html || '').split(/class="card card-product/).slice(1), nuevos = 0;
     if (!trozos.length) trozos = [String(html || '')];
@@ -141,7 +166,9 @@
       try { src = src && !/img_default/.test(src) ? new URL(src, location.href).href : ''; } catch (e) { src = ''; }
       var k = cod6(m[1]); if (!mapa[k]) nuevos++;
       mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src };
+      buscarDocs(t, m[1]);
     });
+    buscarDocs(html, '');          // por si los enlaces van fuera de las tarjetas
     return { nuevos: nuevos, tarjetas: /card card-product/.test(html || '') ? trozos.length : nuevos };
   }
 
@@ -230,6 +257,37 @@
     if (lista.length > LOTE_FOTOS) p.innerHTML += '<br>Se copian de ' + LOTE_FOTOS + ' en ' + LOTE_FOTOS + ': vuelve a tocar el favorito otro día para seguir.';
     boton('Copiar ' + lote.length + ' fotos', function () { this.remove(); copiarFotos(lote); });
   }
+  /* Qué se vio de documentos. Todavía no descarga: enseña lo encontrado y
+     deja copiarlo, para decidir con datos si se programa la descarga. */
+  function informeDocs() {
+    var urls = Object.keys(DOCS);
+    var p = document.createElement('p');
+    p.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #333';
+    if (!urls.length) {
+      p.innerHTML = '📄 <b>Documentos:</b> no se vio ninguna ficha técnica ni manual en el catálogo. ' +
+        '<span style="color:#aeb4bc">Puede que estén dentro de la página de cada equipo y no en la lista.</span>';
+      document.getElementById('sbAtlTxt').appendChild(p);
+      return;
+    }
+    p.innerHTML = '📄 <b>Documentos:</b> se encontraron <b>' + urls.length + '</b> enlaces a fichas o manuales.' +
+      '<br><span style="color:#aeb4bc">Todavía no se descargan. Copia el informe y pásalo para programar la descarga.</span>' +
+      '<br><span style="color:#9be3b5;font-size:11px;word-break:break-all">' +
+        urls.slice(0, 3).map(function (u) { return u.length > 90 ? u.slice(0, 90) + '…' : u; }).join('<br>') +
+      '</span>';
+    document.getElementById('sbAtlTxt').appendChild(p);
+    boton('Copiar informe de documentos', function () {
+      var t = ['Documentos vistos en el catálogo del proveedor: ' + urls.length, ''];
+      urls.slice(0, 40).forEach(function (u) { t.push((DOCS[u] ? DOCS[u] + '  ' : '') + u); });
+      if (urls.length > 40) t.push('… y ' + (urls.length - 40) + ' más');
+      var a = document.createElement('textarea');
+      a.value = t.join('\n'); a.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(a); a.select();
+      try { document.execCommand('copy'); this.textContent = '¡Copiado!'; }
+      catch (e) { this.textContent = 'No se pudo copiar'; }
+      a.remove();
+    });
+  }
+
   async function copiarFotos(lista) {
     var hechas = 0, fallas = 0;
     for (var i = 0; i < lista.length && !parar; i++) {
@@ -326,6 +384,7 @@
         (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal: mira la columna «coincidencia».<br>' : '') +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
       await ofrecerFotos();
+      informeDocs();
       boton('Cerrar', cerrar);
     } catch (e) {
       error(String(e && e.message || e));
