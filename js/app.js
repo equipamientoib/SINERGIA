@@ -836,17 +836,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=b3ee46ca';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=a3fa1149';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=b3ee46ca';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=a3fa1149';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=b3ee46ca','js/06-tablero.js?v=b3ee46ca'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=a3fa1149','js/06-tablero.js?v=a3fa1149'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=b3ee46ca'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=a3fa1149'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1641,21 +1641,18 @@ function abrirCanal(via, texto, asunto){
     abrirCanal('correo', texto, asunto);
     return;
   }
-  const a = document.createElement('a');
+  if(typeof SBWhatsApp !== 'undefined'){ SBWhatsApp.abrir(n, texto); return; }
+  const a = document.createElement('a');          // sin el módulo: como antes
   a.href = urlWhatsApp(n, texto);
   a.target = '_blank'; a.rel = 'noopener';
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-/* En el celular, wa.me abre la aplicación. En la computadora, wa.me pasa
-   por una página intermedia de WhatsApp que con mensajes largos se ve
-   rota y descuadrada: ahí se va directo a WhatsApp Web, que pega el
-   mensaje en el chat. */
+/* La dirección la arma js/whatsapp.js, que además sabe abrirla donde
+   toca. Esto se queda por si alguien la necesita suelta. */
 function urlWhatsApp(numero, texto){
-  const movil = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent || '');
-  const base = movil ? 'https://wa.me/' + numero + '?text='
-                     : 'https://web.whatsapp.com/send?phone=' + numero + '&text=';
-  return base + encodeURIComponent(texto);
+  if(typeof SBWhatsApp !== 'undefined') return SBWhatsApp.direccion(numero, texto);
+  return 'https://wa.me/' + String(numero).replace(/\D/g, '') + '?text=' + encodeURIComponent(texto);
 }
 
 /* ── formulario de contacto ─────────────────────────────────────────── */
@@ -1930,7 +1927,10 @@ function vListaEnviar(via){
   const t = (document.getElementById('vLista')||{}).value||'';
   if(!t.trim()){ document.getElementById('vLista').focus(); return; }
   const msg = 'Hola Sinergia Biomédica, quiero cotizar esta lista de equipos:\n\n'+t.trim();
-  if(via==='wa') window.open(vWA(msg),'_blank','noopener');
+  /* Nada de window.open: en el celular deja al visitante en una pestaña
+     del navegador con la página de wa.me, no en la aplicación. */
+  if(via==='wa') (typeof SBWhatsApp !== 'undefined') ? SBWhatsApp.ir(vWA(msg))
+                                                     : window.open(vWA(msg),'_blank','noopener');
   else location.href = `mailto:${SITE.email}?subject=${encodeURIComponent('Cotización de lista de equipos')}&body=${encodeURIComponent(msg)}`;
 }
 

@@ -25,7 +25,7 @@ PORTAL = ['css/13-clientes.css', 'css/15-expediente.css',
 # se les pone el ?v= en index.html; si no, un cambio en ellos no llega nunca
 # al navegador de quien ya visitó el sitio.
 SUELTOS = ['css/carrito.css', 'css/promo-ventana.css',
-           'js/carrito.js', 'js/promo-ventana.js']
+           'js/carrito.js', 'js/promo-ventana.js', 'js/whatsapp.js']
 
 
 def leer(ruta):
