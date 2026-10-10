@@ -25,23 +25,32 @@
    sólo se pinta: ninguna regla de metrado vive en esta página.
    ===================================================================== */
 
-let PME_DATOS = null;         // el JSON, una vez descargado
-let PME_ESTADO = 'no';        // no | cargando | listo | error
-let PME_ERROR = '';
+/* Todo va POR EXPEDIENTE. La primera versión guardaba un único dato y,
+   al pasar de Pachas a otro proyecto, el panel seguía enseñando las
+   cifras del anterior: el peor error posible en un portal donde cada
+   cliente entra con su clave. */
+const PME_DATOS = {};         // id -> JSON descargado
+const PME_EST = {};           // id -> no | cargando | listo | error
+const PME_ERR = {};           // id -> motivo
 
-/* El JSON del PME de cada expediente, al lado del del expediente. */
-function pmeUrl(id){ return 'data/pme-' + id.replace(/-\d+$/, '') + '.json'; }
+function pmeEstado(id){ return PME_EST[id] || 'no'; }
+
+/* Dónde está el PME de este expediente. Lo dice el propio JSON del
+   expediente (campo «pme»); sin eso, no hay pestaña ni petición. */
+function pmeUrl(d, id){
+  return (d && typeof d.pme === 'string') ? d.pme : 'data/pme-' + id + '.json';
+}
 
 function paneExPme(d, id){
-  if(PME_ESTADO === 'error'){
+  if(pmeEstado(id) === 'error'){
     return `<div class="cargando-proy">
       <p>No se pudo traer el PME.</p>
-      <span>${esc(PME_ERROR)}</span>
+      <span>${esc(PME_ERR[id] || '')}</span>
       <p style="margin-top:12px"><button class="btn btn-fill"
-        onclick="PME_ESTADO='no';pintarExpediente('${id}')">Reintentar</button></p>
+        onclick="delete PME_EST['${id}'];pintarExpediente('${id}')">Reintentar</button></p>
     </div>`;
   }
-  if(PME_ESTADO !== 'listo'){
+  if(pmeEstado(id) !== 'listo'){
     return `<div class="cargando-proy"><div class="cp-barra"><i></i></div>
       <p>Trayendo el PME y la lista de la norma…</p>
       <span>Son los ${d && d.resumen ? d.resumen.ambientes || '' : ''} ambientes del PMA con su equipo.</span></div>`;
@@ -51,18 +60,19 @@ function paneExPme(d, id){
 
 /* Lo llama 06-expediente.js cada vez que se pinta la pestaña. */
 function montarExPme(d, id){
-  if(PME_ESTADO === 'cargando' || PME_ESTADO === 'listo') return;
-  PME_ESTADO = 'cargando';
-  fetch(pmeUrl(id), {cache: 'no-cache'}).then(r => {
+  const e = pmeEstado(id);
+  if(e === 'cargando' || e === 'listo') return;
+  PME_EST[id] = 'cargando';
+  fetch(pmeUrl(d, id), {cache: 'no-cache'}).then(r => {
     if(!r.ok) throw new Error('El archivo del PME no está publicado (' + r.status + ').');
     return r.json();
   }).then(j => {
-    PME_DATOS = j;
-    PME_ESTADO = 'listo';
+    PME_DATOS[id] = j;
+    PME_EST[id] = 'listo';
     pintarExpediente(id);
-  }).catch(e => {
-    PME_ESTADO = 'error';
-    PME_ERROR = e.message || String(e);
+  }).catch(err => {
+    PME_EST[id] = 'error';
+    PME_ERR[id] = err.message || String(err);
     pintarExpediente(id);
   });
 }
@@ -72,8 +82,9 @@ function montarExPme(d, id){
    ambiente —con la lista de la norma, el cotejo contra el PMF y el PMA
    y los avisos— entra en el paso siguiente, con el dato ya publicado. */
 function pmePane(d, id){
-  const m = PME_DATOS.meta || {};
-  const c = PME_DATOS.c || {};
+  const j = PME_DATOS[id] || {};
+  const m = j.meta || {};
+  const c = j.c || {};
   const cif = (n, t, s) => `<div class="ex-cifra"><b>${esc(nf(n))}</b><span>${esc(t)}</span>
     ${s ? `<i>${esc(s)}</i>` : ''}</div>`;
 

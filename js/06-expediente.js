@@ -225,6 +225,9 @@ function pintarExpediente(id){
   if(typeof tbCerrarMenus==='function') tbCerrarMenus();
   const d=EX_DET[id];
   if(typeof TB_EXP!=='undefined') TB_EXP=d;      // para la descarga en PDF con membrete
+  /* Cada expediente tiene las pestañas que tiene: si se venía del PME de
+     otro proyecto, aquí esa pestaña no existe y se vuelve al resumen. */
+  if(EX_TAB==='pme' && d && !d.pme) EX_TAB='res';
   const y=window.pageYOffset;
   let pane='';
   if(!d) pane=EX_ERR[id]?paneExError(id):paneExCargando();
@@ -245,7 +248,7 @@ function pintarExpediente(id){
   if(EX_TAB==='doc' && d) precargarVisor(d);          // se va trayendo el visor mientras mira los documentos
   if(EX_TAB==='doc' && d && EX_DOC_SEC==='visor' && (d.visor||[]).length) setTimeout(()=>montarVisorCad(d),30);
   if(EX_TAB==='met' && d) montarMetrado(d);
-  if(EX_TAB==='pme'){ cargarPme(id); if(typeof montarExPme==='function') montarExPme(d,id); }
+  if(EX_TAB==='pme' && d && d.pme){ cargarPme(id); if(typeof montarExPme==='function') montarExPme(d,id); }
   if(EX_TAB==='res' && d) montarTbResumen(d);
   if(EX_TAB==='pre' && d) montarTbPresupuesto(d);
   if(EX_TAB==='pi' && d) montarTbPreinst(d);
@@ -265,7 +268,7 @@ function tabsEx(id,d){
     <button type="button" class="${EX_TAB==='pre'?'on':''}" onclick="setExTab('${id}','pre')">Presupuesto</button>
     <button type="button" class="${EX_TAB==='pi'?'on':''}" onclick="setExTab('${id}','pi')">Preinstalación</button>
     <button type="button" class="${EX_TAB==='doc'?'on':''}" onclick="setExTab('${id}','doc')">Documentación</button>
-    <button type="button" class="${EX_TAB==='pme'?'on':''}" onclick="setExTab('${id}','pme')">PME en base PMF/PMA/NTS</button>
+    ${d&&d.pme?`<button type="button" class="${EX_TAB==='pme'?'on':''}" onclick="setExTab('${id}','pme')">PME en base PMF/PMA/NTS</button>`:''}
     <div class="det-actu"><span>${d?'Generado el '+d.generado:''}</span></div>
   </div>`;
 }

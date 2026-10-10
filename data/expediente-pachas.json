@@ -4574,5 +4574,6 @@
   "V": 2
  },
  "visor": [],
- "archivos_en": "drive"
+ "archivos_en": "drive",
+ "pme": "data/pme-pachas.json"
 }
