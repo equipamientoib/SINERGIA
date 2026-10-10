@@ -1,0 +1,64 @@
+/* =====================================================================
+   16-pme.css — pestaña «PME en base PMF/PMA/NTS»
+   ---------------------------------------------------------------------
+   Sólo lo propio de esta pestaña. Lo demás —tarjeta, pestañas, tablas,
+   notas— ya lo pone css/15-expediente.css, y conviene que siga siendo
+   así: si esta hoja repitiera esos estilos, el panel del PME se iría
+   separando del resto del expediente a cada cambio.
+
+   Se carga a demanda, con el módulo js/06-pme.js.
+   ===================================================================== */
+
+.pme-pane{ padding: 0 }
+
+/* Las cifras del cruce: cuántos ambientes tienen norma, cuántas líneas
+   salieron, qué quedó sin equipar. Es lo primero que se mira, así que
+   va arriba y grande. */
+.ex-cifras{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+}
+.ex-cifra{
+  border: 1px solid var(--linea);
+  border-radius: var(--r-sm);
+  background: var(--blanco);
+  padding: 12px 14px;
+}
+.ex-cifra b{
+  display: block;
+  font-family: var(--ff-t, var(--ff-d));
+  font-size: 26px;
+  line-height: 1.1;
+  color: var(--onix);
+}
+.ex-cifra span{
+  display: block;
+  margin-top: 4px;
+  font-family: var(--ff-d);
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--grafito);
+}
+.ex-cifra i{
+  display: block;
+  margin-top: 2px;
+  font-style: normal;
+  font-size: 11px;
+  color: var(--gris);
+}
+
+/* La primera cifra manda sobre las demás: es el tamaño del PME. */
+.ex-cifras .ex-cifra:first-child{
+  background: var(--onix);
+  border-color: var(--onix);
+}
+.ex-cifras .ex-cifra:first-child b{ color: var(--blanco) }
+.ex-cifras .ex-cifra:first-child span{ color: rgba(255,255,255,.72) }
+.ex-cifras .ex-cifra:first-child i{ color: rgba(255,255,255,.55) }
+
+@media (max-width: 640px){
+  .ex-cifra b{ font-size: 22px }
+}

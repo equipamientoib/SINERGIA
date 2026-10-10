@@ -1,0 +1,49 @@
+{
+ "meta": {
+  "proyecto": "Centro de Salud Pachas I-4",
+  "nombre": "MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO",
+  "cliente": "Gobierno Regional de Huánuco · Pachas, Dos de Mayo",
+  "cui": "2324623",
+  "categoria": "I-4",
+  "ubicacion": "Pachas, Dos de Mayo, Huánuco · 3452 msnm",
+  "visado": "PMA y PMF compartidos (PDF «PMF PMA PACHAS»), 09/10/2026",
+  "normas": "NTS N.º 113-MINSA/DGIEM-V.01 (nivel I) · NTS N.º 110 (nivel II)",
+  "generado": "09/10/2026 21:59",
+  "area": {
+   "UPSS CONSULTA EXTERNA": 536.02,
+   "UPSS PATOLOGÍA CLÍNICA": 177.9,
+   "UPSS FARMACIA": 36.37,
+   "ACTIVIDAD DE ATENCIÓN DE URGENCIAS Y EMERGENCIAS": 115.24,
+   "ACTIVIDAD DE ATENCIÓN A LA GESTANTE EN PERÍODO DE PARTO": 169.41,
+   "UPS INTERNAMIENTO": 238.05,
+   "UPSS ECOGRAFÍA Y RAYOS X": 111.25,
+   "ACTIVIDAD DE DESINFECCIÓN Y ESTERILIZACIÓN": 91.43,
+   "UPS ADMINISTRACIÓN": 184.89,
+   "UPS GESTIÓN DE LA INFORMACIÓN": 36.83,
+   "UPS TRANSPORTES": 14.0,
+   "UPS CASA DE FUERZA": 37.18,
+   "UPS UNIDAD DE ALMACÉN": 64.77,
+   "UPS LAVANDERÍA": 43.3,
+   "UPS TALLERES DE MANTENIMIENTO": 55.43,
+   "UPSS SALUD AMBIENTAL": 39.13,
+   "UPS CASA MATERNA": 65.95,
+   "UPS USO MÚLTIPLE": 84.88,
+   "UPS RESIDENCIA PARA EL PERSONAL": 77.04,
+   "CISTERNAS": 7.15,
+   "OTROS": 8.0,
+   "COCINA": 52.28
+  }
+ },
+ "c": {
+  "ok": 21,
+  "dis": 8,
+  "sinm": 27,
+  "rev": 17,
+  "lineas": 1109,
+  "unid": 1530.0,
+  "tv": 0,
+  "act": 152,
+  "amb": 179
+ },
+ "parcial": true
+}

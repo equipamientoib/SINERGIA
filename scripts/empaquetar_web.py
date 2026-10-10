@@ -18,8 +18,8 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 SELLO = re.compile(r'\?v=[0-9a-f]+')
 # Los que 06-portal.js carga aparte, fuera del paquete.
-PORTAL = ['css/13-clientes.css', 'css/15-expediente.css',
-          'js/06-expediente.js', 'js/06-tablero.js', 'js/06-clientes.js']
+PORTAL = ['css/13-clientes.css', 'css/15-expediente.css', 'css/16-pme.css',
+          'js/06-expediente.js', 'js/06-tablero.js', 'js/06-pme.js', 'js/06-clientes.js']
 # Sueltos: index.html los pide con su propia etiqueta, fuera del paquete,
 # porque las páginas estáticas también los usan. Entran igual en el sello y
 # se les pone el ?v= en index.html; si no, un cambio en ellos no llega nunca

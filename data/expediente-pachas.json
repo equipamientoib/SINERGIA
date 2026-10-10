@@ -1,0 +1,4578 @@
+{
+ "ok": true,
+ "tipo": "expediente",
+ "generado": "05/10/2026 19:37",
+ "proyecto": {
+  "entidad": "GOBIERNO REGIONAL DE HUÁNUCO",
+  "eess": "PACHAS",
+  "cui": "2324623",
+  "nombre": "MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO",
+  "categoria": "I-4",
+  "ubicacion": "Pachas, Dos De Mayo, Huánuco",
+  "altitud": "3452",
+  "contrato": "[PENDIENTE: número de contrato]",
+  "mes": "[Pendiente: Mes Y Año De Emisión]"
+ },
+ "membrete": {
+  "entidad": "GOBIERNO REGIONAL DE HUÁNUCO",
+  "eess": "PACHAS",
+  "cui": "2324623",
+  "proyecto": "MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO",
+  "distrito": "PACHAS",
+  "provincia": "DOS DE MAYO",
+  "departamento": "HUÁNUCO",
+  "anio": "2026",
+  "firmantes": [
+   {
+    "nombre": "ING. XXXX",
+    "cargo": "CIP/CAP N° XXXX - COORDINADOR DEL PROYECTO"
+   },
+   {
+    "nombre": "ING. XXXX",
+    "cargo": "CIP/CAP N° XXXX - ESPECIALISTA SUPERVISOR"
+   },
+   {
+    "nombre": "ING. XXXX",
+    "cargo": "CIP/CAP N° XXXX - ESPECIALISTA RESPONSABLE"
+   }
+  ],
+  "campos": {
+   "ENTIDAD": "GOBIERNO REGIONAL DE HUÁNUCO",
+   "EESS": "PACHAS",
+   "CUI": "2324623",
+   "PROYECTO": "MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO",
+   "DISTRITO": "PACHAS",
+   "PROVINCIA": "DOS DE MAYO",
+   "DEPARTAMENTO": "HUÁNUCO",
+   "AÑO": "2026",
+   "REGION_NATURAL": "Sierra",
+   "FIRMANTE_1_NOMBRE": "ING. XXXX",
+   "FIRMANTE_1_CARGO": "CIP/CAP N° XXXX - COORDINADOR DEL PROYECTO",
+   "FIRMANTE_2_NOMBRE": "ING. XXXX",
+   "FIRMANTE_2_CARGO": "CIP/CAP N° XXXX - ESPECIALISTA SUPERVISOR",
+   "FIRMANTE_3_NOMBRE": "ING. XXXX",
+   "FIRMANTE_3_CARGO": "CIP/CAP N° XXXX - ESPECIALISTA RESPONSABLE",
+   "ALTITUD": "3452",
+   "CATEGORIA": "I-4",
+   "CONTRATO": "[PENDIENTE: número de contrato]",
+   "MES_ANIO": "[PENDIENTE: mes y año de emisión]",
+   "DIRECCION": "Barrio Gasgas, localidad de Pachas",
+   "COORDENADAS": "09°42'20\" S – 76°46'17\" O",
+   "VIABILIDAD_FECHA": "",
+   "VIABILIDAD_ORGANO": "",
+   "PARTIDA_REGISTRAL": "11138473",
+   "PARTIDA_USO": "Predio independizado de la partida matriz N° 11013561 mediante el Título N° 2016-00820619 (anotación de inscripción del 03/06/2016, Zona Registral N° VIII – Oficina Registral Huánuco). En el Índice de Propietarios figuran la Comunidad Campesina San Lorenzo de Pachas y el Ministerio de Salud – Dirección Regional de Salud Huánuco.",
+   "PARTIDA_AREA": "13,426.20 m², encerrados en un perímetro de 513.050 m, según el levantamiento topográfico y la memoria descriptiva de arquitectura del expediente técnico de origen.",
+   "PARTIDA_CARGAS": "",
+   "DIAGNOSTICO_REFERENCIA": "",
+   "PMF_CONSIDERACIONES": "El Programa Médico Funcional (PMF) y el Programa Médico Arquitectónico (PMA) del Centro de Salud Pachas fueron visados por la Dirección Regional de Salud de Huánuco mediante el Oficio N° 1094-2018-GRH-OEPE-DRS-DG del 01/03/2018, sobre la propuesta presentada por el Consorcio Salud Genesis con Carta N° 022-2018-CSGENESIS/GOREHCO. El establecimiento corresponde a la categoría I-4 y está considerado establecimiento de salud estratégico según la RM N° 997-2012/MINSA.",
+   "TEXTO_ANTECEDENTES_VIABILIDAD": "El referido proyecto de inversión fue declarado viable con fecha {{VIABILIDAD_FECHA}} por {{VIABILIDAD_ORGANO}}, y se encuentra registrado en el Banco de Inversiones del Ministerio de Economía y Finanzas.",
+   "TEXTO_ANTECEDENTES_EXPEDIENTE_ANTERIOR": "Con anterioridad se elaboró un expediente técnico primigenio, aprobado mediante la Resolución Gerencial Regional N° 177-2018-GRH/GRI del 18 de abril de 2018, cuya actualización de costos fue aprobada con la Resolución Gerencial Regional N° 124-2019-GRH/GRI del 4 de abril de 2019. Dicho documento desarrolló el programa de equipamiento sobre la base del programa arquitectónico y de la normativa vigentes en esa oportunidad.",
+   "TEXTO_ANTECEDENTES_CONTRATO": "Mediante el Contrato N° {{CONTRATO}}, la Entidad encargó los servicios orientados a la actualización del expediente técnico del proyecto. En el desarrollo de dicho encargo, y como resultado de la revisión efectuada por cada uno de los especialistas, se identificaron incompatibilidades técnicas en el expediente técnico primigenio con origen en la especialidad de Estructuras, las cuales comprometen el planteamiento de Arquitectura y, a partir de este, el de las especialidades de Instalaciones Sanitarias, Instalaciones Eléctricas y Comunicaciones, Instalaciones Mecánicas y Equipamiento.",
+   "TEXTO_ANTECEDENTES_INCIDENCIA": "Desde la especialidad de Equipamiento, dicha situación incide directamente en la correspondencia entre el Listado de Equipos por Ambientes y Servicios, los Planos de Distribución de Equipos y las previsiones de preinstalación definidas por las demás especialidades, aspecto que ha sido tomado en cuenta para el desarrollo del presente documento.",
+   "TEXTO_CLIMA_DESCRIPCION": "El establecimiento se emplaza a {{ALTITUD}} msnm, dentro de un valle interandino, por lo que presenta un clima templado. La temperatura diurna oscila entre 15 °C y 25 °C, con sensación térmica que puede alcanzar los 29 °C; durante la noche desciende y se mantiene entre 10 °C y 5 °C. En el periodo comprendido entre los meses de noviembre y marzo, la temperatura máxima diaria alcanza los 18 °C y desciende hasta los 4 °C.",
+   "EQUIPAMIENTO_RECUPERABLE": "NO",
+   "TEXTO_PROGRAMA_ARQUITECTONICO": "El planteamiento de equipamiento se desarrolla sobre las Unidades Productoras de Servicios de Salud (UPSS) y Unidades Productoras de Servicios (UPS) del Programa Médico Arquitectónico (PMA), aprobado por la Dirección Regional de Salud de Áncash mediante el Informe Técnico N°018-2021-GRA-GRDS-DIRES/OEPP/I del 08 de marzo de 2021, elaborado sobre la base del Programa Médico Funcional (PMF) y de la Norma Técnica de Salud N°113-MINSA/DGIEM-V.01. El resumen de UPSS y UPS considerado para el dimensionamiento del equipamiento es el siguiente:",
+   "TEXTO_INFRAESTRUCTURA": "El establecimiento se desarrolla en una edificación nueva de cuatro niveles, cuyo volumen principal concentra las circulaciones verticales, con bloques separados estructuralmente y circulaciones diferenciadas —pública, privada y técnica—. Según el metrado del presente expediente, las unidades productoras equipadas se distribuyen {{UPSS_POR_NIVEL}}. Los accesos son diferenciados: el principal por la Avenida San Isidro, con vía auxiliar vehicular y peatonal para no afectar la circulación de la avenida, que sirve a los servicios ambulatorios, Administración y Sala de Usos Múltiples; un segundo por la calle Escolar Norte, hacia Emergencia, Centro Obstétrico, Imágenes e Internamiento; un tercero por la misma calle para los servicios generales; y un cuarto, exclusivo para los ambientes de VIH y TBC. El diseño prevé crecimiento modular para futuras ampliaciones y la incorporación progresiva de nuevas tecnologías médicas, criterios considerados para la previsión de preinstalaciones y para la ubicación del equipamiento en los planos de distribución. (Criterios de diseño tomados de la Memoria Descriptiva de Arquitectura del expediente técnico, numerales 5 y 6.)"
+  },
+  "logo": "data:image/png;base64,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",
+  "formatos": {
+   "A4V": {
+    "pagina": {
+     "ancho": 210.03,
+     "alto": 297.02
+    },
+    "margenes": {
+     "izq": 30.0,
+     "der": 30.0,
+     "sup": 24.99,
+     "inf": 24.99,
+     "encabezado": 12.7,
+     "pie": 12.7
+    },
+    "encabezado": [
+     {
+      "tipo": "tabla",
+      "ind": -16.0,
+      "jc": "left",
+      "bordes": {},
+      "margen": {
+       "izq": 1.23,
+       "der": 1.23,
+       "sup": 0,
+       "inf": 0
+      },
+      "ancho": {
+       "w": 6066,
+       "tipo": "pct"
+      },
+      "grid": [
+       29.67,
+       96.47,
+       31.68,
+       24.2
+      ],
+      "filas": [
+       {
+        "alto": 4.48,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "imagen": true,
+              "cx": 30.64,
+              "cy": 22.86
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 10.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 10.0,
+              "t": "GOBIERNO REGIONAL DE HUÁNUCO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 10.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 2,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "{{TIPO_EESS}}:"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "PACHAS"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 3.42,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 2,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "CUI: "
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "2324623"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 6.44,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "PROYECTO DE INVERSION"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ": "
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "“MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO”"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "DISTRITO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "PACHAS "
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "PROVINCIA"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "DOS DE MAYO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "nil",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 6.74,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "bordes": {
+             "bottom": {
+              "val": "nil",
+              "sz": 4
+             },
+             "top": {
+              "val": "nil",
+              "sz": 4
+             }
+            },
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "bordes": {
+             "bottom": {
+              "val": "nil",
+              "sz": 4
+             },
+             "top": {
+              "val": "nil",
+              "sz": 4
+             }
+            },
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "DEPARTAMENTO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "HUÁNUCO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "AÑO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "2026"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "nil",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       }
+      ]
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0
+     }
+    ],
+    "pie": [
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "tabla",
+      "ind": 0,
+      "jc": "left",
+      "bordes": {
+       "top": {
+        "val": "none",
+        "sz": 0
+       },
+       "left": {
+        "val": "none",
+        "sz": 0
+       },
+       "bottom": {
+        "val": "none",
+        "sz": 0
+       },
+       "right": {
+        "val": "none",
+        "sz": 0
+       },
+       "insideH": {
+        "val": "none",
+        "sz": 0
+       },
+       "insideV": {
+        "val": "none",
+        "sz": 0
+       }
+      },
+      "margen": {
+       "izq": 0,
+       "der": 0,
+       "sup": 0,
+       "inf": 0
+      },
+      "ancho": {
+       "w": 5000,
+       "tipo": "pct"
+      },
+      "grid": [
+       48.61,
+       48.61,
+       52.81
+      ],
+      "filas": [
+       {
+        "alto": 0,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 1.8,
+            "ind_der": 1.82,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_3_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_3_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 1.8,
+            "ind_der": 1.82,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_2_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_2_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 3.9,
+            "ind_der": 3.92,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_1_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_1_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0.71,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{TITULO}}"
+       }
+      ],
+      "antes": 0,
+      "despues": 0,
+      "sz": 6.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": "“MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO” CON CUI 2324623\tPágina "
+       },
+       {
+        "b": true,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{PAGE}}"
+       },
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": " de "
+       },
+       {
+        "b": true,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{NUMPAGES}}"
+       }
+      ],
+      "antes": 0,
+      "despues": 0,
+      "tabs": [
+       {
+        "val": "right",
+        "pos": 150.02
+       }
+      ],
+      "sz": 6.0
+     }
+    ]
+   },
+   "A4H": {
+    "pagina": {
+     "ancho": 297.02,
+     "alto": 210.03
+    },
+    "margenes": {
+     "izq": 24.99,
+     "der": 24.99,
+     "sup": 30.0,
+     "inf": 30.0,
+     "encabezado": 12.7,
+     "pie": 12.7
+    },
+    "encabezado": [
+     {
+      "tipo": "tabla",
+      "ind": -10.99,
+      "jc": "left",
+      "bordes": {},
+      "margen": {
+       "izq": 1.23,
+       "der": 1.23,
+       "sup": 0,
+       "inf": 0
+      },
+      "ancho": {
+       "w": 5445,
+       "tipo": "pct"
+      },
+      "grid": [
+       43.85,
+       142.58,
+       46.81,
+       35.77
+      ],
+      "filas": [
+       {
+        "alto": 4.48,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "imagen": true,
+              "cx": 30.64,
+              "cy": 22.86
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 10.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 10.0,
+              "t": "GOBIERNO REGIONAL DE HUÁNUCO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 10.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 2,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "{{TIPO_EESS}}:"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "PACHAS"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 3.42,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 2,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "CUI: "
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "2324623"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 6.44,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "PROYECTO DE INVERSION"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ": "
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "“MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO”"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "DISTRITO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "PACHAS "
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "PROVINCIA"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "DOS DE MAYO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "nil",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 6.74,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "bordes": {
+             "bottom": {
+              "val": "nil",
+              "sz": 4
+             },
+             "top": {
+              "val": "nil",
+              "sz": 4
+             }
+            },
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "bordes": {
+             "bottom": {
+              "val": "nil",
+              "sz": 4
+             },
+             "top": {
+              "val": "nil",
+              "sz": 4
+             }
+            },
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "DEPARTAMENTO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "HUÁNUCO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "AÑO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "2026"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "nil",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       }
+      ]
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0
+     }
+    ],
+    "pie": [
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "tabla",
+      "ind": 0,
+      "jc": "left",
+      "bordes": {
+       "top": {
+        "val": "none",
+        "sz": 0
+       },
+       "left": {
+        "val": "none",
+        "sz": 0
+       },
+       "bottom": {
+        "val": "none",
+        "sz": 0
+       },
+       "right": {
+        "val": "none",
+        "sz": 0
+       },
+       "insideH": {
+        "val": "none",
+        "sz": 0
+       },
+       "insideV": {
+        "val": "none",
+        "sz": 0
+       }
+      },
+      "margen": {
+       "izq": 0,
+       "der": 0,
+       "sup": 0,
+       "inf": 0
+      },
+      "ancho": {
+       "w": 5000,
+       "tipo": "pct"
+      },
+      "grid": [
+       80.05,
+       80.05,
+       86.96
+      ],
+      "filas": [
+       {
+        "alto": 0,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 17.52,
+            "ind_der": 17.53,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_3_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_3_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 17.52,
+            "ind_der": 17.53,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_2_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_2_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 20.97,
+            "ind_der": 20.99,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_1_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_1_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0.71,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{TITULO}}"
+       }
+      ],
+      "antes": 0,
+      "despues": 0,
+      "sz": 6.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": "“MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO” CON CUI 2324623\tPágina "
+       },
+       {
+        "b": true,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{PAGE}}"
+       },
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": " de "
+       },
+       {
+        "b": true,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{NUMPAGES}}"
+       }
+      ],
+      "antes": 0,
+      "despues": 0,
+      "tabs": [
+       {
+        "val": "right",
+        "pos": 247.03
+       }
+      ],
+      "sz": 6.0
+     }
+    ]
+   },
+   "A3H": {
+    "pagina": {
+     "ancho": 420.0,
+     "alto": 297.0
+    },
+    "margenes": {
+     "izq": 24.99,
+     "der": 24.99,
+     "sup": 30.0,
+     "inf": 30.0,
+     "encabezado": 12.7,
+     "pie": 12.7
+    },
+    "encabezado": [
+     {
+      "tipo": "tabla",
+      "ind": -10.99,
+      "jc": "left",
+      "bordes": {},
+      "margen": {
+       "izq": 1.23,
+       "der": 1.23,
+       "sup": 0,
+       "inf": 0
+      },
+      "ancho": {
+       "w": 5297,
+       "tipo": "pct"
+      },
+      "grid": [
+       63.89,
+       207.75,
+       68.21,
+       52.14
+      ],
+      "filas": [
+       {
+        "alto": 4.48,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "imagen": true,
+              "cx": 30.64,
+              "cy": 22.86
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 10.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 10.0,
+              "t": "GOBIERNO REGIONAL DE HUÁNUCO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 10.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 2,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "{{TIPO_EESS}}:"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "PACHAS"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 3.42,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 2,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "CUI: "
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "2324623"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 6.44,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "both",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "restart",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "PROYECTO DE INVERSION"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ": "
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "“MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO”"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "DISTRITO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "PACHAS "
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "PROVINCIA"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "DOS DE MAYO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "nil",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       },
+       {
+        "alto": 6.74,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "bordes": {
+             "bottom": {
+              "val": "nil",
+              "sz": 4
+             },
+             "top": {
+              "val": "nil",
+              "sz": 4
+             }
+            },
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          }
+         },
+         {
+          "span": 1,
+          "vmerge": "cont",
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 0,
+            "bordes": {
+             "bottom": {
+              "val": "nil",
+              "sz": 4
+             },
+             "top": {
+              "val": "nil",
+              "sz": 4
+             }
+            },
+            "sz": 8.0
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "DEPARTAMENTO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "HUÁNUCO"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "single",
+            "sz": 4
+           },
+           "left": {
+            "val": "single",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 7.5,
+              "t": "AÑO"
+             },
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": ":"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": false,
+              "i": false,
+              "sz": 7.5,
+              "t": "2026"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 7.5
+           }
+          ],
+          "bordes": {
+           "top": {
+            "val": "nil",
+            "sz": 4
+           },
+           "left": {
+            "val": "nil",
+            "sz": 4
+           },
+           "bottom": {
+            "val": "single",
+            "sz": 4
+           },
+           "right": {
+            "val": "single",
+            "sz": 4
+           }
+          },
+          "valign": "center"
+         }
+        ],
+        "exacto": false
+       }
+      ]
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0
+     }
+    ],
+    "pie": [
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0,
+      "sz": 8.0
+     },
+     {
+      "tipo": "tabla",
+      "ind": 0,
+      "jc": "left",
+      "bordes": {
+       "top": {
+        "val": "none",
+        "sz": 0
+       },
+       "left": {
+        "val": "none",
+        "sz": 0
+       },
+       "bottom": {
+        "val": "none",
+        "sz": 0
+       },
+       "right": {
+        "val": "none",
+        "sz": 0
+       },
+       "insideH": {
+        "val": "none",
+        "sz": 0
+       },
+       "insideV": {
+        "val": "none",
+        "sz": 0
+       }
+      },
+      "margen": {
+       "izq": 0,
+       "der": 0,
+       "sup": 0,
+       "inf": 0
+      },
+      "ancho": {
+       "w": 5000,
+       "tipo": "pct"
+      },
+      "grid": [
+       119.89,
+       119.89,
+       130.25
+      ],
+      "filas": [
+       {
+        "alto": 0,
+        "celdas": [
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 37.45,
+            "ind_der": 37.45,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_3_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_3_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 37.45,
+            "ind_der": 37.45,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_2_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_2_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         },
+         {
+          "span": 1,
+          "vmerge": null,
+          "bloques": [
+           {
+            "tipo": "p",
+            "jc": "left",
+            "runs": [],
+            "antes": 0,
+            "despues": 1.06,
+            "ind_izq": 42.62,
+            "ind_der": 42.63,
+            "bordes": {
+             "bottom": {
+              "val": "dashed",
+              "sz": 6
+             }
+            },
+            "sz": 6.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "ING. XXXX"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_1_CIP_LINEA}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           },
+           {
+            "tipo": "p",
+            "jc": "center",
+            "runs": [
+             {
+              "b": true,
+              "i": false,
+              "sz": 8.0,
+              "t": "{{FIRMANTE_1_ROL}}"
+             }
+            ],
+            "antes": 0,
+            "despues": 0,
+            "sz": 8.0
+           }
+          ],
+          "valign": "bottom"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [],
+      "antes": 0,
+      "despues": 0.71,
+      "sz": 8.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{TITULO}}"
+       }
+      ],
+      "antes": 0,
+      "despues": 0,
+      "sz": 6.0
+     },
+     {
+      "tipo": "p",
+      "jc": "left",
+      "runs": [
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": "“MEJORAMIENTO DE LOS SERVICIOS DE SALUD DEL CENTRO DE SALUD PACHAS EN EL DISTRITO DE PACHAS, PROVINCIA DE DOS DE MAYO – HUÁNUCO” CON CUI 2324623\tPágina "
+       },
+       {
+        "b": true,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{PAGE}}"
+       },
+       {
+        "b": false,
+        "i": false,
+        "sz": 6.0,
+        "t": " de "
+       },
+       {
+        "b": true,
+        "i": false,
+        "sz": 6.0,
+        "t": "{{NUMPAGES}}"
+       }
+      ],
+      "antes": 0,
+      "despues": 0,
+      "tabs": [
+       {
+        "val": "right",
+        "pos": 370.01
+       }
+      ],
+      "sz": 6.0
+     }
+    ]
+   }
+  }
+ },
+ "avance": 94,
+ "resumen": {
+  "codigos_eq": 18,
+  "codigos_total": 18,
+  "unidades_eq": 28,
+  "filas_distribucion": 23,
+  "ambientes": 4,
+  "upss": 4,
+  "laminas": 0,
+  "anexos_completos": 15,
+  "anexos_total": 16,
+  "sin_precio": 0,
+  "sin_ficha": 0,
+  "normas": {
+   "NTS 113": 18
+  }
+ },
+ "hitos": [
+  {
+   "t": "Metrado del programa médico funcional",
+   "d": true,
+   "s": "23 filas ambiente × equipo · 18 códigos EQ."
+  },
+  {
+   "t": "Memoria de cálculo (N11, N11A–E)",
+   "d": true,
+   "s": "Camas, esterilización, nutrición, lavandería, lencería"
+  },
+  {
+   "t": "Listado de planos (N12)",
+   "d": false,
+   "s": "0 láminas"
+  },
+  {
+   "t": "Estudio de mercado y presupuesto (N7, N8)",
+   "d": true,
+   "s": "10 proveedores · 18 de 18 precios"
+  },
+  {
+   "t": "Especificaciones técnicas (N13)",
+   "d": true,
+   "s": "18 de 18 fichas"
+  },
+  {
+   "t": "Datos del proyecto y firmantes",
+   "d": false,
+   "s": "PROYECTO.xlsx"
+  }
+ ],
+ "grupos": [
+  {
+   "grupo": "B",
+   "nombre": "Equipo biomédico",
+   "items": 5,
+   "cantidad": 5,
+   "fichas": 5,
+   "sin_ficha": []
+  },
+  {
+   "grupo": "C",
+   "nombre": "Equipo complementario",
+   "items": 3,
+   "cantidad": 5,
+   "fichas": 3,
+   "sin_ficha": []
+  },
+  {
+   "grupo": "E",
+   "nombre": "Equipo electromecánico",
+   "items": 1,
+   "cantidad": 1,
+   "fichas": 1,
+   "sin_ficha": []
+  },
+  {
+   "grupo": "INST",
+   "nombre": "Instrumental",
+   "items": 1,
+   "cantidad": 1,
+   "fichas": 1,
+   "sin_ficha": []
+  },
+  {
+   "grupo": "MA",
+   "nombre": "Mobiliario administrativo",
+   "items": 2,
+   "cantidad": 2,
+   "fichas": 2,
+   "sin_ficha": []
+  },
+  {
+   "grupo": "MC",
+   "nombre": "Mobiliario clínico",
+   "items": 6,
+   "cantidad": 14,
+   "fichas": 6,
+   "sin_ficha": []
+  }
+ ],
+ "anexos": [
+  {
+   "cod": "N1",
+   "titulo": "Listado de claves utilizadas en planos",
+   "estado": "completo",
+   "detalle": "18 filas",
+   "docs": [
+    "ANEXO N1 LISTADO CLAVES"
+   ]
+  },
+  {
+   "cod": "N2",
+   "titulo": "Listado de distribución por ambientes",
+   "estado": "completo",
+   "detalle": "23 filas",
+   "docs": [
+    "ANEXO N2 LISTADO DISTRIBUCION"
+   ]
+  },
+  {
+   "cod": "N3",
+   "titulo": "Listado de equipamiento por grupo genérico",
+   "estado": "completo",
+   "detalle": "18 filas",
+   "docs": [
+    "ANEXO N3 LISTADO GRUPO"
+   ]
+  },
+  {
+   "cod": "N3A",
+   "titulo": "Consolidado por grupo genérico",
+   "estado": "completo",
+   "detalle": "9 filas",
+   "docs": [
+    "ANEXO N3A CONSOLIDADO GRUPO"
+   ]
+  },
+  {
+   "cod": "N3B",
+   "titulo": "Comparativo por grupo genérico",
+   "estado": "completo",
+   "detalle": "9 filas",
+   "docs": [
+    "ANEXO N3B COMPARATIVO GRUPO"
+   ]
+  },
+  {
+   "cod": "N4",
+   "titulo": "Listado de equipamiento y su pre‑instalación",
+   "estado": "completo",
+   "detalle": "18 filas",
+   "docs": [
+    "ANEXO N4 LISTADO PRE INSTALACION"
+   ]
+  },
+  {
+   "cod": "N5",
+   "titulo": "Resumen de pre‑instalación",
+   "estado": "completo",
+   "detalle": "18 filas",
+   "docs": [
+    "ANEXO N5 RESUMEN PRE INSTALACION"
+   ]
+  },
+  {
+   "cod": "N6",
+   "titulo": "Componentes para adquisición",
+   "estado": "completo",
+   "detalle": "18 filas",
+   "docs": [
+    "ANEXO N6 COMPONENTES ADQUISICION"
+   ]
+  },
+  {
+   "cod": "N7",
+   "titulo": "Presupuesto de equipamiento",
+   "estado": "completo",
+   "detalle": "18 filas",
+   "docs": [
+    "ANEXO N7 PRESUPUESTO EQ"
+   ]
+  },
+  {
+   "cod": "N7A",
+   "titulo": "Costo de gestión y supervisión",
+   "estado": "completo",
+   "detalle": "documento fijo del expediente",
+   "docs": [
+    "ANEXO N7A GESTION Y SUPERVISION EQ"
+   ]
+  },
+  {
+   "cod": "N8",
+   "titulo": "Consolidado del presupuesto",
+   "estado": "completo",
+   "detalle": "9 filas",
+   "docs": [
+    "ANEXO N8 CONSOLIDADO EQ"
+   ]
+  },
+  {
+   "cod": "N9",
+   "titulo": "Consideraciones para la adquisición",
+   "estado": "completo",
+   "detalle": "4 documentos",
+   "docs": [
+    "ANEXO N9 CONSIDERACIONES",
+    "ANEXO N9 CONSIDERACIONES CUADRO 1",
+    "ANEXO N9 CONSIDERACIONES CUADRO 2",
+    "ANEXO N9 CONSIDERACIONES CUADRO 3"
+   ]
+  },
+  {
+   "cod": "N10",
+   "titulo": "Cronograma de adquisición e instalación",
+   "estado": "completo",
+   "detalle": "documento fijo del expediente",
+   "docs": [
+    "ANEXO N10 CRONOGRAMA"
+   ]
+  },
+  {
+   "cod": "N11",
+   "titulo": "Memoria de cálculo",
+   "estado": "completo",
+   "detalle": "6 documentos",
+   "docs": [
+    "ANEXO N11 MEMORIA CALCULO",
+    "ANEXO N11A ESTERILIZACION",
+    "ANEXO N11B NUTRICION",
+    "ANEXO N11C LAVANDERIA",
+    "ANEXO N11D MENAJERIA",
+    "ANEXO N11E LENCERIA"
+   ]
+  },
+  {
+   "cod": "N12",
+   "titulo": "Listado de planos de equipamiento",
+   "estado": "pendiente",
+   "detalle": "sin generar",
+   "docs": [
+    "ANEXO N12 LISTADO PLANOS"
+   ]
+  },
+  {
+   "cod": "N13",
+   "titulo": "Especificaciones técnicas",
+   "estado": "completo",
+   "detalle": "18 de 18 fichas técnicas",
+   "docs": [
+    "ANEXO N13 Biomedicos",
+    "ANEXO N13 Complementario",
+    "ANEXO N13 Electromecanico",
+    "ANEXO N13 Instrumental",
+    "ANEXO N13 Mob Administrativo",
+    "ANEXO N13 Mob Clinico"
+   ]
+  }
+ ],
+ "metrado": [
+  {
+   "upss": "Actividad atencion de urgencias y emergencias",
+   "ambientes": [
+    {
+     "cod": "EM-1.07",
+     "nombre": "TOPICO DE URGENCIAS Y EMERGENCIAS (EMG3)",
+     "nivel": "PISO 01",
+     "items": 6,
+     "unidades": 7,
+     "equipos": [
+      {
+       "clave": "D-88",
+       "cant": 1
+      },
+      {
+       "clave": "D-325",
+       "cant": 1
+      },
+      {
+       "clave": "M-72",
+       "cant": 1
+      },
+      {
+       "clave": "D-109",
+       "cant": 1
+      },
+      {
+       "clave": "M-114",
+       "cant": 2
+      },
+      {
+       "clave": "D-373",
+       "cant": 1
+      }
+     ]
+    }
+   ],
+   "items": 6,
+   "unidades": 7,
+   "n_ambientes": 1
+  },
+  {
+   "upss": "Consulta externa",
+   "ambientes": [
+    {
+     "cod": "CE-2.09",
+     "nombre": "CONSULTORIO DE MEDICINA GENERAL",
+     "nivel": "PISO 02",
+     "items": 6,
+     "unidades": 6,
+     "equipos": [
+      {
+       "clave": "D-325",
+       "cant": 1
+      },
+      {
+       "clave": "D-187",
+       "cant": 1
+      },
+      {
+       "clave": "M-72",
+       "cant": 1
+      },
+      {
+       "clave": "M-114",
+       "cant": 1
+      },
+      {
+       "clave": "D-1",
+       "cant": 1
+      },
+      {
+       "clave": "M-86",
+       "cant": 1
+      }
+     ]
+    }
+   ],
+   "items": 6,
+   "unidades": 6,
+   "n_ambientes": 1
+  },
+  {
+   "upss": "Farmacia",
+   "ambientes": [
+    {
+     "cod": "FAR-3.04",
+     "nombre": "DISPENSACION Y EXPENDIO EN UPSS CONSULTA EXTERNA",
+     "nivel": "PISO 03",
+     "items": 5,
+     "unidades": 7,
+     "equipos": [
+      {
+       "clave": "M-114",
+       "cant": 1
+      },
+      {
+       "clave": "M-8",
+       "cant": 3
+      },
+      {
+       "clave": "M-159",
+       "cant": 1
+      },
+      {
+       "clave": "D-288",
+       "cant": 1
+      },
+      {
+       "clave": "M-36",
+       "cant": 1
+      }
+     ]
+    }
+   ],
+   "items": 5,
+   "unidades": 7,
+   "n_ambientes": 1
+  },
+  {
+   "upss": "Patologia clinica",
+   "ambientes": [
+    {
+     "cod": "PCL-3.01",
+     "nombre": "TOMA DE MUESTRAS BIOLOGICAS  (TIPO I-4)",
+     "nivel": "PISO 03",
+     "items": 6,
+     "unidades": 8,
+     "equipos": [
+      {
+       "clave": "D-153",
+       "cant": 2
+      },
+      {
+       "clave": "M-114",
+       "cant": 2
+      },
+      {
+       "clave": "D-92",
+       "cant": 1
+      },
+      {
+       "clave": "M-91",
+       "cant": 1
+      },
+      {
+       "clave": "M-9",
+       "cant": 1
+      },
+      {
+       "clave": "D-145",
+       "cant": 1
+      }
+     ]
+    }
+   ],
+   "items": 6,
+   "unidades": 8,
+   "n_ambientes": 1
+  }
+ ],
+ "planos": [],
+ "planos_fecha": "09/10/2026",
+ "documentos": [],
+ "consolidado": {
+  "nombre": "EXPEDIENTE_EQ_CONSOLIDADO_PACHAS.pdf",
+  "mb": 12.4,
+  "folios": 123,
+  "secciones": [
+   {
+    "seccion": "MEMORIA DESCRIPTIVA",
+    "paginas": "1–18",
+    "folios": "106–123"
+   },
+   {
+    "seccion": "ANEXO N1 LISTADO CLAVES",
+    "paginas": "19–20",
+    "folios": "104–105"
+   },
+   {
+    "seccion": "ANEXO N2 LISTADO DISTRIBUCION",
+    "paginas": "21–23",
+    "folios": "101–103"
+   },
+   {
+    "seccion": "ANEXO N3 LISTADO GRUPO",
+    "paginas": "24–25",
+    "folios": "099–100"
+   },
+   {
+    "seccion": "ANEXO N3A CONSOLIDADO GRUPO",
+    "paginas": "26–27",
+    "folios": "097–098"
+   },
+   {
+    "seccion": "ANEXO N4 LISTADO PRE INSTALACION",
+    "paginas": "28–29",
+    "folios": "095–096"
+   },
+   {
+    "seccion": "ANEXO N5 RESUMEN PRE INSTALACION",
+    "paginas": "30–31",
+    "folios": "093–094"
+   },
+   {
+    "seccion": "ANEXO N6 COMPONENTES ADQUISICION",
+    "paginas": "32–34",
+    "folios": "090–092"
+   },
+   {
+    "seccion": "ANEXO N7 PRESUPUESTO EQ",
+    "paginas": "35–36",
+    "folios": "088–089"
+   },
+   {
+    "seccion": "ANEXO N8 CONSOLIDADO EQ",
+    "paginas": "37–38",
+    "folios": "086–087"
+   },
+   {
+    "seccion": "ANEXO N9 CONSIDERACIONES",
+    "paginas": "39–62",
+    "folios": "062–085"
+   },
+   {
+    "seccion": "ANEXO N9 CONSIDERACIONES CUADRO 1",
+    "paginas": "63–64",
+    "folios": "060–061"
+   },
+   {
+    "seccion": "ANEXO N9 CONSIDERACIONES CUADRO 2",
+    "paginas": "65–66",
+    "folios": "058–059"
+   },
+   {
+    "seccion": "ANEXO N9 CONSIDERACIONES CUADRO 3",
+    "paginas": "67–68",
+    "folios": "056–057"
+   },
+   {
+    "seccion": "ANEXO N10 CRONOGRAMA",
+    "paginas": "69–71",
+    "folios": "053–055"
+   },
+   {
+    "seccion": "ANEXO N11 MEMORIA CALCULO",
+    "paginas": "72–73",
+    "folios": "051–052"
+   },
+   {
+    "seccion": "ANEXO N11A ESTERILIZACION",
+    "paginas": "74–79",
+    "folios": "045–050"
+   },
+   {
+    "seccion": "ANEXO N11C LAVANDERIA",
+    "paginas": "80–84",
+    "folios": "040–044"
+   },
+   {
+    "seccion": "Portada ANEXO 13",
+    "paginas": "85–85",
+    "folios": "039–039"
+   },
+   {
+    "seccion": "ANEXO N13 1. BIOMEDICOS",
+    "paginas": "86–95",
+    "folios": "029–038"
+   },
+   {
+    "seccion": "ANEXO N13 2. COMPLEMENTARIO",
+    "paginas": "96–100",
+    "folios": "024–028"
+   },
+   {
+    "seccion": "ANEXO N13 3. ELECTROMECANICO",
+    "paginas": "101–104",
+    "folios": "020–023"
+   },
+   {
+    "seccion": "ANEXO N13 4. INSTRUMENTAL",
+    "paginas": "105–107",
+    "folios": "017–019"
+   },
+   {
+    "seccion": "ANEXO N13 6. MOB ADMINISTRATIVO",
+    "paginas": "108–111",
+    "folios": "013–016"
+   },
+   {
+    "seccion": "ANEXO N13 7. MOB CLINICO",
+    "paginas": "112–123",
+    "folios": "001–012"
+   }
+  ],
+  "fecha": "05/10/2026 18:37",
+  "url": "",
+  "externo": false
+ },
+ "preinst": {
+  "especialidades": [
+   {
+    "clave": "COMUNICACIONES",
+    "nombre": "Comunicaciones",
+    "params": [
+     {
+      "k": "DICOM_RIS_PACS",
+      "nombre": "DICOM (RIS(PACS)",
+      "tipo": "x"
+     },
+     {
+      "k": "VNA_RIS_PACS",
+      "nombre": "VNA (RIS/PACS)",
+      "tipo": "x"
+     },
+     {
+      "k": "RSS_HIS",
+      "nombre": "RSS (HIS)",
+      "tipo": "x"
+     },
+     {
+      "k": "HL7_HIS",
+      "nombre": "HL7 (HIS)",
+      "tipo": "x"
+     },
+     {
+      "k": "LIS",
+      "nombre": "LIS",
+      "tipo": "x"
+     },
+     {
+      "k": "SCADA",
+      "nombre": "SCADA",
+      "tipo": "x"
+     },
+     {
+      "k": "BMS",
+      "nombre": "BMS",
+      "tipo": "x"
+     },
+     {
+      "k": "CATEGORIA_UTP",
+      "nombre": "CATEGORIA UTP",
+      "tipo": "x"
+     },
+     {
+      "k": "FIBRA_OPTICA",
+      "nombre": "FIBRA OPTICA",
+      "tipo": "x"
+     },
+     {
+      "k": "INALAMBRICA",
+      "nombre": "INALAMBRICA",
+      "tipo": "x"
+     }
+    ]
+   },
+   {
+    "clave": "ELECTRICAS",
+    "nombre": "Electricas",
+    "params": [
+     {
+      "k": "MONOFASICO_220_VAC",
+      "nombre": "MONOFASICO (220 VAC)",
+      "tipo": "x"
+     },
+     {
+      "k": "TRIFASICO_380_VAC",
+      "nombre": "TRIFASICO (380 VAC)",
+      "tipo": "x"
+     },
+     {
+      "k": "BATERIAS_VDC",
+      "nombre": "BATERIAS (VDC)",
+      "tipo": "x"
+     },
+     {
+      "k": "PUESTA_TIERRA_5",
+      "nombre": "PUESTA TIERRA (<5Ω)",
+      "tipo": "x"
+     },
+     {
+      "k": "LLAVE_ITM",
+      "nombre": "LLAVE ITM",
+      "tipo": "x"
+     },
+     {
+      "k": "LLAVE_DIFERENCIAL",
+      "nombre": "LLAVE DIFERENCIAL",
+      "tipo": "x"
+     },
+     {
+      "k": "TABLERO_ACOMETIDA",
+      "nombre": "TABLERO (ACOMETIDA)",
+      "tipo": "x"
+     },
+     {
+      "k": "RED_EMERGENCIA_G_E",
+      "nombre": "RED. EMERGENCIA (G.E)",
+      "tipo": "x"
+     },
+     {
+      "k": "RED_ESTABILIZADA_UPS",
+      "nombre": "RED. ESTABILIZADA (UPS)",
+      "tipo": "x"
+     },
+     {
+      "k": "RED_GENERAL",
+      "nombre": "RED GENERAL",
+      "tipo": "x"
+     },
+     {
+      "k": "POTENCIA_WATTS",
+      "nombre": "POTENCIA (WATTS)",
+      "tipo": "num"
+     }
+    ]
+   },
+   {
+    "clave": "GAS COMBUSTIBLE",
+    "nombre": "Gas Combustible",
+    "params": [
+     {
+      "k": "SUMINISTRO_GAS_PROPANO",
+      "nombre": "SUMINISTRO GAS PROPANO",
+      "tipo": "x"
+     },
+     {
+      "k": "SUMINISTRO_GLP",
+      "nombre": "SUMINISTRO GLP",
+      "tipo": "x"
+     },
+     {
+      "k": "VAPOR_DE_RED",
+      "nombre": "VAPOR DE RED",
+      "tipo": "x"
+     },
+     {
+      "k": "DIESEL",
+      "nombre": "DIESEL",
+      "tipo": "x"
+     }
+    ]
+   },
+   {
+    "clave": "GASES MEDICINALES",
+    "nombre": "Gases Medicinales",
+    "params": [
+     {
+      "k": "AIRE_COMPRIMIDO",
+      "nombre": "AIRE COMPRIMIDO",
+      "tipo": "x"
+     },
+     {
+      "k": "OXIGENO",
+      "nombre": "OXIGENO",
+      "tipo": "x"
+     },
+     {
+      "k": "VACIO",
+      "nombre": "VACIO",
+      "tipo": "x"
+     },
+     {
+      "k": "AIRE_MEDICINAL",
+      "nombre": "AIRE MEDICINAL",
+      "tipo": "x"
+     },
+     {
+      "k": "OXIDO_NITROSO",
+      "nombre": "OXIDO NITROSO",
+      "tipo": "x"
+     },
+     {
+      "k": "AIRE_INSTRUMENTAL",
+      "nombre": "AIRE INSTRUMENTAL",
+      "tipo": "x"
+     },
+     {
+      "k": "EXTRACCION_DE_GAS_ANESTESICOS",
+      "nombre": "EXTRACCION DE GAS ANESTESICOS",
+      "tipo": "x"
+     },
+     {
+      "k": "CO2",
+      "nombre": "CO2",
+      "tipo": "x"
+     }
+    ]
+   },
+   {
+    "clave": "HVAC",
+    "nombre": "HVAC",
+    "params": [
+     {
+      "k": "CLIMATIZACION",
+      "nombre": "CLIMATIZACION",
+      "tipo": "x"
+     },
+     {
+      "k": "EXTRACCION_DE_VAHOS",
+      "nombre": "EXTRACCION DE VAHOS",
+      "tipo": "x"
+     },
+     {
+      "k": "RENOVACIONES_POR_MINUTO",
+      "nombre": "RENOVACIONES POR MINUTO",
+      "tipo": "num"
+     }
+    ]
+   },
+   {
+    "clave": "ESTRUCTURAL",
+    "nombre": "Estructural",
+    "params": [
+     {
+      "k": "PESO_KG",
+      "nombre": "PESO (Kg)",
+      "tipo": "num"
+     },
+     {
+      "k": "CIMENTACION",
+      "nombre": "CIMENTACION",
+      "tipo": "x"
+     },
+     {
+      "k": "REFUERZO_ESTRUCTURAL_PARED",
+      "nombre": "REFUERZO ESTRUCTURAL PARED",
+      "tipo": "x"
+     },
+     {
+      "k": "SISTEMA_DE_ANCLAJE_A_TECHO",
+      "nombre": "SISTEMA DE ANCLAJE A TECHO",
+      "tipo": "x"
+     }
+    ]
+   },
+   {
+    "clave": "SANITARIAS",
+    "nombre": "Sanitarias",
+    "params": [
+     {
+      "k": "REQ_AGUA_FRIA",
+      "nombre": "REQ. AGUA FRIA",
+      "tipo": "x"
+     },
+     {
+      "k": "REQ_AGUA_BLANDA",
+      "nombre": "REQ. AGUA BLANDA",
+      "tipo": "x"
+     },
+     {
+      "k": "REQ_AGUA_CALIENTE",
+      "nombre": "REQ. AGUA CALIENTE",
+      "tipo": "x"
+     },
+     {
+      "k": "REQ_AGUA_OSMOTIZADA",
+      "nombre": "REQ. AGUA OSMOTIZADA",
+      "tipo": "x"
+     },
+     {
+      "k": "REQ_DESAG_E_PVC",
+      "nombre": "REQ. DESAGÜE (PVC)",
+      "tipo": "x"
+     },
+     {
+      "k": "REQ_DESAG_E_COBRE",
+      "nombre": "REQ. DESAGÜE (COBRE)",
+      "tipo": "x"
+     }
+    ]
+   }
+  ],
+  "codigos": [
+   {
+    "clave": "D-1",
+    "desc": "ELECTROCARDIOGRAFO",
+    "grupo": "B",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:COMUNICACIONES": "X",
+     "HL7_HIS": "X",
+     "CATEGORIA_UTP": "X",
+     "ESP:ELECTRICAS": "X",
+     "MONOFASICO_220_VAC": "X",
+     "PUESTA_TIERRA_5": "X",
+     "RED_EMERGENCIA_G_E": "X",
+     "POTENCIA_WATTS": 200
+    }
+   },
+   {
+    "clave": "D-109",
+    "desc": "COCHE DE PARO EQUIPADO",
+    "grupo": "B",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ELECTRICAS": "X",
+     "MONOFASICO_220_VAC": "X",
+     "PUESTA_TIERRA_5": "X",
+     "RED_EMERGENCIA_G_E": "X",
+     "POTENCIA_WATTS": 300
+    }
+   },
+   {
+    "clave": "D-373",
+    "desc": "DESFIBRILADOR EXTERNO AUTOMATICO",
+    "grupo": "B",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ELECTRICAS": "X",
+     "RED_EMERGENCIA_G_E": "X"
+    }
+   },
+   {
+    "clave": "D-88",
+    "desc": "ASPIRADOR DE SECRECIONES RODABLE",
+    "grupo": "B",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ELECTRICAS": "X",
+     "MONOFASICO_220_VAC": "X",
+     "PUESTA_TIERRA_5": "X",
+     "RED_GENERAL": "X",
+     "POTENCIA_WATTS": 500
+    }
+   },
+   {
+    "clave": "D-92",
+    "desc": "DESTRUCTOR DE AGUJAS HIPODERMICAS",
+    "grupo": "B",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ELECTRICAS": "X",
+     "MONOFASICO_220_VAC": "X",
+     "PUESTA_TIERRA_5": "X",
+     "RED_GENERAL": "X",
+     "POTENCIA_WATTS": 150
+    }
+   },
+   {
+    "clave": "D-153",
+    "desc": "CANASTILLA (GRADILLA) PARA TRANSPORTE DE MUESTRAS",
+    "grupo": "C",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "D-187",
+    "desc": "BALANZA DIGITAL NEONATAL",
+    "grupo": "C",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ELECTRICAS": "X",
+     "MONOFASICO_220_VAC": "X",
+     "BATERIAS_VDC": "X",
+     "RED_GENERAL": "X",
+     "POTENCIA_WATTS": 30
+    }
+   },
+   {
+    "clave": "D-325",
+    "desc": "BALANZA DIGITAL CON TALLIMETRO ADULTO",
+    "grupo": "C",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ELECTRICAS": "X",
+     "MONOFASICO_220_VAC": "X",
+     "BATERIAS_VDC": "X",
+     "RED_GENERAL": "X",
+     "POTENCIA_WATTS": 10
+    }
+   },
+   {
+    "clave": "D-288",
+    "desc": "REFRIGERADORA PARA MEDICAMENTOS",
+    "grupo": "E",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ELECTRICAS": "X",
+     "MONOFASICO_220_VAC": "X",
+     "PUESTA_TIERRA_5": "X",
+     "RED_EMERGENCIA_G_E": "X",
+     "POTENCIA_WATTS": 450,
+     "ESP:HVAC": "X",
+     "CLIMATIZACION": "X"
+    }
+   },
+   {
+    "clave": "D-145",
+    "desc": "SET DE RIÑONERAS DE ACERO QUIRURGICO",
+    "grupo": "INST",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "M-36",
+    "desc": "SILLA METALICA APILABLE",
+    "grupo": "MA",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "M-9",
+    "desc": "PERCHA METALICA DE PARED CON 4 GANCHOS",
+    "grupo": "MA",
+    "v": {
+     "REQUIERE": "X",
+     "COMPENSACION": "NO",
+     "ESP:ESTRUCTURAL": "X",
+     "REFUERZO_ESTRUCTURAL_PARED": "X (DRYWALL)"
+    }
+   },
+   {
+    "clave": "M-114",
+    "desc": "CUBO DE ACERO INOXIDABLE PARA DESPERDICIOS CON TAPA ACCIONADA A PEDAL",
+    "grupo": "MC",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "M-159",
+    "desc": "MESA DE USO MULTIPLE DE ACERO INOXIDABLE DE 90 X 45 CM.",
+    "grupo": "MC",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "M-72",
+    "desc": "BIOMBO DE ACERO INOXIDABLE DE 2 CUERPOS",
+    "grupo": "MC",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "M-8",
+    "desc": "ESTANTERIA METALICA DE ANGULOS RANURADOS DE 01 CUERPO 05 ANAQUELES",
+    "grupo": "MC",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "M-86",
+    "desc": "ESCALINATA METALICA 2 PELDAÑOS",
+    "grupo": "MC",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   },
+   {
+    "clave": "M-91",
+    "desc": "MESA DE ACERO INOXIDABLE RODABLE PARA MULTIPLES USOS",
+    "grupo": "MC",
+    "v": {
+     "REQUIERE": "NO",
+     "COMPENSACION": "NO"
+    }
+   }
+  ]
+ },
+ "presupuesto": {
+  "codigos": [
+   {
+    "clave": "D-1",
+    "desc": "ELECTROCARDIOGRAFO",
+    "grupo": "B",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-109",
+    "desc": "COCHE DE PARO EQUIPADO",
+    "grupo": "B",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-373",
+    "desc": "DESFIBRILADOR EXTERNO AUTOMATICO",
+    "grupo": "B",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-88",
+    "desc": "ASPIRADOR DE SECRECIONES RODABLE",
+    "grupo": "B",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-92",
+    "desc": "DESTRUCTOR DE AGUJAS HIPODERMICAS",
+    "grupo": "B",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-153",
+    "desc": "CANASTILLA (GRADILLA) PARA TRANSPORTE DE MUESTRAS",
+    "grupo": "C",
+    "cant": 2,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-187",
+    "desc": "BALANZA DIGITAL NEONATAL",
+    "grupo": "C",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-325",
+    "desc": "BALANZA DIGITAL CON TALLIMETRO ADULTO",
+    "grupo": "C",
+    "cant": 2,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-288",
+    "desc": "REFRIGERADORA PARA MEDICAMENTOS",
+    "grupo": "E",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "D-145",
+    "desc": "SET DE RIÑONERAS DE ACERO QUIRURGICO",
+    "grupo": "INST",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-36",
+    "desc": "SILLA METALICA APILABLE",
+    "grupo": "MA",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-9",
+    "desc": "PERCHA METALICA DE PARED CON 4 GANCHOS",
+    "grupo": "MA",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-114",
+    "desc": "CUBO DE ACERO INOXIDABLE PARA DESPERDICIOS CON TAPA ACCIONADA A PEDAL",
+    "grupo": "MC",
+    "cant": 6,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-159",
+    "desc": "MESA DE USO MULTIPLE DE ACERO INOXIDABLE DE 90 X 45 CM.",
+    "grupo": "MC",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-72",
+    "desc": "BIOMBO DE ACERO INOXIDABLE DE 2 CUERPOS",
+    "grupo": "MC",
+    "cant": 2,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-8",
+    "desc": "ESTANTERIA METALICA DE ANGULOS RANURADOS DE 01 CUERPO 05 ANAQUELES",
+    "grupo": "MC",
+    "cant": 3,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-86",
+    "desc": "ESCALINATA METALICA 2 PELDAÑOS",
+    "grupo": "MC",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   },
+   {
+    "clave": "M-91",
+    "desc": "MESA DE ACERO INOXIDABLE RODABLE PARA MULTIPLES USOS",
+    "grupo": "MC",
+    "cant": 1,
+    "unit": null,
+    "total": 0
+   }
+  ],
+  "total": 0,
+  "sin_precio": [
+   "D-1",
+   "D-109",
+   "D-373",
+   "D-88",
+   "D-92",
+   "D-153",
+   "D-187",
+   "D-325",
+   "D-288",
+   "D-145",
+   "M-36",
+   "M-9",
+   "M-114",
+   "M-159",
+   "M-72",
+   "M-8",
+   "M-86",
+   "M-91"
+  ]
+ },
+ "claves": [
+  {
+   "clave": "D-1",
+   "desc": "ELECTROCARDIOGRAFO",
+   "grupo": "B",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-109",
+   "desc": "COCHE DE PARO EQUIPADO",
+   "grupo": "B",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-145",
+   "desc": "SET DE RIÑONERAS DE ACERO QUIRURGICO",
+   "grupo": "INST",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-153",
+   "desc": "CANASTILLA (GRADILLA) PARA TRANSPORTE DE MUESTRAS",
+   "grupo": "C",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-187",
+   "desc": "BALANZA DIGITAL NEONATAL",
+   "grupo": "C",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-288",
+   "desc": "REFRIGERADORA PARA MEDICAMENTOS",
+   "grupo": "E",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-325",
+   "desc": "BALANZA DIGITAL CON TALLIMETRO ADULTO",
+   "grupo": "C",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-373",
+   "desc": "DESFIBRILADOR EXTERNO AUTOMATICO",
+   "grupo": "B",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-88",
+   "desc": "ASPIRADOR DE SECRECIONES RODABLE",
+   "grupo": "B",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "D-92",
+   "desc": "DESTRUCTOR DE AGUJAS HIPODERMICAS",
+   "grupo": "B",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-114",
+   "desc": "CUBO DE ACERO INOXIDABLE PARA DESPERDICIOS CON TAPA ACCIONADA A PEDAL",
+   "grupo": "MC",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-159",
+   "desc": "MESA DE USO MULTIPLE DE ACERO INOXIDABLE DE 90 X 45 CM.",
+   "grupo": "MC",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-36",
+   "desc": "SILLA METALICA APILABLE",
+   "grupo": "MA",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-72",
+   "desc": "BIOMBO DE ACERO INOXIDABLE DE 2 CUERPOS",
+   "grupo": "MC",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-8",
+   "desc": "ESTANTERIA METALICA DE ANGULOS RANURADOS DE 01 CUERPO 05 ANAQUELES",
+   "grupo": "MC",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-86",
+   "desc": "ESCALINATA METALICA 2 PELDAÑOS",
+   "grupo": "MC",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-9",
+   "desc": "PERCHA METALICA DE PARED CON 4 GANCHOS",
+   "grupo": "MA",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  },
+  {
+   "clave": "M-91",
+   "desc": "MESA DE ACERO INOXIDABLE RODABLE PARA MULTIPLES USOS",
+   "grupo": "MC",
+   "provee": "EQ.",
+   "norma": "NTS 113"
+  }
+ ],
+ "comparativo_pip": {
+  "B": 1602,
+  "MA": 1482,
+  "V": 2
+ },
+ "visor": [],
+ "archivos_en": "drive"
+}

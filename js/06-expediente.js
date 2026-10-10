@@ -44,6 +44,25 @@ const EXPEDIENTES_LOCAL = [
     script: '',
     detalle: true,
     datos: 'data/expediente-huari.json'
+  },
+  {
+    id: 'pachas-2026',
+    tipo: 'expediente',
+    cliente: 'Gobierno Regional de Huánuco · Pachas, Dos de Mayo',
+    titulo: 'Expediente técnico de equipamiento — Centro de Salud Pachas',
+    servicio: 'CUI 2324623',
+    fecha: 'Oct 2026',
+    foto: '',
+    desc: 'Componente de equipamiento del expediente técnico del C.S. Pachas (I\u2011 4): '
+        + 'el PME armado contra el PMF, el PMA y la NTS, ambiente por ambiente.',
+    estado: 'En curso',
+    avance: 0,                       // se actualiza con el JSON
+    /* SHA-256 de la clave provisional «pachas26-sb». Cámbiala en cuanto
+       entregues el acceso: aquí sólo vive el hash, nunca la clave. */
+    clave_hash: '3d79d06ba1fdbdd4f003219bd9ce5ca15f4dcd4bbb4074f3f78d50acaed88605',
+    script: '',
+    detalle: true,
+    datos: 'data/expediente-pachas.json'
   }
 ];
 
@@ -213,6 +232,10 @@ function pintarExpediente(id){
   else if(EX_TAB==='pre') pane=paneTbPresupuesto(d);
   else if(EX_TAB==='pi') pane=paneTbPreinst(d);
   else if(EX_TAB==='doc') pane=paneExDocs(d);
+  /* El PME trae la lista de la norma de cada ambiente: son cientos de
+     kilobytes que no tiene por qué pagar quien sólo mira el avance, así
+     que su módulo se baja al abrir la pestaña. */
+  else if(EX_TAB==='pme') pane=(typeof paneExPme==='function')?paneExPme(d,id):paneExPmeCargando();
   else pane=paneTbResumen(d)+`<details class="bloque ex-avance" ${EX_AVANCE_ABIERTO?'open':''} ontoggle="EX_AVANCE_ABIERTO=this.open"><summary><span>Avance del expediente</span><i>${d.avance}% · ${d.resumen.anexos_completos} de ${d.resumen.anexos_total} anexos completos</i></summary><div class="ex-avance-cuerpo">${paneExResumen(d)}</div></details>`;
   cont.innerHTML=`<div class="dash-card det-card ex-card">${tabsEx(id,d)}${pane}</div>`;
   /* En pantallas angostas la barra de pestañas se desplaza: que la activa se vea. */
@@ -222,6 +245,7 @@ function pintarExpediente(id){
   if(EX_TAB==='doc' && d) precargarVisor(d);          // se va trayendo el visor mientras mira los documentos
   if(EX_TAB==='doc' && d && EX_DOC_SEC==='visor' && (d.visor||[]).length) setTimeout(()=>montarVisorCad(d),30);
   if(EX_TAB==='met' && d) montarMetrado(d);
+  if(EX_TAB==='pme'){ cargarPme(id); if(typeof montarExPme==='function') montarExPme(d,id); }
   if(EX_TAB==='res' && d) montarTbResumen(d);
   if(EX_TAB==='pre' && d) montarTbPresupuesto(d);
   if(EX_TAB==='pi' && d) montarTbPreinst(d);
@@ -241,6 +265,7 @@ function tabsEx(id,d){
     <button type="button" class="${EX_TAB==='pre'?'on':''}" onclick="setExTab('${id}','pre')">Presupuesto</button>
     <button type="button" class="${EX_TAB==='pi'?'on':''}" onclick="setExTab('${id}','pi')">Preinstalación</button>
     <button type="button" class="${EX_TAB==='doc'?'on':''}" onclick="setExTab('${id}','doc')">Documentación</button>
+    <button type="button" class="${EX_TAB==='pme'?'on':''}" onclick="setExTab('${id}','pme')">PME en base PMF/PMA/NTS</button>
     <div class="det-actu"><span>${d?'Generado el '+d.generado:''}</span></div>
   </div>`;
 }
@@ -862,3 +887,36 @@ function cerrarVisorCad(){
    el avance de la tarjeta sea el real en cuanto llegue el JSON.        */
 mezclarExpedientes();
 EXPEDIENTES_LOCAL.forEach(e=>cargarExpediente(e.id));
+
+
+/* ─────────────────── EL PME, A DEMANDA ───────────────────
+   La pestaña «PME en base PMF/PMA/NTS» necesita su propio módulo y la
+   lista de la norma. Se descargan al abrirla por primera vez; después ya
+   están en memoria.                                                    */
+let PME_MOD = 'no';          // no | cargando | listo | error
+
+function paneExPmeCargando(){
+  return `<div class="cargando-proy">
+    <div class="cp-barra"><i></i></div>
+    <p>${PME_MOD==='error'?'No se pudo cargar el PME. Vuelve a entrar a la pestaña.'
+        :'Trayendo el PME y la lista de la norma…'}</p></div>`;
+}
+
+function cargarPme(id){
+  if(PME_MOD==='listo' || PME_MOD==='cargando') return;
+  PME_MOD='cargando';
+  /* El sello ?v= es el mismo con el que se pidió este archivo: así el
+     navegador se entera de los cambios igual que con el resto. */
+  const src=(document.querySelector('script[src*="06-expediente.js"]')||{}).src||'';
+  const v=(src.match(/\?v=[0-9a-f]+/)||[''])[0];
+
+  const css=document.createElement('link');
+  css.rel='stylesheet'; css.href='css/16-pme.css'+v;
+  document.head.appendChild(css);
+
+  const js=document.createElement('script');
+  js.src='js/06-pme.js'+v; js.async=false;
+  js.onload=()=>{ PME_MOD='listo'; try{ pintarExpediente(id); }catch(e){} };
+  js.onerror=()=>{ PME_MOD='error'; try{ pintarExpediente(id); }catch(e){} };
+  document.head.appendChild(js);
+}
