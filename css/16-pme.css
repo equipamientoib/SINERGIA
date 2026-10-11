@@ -151,3 +151,165 @@
   .pme-wrap{max-height:60vh}
   .pme-tabla{font-size:11.5px}
 }
+
+/* ── Los cuadros de aviso: cada uno filtra la tabla ──
+   Son botones, no cifras, así que tienen que dejarse pulsar y marcarse
+   cuando están activos. El rojo sólo para lo que sí es un error. */
+.pme-avb-fila{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.pme-avb{text-align:left;cursor:pointer;font:inherit;transition:border-color .12s,background .12s}
+.pme-avb:hover{border-color:var(--linea-b);background:#FCFBF9}
+.pme-avb b{font-size:21px}
+.pme-avb.act{border-color:var(--bronce);background:#FDF7E6;box-shadow:inset 0 0 0 1px var(--bronce)}
+.pme-avb.mal b{color:#9E342C}
+.pme-avb-fila .ex-cifra:first-child{background:var(--blanco);border-color:var(--linea)}
+.pme-avb-fila .ex-cifra:first-child b{color:var(--onix)}
+.pme-avb-fila .ex-cifra:first-child span{color:var(--grafito)}
+.pme-avb-fila .ex-cifra:first-child i{color:var(--gris)}
+.pme-avb-fila .ex-cifra:first-child.act{border-color:var(--bronce);background:#FDF7E6}
+
+/* ── Títulos de cada bloque, con su botón de abrir a la derecha ── */
+.pme-h5{margin:26px 0 0;font-family:var(--ff-d);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--grafito);display:flex;align-items:center;gap:12px}
+.pme-h5 .ex-btn{margin-left:auto;text-transform:none;letter-spacing:0}
+
+/* ── La ficha de un código ── */
+.pme-ficha{margin-top:14px;border:1px solid var(--bronce);border-radius:var(--r-sm);
+  background:#FDFBF6;padding:14px}
+.pme-ficha-cab{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pme-ficha-cab b{font-family:var(--ff-m,monospace)}
+.pme-ficha-cab .ex-btn{margin-left:auto}
+.pme-tabla-ficha{margin-top:10px}
+.pme-upss-c{color:var(--gris);font-size:11px}
+
+/* ── El consolidado y la bitácora: tablas largas, con su propio alto ── */
+.pme-wrap-2{overflow:auto;max-height:52vh;margin-top:10px;
+  border:1px solid var(--linea);border-radius:var(--r-sm);background:var(--blanco)}
+.pme-cod-b{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;
+  text-decoration:underline dotted;text-underline-offset:3px}
+.pme-cod-b:hover{color:var(--cobre-d,#8A5A12)}
+.pme-log td{vertical-align:top}
+.pme-quien{color:var(--gris);white-space:nowrap}
+
+@media (max-width:860px){
+  .pme-wrap-2{max-height:46vh}
+  .pme-h5{flex-wrap:wrap}
+}
+
+/* ══════════════ EL CAJÓN DE COTEJO ══════════════
+   No tapa la página: la empuja. El <body> se encoge por la derecha lo
+   que mide el cajón, así se ve la tabla y el documento a la vez, que es
+   de lo que va auditar. */
+:root{ --pme-cajon: 52vw }
+body.con-cajon{ padding-right: var(--pme-cajon) }
+#pmeCajon .pme-cajon{
+  position: fixed; top: 0; right: 0; bottom: 0; width: var(--pme-cajon);
+  display: flex; flex-direction: column; z-index: 60;
+  background: var(--blanco); border-left: 1px solid var(--linea);
+  box-shadow: -10px 0 28px rgba(0,0,0,.09);
+}
+.pme-tirador{position:absolute;left:-3px;top:0;bottom:0;width:7px;cursor:col-resize;z-index:2}
+.pme-tirador:hover{background:var(--bronce)}
+.pme-cajon-h{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-bottom:1px solid var(--linea);background:#FCFBF9}
+.pme-cajon-h b{display:block;font-family:var(--ff-d);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--grafito)}
+.pme-cajon-h span{display:block;margin-top:2px;font-size:12.5px;color:var(--onix)}
+.pme-cajon-h .ex-btn{margin-left:auto}
+.pme-cajon-c{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto}
+
+/* Cada documento es un panel que se pliega. Los abiertos se reparten el
+   alto; los plegados ocupan sólo su cabecera. */
+/* El sitio le pone a <section> un relleno de 70px arriba y abajo para
+   las secciones de la portada. Aqui son paneles, no secciones de pagina:
+   eran 140px de aire por panel. */
+.pme-pan{display:flex;flex-direction:column;flex:1 1 0;min-height:0;
+  padding:0;margin:0;border-bottom:1px solid var(--linea)}
+.pme-pan.plegado{flex:0 0 auto}
+.pme-pan.plegado .pme-pan-v{display:none}
+.pme-pan.plegado .pme-pan-nav{display:none}
+.pme-pan>header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:8px 12px;background:#FCFBF9;border-bottom:1px solid var(--linea)}
+.pme-pan-t{flex:1;min-width:180px;display:flex;align-items:baseline;gap:8px;
+  font:inherit;text-align:left;background:none;border:0;padding:0;cursor:pointer;color:inherit}
+.pme-pan-t i{font-style:normal;width:14px;color:var(--gris)}
+.pme-pan-t b{font-size:12.5px;color:var(--onix)}
+.pme-pan-t span{font-size:11.5px;color:var(--gris)}
+.pme-pan-nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.pme-pan-nav .ex-btn{padding:2px 7px;font-size:11.5px}
+.pme-pan-nav .ex-btn[disabled]{opacity:.4;cursor:default}
+.pme-pan-p{font-size:11.5px;color:var(--gris);white-space:nowrap}
+.pme-pan-v{flex:1;min-height:0;overflow:auto;background:var(--blanco)}
+.pme-pan-v iframe{display:block;width:100%;height:100%;border:0}
+.pme-pan-xls{padding:10px 12px}
+
+/* La hoja del Excel, tal cual. Resaltadas las filas del ambiente y, más
+   fuerte, las que son renglón de equipo copiado. */
+.pme-xcab{margin:0 0 8px;font-size:11.5px;color:var(--gris)}
+.pme-xl{border-collapse:collapse;font-size:11px;font-family:var(--ff-m,monospace)}
+.pme-xl th,.pme-xl td{border:1px solid var(--linea);padding:2px 6px;
+  max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pme-xl thead th{position:sticky;top:0;background:#F2EFEA;color:var(--grafito);z-index:1}
+.pme-xf{background:#F2EFEA;color:var(--gris);text-align:right;position:sticky;left:0}
+.pme-xr-amb td{background:#FDFBF6}
+.pme-xr-eq td{background:#FDF7E6}
+.pme-xr-eq .pme-xf{background:#F6E7C3;color:var(--onix)}
+
+/* El botón de cotejar, encima de la lista de la norma. */
+.pme-fuentes{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.pme-cita{font-size:11.5px;color:var(--gris)}
+
+@media (max-width:1100px){
+  /* Sin sitio para los dos a la vez, el cajón se pone encima. */
+  body.con-cajon{padding-right:0}
+  #pmeCajon .pme-cajon{width:min(96vw,var(--pme-cajon))}
+  .pme-tirador{display:none}
+}
+
+/* ══════════════ FISCALIZAR DESDE LA WEB ══════════════ */
+.pme-edbarra{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 0;
+  padding:10px 12px;border:1px solid var(--linea);border-radius:var(--r-sm);background:#FCFBF9}
+.pme-edbarra.act{border-color:var(--bronce);background:#FDF7E6}
+.pme-edbarra b{font-family:var(--ff-d);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--grafito)}
+.pme-edbarra input[type=password]{padding:5px 9px;border:1px solid var(--linea-b);
+  border-radius:var(--r-sm);font:inherit;font-size:13px;width:180px}
+.pme-edmal{font-size:11.5px;color:#9E342C}
+
+/* El − N + de cada renglón. */
+.pme-q{white-space:nowrap}
+.pme-mas{width:20px;height:20px;line-height:1;padding:0;font:inherit;font-size:13px;
+  border:1px solid var(--linea-b);border-radius:4px;background:var(--blanco);
+  color:var(--grafito);cursor:pointer;vertical-align:middle}
+.pme-mas:hover:not([disabled]){border-color:var(--bronce);color:var(--onix)}
+.pme-mas[disabled]{opacity:.35;cursor:default}
+.pme-q b{display:inline-block;min-width:22px;text-align:center;vertical-align:middle}
+.pme-q b.tocada{color:var(--cobre-d,#8A5A12);background:#FDF7E6;border-radius:4px}
+
+/* El lápiz de cada renglón: abre su cajita sin mover nada más. */
+.pme-lapiz{float:right;margin-left:6px;font-size:12px;line-height:1;padding:1px 5px;
+  cursor:pointer;color:var(--gris);background:none;border:1px solid transparent;border-radius:4px}
+.pme-lapiz:hover{color:var(--onix);border-color:var(--linea-b);background:var(--blanco)}
+.pme-lapiz.puesta{color:var(--cobre-d,#8A5A12);border-color:var(--bronce);background:#FDF7E6}
+.pme-lapiz.mal{color:#9E342C;border-color:#9E342C;background:rgba(178,58,50,.08)}
+.pme-obsr{display:none}
+.pme-obsr.abierta{display:table-row}
+.pme-obsr>td{padding:0 8px 8px !important;background:#FCFBF9 !important}
+.pme-obs{margin-top:10px}
+.pme-obs-t{display:block;font-family:var(--ff-d);font-size:10px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--grafito);margin-bottom:4px}
+.pme-obs textarea{width:100%;padding:7px 9px;border:1px solid var(--linea-b);
+  border-radius:var(--r-sm);font:inherit;font-size:13px;resize:vertical}
+.pme-obs-mal{display:inline-flex;align-items:center;gap:6px;margin-top:5px;
+  font-size:12px;color:var(--grafito)}
+
+/* La fila con algo puesto se nota en la tabla. */
+.pme-eq tr.react td{background:#FFFBEF}
+
+/* La herramienta de armado, dentro de la pestaña. Va en un marco propio
+   porque trae sus propios estilos —los mismos del sitio, copiados— y
+   mezclarlos con los de esta página le rompería el encabezado fijo y el
+   cajón de cotejo, que se cuelgan de la ventana. */
+.pme-marco{margin-top:14px;border:1px solid var(--linea);border-radius:var(--r-sm);
+  overflow:hidden;background:var(--blanco)}
+.pme-marco iframe{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0}
+@media (max-width:860px){ .pme-marco iframe{height:calc(100vh - 110px)} }
