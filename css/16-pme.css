@@ -62,3 +62,92 @@
 @media (max-width: 640px){
   .ex-cifra b{ font-size: 22px }
 }
+
+/* ── La tabla ambiente por ambiente ──
+   Son dieciséis columnas: no caben a lo ancho de la tarjeta, así que
+   se desplaza en horizontal dentro de su caja y la cabecera se queda
+   arriba al bajar, como en una hoja de cálculo. */
+.pme-filtros{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0 10px}
+.pme-buscar{flex:1 1 320px;min-width:220px;padding:8px 12px;border:1px solid var(--linea);
+  border-radius:var(--r-sm);font-family:var(--ff-b);font-size:13px;background:var(--blanco)}
+.pme-filtros select{padding:8px 10px;border:1px solid var(--linea);border-radius:var(--r-sm);
+  font-family:var(--ff-b);font-size:13px;background:var(--blanco)}
+
+.pme-wrap{overflow:auto;max-height:72vh;border:1px solid var(--linea);border-radius:var(--r-sm);
+  background:var(--blanco)}
+.pme-tabla{width:100%;border-collapse:collapse;font-size:12px}
+.pme-tabla thead th{position:sticky;top:0;z-index:3;background:var(--crema-2);
+  font-family:var(--ff-d);font-size:10px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--grafito);text-align:left;padding:8px 8px;border-bottom:1px solid var(--linea)}
+.pme-tabla td{padding:7px 8px;border-bottom:1px solid var(--linea);vertical-align:top}
+.pme-tabla td.n,.pme-tabla th.n{text-align:right;white-space:nowrap}
+.pme-tabla tr.pme-fila:hover > td{background:var(--crema-1)}
+.pme-tabla tr.pme-fila.abierta > td{background:var(--crema-1);border-bottom:none}
+
+/* La banda de cada unidad productora se queda pegada bajo la cabecera. */
+.pme-tabla tr.pme-upss > td{position:sticky;top:30px;z-index:2;background:var(--onix);color:var(--blanco);
+  font-family:var(--ff-d);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:7px 10px}
+.pme-tabla tr.pme-upss small{margin-left:10px;color:rgba(255,255,255,.6);text-transform:none;letter-spacing:0}
+.pme-tabla tr.pme-upss button{background:none;border:1px solid rgba(255,255,255,.35);color:var(--blanco);
+  width:18px;height:18px;line-height:1;border-radius:4px;margin-right:8px;cursor:pointer}
+
+.pme-abrir button{width:22px;height:22px;line-height:1;border:1px solid var(--linea-b);
+  background:var(--blanco);border-radius:4px;cursor:pointer;color:var(--grafito)}
+.pme-abrir button:hover{border-color:var(--bronce);background:var(--cobre-l)}
+
+.pme-cod{font-family:var(--ff-m,monospace);font-size:11.5px;white-space:nowrap}
+.pme-amb{min-width:160px;line-height:1.35}
+.pme-amb small,.pme-tabla td small{display:block;color:var(--gris);font-size:10.5px;margin-top:2px}
+.pme-desc{min-width:220px}
+.pme-nd{color:var(--gris);font-style:italic}
+.pme-conf{font-size:11px;color:var(--gris);min-width:90px}
+.pme-no{padding:18px;color:var(--gris);font-size:13px}
+
+/* Los avisos: lo que hay que mirar de ese ambiente. */
+.pme-avisos{min-width:130px}
+.pme-av{display:inline-block;margin:0 4px 3px 0;padding:2px 7px;border-radius:999px;
+  font-family:var(--ff-d);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;
+  background:var(--crema-2);color:var(--grafito);cursor:help}
+.pme-av.unidos,.pme-av.unif{background:#FBEFD9;color:#8A5A12}
+.pme-av.prop{background:#F3E8F6;color:#6B3A7A}
+.pme-av.sinnts,.pme-av.pmf{background:rgba(178,58,50,.1);color:#9E342C}
+.pme-av.cero{background:#EDEDED;color:#5A5A5A}
+
+/* El detalle de un ambiente, debajo de su fila. */
+.pme-det > td{padding:0;background:var(--crema-1)}
+.pme-caja{padding:14px 16px 16px;border-left:3px solid var(--bronce)}
+.pme-cab{font-size:12.5px;line-height:1.6;color:var(--grafito);margin:0 0 10px}
+.pme-cod-amb{display:inline-block;margin-right:8px;padding:2px 8px;border-radius:999px;
+  background:var(--onix);color:var(--blanco);font-family:var(--ff-m,monospace);font-size:11px}
+.pme-cod-pmf{margin-left:8px;color:var(--gris)}
+.pme-avlista{margin:0 0 12px;padding:0;list-style:none;font-size:12px}
+.pme-avlista li{padding:5px 10px;margin-bottom:4px;border-radius:var(--r-sm);background:var(--blanco);
+  border-left:3px solid var(--linea-b);color:var(--grafito)}
+.pme-avlista li.unidos,.pme-avlista li.unif{border-left-color:#C9962E}
+.pme-avlista li.sinnts,.pme-avlista li.pmf{border-left-color:#B23A32}
+
+.pme-eq{width:100%;border-collapse:collapse;font-size:12px;background:var(--blanco)}
+.pme-eq thead th{background:var(--crema-2);font-family:var(--ff-d);font-size:10px;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--grafito);text-align:left;
+  padding:6px 8px;border-bottom:1px solid var(--linea);white-space:nowrap}
+/* La letra de la columna en el LS, para cotejar sin traducir. */
+.pme-eq thead th i{font-style:normal;margin-left:4px;padding:1px 5px;border-radius:3px;
+  background:var(--onix);color:var(--blanco);font-size:9px}
+.pme-eq td{padding:5px 8px;border-bottom:1px solid var(--linea)}
+.pme-eq td.n{text-align:right;white-space:nowrap}
+.pme-eq tr.oc > td{color:var(--gris)}
+.pme-eq tr.cero > td,.pme-eq tr.anul > td{background:#F6F6F6;color:var(--gris)}
+.pme-eq tr.dup > td,.pme-eq tr.falta > td{background:rgba(178,58,50,.06)}
+.pme-eq tr.pme-parte > td{background:#EEF2F7;border-top:2px solid #94A3B8;padding:5px 10px;
+  font-size:11.5px;color:#1E293B}
+
+.pme-rep{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:999px;
+  background:var(--crema-2);color:var(--gris);white-space:nowrap}
+.pme-rep.ok{background:rgba(46,139,107,.09);color:#226B51}
+.pme-rep.unif{background:#FBEFD9;color:#8A5A12}
+.pme-rep.mal{background:rgba(178,58,50,.1);color:#9E342C}
+
+@media (max-width:860px){
+  .pme-wrap{max-height:60vh}
+  .pme-tabla{font-size:11.5px}
+}
