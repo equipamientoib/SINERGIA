@@ -988,9 +988,16 @@ function fisSeparar(ev, i){
   const y0 = ev.touches ? ev.touches[0].clientY : ev.clientY;
   /* Se fija el alto actual de los TRES en el flex antes de tocar nada:
      si no, el que no se arrastra conserva su `flex:1` y, al lado de unos
-     grow de varios cientos, se queda sin sitio. */
-  paneles.forEach(p => { p.style.flex = p.offsetHeight + ' 0 0px'; });
-  const ha = a.offsetHeight, hb = b.offsetHeight;
+     grow de varios cientos, se queda sin sitio.
+
+     Y se MIDEN los tres antes de asignar ninguno: midiendo y asignando
+     en el mismo bucle, al poner el primero en «flex: 279 0 0px» los
+     otros seguian en «flex: 1», el primero se llevaba 279 partes de 281
+     y los demas se quedaban en 3 px —que era justo el alto que se les
+     guardaba—. Por eso al arrastrar se plegaban. */
+  const altos = paneles.map(p => p.offsetHeight);
+  paneles.forEach((p, k) => { p.style.flex = altos[k] + ' 0 0px'; });
+  const ha = altos[i], hb = altos[i + 1];
   const suma = ha + hb;
 
   /* Si hubo movimiento, al soltar hay que comerse el «click» que el

@@ -626,7 +626,68 @@ function pmeRepintarTodo(){
   const id = pmeId();
   const p = document.querySelector('.pme-pane');
   if(id && p) p.outerHTML = pmePane(null, id);
+  pmeCompacto();
 }
+
+/* Con la fiscalización abierta, la cabecera del expediente se repliega:
+   entre ella, la miga de pan y la barra del sitio se iban 330 px antes
+   de empezar el marco. El nombre del proyecto no se pierde, se queda en
+   la barra de revisión. */
+function pmeCompacto(){
+  document.body.classList.toggle('pme-herr', !!document.querySelector('.pme-marco'));
+  pmeAltoMarco();
+}
+
+/* El alto del marco se mide, no se adivina: lo que hay encima cambia
+   según la barra de revisión ocupe una línea o dos y según los márgenes
+   de la tarjeta, que dependen del ancho. */
+function pmeAltoMarco(){
+  const f = document.querySelector('.pme-marco iframe');
+  if(!f) return;
+  /* Sin scroll de por medio: la cabecera va replegada y las pestañas
+     pegadas, así que el marco empieza donde empieza y ahí se queda. */
+  const arriba = f.getBoundingClientRect().top;
+  const alto = Math.max(420, Math.round(innerHeight - arriba - 14));
+  f.style.height = alto + 'px';
+}
+addEventListener('resize', () => { try{ pmeAltoMarco(); }catch(e){} });
+
+/* Cotejar necesita la pantalla entera: tres documentos apilados en el
+   alto de una pestaña no se leen, y al repartirlos con el tirador
+   chocan con el mínimo y se pliegan. Mientras el cajón esté abierto, el
+   marco se lleva toda la ventana; al cerrarlo vuelve a su sitio dentro
+   de la pestaña. El marco no se mueve del DOM —moverlo recargaría la
+   herramienta—: sólo cambia de posición. */
+addEventListener('message', e => {
+  const d = e && e.data;
+  if(!d || d.pme !== 'cotejo') return;
+  const m = document.querySelector('.pme-marco');
+  if(!m) return;
+  document.body.classList.toggle('pme-cotejo', !!d.abierto);
+
+  /* El transform de la animación de entrada de `.page` atrapa a todo lo
+     que esté position:fixed dentro. Y lo pone una ANIMACIÓN, que gana
+     hasta al estilo en línea: la única forma de quitarlo es en el
+     propio elemento y con !important. Se devuelve al cerrar. */
+  const pg = m.closest('.page');
+  if(pg){
+    if(d.abierto){
+      pg.style.setProperty('transform', 'none', 'important');
+      /* Con el transform ya en «none» seguía atrapando: a `.page` le
+         queda la ANIMACIÓN de entrada, y una animación que toca el
+         transform crea el contenedor igual, valga lo que valga ahora.
+         Hay que apagar la animación, no sólo su resultado. */
+      pg.style.setProperty('animation', 'none', 'important');
+    }else{
+      pg.style.removeProperty('transform');
+      pg.style.removeProperty('animation');
+    }
+  }
+
+  const f = m.querySelector('iframe');
+  if(d.abierto){ if(f) f.style.height = ''; }
+  else { try{ pmeAltoMarco(); }catch(e2){} }
+});
 
 /* ═══════════════ PMF CONTRA PMA ═══════════════
    El PMF tiene que estar contenido en el PMA. Lo que no cuadra no cuelga
@@ -971,6 +1032,7 @@ function pmePintarHoja(){
   window.pintarExpediente = function(){
     const r = antes.apply(this, arguments);
     try{ pmePintarCajon(); }catch(e){}
+    try{ pmeCompacto(); }catch(e){}
     return r;
   };
 })();
@@ -1113,10 +1175,11 @@ function pmeBarraEdicion(id){
     </div>`;
   }
   if(PME_HERRAMIENTA[id]){
+    const pr = (pmeIdx(id).j.meta || {}).proyecto || '';
     return `<div class="pme-edbarra act">
       <b>Modo revisión</b>
-      <span class="th-nota">Ésta es la herramienta de armado completa, la misma de tu equipo.
-        Lo que corrijas se guarda en este navegador.</span>
+      ${pr ? `<span class="pme-donde">${esc(pr)}</span>` : ''}
+      <span class="th-nota">Lo que corrijas se guarda en este navegador.</span>
       <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id].split('?')[0])}" target="_blank" rel="noopener">
         Abrir la herramienta completa</a>
       <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">Volver a la vista del cliente ✕</button>

@@ -30,18 +30,34 @@
 
   /* El cajón de cotejo se cuelga de la ventana —que aquí es la del
      marco— y mide su ancho con innerWidth. Al empotrar, la ventana es
-     más estrecha que la pantalla, así que el mínimo de 420 px se queda
-     grande: se le deja la mitad justa y se olvida el ancho guardado de
-     cuando se usó suelta. */
-  try{
-    var n = Math.round(window.innerWidth * 0.5);
-    localStorage.setItem('pme-cajon-ancho', n);
-    document.documentElement.style.setProperty('--cajon', n + 'px');
-    addEventListener('resize', function(){
-      if(!document.querySelector('.fis-cajon')) return;
-      var m = Math.round(window.innerWidth * 0.5);
-      localStorage.setItem('pme-cajon-ancho', m);
-      document.documentElement.style.setProperty('--cajon', m + 'px');
-    });
-  }catch(e){}
+     más estrecha que la pantalla: se le deja la mitad justa y se olvida
+     el ancho guardado de cuando se usó suelta. */
+  function anchoCajon(){
+    try{
+      var n = Math.round(window.innerWidth * 0.5);
+      localStorage.setItem('pme-cajon-ancho', n);
+      document.documentElement.style.setProperty('--cajon', n + 'px');
+    }catch(e){}
+  }
+  anchoCajon();
+  addEventListener('resize', function(){
+    if(document.querySelector('.fis-cajon')) anchoCajon();
+  });
+
+  /* Cotejar necesita ALTO: tres documentos apilados en el alto de una
+     pestaña no se leen, y al repartirlos con el tirador chocan con el
+     mínimo y se pliegan. Así que se avisa a la página de fuera cuando
+     el cajón se abre y se cierra, y ella le da al marco la pantalla
+     entera mientras dure. Cuando se cierra, el marco vuelve a su sitio
+     dentro de la pestaña. */
+  var abierto = null;
+  function avisar(){
+    var hay = !!document.querySelector('.fis-cajon');
+    if(hay === abierto) return;
+    abierto = hay;
+    try{ parent.postMessage({pme: 'cotejo', abierto: hay}, '*'); }catch(e){}
+    if(hay) anchoCajon();
+  }
+  new MutationObserver(avisar).observe(document.body, {childList: true, subtree: true});
+  avisar();
 })();
