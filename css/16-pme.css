@@ -305,18 +305,12 @@ body.con-cajon{ padding-right: var(--pme-cajon) }
 /* La fila con algo puesto se nota en la tabla. */
 .pme-eq tr.react td{background:#FFFBEF}
 
-/* La herramienta de armado, a pantalla completa. Tiene que ser la
-   ventana entera: dentro, su barra de pestañas se ancla con sticky y su
-   cajón de cotejo con position:fixed, los dos contra la ventana. En un
-   recuadro se anclan al recuadro —la barra deja de quedarse arriba al
-   bajar— y el cajón se reparte el ancho del recuadro en vez del de la
-   pantalla. Así el marco ES la ventana y se comporta igual que con
-   doble clic en el equipo. */
-.pme-lleno{position:fixed;inset:0;z-index:200;background:var(--blanco)}
-.pme-lleno iframe{display:block;width:100%;height:100%;border:0}
-.pme-lleno-b{position:fixed;right:14px;bottom:14px;z-index:201;display:flex;gap:8px}
-.pme-lleno-b .ex-btn{background:var(--onix);color:var(--blanco);border-color:var(--onix);
-  box-shadow:0 6px 18px rgba(0,0,0,.22)}
-.pme-lleno-b .ex-btn:hover{background:var(--grafito);border-color:var(--grafito)}
-/* Con la herramienta abierta, la página de debajo no se desplaza. */
-body.con-herramienta{overflow:hidden}
+/* La Fiscalización de la herramienta, dentro de la pestaña. Va en un
+   marco propio porque trae sus propios estilos —los mismos del sitio,
+   copiados— y mezclarlos con los de esta página rompería las dos. El
+   marco se lleva el alto que queda de pantalla: dentro, el cajón de
+   cotejo se cuelga de él y ocupa su mitad. */
+.pme-marco{margin-top:12px;border:1px solid var(--linea);border-radius:var(--r-sm);
+  overflow:hidden;background:var(--blanco)}
+.pme-marco iframe{display:block;width:100%;height:calc(100vh - 210px);min-height:560px;border:0}
+@media (max-width:860px){ .pme-marco iframe{height:calc(100vh - 150px);min-height:460px} }

@@ -234,9 +234,13 @@ function pmePane(d, id){
      su cajón de cotejo—, no una copia suya. Lo que se corrige dentro se
      guarda en el navegador igual que en local. */
   if(PME_EDITA && PME_HERRAMIENTA[id]){
-    /* El marco no se pinta aquí: cuelga del <body>. Ver pmeHerramienta(). */
+    /* Dentro de la pestaña, no encima de la página: el expediente
+       conserva su cabecera y sus pestañas, y aquí entra la
+       Fiscalización de la herramienta y nada más. */
     return `<div class="pme-pane" data-id="${esc(id)}">
-      <p class="ex-nota">La herramienta de armado está abierta a pantalla completa.</p>
+      ${pmeBarraEdicion(id)}
+      <div class="pme-marco"><iframe src="${esc(PME_HERRAMIENTA[id])}"
+        title="Fiscalización del PME"></iframe></div>
     </div>`;
   }
   return `<div class="pme-pane" data-id="${esc(id)}">
@@ -622,41 +626,6 @@ function pmeRepintarTodo(){
   const id = pmeId();
   const p = document.querySelector('.pme-pane');
   if(id && p) p.outerHTML = pmePane(null, id);
-  pmeHerramienta();
-}
-
-/* ── La herramienta de armado, a pantalla completa ──
-   Cuelga del <body> y no del panel: `.page.active` lleva un transform
-   —la animación de entrada— y un transform atrapa a todo lo que esté
-   `position:fixed` dentro. Dentro del panel, el marco se quedaba en
-   378px de alto en vez de los 900 de la ventana, su barra de pestañas
-   se anclaba al marco en vez de a la pantalla y el cajón de cotejo se
-   repartía el ancho del marco. Colgado del body, el marco ES la
-   ventana y la herramienta se comporta igual que con doble clic.
-
-   Y no se vuelve a crear si ya está: el iframe recargaría, y con él la
-   herramienta entera. */
-function pmeHerramienta(){
-  const id = pmeId();
-  const quiere = id && PME_EDITA && PME_HERRAMIENTA[id] && document.querySelector('.pme-pane');
-  let e = document.getElementById('pmeHerramienta');
-  if(!quiere){
-    if(e) e.remove();
-    document.body.classList.remove('con-herramienta');
-    return;
-  }
-  if(e) return;
-  const u = PME_HERRAMIENTA[id];
-  e = document.createElement('div');
-  e.id = 'pmeHerramienta';
-  e.className = 'pme-lleno';
-  e.innerHTML = `<iframe src="${esc(u)}" title="Herramienta de armado del PME"></iframe>
-    <div class="pme-lleno-b">
-      <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">‹ Volver al expediente</button>
-      <a class="ex-btn" href="${esc(u)}" target="_blank" rel="noopener">Abrir aparte</a>
-    </div>`;
-  document.body.appendChild(e);
-  document.body.classList.add('con-herramienta');
 }
 
 /* ═══════════════ PMF CONTRA PMA ═══════════════
@@ -1002,7 +971,6 @@ function pmePintarHoja(){
   window.pintarExpediente = function(){
     const r = antes.apply(this, arguments);
     try{ pmePintarCajon(); }catch(e){}
-    try{ pmeHerramienta(); }catch(e){}
     return r;
   };
 })();
@@ -1073,7 +1041,7 @@ const PME_EDITOR_HASH = '3d79d06ba1fdbdd4f003219bd9ce5ca15f4dcd4bbb4074f3f78d50a
 /* Dónde vive la herramienta de armado de cada expediente. Es la carpeta
    0. PME publicada tal cual; sin entrada aquí, la pestaña se queda en
    la vista de lectura. */
-const PME_HERRAMIENTA = {'pachas-2026': 'pme/pachas/index.html'};
+const PME_HERRAMIENTA = {'pachas-2026': 'pme/pachas/index.html?solo=fis'};
 let PME_EDITA = false;
 const PME_REV = {};              // la revisión de cada expediente
 
@@ -1149,7 +1117,8 @@ function pmeBarraEdicion(id){
       <b>Modo revisión</b>
       <span class="th-nota">Ésta es la herramienta de armado completa, la misma de tu equipo.
         Lo que corrijas se guarda en este navegador.</span>
-      <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id])}" target="_blank" rel="noopener">Abrir aparte</a>
+      <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id].split('?')[0])}" target="_blank" rel="noopener">
+        Abrir la herramienta completa</a>
       <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">Volver a la vista del cliente ✕</button>
     </div>`;
   }
