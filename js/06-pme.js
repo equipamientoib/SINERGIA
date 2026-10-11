@@ -234,10 +234,9 @@ function pmePane(d, id){
      su cajón de cotejo—, no una copia suya. Lo que se corrige dentro se
      guarda en el navegador igual que en local. */
   if(PME_EDITA && PME_HERRAMIENTA[id]){
+    /* El marco no se pinta aquí: cuelga del <body>. Ver pmeHerramienta(). */
     return `<div class="pme-pane" data-id="${esc(id)}">
-      ${pmeBarraEdicion(id)}
-      <div class="pme-marco"><iframe src="${esc(PME_HERRAMIENTA[id])}"
-        title="Herramienta de armado del PME"></iframe></div>
+      <p class="ex-nota">La herramienta de armado está abierta a pantalla completa.</p>
     </div>`;
   }
   return `<div class="pme-pane" data-id="${esc(id)}">
@@ -623,6 +622,41 @@ function pmeRepintarTodo(){
   const id = pmeId();
   const p = document.querySelector('.pme-pane');
   if(id && p) p.outerHTML = pmePane(null, id);
+  pmeHerramienta();
+}
+
+/* ── La herramienta de armado, a pantalla completa ──
+   Cuelga del <body> y no del panel: `.page.active` lleva un transform
+   —la animación de entrada— y un transform atrapa a todo lo que esté
+   `position:fixed` dentro. Dentro del panel, el marco se quedaba en
+   378px de alto en vez de los 900 de la ventana, su barra de pestañas
+   se anclaba al marco en vez de a la pantalla y el cajón de cotejo se
+   repartía el ancho del marco. Colgado del body, el marco ES la
+   ventana y la herramienta se comporta igual que con doble clic.
+
+   Y no se vuelve a crear si ya está: el iframe recargaría, y con él la
+   herramienta entera. */
+function pmeHerramienta(){
+  const id = pmeId();
+  const quiere = id && PME_EDITA && PME_HERRAMIENTA[id] && document.querySelector('.pme-pane');
+  let e = document.getElementById('pmeHerramienta');
+  if(!quiere){
+    if(e) e.remove();
+    document.body.classList.remove('con-herramienta');
+    return;
+  }
+  if(e) return;
+  const u = PME_HERRAMIENTA[id];
+  e = document.createElement('div');
+  e.id = 'pmeHerramienta';
+  e.className = 'pme-lleno';
+  e.innerHTML = `<iframe src="${esc(u)}" title="Herramienta de armado del PME"></iframe>
+    <div class="pme-lleno-b">
+      <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">‹ Volver al expediente</button>
+      <a class="ex-btn" href="${esc(u)}" target="_blank" rel="noopener">Abrir aparte</a>
+    </div>`;
+  document.body.appendChild(e);
+  document.body.classList.add('con-herramienta');
 }
 
 /* ═══════════════ PMF CONTRA PMA ═══════════════
@@ -968,6 +1002,7 @@ function pmePintarHoja(){
   window.pintarExpediente = function(){
     const r = antes.apply(this, arguments);
     try{ pmePintarCajon(); }catch(e){}
+    try{ pmeHerramienta(); }catch(e){}
     return r;
   };
 })();

@@ -60,6 +60,9 @@ const EXPEDIENTES_LOCAL = [
     /* SHA-256 de la clave «pachas26». Cámbiala en cuanto
        entregues el acceso: aquí sólo vive el hash, nunca la clave. */
     clave_hash: '2c29789953a488f018177646c696f61f193b3f0154234ea055097dfd825e8418',
+    /* La de revisión: abre el expediente igual, y además deja la pestaña
+       del PME en modo revisión, con la herramienta de armado entera. */
+    clave_revision: '3d79d06ba1fdbdd4f003219bd9ce5ca15f4dcd4bbb4074f3f78d50acaed88605',
     script: '',
     detalle: true,
     datos: 'data/expediente-pachas.json'
