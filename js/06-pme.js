@@ -48,7 +48,8 @@ function pmeUrl(d, id){
 }
 
 /* Qué se busca, qué unidad se mira, qué fila está abierta. */
-const PMEV = {q: '', upss: '', abierto: null, plegadas: {}};
+const PMEV = {q: '', upss: '', abierto: null, plegadas: {},
+              alerta: '', cod: '', res: false, log: false, pmf: false};
 
 function paneExPme(d, id){
   if(pmeEstado(id) === 'error'){
@@ -99,6 +100,10 @@ function pmeIdx(id){
   const disPmf = {};
   (j.pmf || []).forEach(p => { if(p.res !== 'Compatible') disPmf[p.cod] = p; });
 
+  /* Cuantos ambientes comparten cada grupo de unificacion. */
+  const porGrupo = {};
+  amb.forEach(a => { if(a.m.grupo) porGrupo[a.m.grupo] = (porGrupo[a.m.grupo] || 0) + 1; });
+
   amb.forEach(a => {
     const m = a.m;
     a.ren = pmeRenglones(a, j);
@@ -122,6 +127,14 @@ function pmeIdx(id){
       'No se equipa, queda declarado' + (m.nota ? ' — ' + m.nota : '')]);
     if(m.pmf && disPmf[m.pmf]) a.avisos.push(['pmf', 'Discrepancia PMF–PMA', disPmf[m.pmf].det]);
     if(a.cero) a.avisos.push(['cero', 'En cero', a.cero + ' renglones declarados y en cero']);
+    /* Un codigo que la NTS trae dos veces en la misma lista: el ambiente
+       se lleva el doble y eso si es un error de la norma. */
+    const dups = [...new Set(a.ren.filter(x => x.est === 'dup').map(x => x.c))];
+    if(dups.length) a.avisos.push(['dup', 'Repetido en la norma',
+      'La norma trae el renglon repetido y el ambiente se lleva el doble: ' + dups.join(', ')]);
+    if(m.grupo) a.avisos.push(['unif2', 'Ambientes unificados',
+      'Unificado en el grupo ' + m.grupo + ' con ' + ((porGrupo[m.grupo] || 1) - 1)
+      + ' ambiente(s) mas: la lista de equipos se une y no se suma']);
   });
 
   PME_IX[id] = {amb: amb, j: j};
@@ -201,6 +214,13 @@ function pmePane(d, id){
       ${cif(c.dis || 0, 'discrepancias PMF–PMA', 'por resolver')}
     </div>
 
+    ${pmeAvisos(id)}
+    ${pmeFicha(id)}
+    ${pmePmfPma(id)}
+    ${pmeBitacora(id)}
+    ${pmeConsolidado(id)}
+
+    <h5 class="pme-h5">PMF · PMA · NTS, ambiente por ambiente</h5>
     <div class="pme-filtros">
       <input type="search" class="pme-buscar" value="${esc(PMEV.q)}"
         placeholder="Buscar ambiente, código de ambiente o de equipo (M-9, D-140, CES-002…)"
@@ -209,6 +229,10 @@ function pmePane(d, id){
         <option value="">Todas las UPSS / UPS</option>
         ${upss.map(u => `<option value="${esc(u)}" ${PMEV.upss === u ? 'selected' : ''}>${esc(u)}</option>`).join('')}
       </select>
+      ${PMEV.alerta ? `<button type="button" class="ex-btn" onclick="pmeAlerta('${PMEV.alerta}')">
+        Quitar el filtro «${esc(PME_ALERTAS[PMEV.alerta][0])}» ✕</button>` : ''}
+      <button type="button" class="ex-btn" onclick="pmePlegarTodas(true)">Plegar todas</button>
+      <button type="button" class="ex-btn" onclick="pmePlegarTodas(false)">Desplegar todas</button>
       <span class="th-nota" id="pmeCuenta">${pmeFiltradas(id).length} de ${ix.amb.length} ambientes</span>
     </div>
 
@@ -242,6 +266,7 @@ function pmeFiltradas(id){
   return ix.amb.filter(a => {
     const m = a.m;
     if(PMEV.upss && m.upss !== PMEV.upss) return false;
+    if(PMEV.alerta && !a.avisos.some(x => x[0] === PMEV.alerta)) return false;
     if(!q) return true;
     const cab = (m.upss + ' ' + m.amb + ' ' + (m.ambnts || '') + ' ' + (m.cod || '') + ' ' +
                  (m.cods || '') + ' ' + (m.pmf || '') + ' ' + (m.nota || '')).toLowerCase();
@@ -375,4 +400,201 @@ function pmeDetalle(a, j){
     <p class="th-nota">Cada columna lleva la letra que le toca en la hoja
       <b>PI_POR_ESPECILIDAD_F5</b> del LS, para cotejar una contra otra sin traducir nada.</p>
   </div>`;
+}
+
+/* ═══════════════ LO QUE HAY QUE MIRAR ═══════════════
+   Los mismos avisos que la herramienta de fiscalización, y cada uno
+   filtra la tabla. Falta «con observación tuya»: las observaciones
+   viven en el navegador de quien revisa y todavía no se publican. */
+
+const PME_ALERTAS = {
+  unif2:  ['Ambientes unificados', 'comparten ambiente: la lista se une'],
+  unidos: ['Dos ambientes en una línea', 'el PMA junta dos ambientes de la NTS'],
+  dup:    ['Repetido en la norma', 'la NTS trae el renglón dos veces'],
+  pmf:    ['Discrepancia PMF–PMA', 'el PMF y el PMA no dicen lo mismo'],
+  prop:   ['Emparejado por propuesta', 'el ambiente NTS lo elegimos nosotros'],
+  sinnts: ['Sin ambiente en la NTS', 'no se equipa, queda declarado'],
+  unif:   ['Renglones anulados', 'unificación: no se suma, manda la mayor'],
+  cero:   ['No se equipa', 'retirado, sin N.º o funciona en otro']
+};
+
+function pmeAlerta(t){
+  PMEV.alerta = PMEV.alerta === t ? '' : t;
+  PMEV.abierto = null;
+  pmeRepintarTodo();
+}
+
+function pmeAvisos(id){
+  const ix = pmeIdx(id);
+  const c = {};
+  Object.keys(PME_ALERTAS).forEach(t => {
+    c[t] = ix.amb.filter(a => a.avisos.some(x => x[0] === t)).length;
+  });
+  return `
+  <h5 class="pme-h5">Qué hay que mirar</h5>
+  <p class="ex-nota">Un código <b>repetido en la norma</b> sí es un error: la lista de la NTS trae el
+    renglón dos veces y el ambiente termina con el doble. Un renglón <b>anulado por unificación</b> no
+    lo es: es la regla de no sumar. Un <b>OC</b> tampoco: no se metra. Y un código que aparece en muchos
+    ambientes es lo normal; haz clic en él y sale en cuáles.</p>
+  <div class="ex-cifras pme-avb-fila">
+    ${Object.keys(PME_ALERTAS).map(t => `
+      <button type="button" class="ex-cifra pme-avb ${PMEV.alerta === t ? 'act' : ''}
+        ${c[t] && (t === 'dup' || t === 'pmf') ? 'mal' : ''}" onclick="pmeAlerta('${t}')">
+        <b>${esc(nf(c[t]))}</b><span>${esc(PME_ALERTAS[t][0])}</span>
+        <i>${esc(PME_ALERTAS[t][1])}</i>
+      </button>`).join('')}
+  </div>`;
+}
+
+/* ═══════════════ LA FICHA DE UN CÓDIGO ═══════════════
+   En qué ambientes está un equipo y con cuánto en cada uno. Es lo que
+   responde «este código, ¿por qué sale 40 veces?». */
+
+function pmeCod(c){ PMEV.cod = PMEV.cod === c ? '' : c; pmeRepintarTodo(); }
+
+function pmeFicha(id){
+  const cod = PMEV.cod;
+  if(!cod) return '';
+  const ix = pmeIdx(id);
+  const cat = (ix.j.cat || {})[cod] || ['(sin descripción en el catálogo)', '', 'EQ'];
+  const donde = [];
+  ix.amb.forEach(a => {
+    a.ren.forEach(x => {
+      if(x.c !== cod) return;
+      donde.push({a: a, x: x, q: x.ln ? (x.ln.fin || 0) : 0});
+    });
+  });
+  const total = donde.reduce((s, d) => s + d.q, 0);
+  return `<div class="pme-ficha">
+    <div class="pme-ficha-cab">
+      <b>${esc(cod)}</b> ${esc(cat[0])}
+      <span class="th-nota">${esc(cat[2])}${cat[1] ? ' · ' + esc(cat[1]) : ''}</span>
+      <button type="button" class="ex-btn" onclick="pmeCod('${esc(cod)}')">Cerrar ✕</button>
+    </div>
+    <p class="ex-nota">Está en <b>${esc(nf(donde.length))}</b> renglones de la norma, en
+      <b>${esc(nf(new Set(donde.map(d => d.a.i)).size))}</b> ambientes, y suma
+      <b>${esc(nf(total))}</b> unidades en el PME.</p>
+    <table class="ex-tabla pme-tabla pme-tabla-ficha"><thead><tr>
+      <th>Cód. amb.</th><th>Ambiente</th><th>UPSS / UPS</th>
+      <th class="n">Norma</th><th class="n">PME</th><th>Qué pasó</th>
+    </tr></thead><tbody>
+    ${donde.map(d => {
+      const q = PME_QUE_PASO[d.x.est] || ['copiado', 'ok'];
+      return `<tr>
+        <td class="pme-cod">${esc(d.a.m.cods || '')}</td>
+        <td class="pme-amb">${esc(d.a.m.amb || '')}</td>
+        <td class="pme-upss-c">${esc(d.a.m.upss || '')}</td>
+        <td class="n">${esc(nf(d.x.qn || 0))}</td>
+        <td class="n">${esc(nf(d.q))}</td>
+        <td><span class="pme-rep ${q[1]}">${esc(q[0])}</span></td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>`;
+}
+
+/* ═══════════════ EL CONSOLIDADO ═══════════════
+   Todo el equipamiento sumado por código: lo que de verdad se compra. */
+
+function pmeVerRes(){ PMEV.res = !PMEV.res; pmeRepintarTodo(); }
+
+function pmeConsolidado(id){
+  const ix = pmeIdx(id);
+  const ls = ix.j.res || [];
+  if(!ls.length) return '';
+  const tot = ls.reduce((s, r) => s + (r.q || 0), 0);
+  return `<h5 class="pme-h5">Todo el equipamiento, por código
+    <button type="button" class="ex-btn" onclick="pmeVerRes()">
+      ${PMEV.res ? 'Ocultar' : 'Ver los ' + nf(ls.length) + ' códigos'}</button></h5>
+  <p class="ex-nota">Cada código una vez, con lo que suma en todo el establecimiento y en cuántos
+    ambientes aparece. Son <b>${esc(nf(ls.length))}</b> códigos y <b>${esc(nf(tot))}</b> unidades.</p>
+  ${PMEV.res ? `<div class="pme-wrap-2"><table class="ex-tabla pme-tabla"><thead><tr>
+    <th>Código</th><th>Descripción</th><th>Tipo</th><th>EQ/OC</th>
+    <th class="n">Unid.</th><th class="n">Ambientes</th><th>Norma</th>
+  </tr></thead><tbody>
+  ${ls.map(r => `<tr>
+    <td class="pme-cod"><button type="button" class="pme-cod-b"
+      onclick="pmeCod('${esc(r.c)}')">${esc(r.c)}</button></td>
+    <td>${esc(r.d || '')}</td><td>${esc(r.t || '')}</td><td>${esc(r.p || '')}</td>
+    <td class="n">${esc(nf(r.q || 0))}</td><td class="n">${esc(nf(r.amb || 0))}</td>
+    <td>${esc((r.normas || []).join(' · '))}</td>
+  </tr>`).join('')}
+  </tbody></table></div>` : ''}`;
+}
+
+/* ═══════════════ LA BITÁCORA ═══════════════
+   Por qué cada ambiente quedó emparejado como quedó. Es el rastro de la
+   auditoría: quién lo decidió, qué decidió y en qué ambiente. */
+
+function pmeVerLog(){ PMEV.log = !PMEV.log; pmeRepintarTodo(); }
+
+function pmeBitacora(id){
+  const ls = (pmeIdx(id).j.log) || [];
+  if(!ls.length) return '';
+  return `<h5 class="pme-h5">Bitácora del emparejamiento
+    <button type="button" class="ex-btn" onclick="pmeVerLog()">
+      ${PMEV.log ? 'Ocultar' : 'Ver las ' + nf(ls.length) + ' entradas'}</button></h5>
+  <p class="ex-nota">Cada decisión que se tomó al emparejar el PMA con la NTS, con su porqué. Lo que
+    no sale aquí es porque vino heredado del PMA visado sin cambio.</p>
+  ${PMEV.log ? `<div class="pme-wrap-2"><table class="ex-tabla pme-tabla pme-log"><thead><tr>
+    <th>Dónde</th><th>Qué se decidió</th><th>Quién</th>
+  </tr></thead><tbody>
+  ${ls.map(r => `<tr>
+    <td class="pme-amb">${esc(r.where || '')}</td>
+    <td>${esc(r.what || '')}</td>
+    <td class="pme-quien">${esc(r.who || '')}</td>
+  </tr>`).join('')}
+  </tbody></table></div>` : ''}`;
+}
+
+function pmePlegarTodas(plegar){
+  const ix = pmeIdx(pmeId());
+  PMEV.plegadas = {};
+  if(plegar) ix.amb.forEach(a => { PMEV.plegadas[a.m.upss] = true; });
+  PMEV.abierto = null;
+  pmeRepintar();
+}
+
+/* Al tocar un filtro o abrir una ficha cambia toda la pestaña, no sólo
+   la tabla: los cuadros tienen que marcarse y la ficha aparecer. */
+function pmeRepintarTodo(){
+  const id = pmeId();
+  const p = document.querySelector('.pme-pane');
+  if(id && p) p.outerHTML = pmePane(null, id);
+}
+
+/* ═══════════════ PMF CONTRA PMA ═══════════════
+   El PMF tiene que estar contenido en el PMA. Lo que no cuadra no cuelga
+   de ningún ambiente —justamente porque no lo encontró— así que va en su
+   propio bloque: si no, las discrepancias se cuentan arriba y no están
+   en ninguna parte. */
+
+function pmeVerPmf(){ PMEV.pmf = !PMEV.pmf; pmeRepintarTodo(); }
+
+function pmePmfPma(id){
+  const ls = (pmeIdx(id).j.pmf) || [];
+  const mal = ls.filter(p => p.res !== 'Compatible');
+  if(!ls.length) return '';
+  const dis = mal.filter(p => p.res === 'Discrepancia').length;
+  return `<h5 class="pme-h5">El PMF dentro del PMA
+    <button type="button" class="ex-btn" onclick="pmeVerPmf()">
+      ${PMEV.pmf ? 'Ocultar' : 'Ver los ' + nf(mal.length) + ' que no cuadran'}</button></h5>
+  <p class="ex-nota">De los <b>${esc(nf(ls.length))}</b> renglones del PMF,
+    <b>${esc(nf(ls.length - mal.length))}</b> casan con el PMA.
+    Quedan <b>${esc(nf(dis))}</b> ${dis === 1 ? 'discrepancia' : 'discrepancias'} y
+    <b>${esc(nf(mal.length - dis))}</b> por validar: el PMA no trae códigos, así que esos se
+    emparejaron por nombre y hay que confirmarlos.</p>
+  ${PMEV.pmf && mal.length ? `<div class="pme-wrap-2"><table class="ex-tabla pme-tabla pme-log"><thead><tr>
+    <th>Cód. PMF</th><th>Ambiente (PMF)</th><th class="n">Pág.</th>
+    <th>En el PMA</th><th>Estado</th><th>Qué pasa</th>
+  </tr></thead><tbody>
+  ${mal.map(p => `<tr>
+    <td class="pme-cod">${esc(p.cod || '')}</td>
+    <td class="pme-amb">${esc(p.amb || '')}</td>
+    <td class="n">${esc(String(p.pag == null ? '' : p.pag))}</td>
+    <td class="pme-amb">${esc(p.pma || '')}</td>
+    <td><span class="pme-rep ${p.res === 'Discrepancia' ? 'mal' : 'unif'}">${esc(p.res || '')}</span></td>
+    <td>${esc(p.det || '')}</td>
+  </tr>`).join('')}
+  </tbody></table></div>` : ''}`;
 }
