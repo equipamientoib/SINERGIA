@@ -106,12 +106,21 @@ function pmeIdx(id){
 
   amb.forEach(a => {
     const m = a.m;
-    a.ren = pmeRenglones(a, j);
-    a.unid = a.ls.reduce((s, r) => s + (r.fin || 0), 0);
+    a.ren = pmeRenglones(a, j, id);
+    a.unid = a.ren.reduce((s, x) => s + (x.p === 'OC' ? 0 : x.q), 0);
+    a.react = a.ren.filter(x => x.est === 'react').length;
     a.oc = a.ren.filter(x => x.p === 'OC').length;
     a.anul = a.ren.filter(x => x.est === 'anul').length;
     a.cero = a.ren.filter(x => x.est === 'cero').length;
     a.avisos = [];
+    const oAmb = pmeRev(id).obs[m.cods || ''];
+    const oRen = a.ren.filter(x => pmeRev(id).obsr[(m.cods || '') + '|' + x.c + '|' + x.j]).length;
+    if(oAmb || oRen) a.avisos.push(['obs', 'Con observación tuya',
+      (oAmb ? 'Tienes puesta una observación' : 'Tienes observaciones')
+      + (oRen ? ' y ' + oRen + ' en renglones' : '') + ' en este ambiente']);
+    if(a.react) a.avisos.push(['react', 'Reactivado por ti',
+      a.react + (a.react === 1 ? ' renglón que la unificación había anulado y volviste a meter'
+                               : ' renglones que la unificación había anulado y volviste a meter')]);
     if(a.nts && (a.nts.partes || []).length > 1){
       a.avisos.push(['unidos', 'Dos ambientes en una línea',
         'El PMA junta dos ambientes de la norma en esta línea: se equipa con las dos listas, y de los '
@@ -144,11 +153,18 @@ function pmeIdx(id){
 /* Los renglones de la norma del ambiente, en el orden de la norma, cada
    uno con su línea del PME y qué pasó con él. Las líneas del PME salen
    de la norma y en su mismo orden, así que se recorren a la vez. */
-function pmeRenglones(a, j){
+function pmeRenglones(a, j, id){
   const out = [];
   if(!a.nts) return out;
   const libres = a.ls.slice();
   const vistos = {};
+  /* La llave de una cantidad corregida es CÓDIGO DE AMBIENTE | código |
+     la vez que ese código se repite dentro del ambiente, la misma que
+     usa la herramienta local. Nada de índices: así lo corregido sigue
+     en su sitio cuando la base se vuelve a generar. */
+  const veces = {};
+  const cods = a.m.cods || '';
+  const rev = pmeRev(id);
   a.nts.eq.forEach((par, k) => {
     const cod = par[0], qn = par[1], ip = par[2] || 0, unido = par[3] === 1;
     const c = (j.cat || {})[cod] || ['(sin descripción en el catálogo)', '', 'EQ'];
@@ -161,18 +177,34 @@ function pmeRenglones(a, j){
       const n = libres.findIndex(r => r.c === cod);
       if(n >= 0) ln = libres.splice(n, 1)[0];
     }
+
+    /* Cuánto vale hoy este renglón: lo que trae el dato publicado, o lo
+       que corregiste al fiscalizar. El anulado no tiene línea, pero si
+       lo reactivaste entra con tu cantidad. */
+    let kq = '', q = 0, tocada = false;
+    const kf = cods + '|' + cod + '|u' + (k + 1);
+    if(unido && p !== 'OC'){
+      q = Math.max(0, Number(rev.forz[kf]) || 0);
+    }else if(ln){
+      veces[cod] = (veces[cod] || 0) + 1;
+      kq = cods + '|' + cod + '|' + veces[cod];
+      q = pmeQRev(id, kq, ln.fin || 0);
+      tocada = q !== (ln.fin || 0);
+    }
+
     let est = 'ok';
     if(p === 'OC') est = 'oc';
-    else if(unido) est = 'anul';
+    else if(unido) est = q > 0 ? 'react' : 'anul';
     else if(!ln) est = 'falta';
-    else if((ln.fin || 0) === 0) est = 'cero';
+    else if(q === 0) est = 'cero';
     /* El rojo es para la segunda aparición en adelante: el primer
        renglón es legítimo, el que sobra es el repetido. */
     if(p !== 'OC' && !unido && vistos[kv] > 1) est = 'dup';
 
     const parte = (a.nts.partes || [])[ip] || null;
     out.push({j: k + 1, c: cod, d: c[0], t: c[1], p: p, qn: qn, ln: ln, est: est,
-              ip: ip, parte: parte, norma: parte ? parte.n : a.nts.n});
+              ip: ip, parte: parte, norma: parte ? parte.n : a.nts.n,
+              kq: kq, kf: kf, q: q, tocada: tocada, unido: unido, vez: vistos[kv]});
   });
   return out;
 }
@@ -214,6 +246,7 @@ function pmePane(d, id){
       ${cif(c.dis || 0, 'discrepancias PMF–PMA', 'por resolver')}
     </div>
 
+    ${pmeBarraEdicion(id)}
     ${pmeAvisos(id)}
     ${pmeFicha(id)}
     ${pmePmfPma(id)}
@@ -374,9 +407,18 @@ function pmeDetalle(a, j){
       <td class="n">${nf(x.qn)}</td>
       <td>${esc(x.t)}</td>
       <td>${esc(x.p)}</td>
-      <td class="n">${x.ln ? nf(x.ln.fin || 0) : '—'}</td>
-      <td><span class="pme-rep ${et[1]}">${esc(et[0])}</span></td>
-    </tr>`;
+      <td class="n pme-q">${pmeCeldaQ(a, x)}</td>
+      <td><span class="pme-rep ${et[1]}">${esc(et[0])}${
+          x.est === 'dup' ? ' · ' + x.vez + '.º renglón' : ''}</span>
+        ${x.est === 'react' ? '<small>lo anuló la unificación y lo volviste a meter: entra como línea aparte</small>' : ''}
+        ${PME_EDITA ? `<button type="button" class="pme-lapiz ${oRen(a, x) ? 'puesta' : ''}
+          ${oRen(a, x) && oRen(a, x).mal ? 'mal' : ''}" title="Observar este renglón"
+          onclick="pmeAbrirObsRen(${a.i}, ${x.j})">✎</button>` : ''}</td>
+    </tr>${PME_EDITA ? `
+    <tr class="pme-obsr ${oRen(a, x) ? 'abierta' : ''}" id="pme-obsr-${a.i}-${x.j}">
+      <td colspan="9">${pmeCajaObs((a.m.cods || '') + '|' + x.c + '|' + x.j, true,
+        'Observación sobre el renglón ' + x.j + ' · ' + x.c)}</td>
+    </tr>` : ''}`;
   }).join('');
 
   return `<div class="pme-caja">
@@ -403,6 +445,7 @@ function pmeDetalle(a, j){
       </tr></thead>
       <tbody>${filas}</tbody>
     </table>
+    ${PME_EDITA ? pmeCajaObs(m.cods || '', false, 'Tu observación sobre este ambiente') : ''}
     <p class="th-nota">Cada columna lleva la letra que le toca en la hoja
       <b>PI_POR_ESPECILIDAD_F5</b> del LS, para cotejar una contra otra sin traducir nada.</p>
   </div>`;
@@ -414,6 +457,8 @@ function pmeDetalle(a, j){
    viven en el navegador de quien revisa y todavía no se publican. */
 
 const PME_ALERTAS = {
+  obs:    ['Con observación tuya', 'lo que marcaste al fiscalizar'],
+  react:  ['Reactivado por ti', 'la unificación lo anuló y lo volviste a meter'],
   unif2:  ['Ambientes unificados', 'comparten ambiente: la lista se une'],
   unidos: ['Dos ambientes en una línea', 'el PMA junta dos ambientes de la NTS'],
   dup:    ['Repetido en la norma', 'la NTS trae el renglón dos veces'],
@@ -932,4 +977,265 @@ function pmeFuentes(a, j){
         ? ' · NTS ' + esc(n.n) + ' hoja ' + esc(n.hoja) + ' filas ' + esc(n.f0) + '–' + esc(n.f1)
         : (n ? ' · NTS ' + esc(n.n) : ' · sin ambiente en la NTS')}</span>
   </div>`;
+}
+
+/* La observación puesta sobre un renglón, si la hay. */
+function oRen(a, x){
+  return pmeRev(pmeId()).obsr[(a.m.cods || '') + '|' + x.c + '|' + x.j];
+}
+
+/* La celda de la cantidad. Mirando, el número a secas; revisando, el
+   − N + que la corrige. Un renglón anulado por unificación no tiene
+   línea, pero se puede reactivar: el + le da la primera unidad y el −
+   lo devuelve a anulado cuando llega a cero. */
+function pmeCeldaQ(a, x){
+  if(x.p === 'OC') return '—';
+  if(!PME_EDITA) return x.ln || x.est === 'react' ? nf(x.q) : '—';
+  if(x.unido){
+    return `<button type="button" class="pme-mas" title="Una menos"
+        onclick="pmeForzar('${esc(a.m.cods || '')}', '${esc(x.c)}', ${x.j}, -1)"
+        ${x.q <= 0 ? 'disabled' : ''}>−</button>
+      <b class="${x.q > 0 ? 'tocada' : ''}">${nf(x.q)}</b>
+      <button type="button" class="pme-mas" title="Reactivarlo: entra al PME con esta cantidad"
+        onclick="pmeForzar('${esc(a.m.cods || '')}', '${esc(x.c)}', ${x.j}, 1)">+</button>`;
+  }
+  if(!x.ln) return '—';
+  return `<button type="button" class="pme-mas" title="Una menos"
+      onclick="pmeSumar('${esc(x.kq)}', -1, ${x.ln.fin || 0})" ${x.q <= 0 ? 'disabled' : ''}>−</button>
+    <b class="${x.tocada ? 'tocada' : ''}">${nf(x.q)}</b>
+    <button type="button" class="pme-mas" title="Una más"
+      onclick="pmeSumar('${esc(x.kq)}', 1, ${x.ln.fin || 0})">+</button>`;
+}
+
+/* ═══════════════ FISCALIZAR DESDE LA WEB ═══════════════
+   Mirar no basta: fiscalizar es poder decir «aquí van dos, no una» y
+   «esto está mal» en el sitio exacto donde se ve.
+
+   Lo que se corrige NO se guarda en el dato publicado: se guarda en el
+   navegador de quien revisa, con el MISMO formato que la herramienta
+   local —{v:2, q, obs, obsr, extra, forz}—, para que el .json que sale
+   de aquí lo abra la herramienta y al revés. De ahí sale el LS.
+
+   El cliente entra a mirar; editar pide una segunda clave que sólo
+   tiene quien revisa. Esto no es seguridad de verdad —el dato ya está
+   en el navegador de quien abre el expediente— sino el pestillo que
+   evita que el cliente cambie el metrado sin querer. Lo que de verdad
+   manda es que nada de esto sube a ninguna parte sin el token del
+   Apps Script. */
+
+const PME_EDITOR_HASH = 'c89777de734d31056d393ee4a77f00230c1d3b402c290fd26eef9a7554327621';
+let PME_EDITA = false;
+const PME_REV = {};              // la revisión de cada expediente
+
+function pmeRevLs(id){ return 'pme-rev-' + id; }
+
+function pmeRev(id){
+  if(PME_REV[id]) return PME_REV[id];
+  let d = null;
+  try{ d = JSON.parse(localStorage.getItem(pmeRevLs(id)) || 'null'); }catch(e){}
+  PME_REV[id] = {
+    v: 2,
+    q: (d && d.q) || {}, obs: (d && d.obs) || {}, obsr: (d && d.obsr) || {},
+    extra: (d && d.extra) || [], forz: (d && d.forz) || {}
+  };
+  return PME_REV[id];
+}
+
+function pmeGuardarRev(id){
+  try{ localStorage.setItem(pmeRevLs(id), JSON.stringify(pmeRev(id))); }catch(e){}
+  PME_IX[id] = null;             // los totales cambian: el índice se rehace
+  pmeRepintarTodo();
+}
+
+function pmeCuantasTocadas(id){
+  const r = pmeRev(id);
+  return Object.keys(r.q).length + Object.keys(r.forz).length;
+}
+function pmeCuantasObs(id){
+  const r = pmeRev(id);
+  return Object.keys(r.obs).length + Object.keys(r.obsr).length;
+}
+
+/* ── El pestillo ── */
+
+async function pmeAbrirEdicion(){
+  const i = document.getElementById('pmeClaveEd');
+  const v = (i && i.value || '').trim();
+  const aviso = document.getElementById('pmeEdMal');
+  if(!v) return;
+  let h = '';
+  try{
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+    h = [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+  }catch(e){}
+  if(h !== PME_EDITOR_HASH){
+    if(aviso) aviso.textContent = 'Esa clave no abre el modo revisión.';
+    return;
+  }
+  PME_EDITA = true;
+  try{ sessionStorage.setItem('pme-edita', '1'); }catch(e){}
+  pmeRepintarTodo();
+}
+function pmeCerrarEdicion(){
+  PME_EDITA = false;
+  try{ sessionStorage.removeItem('pme-edita'); }catch(e){}
+  pmeRepintarTodo();
+}
+try{ PME_EDITA = sessionStorage.getItem('pme-edita') === '1'; }catch(e){}
+
+function pmeBarraEdicion(id){
+  if(!PME_EDITA){
+    return `<div class="pme-edbarra">
+      <span class="th-nota">Estás mirando el PME. Para corregir cantidades y dejar
+        observaciones hace falta la clave de revisión.</span>
+      <input type="password" id="pmeClaveEd" placeholder="Clave de revisión"
+        onkeydown="if(event.key==='Enter')pmeAbrirEdicion()">
+      <button type="button" class="ex-btn" onclick="pmeAbrirEdicion()">Entrar a revisar</button>
+      <span class="pme-edmal" id="pmeEdMal"></span>
+    </div>`;
+  }
+  const t = pmeCuantasTocadas(id), o = pmeCuantasObs(id);
+  return `<div class="pme-edbarra act">
+    <b>Modo revisión</b>
+    <span class="th-nota">${t ? nf(t) + (t === 1 ? ' cantidad corregida' : ' cantidades corregidas') : 'sin cantidades corregidas'}
+      · ${o ? nf(o) + (o === 1 ? ' observación' : ' observaciones') : 'sin observaciones'}
+      · se guarda en este navegador</span>
+    <button type="button" class="ex-btn" onclick="pmeBajarJson()">Guardar .json</button>
+    <button type="button" class="ex-btn" onclick="pmeCargarJsonPide()">Cargar .json</button>
+    <input type="file" id="pmeJsonEnt" accept=".json" style="display:none"
+      onchange="pmeCargarJson(this)">
+    <button type="button" class="ex-btn" onclick="pmeOlvidarRev()">Descartar</button>
+    <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">Salir ✕</button>
+  </div>`;
+}
+
+/* ── Las cantidades ──
+   La llave es CÓDIGO DE AMBIENTE | código de equipo | la vez que ese
+   código se repite dentro del ambiente. Nada de índices: así lo que
+   corriges sigue en su sitio cuando la base se vuelve a generar. */
+
+function pmeQRev(id, kq, fin){
+  const v = pmeRev(id).q[kq];
+  if(v === undefined || v === null || v === '') return fin || 0;
+  const q = Math.trunc(Number(v));
+  return Number.isFinite(q) ? Math.max(0, q) : (fin || 0);
+}
+
+function pmeSumar(kq, d, fin){
+  const id = pmeId();
+  const r = pmeRev(id);
+  const q = Math.max(0, pmeQRev(id, kq, fin) + d);
+  if(q === (fin || 0)) delete r.q[kq]; else r.q[kq] = q;
+  pmeGuardarRev(id);
+}
+
+/* El renglón que la unificación anuló no tiene línea, pero se puede
+   reactivar: el + le da la primera unidad y el − lo devuelve a anulado
+   cuando llega a cero. */
+function pmeForzar(cods, cod, j, d){
+  const id = pmeId();
+  const r = pmeRev(id);
+  const k = cods + '|' + cod + '|u' + j;
+  const q = Math.max(0, (Number(r.forz[k]) || 0) + d);
+  if(q <= 0) delete r.forz[k]; else r.forz[k] = q;
+  pmeGuardarRev(id);
+}
+
+/* ── Las observaciones ──
+   Dos niveles, porque los reparos son de dos clases: sobre el AMBIENTE
+   («este ambiente no corresponde») y sobre un RENGLÓN de la norma
+   («esta cantidad está mal»). Cada uno lleva texto y una marca de «está
+   mal», que no es lo mismo que una anotación al margen. */
+
+function pmeObsLee(id, k, ren){
+  return (ren ? pmeRev(id).obsr : pmeRev(id).obs)[k] || {};
+}
+
+function pmePonerObs(k, ren, campo, valor){
+  const id = pmeId();
+  const r = pmeRev(id);
+  const d = ren ? r.obsr : r.obs;
+  const o = Object.assign({}, d[k]);
+  o[campo] = valor;
+  if(!(o.t || '').trim() && !o.mal) delete d[k]; else d[k] = o;
+  try{ localStorage.setItem(pmeRevLs(id), JSON.stringify(r)); }catch(e){}
+  /* No se repinta al teclear: se perdería el cursor. El recuento de la
+     barra se pone al día al cerrar la caja. */
+}
+
+function pmeAbrirObsRen(ia, j){
+  const fila = document.getElementById('pme-obsr-' + ia + '-' + j);
+  if(!fila) return;
+  fila.classList.toggle('abierta');
+  const t = fila.querySelector('textarea');
+  if(fila.classList.contains('abierta') && t) t.focus();
+}
+
+function pmeCajaObs(k, ren, titulo){
+  const id = pmeId();
+  const o = pmeObsLee(id, k, ren);
+  return `<div class="pme-obs">
+    <label class="pme-obs-t">${esc(titulo)}</label>
+    <textarea rows="2" placeholder="Qué has visto y por qué lo observas"
+      oninput="pmePonerObs('${esc(k)}', ${ren ? 'true' : 'false'}, 't', this.value)"
+      onchange="pmeRepintarBarra()">${esc(o.t || '')}</textarea>
+    <label class="pme-obs-mal">
+      <input type="checkbox" ${o.mal ? 'checked' : ''}
+        onchange="pmePonerObs('${esc(k)}', ${ren ? 'true' : 'false'}, 'mal', this.checked); pmeRepintarBarra()">
+      Esto está mal y hay que corregirlo en el origen</label>
+  </div>`;
+}
+
+/* Sólo la barra, para no perder el cursor mientras se escribe. */
+function pmeRepintarBarra(){
+  const id = pmeId();
+  const b = document.querySelector('.pme-edbarra');
+  if(id && b) b.outerHTML = pmeBarraEdicion(id);
+}
+
+/* ── Llevarse la revisión, y traerla ── */
+
+function pmeBajarJson(){
+  const id = pmeId();
+  const r = pmeRev(id);
+  const txt = JSON.stringify(Object.assign({}, r, {
+    _que: 'Revisión del PME — se abre con la herramienta de armado',
+    _cuando: new Date().toISOString()
+  }), null, 1);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type: 'application/json'}));
+  a.download = 'revision-' + id + '-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+function pmeCargarJsonPide(){
+  const i = document.getElementById('pmeJsonEnt');
+  if(i) i.click();
+}
+
+function pmeCargarJson(input){
+  const f = input.files && input.files[0];
+  if(!f) return;
+  const id = pmeId();
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const o = JSON.parse(fr.result);
+      PME_REV[id] = {v: 2, q: o.q || {}, obs: o.obs || {}, obsr: o.obsr || {},
+                     extra: o.extra || [], forz: o.forz || {}};
+      pmeGuardarRev(id);
+    }catch(e){ alert('Ese archivo no se pudo leer como revisión del PME.'); }
+    input.value = '';
+  };
+  fr.readAsText(f);
+}
+
+function pmeOlvidarRev(){
+  if(!confirm('Se borran las cantidades corregidas y las observaciones de este navegador. '
+    + '¿Seguro? Si quieres conservarlas, guarda antes el .json.')) return;
+  const id = pmeId();
+  PME_REV[id] = {v: 2, q: {}, obs: {}, obsr: {}, extra: [], forz: {}};
+  try{ localStorage.removeItem(pmeRevLs(id)); }catch(e){}
+  pmeGuardarRev(id);
 }
