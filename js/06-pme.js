@@ -1034,7 +1034,7 @@ function pmeCeldaQ(a, x){
    manda es que nada de esto sube a ninguna parte sin el token del
    Apps Script. */
 
-const PME_EDITOR_HASH = 'c89777de734d31056d393ee4a77f00230c1d3b402c290fd26eef9a7554327621';
+const PME_EDITOR_HASH = '3d79d06ba1fdbdd4f003219bd9ce5ca15f4dcd4bbb4074f3f78d50acaed88605';
 /* Dónde vive la herramienta de armado de cada expediente. Es la carpeta
    0. PME publicada tal cual; sin entrada aquí, la pestaña se queda en
    la vista de lectura. */
