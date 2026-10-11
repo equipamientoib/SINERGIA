@@ -341,7 +341,12 @@ function pmeAmbPmf(j, cod){
 function pmeDetalle(a, j){
   const m = a.m;
   if(!a.nts){
-    return `<div class="pme-caja"><p class="pme-no"><b>Este ambiente no tiene lista de norma.</b>
+    /* Sin lista de norma no hay nada que equipar, pero el ambiente sí
+       está en el PMA: cotejarlo contra su página es justamente lo que
+       hay que hacer para ver por qué no tiene equivalente. */
+    return `<div class="pme-caja">
+      ${pmeFuentes(a, j)}
+      <p class="pme-no"><b>Este ambiente no tiene lista de norma.</b>
       No se encontró equivalente en la NTS 113, la 110 ni la 119${m.nota ? ' — ' + esc(m.nota) : ''}.
       No se equipa, pero queda en el PME para que se vea que se miró y no que se olvidó.</p></div>`;
   }
@@ -375,6 +380,7 @@ function pmeDetalle(a, j){
   }).join('');
 
   return `<div class="pme-caja">
+    ${pmeFuentes(a, j)}
     <p class="pme-cab">
       <span class="pme-cod-amb">${esc(m.cods || '')}</span>
       <b>${partes.length > 1
@@ -597,4 +603,333 @@ function pmePmfPma(id){
     <td>${esc(p.det || '')}</td>
   </tr>`).join('')}
   </tbody></table></div>` : ''}`;
+}
+
+/* ═══════════════ EL CAJÓN DE COTEJO ═══════════════
+   Auditar es cotejar contra el papel. Estos paneles abren el PMF y el
+   PMA en la página exacta de la que salió la fila, y la hoja de la NTS
+   en las filas exactas de las que salió la lista de equipos.
+
+   El cajón vive fuera del panel y sólo se vuelve a armar cuando cambia
+   el ambiente que se cotejea: si se repintara con la pestaña, cada clic
+   en un filtro recargaría los dos PDF, que tardan. */
+
+const PME_DOCS = {
+  /* Cada página va en su propio archivo: el visor del navegador ignora
+     el «#page=N» dentro de un iframe y enseña siempre la primera. */
+  pmf: {nom: 'Programa Médico Funcional compartido', pags: 2,
+        pag: n => 'data/pachas/paginas/pmf-' + n + '.pdf',
+        abrir: n => 'data/pachas/PMF-visado.pdf#page=' + n},
+  pma: {nom: 'Programa Médico Arquitectónico compartido', pags: 4,
+        pag: n => 'data/pachas/paginas/pma-' + n + '.pdf',
+        abrir: n => 'data/pachas/PMA-visado.pdf#page=' + n},
+  xls: {src: 'data/pachas/NTS_MINSA_113_110_119.xlsx',
+        nom: 'Excel de normas NTS 113 / 110 / 119'}
+};
+/* Sin la barra del visor —son 56 px que aquí no sobran— y la página
+   entera a la vista, igual que en la herramienta local. Con «FitH» se
+   vería más grande, pero el visor del navegador deja el panel en negro
+   hasta que se desplaza: la hoja entera y el botón ⤢ para agrandarla
+   son más de fiar. */
+const PME_VISOR = '#toolbar=0&navpanes=0&view=Fit';
+
+let PME_COTEJO = null;        // qué ambiente se está cotejando
+let PME_CAJON_PUESTO = null;  // el que ya está armado en pantalla
+let PME_LIBRO = null;         // el Excel de normas, leído una sola vez
+let PME_XLSX = null;
+
+function pmeCotejar(i){ PME_COTEJO = i; pmePintarCajon(); pmeRepintar(); }
+function pmeCerrarCotejo(){ PME_COTEJO = null; pmePintarCajon(); pmeRepintar(); }
+
+function pmePintarCajon(){
+  let sitio = document.getElementById('pmeCajon');
+  /* Fuera de la pestaña del PME no hay nada que cotejar: si el panel ya
+     no está en pantalla, el cajón se va con él. */
+  if(!document.querySelector('.pme-pane')) PME_COTEJO = null;
+  if(PME_COTEJO === null){
+    if(sitio) sitio.remove();
+    document.body.classList.remove('con-cajon');
+    PME_CAJON_PUESTO = null;
+    return;
+  }
+  if(!sitio){
+    sitio = document.createElement('div');
+    sitio.id = 'pmeCajon';
+    document.body.appendChild(sitio);
+  }
+  document.body.classList.add('con-cajon');
+  pmeAnchoCajon();
+  if(PME_CAJON_PUESTO === PME_COTEJO) return;
+  PME_CAJON_PUESTO = PME_COTEJO;
+  sitio.innerHTML = pmeCajon();
+  pmeCargarLibro();
+}
+
+/* El cajón no tapa la página: la empuja. Al <body> se le pone un hueco
+   a la derecha del ancho del cajón, así la tabla se corre y se siguen
+   viendo las dos cosas, que es de lo que va auditar. */
+const PME_ANCHO_LS = 'pme-cajon-ancho';
+
+function pmeAnchoCajon(){
+  let g = 0;
+  try{ g = Number(localStorage.getItem(PME_ANCHO_LS)) || 0; }catch(e){}
+  /* Si la ventana todavía no está medida, innerWidth vale 0 y el cajón
+     se quedaba en 0 px sin volver a abrirse nunca. Un ancho de respaldo
+     y un tope que nunca baja del mínimo lo evitan. */
+  const w = innerWidth || 1280;
+  const a = Math.min(Math.max(g || Math.round(w * 0.52), 420),
+                     Math.max(Math.round(w * 0.8), 420));
+  document.documentElement.style.setProperty('--pme-cajon', a + 'px');
+}
+
+/* Al cambiar el tamaño de la ventana el cajón se recalcula: si se abrió
+   estrecho, deja de estarlo en cuanto hay sitio. */
+addEventListener('resize', () => { if(PME_COTEJO !== null) pmeAnchoCajon(); });
+
+function pmeTirar(ev){
+  ev.preventDefault();
+  const mover = e => {
+    const x = (e.touches ? e.touches[0] : e).clientX;
+    const a = Math.min(Math.max(innerWidth - x, 420), Math.round(innerWidth * 0.8));
+    document.documentElement.style.setProperty('--pme-cajon', a + 'px');
+    try{ localStorage.setItem(PME_ANCHO_LS, a); }catch(e2){}
+  };
+  const soltar = () => {
+    removeEventListener('mousemove', mover); removeEventListener('mouseup', soltar);
+    removeEventListener('touchmove', mover); removeEventListener('touchend', soltar);
+  };
+  addEventListener('mousemove', mover); addEventListener('mouseup', soltar);
+  addEventListener('touchmove', mover, {passive: false}); addEventListener('touchend', soltar);
+}
+
+function pmeCajon(){
+  const ix = pmeIdx(pmeId());
+  const a = ix.amb[PME_COTEJO];
+  if(!a) return '';
+  const m = a.m;
+  const p = (ix.j.pmf || []).find(x => x.cod === m.pmf);
+  return `<div class="pme-cajon">
+    <div class="pme-tirador" onmousedown="pmeTirar(event)" ontouchstart="pmeTirar(event)"
+      title="Arrastra para darle más o menos sitio"></div>
+    <div class="pme-cajon-h">
+      <div><b>Cotejo del ambiente</b><span>${esc(m.amb || '')} · ${esc(m.upss || '')}</span></div>
+      <button type="button" class="ex-btn" onclick="pmeCerrarCotejo()">Cerrar ✕</button>
+    </div>
+    <div class="pme-cajon-c">
+      ${pmePanelPdf('pmf', p ? p.pag : null,
+        p ? esc(p.cod || '') + ' · ' + esc(p.amb || '') : 'Este ambiente no está en el PMF')}
+      ${pmePanelPdf('pma', m.pag, esc(m.amb || ''))}
+      ${pmePanelNts(a)}
+    </div>
+  </div>`;
+}
+
+function pmePanelPdf(doc, pag, sub){
+  const t = PME_DOCS[doc];
+  if(!pag){
+    return `<section class="pme-pan plegado" id="fuente-${doc}">
+      <header><button type="button" class="pme-pan-t" onclick="pmePlegarPanel('${doc}')">
+        <i>+</i><b>${esc(t.nom)}</b><span>${sub}</span></button></header></section>`;
+  }
+  return `<section class="pme-pan" id="fuente-${doc}" data-pag="${pag}">
+    <header>
+      <button type="button" class="pme-pan-t" onclick="pmePlegarPanel('${doc}')">
+        <i>−</i><b>${esc(t.nom)}</b><span>${sub}</span></button>
+      <div class="pme-pan-nav">
+        <button type="button" class="ex-btn" title="Dejar sólo éste grande"
+          onclick="pmeSoloEste('${doc}')">⤢</button>
+        <button type="button" class="ex-btn" title="Volver a cargar la página"
+          onclick="pmeRecargarDoc('${doc}')">↻</button>
+        <button type="button" class="ex-btn pme-ant" ${pag <= 1 ? 'disabled' : ''}
+          onclick="pmeDocPag('${doc}', -1)">‹</button>
+        <span class="pme-pan-p">pág. <b>${pag}</b> de ${t.pags}</span>
+        <button type="button" class="ex-btn pme-sig" ${pag >= t.pags ? 'disabled' : ''}
+          onclick="pmeDocPag('${doc}', 1)">›</button>
+        <a class="ex-btn" href="${t.abrir(pag)}" target="_blank" rel="noopener">Aparte</a>
+      </div>
+    </header>
+    <div class="pme-pan-v"><iframe src="${t.pag(pag) + PME_VISOR}"
+      title="${esc(t.nom)} — página ${pag}"></iframe></div>
+  </section>`;
+}
+
+function pmePlegarPanel(doc){
+  const s = document.getElementById('fuente-' + doc);
+  if(!s) return;
+  s.classList.toggle('plegado');
+  const i = s.querySelector('.pme-pan-t i');
+  if(i) i.textContent = s.classList.contains('plegado') ? '+' : '−';
+}
+
+/* Dejar uno grande: pliega los otros dos. Volver a pulsarlo los abre. */
+function pmeSoloEste(doc){
+  const otros = ['pmf', 'pma', 'xls'].filter(d => d !== doc);
+  const cerrados = otros.every(d => {
+    const s = document.getElementById('fuente-' + d);
+    return !s || s.classList.contains('plegado');
+  });
+  otros.forEach(d => {
+    const s = document.getElementById('fuente-' + d);
+    if(!s) return;
+    s.classList.toggle('plegado', !cerrados);
+    const i = s.querySelector('.pme-pan-t i');
+    if(i) i.textContent = s.classList.contains('plegado') ? '+' : '−';
+  });
+}
+
+function pmeRecargarDoc(doc){
+  const s = document.getElementById('fuente-' + doc);
+  const f = s && s.querySelector('iframe');
+  if(f) f.src = f.src;
+}
+
+function pmeDocPag(doc, d){
+  const s = document.getElementById('fuente-' + doc);
+  if(!s) return;
+  const t = PME_DOCS[doc];
+  const pag = Math.min(t.pags, Math.max(1, (Number(s.dataset.pag) || 1) + d));
+  s.dataset.pag = pag;
+  s.querySelector('iframe').src = t.pag(pag) + PME_VISOR;
+  const b = s.querySelector('.pme-pan-p b');
+  if(b) b.textContent = pag;
+  const ant = s.querySelector('.pme-ant'), sig = s.querySelector('.pme-sig');
+  if(ant) ant.disabled = pag <= 1;
+  if(sig) sig.disabled = pag >= t.pags;
+  const a = s.querySelector('.pme-pan-nav a');
+  if(a) a.href = t.abrir(pag);
+}
+
+/* ── La hoja de la NTS, tal cual ──
+   Las mismas filas de las que salió la lista, con tres de margen arriba
+   y abajo para ver dónde empieza y dónde acaba el ambiente. */
+
+function pmePanelNts(a){
+  const n = a.nts;
+  const t = PME_DOCS.xls;
+  if(!n || !n.hoja){
+    return `<section class="pme-pan plegado" id="fuente-xls">
+      <header><button type="button" class="pme-pan-t" onclick="pmePlegarPanel('xls')">
+        <i>+</i><b>${esc(t.nom)}</b><span>Este ambiente no está en la NTS</span></button></header>
+    </section>`;
+  }
+  return `<section class="pme-pan" id="fuente-xls">
+    <header>
+      <button type="button" class="pme-pan-t" onclick="pmePlegarPanel('xls')">
+        <i>−</i><b>${esc(t.nom)}</b>
+        <span>NTS ${esc(n.n)} · hoja ${esc(n.hoja)} · filas ${esc(n.f0)}–${esc(n.f1)}</span></button>
+      <div class="pme-pan-nav">
+        <button type="button" class="ex-btn" title="Dejar sólo éste grande"
+          onclick="pmeSoloEste('xls')">⤢</button>
+        <a class="ex-btn" href="${t.src}" download>Bajar el Excel</a>
+      </div>
+    </header>
+    <div class="pme-pan-v pme-pan-xls" id="pmeExcel">
+      <p class="pme-no">Leyendo el Excel de normas…</p>
+    </div>
+  </section>`;
+}
+
+function pmeSheetJs(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  if(PME_XLSX) return PME_XLSX;
+  PME_XLSX = new Promise((ok, mal) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => window.XLSX ? ok(window.XLSX) : mal(new Error('sin XLSX'));
+    s.onerror = () => mal(new Error('no se pudo traer SheetJS'));
+    document.head.appendChild(s);
+  });
+  PME_XLSX.catch(() => { PME_XLSX = null; });
+  return PME_XLSX;
+}
+
+function pmeCargarLibro(){
+  const caja = document.getElementById('pmeExcel');
+  if(!caja) return;
+  if(PME_LIBRO){ pmePintarHoja(); return; }
+  pmeSheetJs().then(XLSX =>
+    fetch(PME_DOCS.xls.src).then(r => {
+      if(!r.ok) throw new Error('no está el archivo');
+      return r.arrayBuffer();
+    }).then(buf => {
+      PME_LIBRO = XLSX.read(buf, {type: 'array'});
+      pmePintarHoja();
+    })
+  ).catch(() => {
+    caja.innerHTML = `<p class="pme-no">No se pudo abrir el Excel de normas.
+      <a href="${PME_DOCS.xls.src}" download>Bájalo aquí</a> y ábrelo en tu equipo.</p>`;
+  });
+}
+
+function pmePintarHoja(){
+  const caja = document.getElementById('pmeExcel');
+  const ix = pmeIdx(pmeId());
+  const a = ix.amb[PME_COTEJO];
+  if(!caja || !a || !a.nts || !PME_LIBRO) return;
+  const n = a.nts;
+  const ws = PME_LIBRO.Sheets[n.hoja];
+  if(!ws){
+    caja.innerHTML = `<p class="pme-no">El Excel no tiene la hoja <b>${esc(n.hoja)}</b>.</p>`;
+    return;
+  }
+  const XLSX = window.XLSX;
+  const rango = XLSX.utils.decode_range(ws['!ref']);
+  const desde = Math.max(rango.s.r + 1, n.f0 - 3);
+  const hasta = Math.min(rango.e.r + 1, n.f1 + 3);
+  const ultima = Math.min(rango.e.c, rango.s.c + 11);
+  const suyas = {};
+  (n.fil || []).forEach(f => { suyas[f] = true; });
+
+  let cab = '<tr><th class="pme-xf"></th>';
+  for(let c = rango.s.c; c <= ultima; c++) cab += '<th>' + XLSX.utils.encode_col(c) + '</th>';
+  cab += '</tr>';
+
+  let cuerpo = '';
+  for(let f = desde; f <= hasta; f++){
+    const mia = suyas[f];
+    const dentro = f >= n.f0 && f <= n.f1;
+    cuerpo += `<tr class="${mia ? 'pme-xr-eq' : (dentro ? 'pme-xr-amb' : '')}">
+      <th class="pme-xf">${f}</th>`;
+    for(let c = rango.s.c; c <= ultima; c++){
+      const cel = ws[XLSX.utils.encode_cell({r: f - 1, c: c})];
+      const v = cel ? (cel.w !== undefined ? cel.w : cel.v) : '';
+      cuerpo += '<td>' + esc(v === undefined || v === null ? '' : String(v)) + '</td>';
+    }
+    cuerpo += '</tr>';
+  }
+
+  caja.innerHTML = `<p class="pme-xcab">Hoja <b>${esc(n.hoja)}</b> ·
+    el ambiente ocupa las filas <b>${esc(n.f0)}–${esc(n.f1)}</b>, y las resaltadas son
+    los ${esc(nf((n.fil || []).length))} renglones de equipo que se copiaron.</p>
+    <table class="pme-xl"><thead>${cab}</thead><tbody>${cuerpo}</tbody></table>`;
+}
+
+/* Al cambiar de pestaña o de expediente, el cajón tiene que irse con la
+   tabla. pintarExpediente es el único sitio por el que pasa todo eso. */
+(function engancharCajon(){
+  if(typeof window.pintarExpediente !== 'function') return;
+  const antes = window.pintarExpediente;
+  window.pintarExpediente = function(){
+    const r = antes.apply(this, arguments);
+    try{ pmePintarCajon(); }catch(e){}
+    return r;
+  };
+})();
+
+/* El botón de cotejar y la cita de dónde sale cada cosa: la página del
+   PMF, la del PMA y las filas del Excel de normas. */
+function pmeFuentes(a, j){
+  const m = a.m;
+  const cotejando = PME_COTEJO === a.i;
+  const p = (j.pmf || []).find(x => x.cod === m.pmf);
+  const n = a.nts;
+  return `<div class="pme-fuentes">
+    <button type="button" class="ex-btn ${cotejando ? 'ver' : ''}"
+      onclick="${cotejando ? 'pmeCerrarCotejo()' : 'pmeCotejar(' + a.i + ')'}">
+      ${cotejando ? 'Cerrar el cotejo ✕' : 'Cotejar con los documentos'}</button>
+    <span class="pme-cita">${p ? 'PMF pág. ' + esc(String(p.pag)) : 'no está en el PMF'} ·
+      PMA pág. ${esc(String(m.pag))}${n && n.hoja
+        ? ' · NTS ' + esc(n.n) + ' hoja ' + esc(n.hoja) + ' filas ' + esc(n.f0) + '–' + esc(n.f1)
+        : (n ? ' · NTS ' + esc(n.n) : ' · sin ambiente en la NTS')}</span>
+  </div>`;
 }
