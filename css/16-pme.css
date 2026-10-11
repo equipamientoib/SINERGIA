@@ -304,3 +304,12 @@ body.con-cajon{ padding-right: var(--pme-cajon) }
 
 /* La fila con algo puesto se nota en la tabla. */
 .pme-eq tr.react td{background:#FFFBEF}
+
+/* La herramienta de armado, dentro de la pestaña. Va en un marco propio
+   porque trae sus propios estilos —los mismos del sitio, copiados— y
+   mezclarlos con los de esta página le rompería el encabezado fijo y el
+   cajón de cotejo, que se cuelgan de la ventana. */
+.pme-marco{margin-top:14px;border:1px solid var(--linea);border-radius:var(--r-sm);
+  overflow:hidden;background:var(--blanco)}
+.pme-marco iframe{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0}
+@media (max-width:860px){ .pme-marco iframe{height:calc(100vh - 110px)} }

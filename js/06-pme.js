@@ -229,6 +229,17 @@ function pmePane(d, id){
   const upss = [];
   ix.amb.forEach(a => { if(upss.indexOf(a.m.upss) < 0) upss.push(a.m.upss); });
 
+  /* Con la clave de revisión se abre la herramienta de armado tal cual
+     es —la misma de la carpeta 0. PME, con su cabecera, sus pestañas y
+     su cajón de cotejo—, no una copia suya. Lo que se corrige dentro se
+     guarda en el navegador igual que en local. */
+  if(PME_EDITA && PME_HERRAMIENTA[id]){
+    return `<div class="pme-pane" data-id="${esc(id)}">
+      ${pmeBarraEdicion(id)}
+      <div class="pme-marco"><iframe src="${esc(PME_HERRAMIENTA[id])}"
+        title="Herramienta de armado del PME"></iframe></div>
+    </div>`;
+  }
   return `<div class="pme-pane" data-id="${esc(id)}">
     <div class="tab-head">
       <h4>El PME contra el PMF, el PMA y la NTS</h4>
@@ -1024,6 +1035,10 @@ function pmeCeldaQ(a, x){
    Apps Script. */
 
 const PME_EDITOR_HASH = 'c89777de734d31056d393ee4a77f00230c1d3b402c290fd26eef9a7554327621';
+/* Dónde vive la herramienta de armado de cada expediente. Es la carpeta
+   0. PME publicada tal cual; sin entrada aquí, la pestaña se queda en
+   la vista de lectura. */
+const PME_HERRAMIENTA = {'pachas-2026': 'pme/pachas/index.html'};
 let PME_EDITA = false;
 const PME_REV = {};              // la revisión de cada expediente
 
@@ -1092,6 +1107,15 @@ function pmeBarraEdicion(id){
         onkeydown="if(event.key==='Enter')pmeAbrirEdicion()">
       <button type="button" class="ex-btn" onclick="pmeAbrirEdicion()">Entrar a revisar</button>
       <span class="pme-edmal" id="pmeEdMal"></span>
+    </div>`;
+  }
+  if(PME_HERRAMIENTA[id]){
+    return `<div class="pme-edbarra act">
+      <b>Modo revisión</b>
+      <span class="th-nota">Ésta es la herramienta de armado completa, la misma de tu equipo.
+        Lo que corrijas se guarda en este navegador.</span>
+      <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id])}" target="_blank" rel="noopener">Abrir aparte</a>
+      <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">Volver a la vista del cliente ✕</button>
     </div>`;
   }
   const t = pmeCuantasTocadas(id), o = pmeCuantasObs(id);
