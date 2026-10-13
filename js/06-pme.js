@@ -1180,6 +1180,8 @@ function pmeBarraEdicion(id){
       <b>Modo revisión</b>
       ${pr ? `<span class="pme-donde">${esc(pr)}</span>` : ''}
       <span class="th-nota">Lo que corrijas se guarda en este navegador.</span>
+      <button type="button" class="ex-btn pme-env" onclick="pmeEnviarLS()">Enviar al LS del Drive</button>
+      <span class="pme-env-msg" id="pmeEnvMsg"></span>
       <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id].split('?')[0])}" target="_blank" rel="noopener">
         Abrir la herramienta completa</a>
       <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">Volver a la vista del cliente ✕</button>
@@ -1330,3 +1332,115 @@ function pmeOlvidarRev(){
   try{ localStorage.removeItem(pmeRevLs(id)); }catch(e){}
   pmeGuardarRev(id);
 }
+
+/* ═══════════ LLEVAR LA REVISIÓN AL LS DEL DRIVE ═══════════
+
+   Lo que corriges se guarda en el navegador. Esto lo manda al Apps
+   Script del sitio, que lo deja en el Drive y pone al día las
+   cantidades de la hoja.
+
+   Va la REVISIÓN, no celdas sueltas: las reglas del metrado —que los
+   unificados no suman, que lo anulado se declara en cero, que un código
+   repetido se distingue por su ocurrencia, que el OC no se metra— viven
+   en el generador, con su batería de pruebas. El Apps Script escribe
+   sólo las cantidades que ya tienen fila; lo que exige insertar filas
+   —un ambiente del plano, un renglón reactivado— entra al regenerar el
+   LS, que es donde esas reglas se aplican. Por eso después de enviar
+   hay que correr la automatización igual. */
+
+const PME_ENVIO = {
+  url: 'https://script.google.com/macros/s/AKfycbyCC42QwfzqLYKo0J9ahH_m1upJ0uMIhd2hF2R7YOdNhtceXmhzRVYlydhkdjk-Xh_1Rg/exec',
+  /* El mismo pestillo que PACHAS_TOKEN en el Apps Script. No es un
+     secreto fuerte —viaja en el navegador de quien revisa— sino lo que
+     impide que un visitante cualquiera escriba en la hoja. */
+  token: 'pachas26-sb'
+};
+
+function pmeEnvMsg(txt, mal){
+  const e = document.getElementById('pmeEnvMsg');
+  if(!e) return;
+  e.textContent = txt;
+  e.className = 'pme-env-msg' + (mal ? ' mal' : '');
+}
+
+/* La revisión vive dentro del marco, que es la herramienta de verdad.
+   Si el marco no está —vista de lectura— se usa la del propio panel. */
+function pmeRevisionViva(id){
+  const f = document.querySelector('.pme-marco iframe');
+  if(f){
+    try{
+      const w = f.contentWindow;
+      if(w && w.PME_U) return JSON.parse(JSON.stringify(Object.assign({v: 2}, w.PME_U)));
+      const g = w.localStorage.getItem('pme-pachas-i4-v1');
+      if(g) return JSON.parse(g);
+    }catch(e){ /* el marco aún no cargó */ }
+  }
+  return pmeRev(id);
+}
+
+async function pmeEnviarLS(){
+  const id = pmeId();
+  const rev = pmeRevisionViva(id);
+  const nq = Object.keys(rev.q || {}).length;
+  const nf = Object.keys(rev.forz || {}).length;
+  const ne = (rev.extra || []).length;
+  const no = Object.keys(rev.obs || {}).length + Object.keys(rev.obsr || {}).length;
+
+  if(!nq && !nf && !ne && !no){
+    pmeEnvMsg('No hay nada que enviar: no has corregido nada todavía.', true);
+    return;
+  }
+  if(!confirm('Se va a escribir en el LS del Drive:
+
+'
+      + '  · ' + nq + ' cantidades corregidas
+'
+      + '  · ' + nf + ' renglones reactivados
+'
+      + '  · ' + ne + ' ambientes del plano
+'
+      + '  · ' + no + ' observaciones
+
+'
+      + 'Las cantidades se escriben en la hoja. Los ambientes del plano y los '
+      + 'reactivados quedan guardados en el Drive y entran al regenerar el LS.
+
+¿Seguir?')) return;
+
+  pmeEnvMsg('Enviando…');
+  const b = document.querySelector('.pme-env');
+  if(b) b.disabled = true;
+  try{
+    /* text/plain a propósito: con application/json el navegador manda
+       antes una petición de permiso que Apps Script no contesta. */
+    const r = await fetch(PME_ENVIO.url + '?pme=1', {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({token: PME_ENVIO.token, id: id, revision: rev})
+    });
+    const txt = await r.text();
+    let d = null;
+    try{ d = JSON.parse(txt); }catch(e){}
+    if(d && d.ok){
+      pmeEnvMsg('Enviado · ' + nfm(d.puestas_en_la_hoja || 0) + ' de ' + nfm(d.cantidades || 0)
+        + ' cantidades escritas en la hoja'
+        + ((d.sin_sitio || []).length ? ' · ' + d.sin_sitio.length + ' sin fila en el LS' : ''));
+    }else if(d && d.motivo){
+      pmeEnvMsg('No se escribió: ' + d.motivo, true);
+    }else if(/<!DOCTYPE|<html/i.test(txt)){
+      /* Apps Script devuelve su página de error cuando la versión
+         PUBLICADA no tiene el doPost: el editor puede tener el archivo
+         y la implementación seguir siendo la anterior. */
+      pmeEnvMsg('El Apps Script no está publicado con la última versión: '
+        + 'Implementar → Administrar implementaciones → editar → Versión: nueva.', true);
+    }else{
+      pmeEnvMsg('Se envió, pero la respuesta no se entiende. Comprueba la hoja.', true);
+    }
+  }catch(e){
+    pmeEnvMsg('No se pudo enviar: ' + (e && e.message ? e.message : e), true);
+  }
+  if(b) b.disabled = false;
+}
+
+/* nf() ya está cogido por el formateador de números del panel. */
+function nfm(n){ try{ return nf(n); }catch(e){ return String(n); } }

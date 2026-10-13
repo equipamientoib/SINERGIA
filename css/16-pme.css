@@ -350,3 +350,10 @@ body.pme-cotejo{overflow:hidden}
 body.pme-cotejo .pme-marco{position:fixed;top:0;right:0;bottom:0;left:0;
   height:auto;z-index:200;margin:0;border:0;border-radius:0}
 body.pme-cotejo .pme-marco iframe{height:100% !important;min-height:0}
+
+/* El botón de enviar al Drive y su recado. */
+.pme-env{border-color:var(--bronce);color:var(--cobre-d,#8A5A12)}
+.pme-env:hover:not([disabled]){background:#FDF7E6}
+.pme-env[disabled]{opacity:.5;cursor:default}
+.pme-env-msg{font-size:11.5px;color:var(--grafito)}
+.pme-env-msg.mal{color:#9E342C}
