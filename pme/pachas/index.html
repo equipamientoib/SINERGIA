@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programa Médico de Equipamiento — Centro de Salud Pachas I-4</title>
+<meta name="description" content="Armado del Programa Médico de Equipamiento del Centro de Salud Pachas I-4 a partir del PMF y del PMA visados por DIRESA Huánuco y de las NTS N.º 113 y 110: compatibilidad PMF–PMA, PME línea por línea y exportación a Excel.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.ico">
+<!-- Los cuatro primeros son los estilos del sitio, copiados tal cual desde
+     PAGINA WEB/PROTOTIPO/css para que esta carpeta funcione sola con doble
+     clic. El quinto es lo propio del PME. -->
+<link rel="stylesheet" href="css/00-fuentes.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/13-clientes.css">
+<link rel="stylesheet" href="css/15-expediente.css">
+<link rel="stylesheet" href="css/16-pme.css">
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<header>
+  <div class="wrap nav">
+    <svg class="logo-h logo-svg" viewBox="0 0 880 240" role="img" aria-label="Sinergia Biomédica" style="cursor:default">
+      <text x="40" y="208" font-weight="700" font-size="212" textLength="252" lengthAdjust="spacingAndGlyphs"><tspan fill="#9A7F4E">S</tspan><tspan fill="#2A2D33">B</tspan></text>
+      <text x="342" y="158" font-weight="700" font-size="100" fill="#17191D" textLength="498" lengthAdjust="spacingAndGlyphs">SINERGIA</text>
+      <text x="342" y="212" font-weight="600" font-size="52" fill="#2A2D33" textLength="498" lengthAdjust="spacingAndGlyphs">BIOMÉDICA</text>
+      <rect x="342" y="228" width="498" height="3" fill="#9A7F4E"/>
+    </svg>
+    <div class="menu">
+      <span style="font-family:var(--ff-d);font-size:12.5px;color:var(--gris);letter-spacing:.08em;text-transform:uppercase">
+        Herramienta interna · Armado de PME</span>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="page active">
+  <div class="wrap ex-ancho" id="pmeBody">
+
+    <div class="crumb">Expediente técnico de equipamiento &nbsp;/&nbsp; Programa Médico de Equipamiento</div>
+
+    <!-- La cabecera la pinta pmeArrancar() con los datos de js/00-datos.js,
+         para que no haya dos sitios donde corregir el nombre del proyecto. -->
+    <header class="pr-head ex-head" id="pmeHead"></header>
+
+    <noscript>
+      <p class="pme-nojs">Esta herramienta hace sus cuentas en el navegador: sin JavaScript no hay nada que
+        mostrar. El PME preliminar en Excel está en
+        <b>PME-PROPIO/datos/proyecto-compartido.json</b>.</p>
+    </noscript>
+
+    <div id="pmeDet"></div>
+
+    <p class="pme-pie">
+      Herramienta interna de armado del PME. El alcance lo manda el <b>PMA</b>; el <b>PMF</b> aporta los códigos de
+      ambiente y debe estar contenido en él. Las listas de equipos salen de la <b>NTS N.º 113-MINSA/DGIEM-V.01</b>
+      (nivel I) y, cuando el ambiente o el equipo no existe ahí, de la <b>NTS N.º 110</b> (nivel II); lo que no está
+      en ninguna norma se marca <b>Propuesta</b> y se decide a mano. Sólo se metra el equipo <b>EQ</b>: el
+      <b>OC</b> queda fuera. Las líneas en cero no se borran, son la trazabilidad de lo descartado.
+      Lo que corriges se guarda en este navegador; el respaldo portable es el <b>.json</b> de la pestaña Exportar.
+    </p>
+
+  </div>
+</div>
+</main>
+
+<!-- El cajón de cotejo de la pestaña Fiscalización. Va aquí, fuera de
+     .page, y no dentro del panel: así ningún estilo de la página le
+     cambia el marco de referencia y se queda del alto de la pantalla. -->
+<div id="pmeFuente"></div>
+
+<script src="js/00-datos.js"></script>
+<script src="js/02-fiscalizacion.js"></script>
+<script src="js/03-extras.js"></script>
+<script src="js/04-xlsx.js"></script>
+<script src="js/05-archivo.js"></script>
+<script src="js/01-pme.js"></script>
+<!-- Modo empotrado: con ?solo=fis arranca en Fiscalizacion y esconde lo que
+     el expediente ya ensena. Suelta, esta carpeta sigue siendo la
+     herramienta completa. -->
+<script src="js/99-empotrado.js"></script>
+</body>
+</html>

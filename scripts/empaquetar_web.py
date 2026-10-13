@@ -18,8 +18,8 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 SELLO = re.compile(r'\?v=[0-9a-f]+')
 # Los que 06-portal.js carga aparte, fuera del paquete.
-PORTAL = ['css/13-clientes.css', 'css/15-expediente.css',
-          'js/06-expediente.js', 'js/06-tablero.js', 'js/06-clientes.js']
+PORTAL = ['css/13-clientes.css', 'css/15-expediente.css', 'css/16-pme.css',
+          'js/06-expediente.js', 'js/06-tablero.js', 'js/06-pme.js', 'js/06-clientes.js']
 # Sueltos: index.html los pide con su propia etiqueta, fuera del paquete,
 # porque las páginas estáticas también los usan. Entran igual en el sello y
 # se les pone el ?v= en index.html; si no, un cambio en ellos no llega nunca
@@ -49,9 +49,38 @@ def unir(archivos, sep):
                     for f in archivos)
 
 
+def revisar_js(rutas):
+    """Un .js con un error de sintaxis se empaqueta igual y deja la
+    página en blanco, sin aviso hasta que alguien la abre. Si hay node,
+    se comprueba antes de tocar nada. Sin node, se sigue: es una red de
+    seguridad, no un requisito."""
+    import shutil
+    import subprocess
+    node = shutil.which('node')
+    if not node:
+        print('  (sin node: no se comprueba la sintaxis de los JS)')
+        return
+    salto = chr(10)
+    malos = []
+    for r in rutas:
+        f = RAIZ / r
+        if f.suffix != '.js' or not f.exists():
+            continue
+        p = subprocess.run([node, '--check', str(f)], capture_output=True, text=True)
+        if p.returncode:
+            detalle = (p.stderr or '').strip().split(salto)[:3]
+            malos.append(r + salto + (salto + '      ').join([''] + detalle))
+    if malos:
+        raise SystemExit('ERROR de sintaxis, no se empaqueta nada:'
+                         + salto + '  · ' + (salto + '  · ').join(malos))
+    print('  sintaxis de los JS: bien')
+
+
 def main():
     html = leer('index.html')
     css, js = lista(html, 'CSS'), lista(html, 'JS')
+
+    revisar_js(js + PORTAL + SUELTOS)
 
     h = hashlib.sha256()
     for f in css + js + PORTAL + SUELTOS:

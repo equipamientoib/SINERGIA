@@ -754,8 +754,18 @@ async function tryUnlock(id){
   const p=PROYECTOS.find(x=>x.id===id);
   /* clave_verif (nuevo) no sirve para pedir el detalle; clave_hash queda
      solo mientras el Apps Script publicado no se actualice. */
-  const ok=p&&(p.clave_verif ? (await sha256('sinergia-verif:'+v))===p.clave_verif : (p.clave_hash&&h===p.clave_hash));
-  if(ok){PR_OPEN.add(id);PR_KEY[id]=h;PR_PASS[id]=v;renderProyecto(id);}
+  let ok=p&&(p.clave_verif ? (await sha256('sinergia-verif:'+v))===p.clave_verif : (p.clave_hash&&h===p.clave_hash));
+  /* La clave de REVISIÓN de un expediente también abre la puerta, y deja
+     la sesión en modo revisión. Si no, quien revisa escribe la suya, se
+     encuentra un «clave incorrecta» y no entiende por qué. */
+  let revisa=false;
+  if(!ok && p && p.clave_revision && h===p.clave_revision){ ok=true; revisa=true; }
+  if(ok){
+    PR_OPEN.add(id);PR_KEY[id]=h;PR_PASS[id]=v;
+    if(revisa){ try{ sessionStorage.setItem('pme-edita','1'); }catch(e){}
+                try{ if(typeof PME_EDITA!=='undefined') PME_EDITA=true; }catch(e){} }
+    renderProyecto(id);
+  }
   else{if(err)err.classList.add('show');if(inp){inp.value='';inp.focus();}}
 }
 
