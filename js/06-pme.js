@@ -1381,31 +1381,32 @@ function pmeRevisionViva(id){
 async function pmeEnviarLS(){
   const id = pmeId();
   const rev = pmeRevisionViva(id);
-  const nq = Object.keys(rev.q || {}).length;
-  const nf = Object.keys(rev.forz || {}).length;
-  const ne = (rev.extra || []).length;
-  const no = Object.keys(rev.obs || {}).length + Object.keys(rev.obsr || {}).length;
+  const nQ = Object.keys(rev.q || {}).length;
+  const nF = Object.keys(rev.forz || {}).length;
+  const nE = (rev.extra || []).length;
+  const nO = Object.keys(rev.obs || {}).length + Object.keys(rev.obsr || {}).length;
 
-  if(!nq && !nf && !ne && !no){
+  if(!nQ && !nF && !nE && !nO){
     pmeEnvMsg('No hay nada que enviar: no has corregido nada todavía.', true);
     return;
   }
-  if(!confirm('Se va a escribir en el LS del Drive:
-
-'
-      + '  · ' + nq + ' cantidades corregidas
-'
-      + '  · ' + nf + ' renglones reactivados
-'
-      + '  · ' + ne + ' ambientes del plano
-'
-      + '  · ' + no + ' observaciones
-
-'
-      + 'Las cantidades se escriben en la hoja. Los ambientes del plano y los '
-      + 'reactivados quedan guardados en el Drive y entran al regenerar el LS.
-
-¿Seguir?')) return;
+  /* El aviso se arma con una lista y se une: así no hacen falta escapes
+     dentro de la cadena, que es justo lo que partió este archivo una vez
+     y dejó la pestaña entera en «Trayendo el PME…». */
+  const aviso = [
+    'Se va a escribir en el LS del Drive:',
+    '',
+    '  · ' + nQ + ' cantidades corregidas',
+    '  · ' + nF + ' renglones reactivados',
+    '  · ' + nE + ' ambientes del plano',
+    '  · ' + nO + ' observaciones',
+    '',
+    'Las cantidades se escriben en la hoja. Los ambientes del plano y los',
+    'reactivados quedan guardados en el Drive y entran al regenerar el LS.',
+    '',
+    '¿Seguir?'
+  ].join(String.fromCharCode(10));
+  if(!confirm(aviso)) return;
 
   pmeEnvMsg('Enviando…');
   const b = document.querySelector('.pme-env');
@@ -1422,7 +1423,7 @@ async function pmeEnviarLS(){
     let d = null;
     try{ d = JSON.parse(txt); }catch(e){}
     if(d && d.ok){
-      pmeEnvMsg('Enviado · ' + nfm(d.puestas_en_la_hoja || 0) + ' de ' + nfm(d.cantidades || 0)
+      pmeEnvMsg('Enviado · ' + nf(d.puestas_en_la_hoja || 0) + ' de ' + nf(d.cantidades || 0)
         + ' cantidades escritas en la hoja'
         + ((d.sin_sitio || []).length ? ' · ' + d.sin_sitio.length + ' sin fila en el LS' : ''));
     }else if(d && d.motivo){
@@ -1442,5 +1443,3 @@ async function pmeEnviarLS(){
   if(b) b.disabled = false;
 }
 
-/* nf() ya está cogido por el formateador de números del panel. */
-function nfm(n){ try{ return nf(n); }catch(e){ return String(n); } }
