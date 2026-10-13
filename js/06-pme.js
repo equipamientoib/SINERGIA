@@ -239,6 +239,7 @@ function pmePane(d, id){
        Fiscalización de la herramienta y nada más. */
     return `<div class="pme-pane" data-id="${esc(id)}">
       ${pmeBarraEdicion(id)}
+      ${pmeAvisoCorrida(d, id)}
       <div class="pme-marco"><iframe src="${esc(PME_HERRAMIENTA[id])}"
         title="Fiscalización del PME"></iframe></div>
     </div>`;
@@ -261,6 +262,7 @@ function pmePane(d, id){
     </div>
 
     ${pmeBarraEdicion(id)}
+    ${pmeAvisoCorrida(d, id)}
     ${pmeAvisos(id)}
     ${pmeFicha(id)}
     ${pmePmfPma(id)}
@@ -1664,3 +1666,88 @@ async function pmeEscribirHoja(){
     if(b) b.disabled = false;
   }
 }
+
+/* ═══════════ DE QUÉ FECHA ES LO QUE ESTÁS VIENDO ═══════════
+
+   Esta pestaña y las otras cinco no se alimentan de lo mismo, y eso hay
+   que decirlo donde se mira, no en un manual:
+
+     · aquí se lee el PME y la revisión del navegador, así que corregir
+       una cantidad se ve en el acto;
+     · el Resumen, el Metrado, el Presupuesto, las Preinstalaciones y los
+       Documentos salen de expediente-<id>.json, que lo escribe el motor
+       con `run.py base` + `run.py web` desde el equipo.
+
+   Lo segundo no se puede hacer en el navegador: los anexos son Word, el
+   presupuesto lleva los precios del estudio de mercado y el consolidado
+   es un PDF foliado. Pero tampoco puede quedar en que te acuerdes: ya
+   pasó una vez que el Resumen decía 4 ambientes y el PME 1 530, y la
+   única pista era la fecha. Así que la fecha va a la vista, y si los
+   números no cuadran se dice en rojo.                                  */
+
+function pmeAvisoCorrida(d, id){
+  if(!d) return '';
+  const j = (pmeIdx(id) || {}).j || {};
+  const c = j.c || {}, res = d.resumen || {};
+
+  /* Lo pendiente de llevar al expediente. Las cantidades que ya se
+     mandaron al Sheet también cuentan: están en el LS, pero el _BASE de
+     la última corrida no las tiene. */
+  let p = null;
+  try{ p = pmePlanEnvio(id); }catch(e){}
+  const n = p ? (p.cambios.length + p.deshechos.length + p.extra + p.react) : 0;
+  const trozos = [];
+  if(p){
+    const q = p.cambios.length + p.deshechos.length;
+    if(q) trozos.push(nf(q) + (q === 1 ? ' cantidad' : ' cantidades'));
+    if(p.extra) trozos.push(nf(p.extra) + (p.extra === 1 ? ' ambiente del plano' : ' ambientes del plano'));
+    if(p.react) trozos.push(nf(p.react) + (p.react === 1 ? ' reactivado' : ' reactivados'));
+  }
+
+  /* El descuadre: las unidades son el número que comparten los dos
+     lados, y si no coinciden es que el expediente se armó con otro LS. */
+  const u1 = Math.round(Number(c.unid) || 0), u2 = Math.round(Number(res.unidades_eq) || 0);
+  const descuadre = u1 && u2 && u1 !== u2;
+
+  return `<div class="pme-corrida${descuadre ? ' mal' : (n ? ' ojo' : '')}">
+    <b>Lo que ves en las otras pestañas es de la corrida del
+      ${esc(d.generado || 'fecha sin anotar')}.</b>
+    Esta pestaña no: aquí se lee el PME y lo que corrijas se ve al instante.
+    ${descuadre ? `<span class="pme-corr-mal">No cuadran: el PME dice
+        ${esc(nf(u1))} unidades y el resumen ${esc(nf(u2))}. El expediente se armó
+        con otro LS — vuelve a correr <code>run.py base</code>.</span>` : ''}
+    ${n ? `<span class="pme-corr-ojo">Hay ${esc(trozos.join(', '))} que todavía
+        ${n === 1 ? 'no está' : 'no están'} en el resumen ni en los anexos. «Enviar al LS» y «Reescribir la hoja entera»
+        los dejan en el Sheet del Drive, que es la fuente del metrado; rehacer el
+        expediente pide Word y Excel, así que eso va desde tu equipo:
+        <code>py run.py base</code> y después <code>py run.py web</code>.</span>` : ''}
+  </div>`;
+}
+
+/* El marco guarda la revisión en el mismo origen que esta página, así
+   que escribir dentro dispara `storage` aquí fuera. Sin esto, añadir un
+   ambiente en la herramienta no encendía el aviso hasta que algo
+   repintara la pestaña, y un aviso que llega tarde es peor que ninguno:
+   se aprende a no mirarlo.
+
+   Se cambia SÓLO el aviso, no la pestaña: repintarla recrearía el
+   <iframe> y perderías dónde estabas y el cajón de cotejo abierto. */
+function pmeRefrescarAviso(){
+  const av = document.querySelector('.pme-corrida');
+  if(!av) return;
+  const pane = av.closest('.pme-pane');
+  const id = pane && pane.dataset.id;
+  const d = (typeof EX_DET !== 'undefined' && id) ? EX_DET[id] : null;
+  if(!d) return;
+  const caja = document.createElement('div');
+  caja.innerHTML = pmeAvisoCorrida(d, id);
+  const nuevo = caja.firstElementChild;
+  if(nuevo && nuevo.outerHTML !== av.outerHTML) av.replaceWith(nuevo);
+}
+
+addEventListener('storage', e => {
+  if(e.key && e.key.indexOf('pme-') !== 0) return;   // null = se vació todo
+  pmeRefrescarAviso();
+});
+/* Y al volver a la ventana, por si el marco guardó con la pestaña detrás. */
+addEventListener('focus', pmeRefrescarAviso);

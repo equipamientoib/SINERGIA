@@ -401,3 +401,20 @@ body.con-envio{overflow:hidden}
   .pme-envio-c{max-height:100vh;height:100%;border-radius:0}
   .pme-env-tab{max-height:40vh}
 }
+
+/* ══════════════ DE QUÉ FECHA ES LO QUE SE VE ══════════════
+   Va pegado a la barra de revisión, que es donde se mira antes de
+   corregir. En gris cuando no hay nada pendiente —es sólo la fecha—, en
+   ámbar cuando hay correcciones que aún no están en el expediente, y en
+   rojo si los números de las dos pestañas no cuadran, que significa que
+   el expediente se armó con otro LS. */
+.pme-corrida{margin:8px 0 0;padding:9px 12px;border:1px solid var(--linea);
+  border-left:3px solid var(--linea-b);border-radius:var(--r-sm);background:#FCFBF9;
+  font-size:12.5px;line-height:1.55;color:var(--grafito)}
+.pme-corrida b{font-weight:600;color:var(--tinta)}
+.pme-corrida.ojo{border-left-color:var(--bronce);background:#FDF7E6}
+.pme-corrida.mal{border-left-color:#9E342C;background:#FBF1EF}
+.pme-corrida span{display:block;margin-top:5px}
+.pme-corr-mal{color:#9E342C;font-weight:600}
+.pme-corrida code{font-family:var(--ff-m,ui-monospace,monospace);font-size:11.5px;
+  padding:1px 5px;border:1px solid var(--linea-b);border-radius:3px;background:#fff}
