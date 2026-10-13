@@ -620,3 +620,22 @@ body.cabdet .fis-cabdet .fis-eq-copia{visibility:visible;height:auto;overflow:vi
 .ext-tabla tr.ext-equipos > td{background:var(--crema-1);padding:8px 10px}
 .ext-eq{font-size:12px}
 .ext-eq tfoot td{font-family:var(--ff-d);font-size:10px;color:var(--gris)}
+
+/* ═══════ MODO EMPOTRADO (?solo=fis) ═══════
+   Dentro de la pestaña del expediente sólo va la Fiscalización: lo que
+   el expediente ya enseña —su cabecera, su nombre, su miga de pan— se
+   esconde aquí para no verlo dos veces. Se oculta, no se quita: la
+   misma carpeta abierta aparte sigue siendo la herramienta entera. */
+.pme-empotrado body > header,
+.pme-empotrado .crumb,
+.pme-empotrado #pmeHead,
+.pme-empotrado .det-tabs,
+.pme-empotrado .pme-pie,
+.pme-empotrado .skip{ display: none !important }
+.pme-empotrado body{ background: var(--blanco) }
+.pme-empotrado #pmeBody{ padding-top: 0; max-width: none }
+.pme-empotrado .det-card{ border: 0; box-shadow: none; padding-top: 0 }
+/* Sin la cabecera del sitio delante, la cabecera pegajosa de la tabla y
+   la del detalle se pegan arriba del todo, no a 70 px. */
+.pme-empotrado .fis-tabla thead th,
+.pme-empotrado .fis-nts-t th{ top: 0 }

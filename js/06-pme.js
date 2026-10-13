@@ -234,9 +234,13 @@ function pmePane(d, id){
      su cajón de cotejo—, no una copia suya. Lo que se corrige dentro se
      guarda en el navegador igual que en local. */
   if(PME_EDITA && PME_HERRAMIENTA[id]){
-    /* El marco no se pinta aquí: cuelga del <body>. Ver pmeHerramienta(). */
+    /* Dentro de la pestaña, no encima de la página: el expediente
+       conserva su cabecera y sus pestañas, y aquí entra la
+       Fiscalización de la herramienta y nada más. */
     return `<div class="pme-pane" data-id="${esc(id)}">
-      <p class="ex-nota">La herramienta de armado está abierta a pantalla completa.</p>
+      ${pmeBarraEdicion(id)}
+      <div class="pme-marco"><iframe src="${esc(PME_HERRAMIENTA[id])}"
+        title="Fiscalización del PME"></iframe></div>
     </div>`;
   }
   return `<div class="pme-pane" data-id="${esc(id)}">
@@ -622,42 +626,68 @@ function pmeRepintarTodo(){
   const id = pmeId();
   const p = document.querySelector('.pme-pane');
   if(id && p) p.outerHTML = pmePane(null, id);
-  pmeHerramienta();
+  pmeCompacto();
 }
 
-/* ── La herramienta de armado, a pantalla completa ──
-   Cuelga del <body> y no del panel: `.page.active` lleva un transform
-   —la animación de entrada— y un transform atrapa a todo lo que esté
-   `position:fixed` dentro. Dentro del panel, el marco se quedaba en
-   378px de alto en vez de los 900 de la ventana, su barra de pestañas
-   se anclaba al marco en vez de a la pantalla y el cajón de cotejo se
-   repartía el ancho del marco. Colgado del body, el marco ES la
-   ventana y la herramienta se comporta igual que con doble clic.
+/* Con la fiscalización abierta, la cabecera del expediente se repliega:
+   entre ella, la miga de pan y la barra del sitio se iban 330 px antes
+   de empezar el marco. El nombre del proyecto no se pierde, se queda en
+   la barra de revisión. */
+function pmeCompacto(){
+  document.body.classList.toggle('pme-herr', !!document.querySelector('.pme-marco'));
+  pmeAltoMarco();
+}
 
-   Y no se vuelve a crear si ya está: el iframe recargaría, y con él la
-   herramienta entera. */
-function pmeHerramienta(){
-  const id = pmeId();
-  const quiere = id && PME_EDITA && PME_HERRAMIENTA[id] && document.querySelector('.pme-pane');
-  let e = document.getElementById('pmeHerramienta');
-  if(!quiere){
-    if(e) e.remove();
-    document.body.classList.remove('con-herramienta');
-    return;
+/* El alto del marco se mide, no se adivina: lo que hay encima cambia
+   según la barra de revisión ocupe una línea o dos y según los márgenes
+   de la tarjeta, que dependen del ancho. */
+function pmeAltoMarco(){
+  const f = document.querySelector('.pme-marco iframe');
+  if(!f) return;
+  /* Sin scroll de por medio: la cabecera va replegada y las pestañas
+     pegadas, así que el marco empieza donde empieza y ahí se queda. */
+  const arriba = f.getBoundingClientRect().top;
+  const alto = Math.max(420, Math.round(innerHeight - arriba - 14));
+  f.style.height = alto + 'px';
+}
+addEventListener('resize', () => { try{ pmeAltoMarco(); }catch(e){} });
+
+/* Cotejar necesita la pantalla entera: tres documentos apilados en el
+   alto de una pestaña no se leen, y al repartirlos con el tirador
+   chocan con el mínimo y se pliegan. Mientras el cajón esté abierto, el
+   marco se lleva toda la ventana; al cerrarlo vuelve a su sitio dentro
+   de la pestaña. El marco no se mueve del DOM —moverlo recargaría la
+   herramienta—: sólo cambia de posición. */
+addEventListener('message', e => {
+  const d = e && e.data;
+  if(!d || d.pme !== 'cotejo') return;
+  const m = document.querySelector('.pme-marco');
+  if(!m) return;
+  document.body.classList.toggle('pme-cotejo', !!d.abierto);
+
+  /* El transform de la animación de entrada de `.page` atrapa a todo lo
+     que esté position:fixed dentro. Y lo pone una ANIMACIÓN, que gana
+     hasta al estilo en línea: la única forma de quitarlo es en el
+     propio elemento y con !important. Se devuelve al cerrar. */
+  const pg = m.closest('.page');
+  if(pg){
+    if(d.abierto){
+      pg.style.setProperty('transform', 'none', 'important');
+      /* Con el transform ya en «none» seguía atrapando: a `.page` le
+         queda la ANIMACIÓN de entrada, y una animación que toca el
+         transform crea el contenedor igual, valga lo que valga ahora.
+         Hay que apagar la animación, no sólo su resultado. */
+      pg.style.setProperty('animation', 'none', 'important');
+    }else{
+      pg.style.removeProperty('transform');
+      pg.style.removeProperty('animation');
+    }
   }
-  if(e) return;
-  const u = PME_HERRAMIENTA[id];
-  e = document.createElement('div');
-  e.id = 'pmeHerramienta';
-  e.className = 'pme-lleno';
-  e.innerHTML = `<iframe src="${esc(u)}" title="Herramienta de armado del PME"></iframe>
-    <div class="pme-lleno-b">
-      <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">‹ Volver al expediente</button>
-      <a class="ex-btn" href="${esc(u)}" target="_blank" rel="noopener">Abrir aparte</a>
-    </div>`;
-  document.body.appendChild(e);
-  document.body.classList.add('con-herramienta');
-}
+
+  const f = m.querySelector('iframe');
+  if(d.abierto){ if(f) f.style.height = ''; }
+  else { try{ pmeAltoMarco(); }catch(e2){} }
+});
 
 /* ═══════════════ PMF CONTRA PMA ═══════════════
    El PMF tiene que estar contenido en el PMA. Lo que no cuadra no cuelga
@@ -1002,7 +1032,7 @@ function pmePintarHoja(){
   window.pintarExpediente = function(){
     const r = antes.apply(this, arguments);
     try{ pmePintarCajon(); }catch(e){}
-    try{ pmeHerramienta(); }catch(e){}
+    try{ pmeCompacto(); }catch(e){}
     return r;
   };
 })();
@@ -1073,7 +1103,7 @@ const PME_EDITOR_HASH = '3d79d06ba1fdbdd4f003219bd9ce5ca15f4dcd4bbb4074f3f78d50a
 /* Dónde vive la herramienta de armado de cada expediente. Es la carpeta
    0. PME publicada tal cual; sin entrada aquí, la pestaña se queda en
    la vista de lectura. */
-const PME_HERRAMIENTA = {'pachas-2026': 'pme/pachas/index.html'};
+const PME_HERRAMIENTA = {'pachas-2026': 'pme/pachas/index.html?solo=fis'};
 let PME_EDITA = false;
 const PME_REV = {};              // la revisión de cada expediente
 
@@ -1145,11 +1175,15 @@ function pmeBarraEdicion(id){
     </div>`;
   }
   if(PME_HERRAMIENTA[id]){
+    const pr = (pmeIdx(id).j.meta || {}).proyecto || '';
     return `<div class="pme-edbarra act">
       <b>Modo revisión</b>
-      <span class="th-nota">Ésta es la herramienta de armado completa, la misma de tu equipo.
-        Lo que corrijas se guarda en este navegador.</span>
-      <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id])}" target="_blank" rel="noopener">Abrir aparte</a>
+      ${pr ? `<span class="pme-donde">${esc(pr)}</span>` : ''}
+      <span class="th-nota">Lo que corrijas se guarda en este navegador.</span>
+      <button type="button" class="ex-btn pme-env" onclick="pmeEnviarLS()">Enviar al LS del Drive</button>
+      <span class="pme-env-msg" id="pmeEnvMsg"></span>
+      <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id].split('?')[0])}" target="_blank" rel="noopener">
+        Abrir la herramienta completa</a>
       <button type="button" class="ex-btn" onclick="pmeCerrarEdicion()">Volver a la vista del cliente ✕</button>
     </div>`;
   }
@@ -1298,3 +1332,115 @@ function pmeOlvidarRev(){
   try{ localStorage.removeItem(pmeRevLs(id)); }catch(e){}
   pmeGuardarRev(id);
 }
+
+/* ═══════════ LLEVAR LA REVISIÓN AL LS DEL DRIVE ═══════════
+
+   Lo que corriges se guarda en el navegador. Esto lo manda al Apps
+   Script del sitio, que lo deja en el Drive y pone al día las
+   cantidades de la hoja.
+
+   Va la REVISIÓN, no celdas sueltas: las reglas del metrado —que los
+   unificados no suman, que lo anulado se declara en cero, que un código
+   repetido se distingue por su ocurrencia, que el OC no se metra— viven
+   en el generador, con su batería de pruebas. El Apps Script escribe
+   sólo las cantidades que ya tienen fila; lo que exige insertar filas
+   —un ambiente del plano, un renglón reactivado— entra al regenerar el
+   LS, que es donde esas reglas se aplican. Por eso después de enviar
+   hay que correr la automatización igual. */
+
+const PME_ENVIO = {
+  url: 'https://script.google.com/macros/s/AKfycbyCC42QwfzqLYKo0J9ahH_m1upJ0uMIhd2hF2R7YOdNhtceXmhzRVYlydhkdjk-Xh_1Rg/exec',
+  /* El mismo pestillo que PACHAS_TOKEN en el Apps Script. No es un
+     secreto fuerte —viaja en el navegador de quien revisa— sino lo que
+     impide que un visitante cualquiera escriba en la hoja. */
+  token: 'pachas26-sb'
+};
+
+function pmeEnvMsg(txt, mal){
+  const e = document.getElementById('pmeEnvMsg');
+  if(!e) return;
+  e.textContent = txt;
+  e.className = 'pme-env-msg' + (mal ? ' mal' : '');
+}
+
+/* La revisión vive dentro del marco, que es la herramienta de verdad.
+   Si el marco no está —vista de lectura— se usa la del propio panel. */
+function pmeRevisionViva(id){
+  const f = document.querySelector('.pme-marco iframe');
+  if(f){
+    try{
+      const w = f.contentWindow;
+      if(w && w.PME_U) return JSON.parse(JSON.stringify(Object.assign({v: 2}, w.PME_U)));
+      const g = w.localStorage.getItem('pme-pachas-i4-v1');
+      if(g) return JSON.parse(g);
+    }catch(e){ /* el marco aún no cargó */ }
+  }
+  return pmeRev(id);
+}
+
+async function pmeEnviarLS(){
+  const id = pmeId();
+  const rev = pmeRevisionViva(id);
+  const nq = Object.keys(rev.q || {}).length;
+  const nf = Object.keys(rev.forz || {}).length;
+  const ne = (rev.extra || []).length;
+  const no = Object.keys(rev.obs || {}).length + Object.keys(rev.obsr || {}).length;
+
+  if(!nq && !nf && !ne && !no){
+    pmeEnvMsg('No hay nada que enviar: no has corregido nada todavía.', true);
+    return;
+  }
+  if(!confirm('Se va a escribir en el LS del Drive:
+
+'
+      + '  · ' + nq + ' cantidades corregidas
+'
+      + '  · ' + nf + ' renglones reactivados
+'
+      + '  · ' + ne + ' ambientes del plano
+'
+      + '  · ' + no + ' observaciones
+
+'
+      + 'Las cantidades se escriben en la hoja. Los ambientes del plano y los '
+      + 'reactivados quedan guardados en el Drive y entran al regenerar el LS.
+
+¿Seguir?')) return;
+
+  pmeEnvMsg('Enviando…');
+  const b = document.querySelector('.pme-env');
+  if(b) b.disabled = true;
+  try{
+    /* text/plain a propósito: con application/json el navegador manda
+       antes una petición de permiso que Apps Script no contesta. */
+    const r = await fetch(PME_ENVIO.url + '?pme=1', {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({token: PME_ENVIO.token, id: id, revision: rev})
+    });
+    const txt = await r.text();
+    let d = null;
+    try{ d = JSON.parse(txt); }catch(e){}
+    if(d && d.ok){
+      pmeEnvMsg('Enviado · ' + nfm(d.puestas_en_la_hoja || 0) + ' de ' + nfm(d.cantidades || 0)
+        + ' cantidades escritas en la hoja'
+        + ((d.sin_sitio || []).length ? ' · ' + d.sin_sitio.length + ' sin fila en el LS' : ''));
+    }else if(d && d.motivo){
+      pmeEnvMsg('No se escribió: ' + d.motivo, true);
+    }else if(/<!DOCTYPE|<html/i.test(txt)){
+      /* Apps Script devuelve su página de error cuando la versión
+         PUBLICADA no tiene el doPost: el editor puede tener el archivo
+         y la implementación seguir siendo la anterior. */
+      pmeEnvMsg('El Apps Script no está publicado con la última versión: '
+        + 'Implementar → Administrar implementaciones → editar → Versión: nueva.', true);
+    }else{
+      pmeEnvMsg('Se envió, pero la respuesta no se entiende. Comprueba la hoja.', true);
+    }
+  }catch(e){
+    pmeEnvMsg('No se pudo enviar: ' + (e && e.message ? e.message : e), true);
+  }
+  if(b) b.disabled = false;
+}
+
+/* nf() ya está cogido por el formateador de números del panel. */
+function nfm(n){ try{ return nf(n); }catch(e){ return String(n); } }

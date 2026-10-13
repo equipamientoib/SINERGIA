@@ -305,18 +305,55 @@ body.con-cajon{ padding-right: var(--pme-cajon) }
 /* La fila con algo puesto se nota en la tabla. */
 .pme-eq tr.react td{background:#FFFBEF}
 
-/* La herramienta de armado, a pantalla completa. Tiene que ser la
-   ventana entera: dentro, su barra de pestañas se ancla con sticky y su
-   cajón de cotejo con position:fixed, los dos contra la ventana. En un
-   recuadro se anclan al recuadro —la barra deja de quedarse arriba al
-   bajar— y el cajón se reparte el ancho del recuadro en vez del de la
-   pantalla. Así el marco ES la ventana y se comporta igual que con
-   doble clic en el equipo. */
-.pme-lleno{position:fixed;inset:0;z-index:200;background:var(--blanco)}
-.pme-lleno iframe{display:block;width:100%;height:100%;border:0}
-.pme-lleno-b{position:fixed;right:14px;bottom:14px;z-index:201;display:flex;gap:8px}
-.pme-lleno-b .ex-btn{background:var(--onix);color:var(--blanco);border-color:var(--onix);
-  box-shadow:0 6px 18px rgba(0,0,0,.22)}
-.pme-lleno-b .ex-btn:hover{background:var(--grafito);border-color:var(--grafito)}
-/* Con la herramienta abierta, la página de debajo no se desplaza. */
-body.con-herramienta{overflow:hidden}
+/* La Fiscalización de la herramienta, dentro de la pestaña. Va en un
+   marco propio porque trae sus propios estilos —los mismos del sitio,
+   copiados— y mezclarlos con los de esta página rompería las dos. El
+   marco se lleva el alto que queda de pantalla: dentro, el cajón de
+   cotejo se cuelga de él y ocupa su mitad. */
+.pme-marco{margin-top:12px;border:1px solid var(--linea);border-radius:var(--r-sm);
+  overflow:hidden;background:var(--blanco)}
+.pme-marco iframe{display:block;width:100%;height:calc(100vh - 210px);min-height:560px;border:0}
+@media (max-width:860px){ .pme-marco iframe{height:calc(100vh - 150px);min-height:460px} }
+
+/* ── Revisando, la cabecera del expediente se repliega ──
+   Entre la barra del sitio, la miga de pan, la ficha del proyecto, las
+   pestañas y la barra de revisión se iban 425 px antes de empezar el
+   marco, y en un portátil al marco no le quedaba nada. Es lo mismo que
+   hace la herramienta al bajar: replegarse. El nombre del proyecto se
+   queda en la barra de revisión, para no perder de vista dónde se está. */
+.crumb,.pr-head{transition:max-height .22s ease,opacity .18s ease}
+body.pme-herr .crumb,
+body.pme-herr .pr-head{max-height:0;opacity:0;border-bottom:0;overflow:hidden;
+  pointer-events:none;padding-top:0 !important;padding-bottom:0 !important}
+/* Las pestañas del expediente se quedan arriba, debajo de la del sitio. */
+body.pme-herr .det-tabs{position:sticky;top:71px;z-index:40;background:var(--blanco);
+  box-shadow:0 10px 18px -14px rgba(23,25,29,.35)}
+/* Y el marco se lleva lo que queda de pantalla. */
+/* El alto lo pone pmeAltoMarco() midiendo; esto es sólo el respaldo
+   por si el script no llegara a correr. */
+body.pme-herr .pme-marco iframe{height:calc(100vh - 230px);min-height:420px}
+.pme-donde{font-size:12px;color:var(--onix);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:34vw}
+@media (max-width:860px){
+  body.pme-herr .det-tabs{top:0}
+  body.pme-herr .pme-marco iframe{height:calc(100vh - 150px)}
+  .pme-donde{display:none}
+}
+
+/* ── Cotejando, el marco se lleva la pantalla ──
+   `.page.active` lleva un transform de la animación de entrada, y un
+   transform atrapa a todo lo que esté position:fixed dentro. Mientras
+   se revisa ya no hace falta esa animación, así que se quita y el marco
+   puede clavarse a la ventana. */
+body.pme-herr .page.active{transform:none}
+body.pme-cotejo{overflow:hidden}
+body.pme-cotejo .pme-marco{position:fixed;top:0;right:0;bottom:0;left:0;
+  height:auto;z-index:200;margin:0;border:0;border-radius:0}
+body.pme-cotejo .pme-marco iframe{height:100% !important;min-height:0}
+
+/* El botón de enviar al Drive y su recado. */
+.pme-env{border-color:var(--bronce);color:var(--cobre-d,#8A5A12)}
+.pme-env:hover:not([disabled]){background:#FDF7E6}
+.pme-env[disabled]{opacity:.5;cursor:default}
+.pme-env-msg{font-size:11.5px;color:var(--grafito)}
+.pme-env-msg.mal{color:#9E342C}
