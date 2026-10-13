@@ -117,7 +117,41 @@ function pmeClaves(){
 }
 function pmeClave(r){ return pmeClaves()[r.n]; }
 
+/* ── AMBIENTES RETIRADOS DEL METRADO ──
+
+   El PMA es el documento y no se toca, pero un ambiente suyo puede
+   acabar sin equipar: el proyecto lo retira, cambia de uso, o el plano
+   lo resuelve de otra manera. Eso se dice retirándolo aquí.
+
+   Retirar NO borra sus líneas del LS. Van a cero, en gris, con el
+   motivo escrito en la columna de observaciones. Un hueco en la hoja no
+   se distingue de un olvido; una línea en cero dice «se miró y se
+   descartó», que es lo que un supervisor necesita leer. Es la misma
+   regla que ya rige los renglones sueltos en cero y los anulados por
+   unificación.
+
+   Se guarda por CÓDIGO DE AMBIENTE, igual que el resto de la revisión,
+   así que volver a equiparlo devuelve las cantidades que tuviera. */
+function pmeApagado(cods){ return !!(PME_U.off || {})[cods]; }
+
+/* Cuántos ambientes físicos lleva una línea del PMA. Entero y nunca
+   menos de uno: el motor trunca igual, y si no, las dos hojas darían
+   números distintos para el mismo ambiente. */
+function pmeVecesAmb(v){
+  const n = Math.trunc(Number(v));
+  return Number.isFinite(n) ? Math.max(1, n) : 1;
+}
+
+function pmeApagar(cods, si){
+  PME_U.off = PME_U.off || {};
+  if(si) PME_U.off[cods] = 1; else delete PME_U.off[cods];
+  pmeGuardarLS();
+}
+
+function pmeCuantosApagados(){ return Object.keys(PME_U.off || {}).length; }
+
 function pmeQ(r){
+  if(pmeApagado(r.cods)) return 0;
   const v = PME_U.q[pmeClave(r)];
   if(v === undefined || v === null || v === '') return r.fin || 0;
   /* El −/+ nunca deja un negativo, pero una revisión editada a mano o un
@@ -140,12 +174,13 @@ function pmeCargarLS(){
     /* Sin nada guardado se vuelve al preliminar limpio: esta función
        también es la que usa «Descartar la revisión». */
     const o = s ? JSON.parse(s) : {};
-    PME_U = {q: o.q || {}, dec: o.dec || {}, obs: o.obs || {}, obsr: o.obsr || {}, extra: o.extra || [], forz: o.forz || {}};
+    PME_U = {q: o.q || {}, dec: o.dec || {}, obs: o.obs || {}, obsr: o.obsr || {},
+             extra: o.extra || [], forz: o.forz || {}, off: o.off || {}, add: o.add || {}};
     if(s && o.v !== 2) pmeMigrar();
   }catch(e){
     /* Modo privado, almacenamiento bloqueado o JSON roto: se sigue con
        el preliminar limpio. No es motivo para no abrir la herramienta. */
-    PME_U = {q: {}, dec: {}, obs: {}, obsr: {}, extra: [], forz: {}};
+    PME_U = {q: {}, dec: {}, obs: {}, obsr: {}, extra: [], forz: {}, off: {}, add: {}};
   }
 }
 /* Lo guardado con el formato viejo —número de línea e índice de
@@ -172,7 +207,7 @@ function pmeMigrar(){
     else perdidas++;
   });
   PME_U = {q: q, dec: PME_U.dec || {}, obs: obs, obsr: obsr, extra: PME_U.extra || [],
-           forz: PME_U.forz || {}};
+           forz: PME_U.forz || {}, off: PME_U.off || {}, add: PME_U.add || {}};
   PME_PERDIDAS = perdidas;
   pmeGuardarLS();
 }
@@ -726,8 +761,13 @@ function pmeCargarJson(input){
   fr.onload = () => {
     try{
       const o = JSON.parse(fr.result);
-      PME_U = {q: o.q || {}, dec: o.dec || {}, obs: o.obs || {}, obsr: o.obsr || {}, extra: o.extra || [], forz: o.forz || {}};
+      PME_U = {q: o.q || {}, dec: o.dec || {}, obs: o.obs || {}, obsr: o.obsr || {},
+             extra: o.extra || [], forz: o.forz || {}, off: o.off || {}, add: o.add || {}};
       if(o.v !== 2) pmeMigrar();
+      /* Un respaldo guardado antes del arreglo de los códigos puede
+         traer dos ambientes del plano con el mismo: se rehacen aquí
+         igual que al abrir. */
+      try{ if(typeof extRenumerar === 'function' && pmeExtras().length) extRenumerar(); }catch(e){}
       pmeGuardarLS();
       fisOlvidar();
       pintarPme();
@@ -806,6 +846,8 @@ const LS_CENT  = {borde: 1, centro: 1, medio: 1};
 const LS_CANT  = {borde: 1, centro: 1, medio: 1, fmt: '0'};
 const LS_SEP   = {fondo: 'CFE2F3', borde: 1};     // la fila que separa ambientes
 const LS_PLANO = {fondo: 'C6E0B4', borde: 1};     // la banda del ambiente del plano
+const LS_ANADE = {fondo: 'D9E8F5', borde: 1};     // el equipo que añadiste al ambiente
+const LS_ANADEC = {fondo: 'D9E8F5', borde: 1, centro: 1, medio: 1};
 const LS_NOTA  = {borde: 1, color: '7A5B12'};     // la columna de observación
 
 /* Lo que en el LS se llena con fórmulas —la norma, la descripción, el
@@ -833,10 +875,16 @@ function lsFila(base, datos){
 
 /* El estilo de toda una fila, columna por columna, según cómo quedó. */
 function lsBase(estado){
-  const fondo = {ok: LS_CELDA, anul: LS_ANUL, react: LS_REAC, cero: LS_OFF}[estado] || LS_OFF;
+  const fondo = {ok: LS_CELDA, anul: LS_ANUL, react: LS_REAC, cero: LS_OFF,
+                 anade: LS_ANADE}[estado] || LS_OFF;
   const b = new Array(LS_N).fill(fondo);
   if(estado === 'ok') b[20] = LS_NOTA;
-  if(estado === 'ok'){
+  if(estado === 'anade'){
+    /* El añadido se pinta entero, columna de observación incluida: es
+       justo ahí donde dice de dónde salió, y el motor lo pinta igual. */
+    b[1] = LS_ANADEC; b[12] = LS_ANADEC; b[16] = LS_ANADEC;
+    b[17] = LS_ANADEC; b[18] = LS_ANADEC; b[19] = LS_ANADEC;
+  }else if(estado === 'ok'){
     b[1] = LS_CENT; b[2] = LS_UPSS; b[12] = LS_CENT;
     b[16] = LS_CANT; b[17] = LS_CENT; b[18] = LS_CENT; b[19] = LS_CENT;
   }else{
@@ -866,7 +914,7 @@ function pmeExcelLs(){
 function lsBlob(){
   try{
     const filas = [{alto: 37.5, celdas: LS_COLS.map(t => ({v: t, s: LS_CAB}))}];
-    let nAmb = 0, nCero = 0, nAnul = 0, nLin = 0, nReac = 0, nPlano = 0, unid = 0;
+    let nAmb = 0, nCero = 0, nAnul = 0, nLin = 0, nReac = 0, nPlano = 0, nAnade = 0, unid = 0;
 
     fisIdx().lista.forEach(a => {
       const m = a.m;
@@ -878,6 +926,7 @@ function lsBlob(){
       nAmb++;
       const nombre = (m.ambnts || m.amb || '').toUpperCase();
 
+      const apagado = pmeApagado(m.cods);
       const tit = new Array(LS_N).fill(LS_CELDA);
       const banda = a.extra ? LS_PLANO : LS_TIT;
       tit[13] = banda; tit[14] = banda; tit[12] = LS_CENT; tit[20] = LS_NOTA;
@@ -888,6 +937,12 @@ function lsBlob(){
               + (a.nts && a.nts.partes && a.nts.partes.length > 1
                  ? ' · unido de ' + a.nts.partes.length + ' ambientes de la NTS' : '');
       }
+      /* Retirado: se dice en la banda, que es lo primero que se lee del
+         ambiente, y además en cada renglón. Decirlo sólo renglón a
+         renglón obligaría a leer treinta líneas para entender por qué
+         están todas en cero. */
+      if(apagado) d[20] = 'AMBIENTE RETIRADO DEL METRADO: no se equipa'
+                        + (d[20] ? ' · ' + d[20] : '');
       filas.push(lsFila(tit, d));
 
       /* Los anulados por unificación van TODOS al final del ambiente, no
@@ -899,10 +954,16 @@ function lsBlob(){
       a.ren.forEach(x => {
         if(x.p === 'OC') return;           // el OC no se metra, nunca estuvo
         const q = x.ln ? pmeQ(x.ln) : 0;
+        /* El equipo que añadiste a este ambiente entra por aquí como
+           cualquier otro: el índice lo mete al final de la lista, que es
+           donde lo escribe el motor. Sólo cambia cómo se pinta y lo que
+           dice la observación. */
         const estado = !x.ln ? 'anul'
-          : (x.est === 'react' ? 'react' : (q === 0 ? 'cero' : 'ok'));
+          : (x.est === 'react' ? 'react'
+             : (q === 0 ? 'cero' : (x.ln.anadida ? 'anade' : 'ok')));
         if(estado === 'anul') nAnul++;
-        else { nLin++; if(q === 0) nCero++; if(estado === 'react') nReac++; unid += q; }
+        else { nLin++; if(q === 0) nCero++; if(estado === 'react') nReac++;
+               if(estado === 'anade') nAnade++; unid += q; }
         (estado === 'anul' ? anulados : filas).push(lsFila(lsBase(estado), lsDatos({
           upss: m.upss, cods: m.cods, nombre: nombre,
           /* La descripción la da la LÍNEA DEL METRADO —x.ln—, que es la
@@ -916,12 +977,22 @@ function lsBlob(){
              anulado no hay línea: entonces vale la del renglón. */
           c: x.c, d: (x.ln && x.ln.d) || x.d || (PME_D.cat[x.c] || [])[0],
           t: x.t, p: x.p, zona: m.zona,
-          norma: x.ln && x.ln.nEq ? 'NTS ' + x.ln.nEq
-               : (a.nts && a.nts.n ? 'NTS ' + a.nts.n : 'Propuesta'),
+          /* Un equipo que añadiste no hereda la norma del ambiente: si no
+             lo sacaste de la NTS es Propuesta, y así tiene que leerse. El
+             resto sí cae en la del ambiente cuando la línea no la trae. */
+          norma: (x.ln && x.ln.anadida)
+               ? (x.ln.nEq ? 'NTS ' + x.ln.nEq : 'Propuesta')
+               : (x.ln && x.ln.nEq ? 'NTS ' + x.ln.nEq
+                  : (a.nts && a.nts.n ? 'NTS ' + a.nts.n : 'Propuesta')),
           q: q,
           nota: {
             ok: a.extra ? 'Equipo de un ambiente añadido por planos' : '',
-            cero: 'EN CERO: lo pusiste en cero al fiscalizar',
+            anade: (x.ln && x.ln.nEq)
+              ? 'EQUIPO AÑADIDO POR TI, de la NTS ' + x.ln.nEq
+                + ': no estaba en la lista de este ambiente'
+              : 'EQUIPO AÑADIDO POR TI: no es de la norma, es propuesta del proyectista',
+            cero: apagado ? 'EN CERO: el ambiente está retirado del metrado'
+                          : 'EN CERO: lo pusiste en cero al fiscalizar',
             anul: 'ANULADO por unificación: el mismo código va en la otra lista '
                 + 'de este ambiente y manda la mayor cantidad',
             react: 'REACTIVADO por ti: la unificación lo había anulado y lo volviste a meter',
@@ -952,6 +1023,8 @@ function lsBlob(){
         (nCero ? ' · ' + pmeNum(nCero) + ' en cero, en gris' : '') +
         (nAnul ? ' · ' + pmeNum(nAnul) + ' anulados por unificación, en gris y tachados' : '') +
         (nReac ? ' · ' + pmeNum(nReac) + ' reactivados por ti, en amarillo' : '') +
+        (nAnade ? ' · ' + pmeNum(nAnade) + (nAnade === 1 ? ' equipo añadido' : ' equipos añadidos')
+                + ' por ti, en azul' : '') +
         (nPlano ? ' · ' + pmeNum(nPlano) + (nPlano === 1 ? ' ambiente' : ' ambientes')
                 + ' del plano, en verde' : '') + '.',
     };
@@ -1087,6 +1160,13 @@ function pmeArrancar(){
       </dl>`;
   }
   pmeCargarLS();
+  /* Los códigos de los ambientes del plano se repetían hasta este
+     arreglo, así que una revisión guardada antes puede traer dos con el
+     mismo. Se rehacen al abrir, una vez, antes de pintar nada: si se
+     dejara para cuando se toca un añadido, lo que se vea hasta entonces
+     —y lo que se mande al LS— seguiría con los códigos repetidos. */
+  try{ if(typeof extRenumerar === 'function' && pmeExtras().length) extRenumerar(); }
+  catch(e){}
   pintarPme();
   pmeVigilarScroll();
   /* El archivo vinculado se recupera después de pintar: si no está, no

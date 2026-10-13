@@ -295,7 +295,7 @@ function fisRenglones(a){
    lee como el nombre de una variable y no pasa nada al pulsar. */
 function fisId(i){ return typeof i === 'string' ? "'" + i + "'" : i; }
 
-function fisOlvidar(){ FIS_IX = null; FIS_FZ = null; }
+function fisOlvidar(){ FIS_IX = null; FIS_FZ = null; FIS_AD = null; }
 
 /* ─────────── RENGLONES ANULADOS QUE SE REACTIVAN ───────────
    La unificación descarta el renglón que pide menos. Casi siempre está
@@ -657,6 +657,9 @@ function fisFila(a){
   const p = PME_D.pmf.find(x => x.cod === m.pmf);
   const grave = a.alertas.some(x => x.t === 'dup' || x.t === 'pmf');
   const ren = a.ren.filter(x => x.j !== '').length;
+  /* Retirado se ve sin abrir la fila: si hubiera que desplegarla para
+     enterarse, revisar 232 ambientes sería imposible. */
+  const apagada = pmeApagado(m.cods) ? ' apagada' : '';
 
   const angosto = !!FIS_FUENTE;
   const abrir = `<td class="fis-abrir"><button type="button" onclick="fisAbrir(${fisId(a.i)})"
@@ -664,7 +667,7 @@ function fisFila(a){
   const avisos = `<td>${a.alertas.length ? `<span class="cmp-marcas">${a.alertas.map(x =>
       `<i class="fis-m ${x.t}" title="${esc(x.txt)}">${esc(FIS_ALERTAS[x.t][0])}</i>`).join('')}</span>` : ''}</td>`;
 
-  if(angosto) return `<tr class="fis-r ${ab ? 'abierta' : ''} ${grave ? 'grave' : ''}" id="fisu-${a.i}">
+  if(angosto) return `<tr class="fis-r ${ab ? 'abierta' : ''} ${grave ? 'grave' : ''}${apagada}" id="fisu-${a.i}">
       ${abrir}
       <td class="pme-cod c-pmf">${m.pmf ? esc(m.pmf) : '<span class="fis-nd">—</span>'}</td>
       <td class="pme-cod c-pma">${esc(m.cods || '')}</td>
@@ -679,7 +682,7 @@ function fisFila(a){
     </tr>
     ${ab ? fisFilaCabNorma(a, 10) + `<tr class="fis-det-r"><td colspan="10">${fisDetalle(a)}</td></tr>` : ''}`;
 
-  return `<tr class="fis-r ${ab ? 'abierta' : ''} ${grave ? 'grave' : ''}" id="fisu-${a.i}">
+  return `<tr class="fis-r ${ab ? 'abierta' : ''} ${grave ? 'grave' : ''}${apagada}" id="fisu-${a.i}">
       ${abrir}
 
       <td class="pme-cod c-pmf">${m.pmf ? esc(m.pmf) : '<span class="fis-nd">—</span>'}</td>
@@ -745,13 +748,15 @@ function fisFilaCabNorma(a, cols){
 /* — El detalle: la lista de la norma tal cual — */
 function fisDetalle(a){
   const m = a.m;
-  const cabecera = fisBotonesFuente(a) + fisPorque(a) + (m.grupo ? fisBloqueGrupo(a) : '');
+  const cabecera = fisBotonesFuente(a) + fisBotonRetirar(a) + fisPorque(a)
+                 + (m.grupo ? fisBloqueGrupo(a) : '');
   if(!a.nts){
     return `<div class="fis-det-caja">
       ${cabecera}
       <p class="fis-no"><b>Este ambiente no tiene lista de norma.</b> No se encontró equivalente en la NTS 113,
         la 110 ni la 119${m.nota ? ' — ' + esc(m.nota) : ''}. No se equipa, pero queda en el PME para que se vea
         que se miró y no que se olvidó.</p>
+      ${fisAnadidos(a)}
       ${fisCajaObs(a.i, null, 'Tu observación sobre este ambiente')}
     </div>`;
   }
@@ -853,6 +858,7 @@ function fisDetalle(a){
         <td class="n">${pmeNum(a.unid)}</td><td></td>
       </tr></tfoot>
     </table>
+    ${fisAnadidos(a)}
     ${fisCajaObs(a.i, null, 'Tu observación sobre este ambiente')}
   </div>`;
 }
@@ -2098,4 +2104,335 @@ function fisNormaParaExcel(){
     });
   });
   return out;
+}
+
+/* ─────────── RETIRAR UN AMBIENTE DEL METRADO ───────────
+
+   El PMA es el documento y no se toca. Pero un ambiente suyo puede
+   acabar sin equipar —el proyecto lo retira, cambia de uso, el plano lo
+   resuelve de otra manera— y hasta ahora la única forma de decirlo era
+   poner a mano en cero sus treinta renglones, uno por uno.
+
+   Retirar no borra: las líneas siguen en el LS, en cero y en gris, con
+   el motivo en la columna de observaciones. Un hueco en la hoja no se
+   distingue de un olvido; una línea en cero dice «se miró y se
+   descartó», que es justo lo que un supervisor viene a leer. */
+
+function fisBotonRetirar(a){
+  const m = a.m;
+  if(!m.cods) return '';
+  const off = pmeApagado(m.cods);
+  return `<div class="fis-retirar${off ? ' off' : ''}">
+    <button type="button" class="ex-btn${off ? ' ver' : ''}" onclick="fisRetirar(${fisId(a.i)})">
+      ${off ? '↩ Volver a equiparlo' : '✕ Retirar este ambiente del metrado'}</button>
+    <span>${off
+      ? `Retirado. Sus ${pmeNum(a.ren.filter(x => x.j !== '' && x.p !== 'OC').length)} renglones van en cero
+         y así salen al LS, en gris y con el motivo escrito. Las cantidades que hubieras corregido
+         se guardan: vuelven si lo equipas otra vez.`
+      : `Para cuando el proyecto ya no lo equipa. Las líneas <b>no se borran</b>: van a cero con el
+         motivo, porque un hueco en la hoja no se distingue de un olvido.`}</span>
+  </div>`;
+}
+
+function fisRetirar(ia){
+  const a = fisIdx().porAmb[ia];
+  if(!a || !a.m.cods) return;
+  const off = pmeApagado(a.m.cods);
+  if(!off){
+    const n = a.ren.filter(x => x.j !== '' && x.p !== 'OC').length;
+    if(!confirm('Se retira «' + (a.m.amb || a.m.cods) + '» del metrado.' + String.fromCharCode(10) +
+                String.fromCharCode(10) +
+                'Sus ' + n + ' renglones pasan a cero. No se borran del LS: salen en gris con el motivo, ' +
+                'para que se vea que se miró y se descartó.' + String.fromCharCode(10) +
+                String.fromCharCode(10) + '¿Seguimos?')) return;
+  }
+  pmeApagar(a.m.cods, !off);
+  fisOlvidar();
+  pintarPme();
+}
+
+/* ─────────── EQUIPOS AÑADIDOS A UN AMBIENTE ───────────
+
+   La NTS da la lista de cada ambiente y de ahí sale el metrado. Pero un
+   proyecto real lleva cosas que la norma no pone: lo que pide el
+   programa funcional, lo que exige el equipo que ya hay, lo que decide
+   el proyectista. Hasta ahora eso sólo cabía añadiendo un ambiente
+   entero, que no es lo mismo.
+
+   Se añaden por CÓDIGO DE AMBIENTE, como todo lo demás de la revisión,
+   y cada uno guarda de qué norma salió —o ninguna, y entonces es
+   «Propuesta»—. Esa es la columna que un supervisor mira primero: de
+   dónde sale cada renglón.
+
+   Lo que se guarda es la cantidad POR AMBIENTE FÍSICO, igual que en la
+   norma: un ambiente con N.º 3 se lleva el triple, como sus renglones
+   normativos. Guardar el total haría que añadir lo mismo a dos
+   ambientes diera números distintos sin motivo visible. */
+
+function pmeAnadidos(cods){ return (PME_U.add || {})[cods] || []; }
+
+function pmeAnadidas(){
+  if(FIS_AD) return FIS_AD;
+  const add = PME_U.add || {};
+  const out = [];
+  if(Object.keys(add).length){
+    const mete = (m, ia, veces) => {
+      (add[m.cods] || []).forEach((it, k) => {
+        const q = Math.max(0, Math.trunc(Number(it.q)) || 0);
+        out.push({
+          n: 'A' + ia + '-' + k, ia: ia, anadida: true,
+          upss: m.upss, tipo: m.tipo, zona: m.zona, amb: m.amb,
+          pag: m.pag, namb: m.n, estado: m.estado, pmf: m.pmf,
+          nAmbNorma: it.n || '', codAmb: m.cod, ambNts: m.ambnts,
+          c: it.c, d: it.d, t: it.t || '', p: 'EQ',
+          qn: q, calc: q * veces, fin: q * veces, nEq: it.n || '',
+          obs: it.n ? 'Equipo que añadiste a este ambiente, de la NTS ' + it.n
+                    : 'Equipo que añadiste a este ambiente: no es de la norma',
+          conf: m.conf, nota: m.nota, area: m.area, grupo: m.grupo,
+          cods: m.cods, codsl: m.codsl,
+        });
+      });
+    };
+    PME_D.match.forEach((m, i) => {
+      if(!add[m.cods]) return;
+      mete(m, i, pmeVecesAmb(m.n));
+    });
+    pmeExtras().forEach(e => {
+      const cods = extCodsTxt(e);
+      if(!add[cods]) return;
+      const ambs = extAmbs(e);
+      const m = {upss: e.upss, tipo: 'Añadido por planos', zona: '', amb: e.amb,
+                 pag: '', n: e.n, estado: 'Añadido por planos', pmf: '',
+                 cod: ambs.map(a => a.cod).filter(Boolean).join(' + '),
+                 ambnts: ambs.map(a => a.amb).join(' + '),
+                 conf: 'Añadido por planos', nota: '', area: '', grupo: '',
+                 cods: cods, codsl: extCods(e)};
+      mete(m, 'P' + e.id, Math.max(1, extVeces(e)));
+    });
+  }
+  FIS_AD = out;
+  return out;
+}
+
+let FIS_AD = null;
+
+/* ─────────── AÑADIR UN EQUIPO A UN AMBIENTE ───────────
+
+   La NTS da la lista de cada ambiente y de ahí sale el metrado, pero un
+   proyecto real lleva cosas que la norma no pone. Dos caminos, y la
+   diferencia entre ellos es lo único que importa aquí:
+
+     · DE LA NORMA: se busca el código en la NTS —la 113 y la 110
+       enteras, 841 códigos— y entra con su norma de origen escrita. Es
+       un equipo normativo que no estaba en la lista de ESTE ambiente.
+     · PROPIO: se escribe a mano y entra como «Propuesta». No es de la
+       norma, y la hoja lo dice en su columna, que es lo primero que
+       mira un supervisor.
+
+   Nunca se inventa la norma de un código: si sale del buscador lleva la
+   que le corresponde; si se escribe a mano, no lleva ninguna. */
+
+const FIS_ADD = {amb: null, q: '', c: '', d: '', t: '', n: '', cant: 1, propio: false};
+
+/* De qué norma sale cada código. La 113 primero y la 110 después, el
+   mismo orden que manda en el metrado: un código que está en las dos se
+   declara de la 113. */
+let FIS_NORMA_COD = null;
+function fisNormaCod(c){
+  if(!FIS_NORMA_COD){
+    FIS_NORMA_COD = {};
+    const todo = PME_D.ntsTodo || {};
+    ['113', '110'].forEach(n => {
+      const amb = (todo[n] || {}).amb || [];
+      amb.forEach(a => (a[4] || []).forEach(par => {
+        if(!FIS_NORMA_COD[par[0]]) FIS_NORMA_COD[par[0]] = n;
+      }));
+    });
+  }
+  return FIS_NORMA_COD[c] || '';
+}
+
+function fisAddBuscar(q){
+  const t = (q || '').trim().toUpperCase();
+  if(t.length < 2) return [];
+  const out = [];
+  Object.keys(PME_D.cat).forEach(c => {
+    if(out.length >= 12) return;
+    const x = PME_D.cat[c];
+    if(x[2] === 'OC') return;                 // el OC no se metra: no se ofrece
+    if(c.toUpperCase().indexOf(t) >= 0 || (x[0] || '').toUpperCase().indexOf(t) >= 0){
+      out.push({c: c, d: x[0], t: x[1], n: fisNormaCod(c)});
+    }
+  });
+  return out;
+}
+
+function fisAddAbrir(ia){
+  FIS_ADD.amb = FIS_ADD.amb === ia ? null : ia;
+  fisAddLimpiar();
+  pintarPme();
+}
+function fisAddLimpiar(){
+  FIS_ADD.q = ''; FIS_ADD.c = ''; FIS_ADD.d = ''; FIS_ADD.t = '';
+  FIS_ADD.n = ''; FIS_ADD.cant = 1; FIS_ADD.propio = false;
+}
+function fisAddCampo(k, v){ FIS_ADD[k] = v; pintarPme(); }
+function fisAddModo(propio){
+  if(FIS_ADD.propio === propio) return;
+  const amb = FIS_ADD.amb;
+  fisAddLimpiar();
+  FIS_ADD.amb = amb; FIS_ADD.propio = propio;
+  pintarPme();
+}
+function fisAddElegir(c){
+  const x = PME_D.cat[c];
+  if(!x) return;
+  FIS_ADD.c = c; FIS_ADD.d = x[0]; FIS_ADD.t = x[1]; FIS_ADD.n = fisNormaCod(c);
+  FIS_ADD.q = '';
+  pintarPme();
+}
+
+function fisAddPoner(ia){
+  const a = fisIdx().porAmb[ia];
+  if(!a || !a.m.cods) return;
+  const c = (FIS_ADD.c || '').trim().toUpperCase();
+  const d = (FIS_ADD.d || '').trim();
+  if(!c){ alert('Falta el código del equipo.'); return; }
+  if(!d){ alert('Falta la descripción del equipo.'); return; }
+  const q = Math.max(1, Math.trunc(Number(FIS_ADD.cant)) || 1);
+  PME_U.add = PME_U.add || {};
+  const l = PME_U.add[a.m.cods] = PME_U.add[a.m.cods] || [];
+  /* Propio quiere decir propio: aunque el código exista en la NTS, si lo
+     escribiste a mano no se le cuelga una norma que tú no elegiste. */
+  l.push({c: c, d: d, t: (FIS_ADD.t || '').trim(),
+          n: FIS_ADD.propio ? '' : (FIS_ADD.n || ''), q: q});
+  pmeGuardarLS();
+  FIS_ADD.amb = null;
+  fisAddLimpiar();
+  fisOlvidar();
+  pintarPme();
+}
+
+function fisAddQuitar(ia, k){
+  const a = fisIdx().porAmb[ia];
+  if(!a) return;
+  const l = pmeAnadidos(a.m.cods);
+  const it = l[k];
+  if(!it) return;
+  if(!confirm('Se quita «' + it.c + ' · ' + it.d + '» de este ambiente. ¿Seguimos?')) return;
+  l.splice(k, 1);
+  if(!l.length) delete PME_U.add[a.m.cods];
+  pmeGuardarLS();
+  fisOlvidar();
+  pintarPme();
+}
+
+function fisAddCant(ia, k, d){
+  const a = fisIdx().porAmb[ia];
+  if(!a) return;
+  const it = pmeAnadidos(a.m.cods)[k];
+  if(!it) return;
+  it.q = Math.max(0, (Math.trunc(Number(it.q)) || 0) + d);
+  pmeGuardarLS();
+  fisOlvidar();
+  pintarPme();
+}
+
+function fisAddTotal(v, veces){
+  return pmeNum(Math.max(1, Math.trunc(Number(v)) || 1) * veces);
+}
+
+function fisAnadidos(a){
+  const m = a.m;
+  if(!m.cods) return '';
+  const lista = pmeAnadidos(m.cods);
+  const veces = pmeVecesAmb(m.n);
+  const abierto = FIS_ADD.amb === a.i;
+  const hall = (abierto && !FIS_ADD.propio) ? fisAddBuscar(FIS_ADD.q) : [];
+
+  const filas = lista.map((it, k) => `<tr>
+    <td><span class="pme-cod">${esc(it.c)}</span></td>
+    <td class="pme-desc">${esc(it.d)}</td>
+    <td>${esc(it.t || '—')}</td>
+    <td>${it.n ? pmeEt(it.n) : '<span class="fis-propio">Propuesta</span>'}</td>
+    <td class="n pme-q">
+      <button type="button" class="fis-mas" title="Una menos"
+        onclick="fisAddCant(${fisId(a.i)}, ${k}, -1)" ${it.q <= 0 ? 'disabled' : ''}>−</button>
+      <b class="tocada">${pmeNum(it.q)}</b>
+      <button type="button" class="fis-mas" title="Una más"
+        onclick="fisAddCant(${fisId(a.i)}, ${k}, 1)">+</button></td>
+    <td class="n">${pmeNum(Math.max(0, Math.trunc(Number(it.q)) || 0) * veces)}</td>
+    <td><button type="button" class="fis-quitar" title="Quitarlo de este ambiente"
+      onclick="fisAddQuitar(${fisId(a.i)}, ${k})">✕</button></td>
+  </tr>`).join('');
+
+  return `<div class="fis-anade">
+    <h5 class="fis-tit">Equipos que añadiste a <b>${esc(m.cods)}</b>${
+      lista.length ? ` <span class="fis-anade-n">${pmeNum(lista.length)}</span>` : ''}</h5>
+    ${lista.length ? `<table class="pme-tabla fis-eq fis-eq-anade">
+      <colgroup><col style="width:9%"><col><col style="width:7%"><col style="width:11%">
+        <col style="width:11%"><col style="width:9%"><col style="width:5%"></colgroup>
+      <thead><tr><th>Código</th><th>Descripción</th><th>Tipo</th><th>De dónde sale</th>
+        <th class="n" title="Por cada ambiente físico, como en la norma">Cant. por amb.</th>
+        <th class="n" title="Lo que entra al PME: la cantidad × el N.º de ambientes">Cant. PME</th>
+        <th></th></tr></thead>
+      <tbody>${filas}</tbody>
+    </table>` : `<p class="fis-anade-no">Ninguno todavía. La tabla de arriba es la lista de la norma;
+      aquí entra lo que este ambiente lleva <b>además</b> —de la NTS o propuesto por ti— y sale al LS
+      con su origen escrito en la columna de norma.</p>`}
+
+    <div class="ex-btns" style="margin:8px 0 0">
+      <button type="button" class="ex-btn ${abierto ? 'ver' : ''}" onclick="fisAddAbrir(${fisId(a.i)})">
+        ${abierto ? 'Cancelar' : '+ Añadir un equipo a este ambiente'}</button>
+    </div>
+
+    ${abierto ? `<div class="fis-addform">
+      <div class="fis-addtabs">
+        <button type="button" class="${FIS_ADD.propio ? '' : 'on'}"
+          onclick="fisAddModo(false)">Buscarlo en la NTS</button>
+        <button type="button" class="${FIS_ADD.propio ? 'on' : ''}"
+          onclick="fisAddModo(true)">Escribirlo yo</button>
+      </div>
+
+      ${FIS_ADD.propio ? `<div class="fis-addfila">
+        <label>Código <input type="text" value="${esc(FIS_ADD.c)}" placeholder="PROP-01…"
+          oninput="FIS_ADD.c = this.value"></label>
+        <label class="ancha">Descripción <input type="text" value="${esc(FIS_ADD.d)}"
+          placeholder="Como debe salir en el LS" oninput="FIS_ADD.d = this.value"></label>
+        <label class="corta">Tipo <input type="text" value="${esc(FIS_ADD.t)}" placeholder="C, E, M…"
+          oninput="FIS_ADD.t = this.value"></label>
+        <label class="corta">Cant. por amb. <input type="number" min="1" step="1"
+          value="${esc(FIS_ADD.cant)}" oninput="FIS_ADD.cant = this.value"></label>
+      </div>
+      <p class="fis-addnota">Entra como <b>Propuesta</b> en la columna de norma de origen: no es de la
+        NTS y la hoja lo dice.${veces > 1 ? ` Este ambiente son <b>${veces}</b>, así que al PME entran
+        <b>${fisAddTotal(FIS_ADD.cant, veces)}</b>.` : ''}</p>`
+      : `<label class="fis-addbusca">Busca el equipo en la NTS 113 y la 110
+        <input type="search" value="${esc(FIS_ADD.q)}"
+          placeholder="Por código o por nombre: «D-140», «camilla», «balanza»…"
+          oninput="fisAddCampo('q', this.value)"></label>
+      ${FIS_ADD.c ? `<div class="fis-addelegido">
+          <span class="pme-cod">${esc(FIS_ADD.c)}</span> <b>${esc(FIS_ADD.d)}</b>
+          ${FIS_ADD.n ? pmeEt(FIS_ADD.n) : '<span class="fis-propio">sin norma</span>'}
+          <label class="corta">Cant. por amb. <input type="number" min="1" step="1"
+            value="${esc(FIS_ADD.cant)}" oninput="FIS_ADD.cant = this.value"></label>
+          ${veces > 1 ? `<small>× ${veces} ambientes =
+            <b>${fisAddTotal(FIS_ADD.cant, veces)}</b> al PME</small>` : ''}
+        </div>`
+       : hall.length ? `<ul class="fis-addhall">${hall.map(x =>
+          `<li><button type="button" onclick="fisAddElegir('${esc(x.c)}')">
+            <span class="pme-cod">${esc(x.c)}</span> ${esc(x.d)}
+            ${x.n ? pmeEt(x.n) : '<span class="fis-propio">sin norma</span>'}</button></li>`).join('')}</ul>`
+       : (FIS_ADD.q || '').trim().length >= 2
+          ? `<p class="fis-addnota">Ningún equipo de la norma coincide con «${esc(FIS_ADD.q)}».
+             Si no está en la NTS, escríbelo tú en la otra pestaña.</p>`
+          : `<p class="fis-addnota">Escribe dos letras o más. Son 841 códigos de la 113 y la 110;
+             el <b>OC</b> no se ofrece, porque no se metra.</p>`}`}
+
+      <div class="ex-btns" style="margin-top:8px">
+        <button type="button" class="ex-btn ex-btn-fill" onclick="fisAddPoner(${fisId(a.i)})"
+          ${(FIS_ADD.c && FIS_ADD.d) ? '' : 'disabled'}>Añadirlo al ambiente</button>
+      </div>
+    </div>` : ''}
+  </div>`;
 }

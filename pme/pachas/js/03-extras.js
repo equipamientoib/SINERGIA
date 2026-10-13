@@ -185,7 +185,14 @@ function pmeLineas(){
     ? PME_D.pme.concat(ex.reduce((a, e) => a.concat(extLineas(e)), []))
     : PME_D.pme;
   const fz = pmeForzadas();
-  return fz.length ? base.concat(fz) : base;
+  /* Los equipos que añadiste van los últimos. El orden importa: la
+     ocurrencia de un código —la vez que se repite dentro del ambiente—
+     se cuenta recorriendo esta lista, y el motor la cuenta escribiendo
+     la hoja. Los dos ponen lo añadido detrás de lo normativo, así que
+     la misma línea sale con el mismo número en los dos sitios. */
+  const ad = pmeAnadidas();
+  const con = fz.length ? base.concat(fz) : base;
+  return ad.length ? con.concat(ad) : con;
 }
 
 /* ─────────────────────── ALTA Y BAJA ─────────────────────── */
@@ -265,6 +272,7 @@ function extAnadir(){
     id: id, upss: EXT.upss, amb: EXT.amb.trim(), n: Math.max(1, Number(EXT.n) || 1),
     ntsx: EXT.ntsx.slice(), cod: extCodigo(EXT.upss), nota: 'Añadido desde los planos',
   });
+  extRenumerar();
   pmeGuardarLS();
   fisOlvidar();
   EXT.amb = ''; EXT.q = ''; EXT.ntsx = []; EXT.n = 1; EXT.abierto = false;
@@ -276,6 +284,7 @@ function extQuitar(id){
   if(!e) return;
   if(!confirm('Se quita «' + e.amb + '» y sus equipos salen del PME. ¿Seguimos?')) return;
   PME_U.extra = pmeExtras().filter(x => x.id !== id);
+  extRenumerar();
   pmeGuardarLS();
   fisOlvidar();
   pintarPme();
@@ -285,6 +294,7 @@ function extCantidad(id, d){
   const e = pmeExtras().find(x => x.id === id);
   if(!e) return;
   e.n = Math.max(1, (Number(e.n) || 1) + d);
+  extRenumerar();
   pmeGuardarLS();
   fisOlvidar();
   pintarPme();
@@ -332,6 +342,12 @@ function extPanel(){
     programó, se añade aquí, se le elige su ambiente de la <b>NTS</b> y se equipa como cualquier otro.
     Llevan código propio —<b>CES-P01</b>, <b>INT-P01</b>…— y salen marcados como <b>Añadido por planos</b>
     en el PME y en el Excel, para que se sepa de dónde vienen. Se guardan con tu revisión, no con los datos.</p>
+
+  ${EXT_TURBIOS ? `<p class="ext-turbio"><b>Ojo:</b> ${pmeNum(EXT_TURBIOS)}
+    ${EXT_TURBIOS === 1 ? 'ambiente venía' : 'ambientes venían'} de una revisión anterior con el código
+    repetido. Ya está${EXT_TURBIOS === 1 ? '' : 'n'} renumerado${EXT_TURBIOS === 1 ? '' : 's'}, pero las
+    cantidades que hubieras corregido ahí no se movieron: como dos ambientes compartían código, no hay
+    forma de saber de cuál era cada una. Revísalas antes de mandar nada al LS.</p>` : ''}
 
   ${ex.length ? `<div class="pme-wrap" style="max-height:34vh">
     <table class="pme-tabla ext-tabla">
@@ -416,4 +432,84 @@ function extParaExcel(){
         + (ambs.length > 1 ? ' · ' + ambs.length + ' ambientes de la NTS unidos: no se suman, manda la mayor' : ''),
     };
   });
+}
+
+/* ─────────── LOS CÓDIGOS DE LOS AMBIENTES DEL PLANO ───────────
+
+   El correlativo se sacaba sumando los añadidos que había en ese
+   momento, y eso repetía códigos en dos casos reales:
+
+     · se borraba uno de en medio y el siguiente que entraba heredaba
+       un número ya ocupado;
+     · se le subía el N.º a uno y su rango pisaba al de al lado.
+
+   Repetir un código no es un detalle de presentación: la llave de la
+   revisión es CÓDIGO DE AMBIENTE | código de equipo | ocurrencia, así
+   que dos ambientes con el mismo código comparten las cantidades que
+   corrijas, en silencio, y eso sólo se ve auditando.
+
+   Así que los códigos se rehacen de corrido —en el orden en que los
+   diste de alta, reservando tantos como ambientes físicos tenga cada
+   uno— cada vez que se añade, se quita o cambia un N.º. Y como la
+   llave cuelga del código, las correcciones se mudan con él: renumerar
+   sin mudarlas las dejaría colgadas de un ambiente que ya no existe. */
+
+function extRenumerar(){
+  const ex = pmeExtras();
+  const antes = {};
+  ex.forEach(e => { antes[e.id] = extCodsTxt(e); });
+
+  const usados = {};                       // cuántos lleva cada UPSS
+  ex.forEach(e => {
+    const base = (PME_D.match.find(m => m.upss === e.upss) || {}).cods || 'ADI-000';
+    const pre = base.split('-')[0];
+    const k = (usados[e.upss] || 0) + 1;
+    usados[e.upss] = k + Math.max(1, extVeces(e)) - 1;
+    e.cod = pre + '-P' + String(k).padStart(2, '0');
+  });
+
+  /* Una revisión guardada antes de este arreglo puede traer ya dos
+     ambientes con el mismo código. Entonces no hay forma de saber de
+     cuál de los dos es cada corrección, así que esas llaves se dejan
+     quietas en vez de mudarlas a ciegas: colocarlas donde no van sería
+     peor que dejarlas donde están, porque ya no se notaría. */
+  const cuantos = {};
+  ex.forEach(e => { cuantos[antes[e.id]] = (cuantos[antes[e.id]] || 0) + 1; });
+
+  const mapa = {};
+  let turbios = 0;
+  ex.forEach(e => {
+    const a = antes[e.id], b = extCodsTxt(e);
+    if(!a || a === b) return;
+    if(cuantos[a] > 1){ turbios++; return; }
+    mapa[a] = b;
+  });
+  EXT_TURBIOS = turbios;
+  if(Object.keys(mapa).length) pmeMudarClaves(mapa);
+  return mapa;
+}
+
+/* Cuántos ambientes del plano venían con el código repetido de una
+   revisión vieja. La fiscalización lo dice si pasa; callarlo dejaría
+   correcciones colgadas sin que nadie se enterara. */
+let EXT_TURBIOS = 0;
+
+/* Mudar la revisión de un código de ambiente a otro. Todas las llaves
+   empiezan por el código del ambiente: las cantidades, los reactivados
+   y las observaciones de renglón llevan detrás el código del equipo y
+   la ocurrencia; la observación del ambiente es el código a secas. */
+function pmeMudarClaves(mapa){
+  const mudar = o => {
+    const out = {};
+    Object.keys(o || {}).forEach(k => {
+      const p = k.split('|');
+      if(mapa[p[0]]) p[0] = mapa[p[0]];
+      out[p.join('|')] = o[k];
+    });
+    return out;
+  };
+  PME_U.q    = mudar(PME_U.q);
+  PME_U.forz = mudar(PME_U.forz);
+  PME_U.obs  = mudar(PME_U.obs);
+  PME_U.obsr = mudar(PME_U.obsr);
 }
