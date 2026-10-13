@@ -1180,7 +1180,7 @@ function pmeBarraEdicion(id){
       <b>Modo revisión</b>
       ${pr ? `<span class="pme-donde">${esc(pr)}</span>` : ''}
       <span class="th-nota">Lo que corrijas se guarda en este navegador.</span>
-      <button type="button" class="ex-btn pme-env" onclick="pmeEnviarLS()">Enviar al LS del Drive</button>
+      <button type="button" class="ex-btn pme-env" onclick="pmeAbrirEnvio()">Enviar al LS del Drive</button>
       <span class="pme-env-msg" id="pmeEnvMsg"></span>
       <a class="ex-btn" href="${esc(PME_HERRAMIENTA[id].split('?')[0])}" target="_blank" rel="noopener">
         Abrir la herramienta completa</a>
@@ -1335,9 +1335,8 @@ function pmeOlvidarRev(){
 
 /* ═══════════ LLEVAR LA REVISIÓN AL LS DEL DRIVE ═══════════
 
-   Lo que corriges se guarda en el navegador. Esto lo manda al Apps
-   Script del sitio, que lo deja en el Drive y pone al día las
-   cantidades de la hoja.
+   Lo que corriges se guarda en el navegador. Esto lo lleva a la hoja de
+   Google, que es de donde el motor saca el expediente.
 
    Va la REVISIÓN, no celdas sueltas: las reglas del metrado —que los
    unificados no suman, que lo anulado se declara en cero, que un código
@@ -1345,8 +1344,15 @@ function pmeOlvidarRev(){
    en el generador, con su batería de pruebas. El Apps Script escribe
    sólo las cantidades que ya tienen fila; lo que exige insertar filas
    —un ambiente del plano, un renglón reactivado— entra al regenerar el
-   LS, que es donde esas reglas se aplican. Por eso después de enviar
-   hay que correr la automatización igual. */
+   LS, que es donde esas reglas se aplican.
+
+   LO QUE SE DESHACE TAMBIÉN VIAJA. Cuando una cantidad vuelve a su valor
+   original, la herramienta borra esa llave de la revisión —y hace bien,
+   porque ya no hay nada corregido—. Pero la hoja se quedaría con el
+   valor viejo. Por eso se recuerda qué se mandó la última vez: lo que
+   estaba y ya no está se envía con su valor de la norma. Sin esto, la
+   hoja sólo sabe avanzar y un arrepentimiento no se nota hasta que
+   alguien compara. */
 
 const PME_ENVIO = {
   url: 'https://script.google.com/macros/s/AKfycbyCC42QwfzqLYKo0J9ahH_m1upJ0uMIhd2hF2R7YOdNhtceXmhzRVYlydhkdjk-Xh_1Rg/exec',
@@ -1356,15 +1362,18 @@ const PME_ENVIO = {
   token: 'pachas26-sb'
 };
 
-function pmeEnvMsg(txt, mal){
-  const e = document.getElementById('pmeEnvMsg');
-  if(!e) return;
-  e.textContent = txt;
-  e.className = 'pme-env-msg' + (mal ? ' mal' : '');
+/* Qué llaves se mandaron la última vez, para saber qué se ha deshecho. */
+function pmeEnviadas(id){
+  try{ return JSON.parse(localStorage.getItem('pme-enviado-' + id) || '{}'); }
+  catch(e){ return {}; }
+}
+function pmeGuardarEnviadas(id, q){
+  try{ localStorage.setItem('pme-enviado-' + id, JSON.stringify(q)); }catch(e){}
 }
 
 /* La revisión vive dentro del marco, que es la herramienta de verdad.
-   Si el marco no está —vista de lectura— se usa la del propio panel. */
+   PME_U no está en window —es del módulo—, así que si no se alcanza se
+   lee su respaldo del navegador. Sin marco, la del propio panel. */
 function pmeRevisionViva(id){
   const f = document.querySelector('.pme-marco iframe');
   if(f){
@@ -1378,39 +1387,144 @@ function pmeRevisionViva(id){
   return pmeRev(id);
 }
 
+/* Cada llave de cantidad, con su ambiente, su código, su descripción y
+   lo que manda la norma. La llave es CODS|CÓDIGO|la vez que ese código
+   se repite dentro del ambiente, igual que en la herramienta. */
+function pmeIndiceLlaves(id){
+  const ix = pmeIdx(id), out = {};
+  ix.amb.forEach(a => {
+    const veces = {}, cods = a.m.cods || '';
+    (a.ls || []).forEach(ln => {
+      veces[ln.c] = (veces[ln.c] || 0) + 1;
+      out[cods + '|' + ln.c + '|' + veces[ln.c]] = {
+        cods: cods, amb: a.m.amb || '', c: ln.c, d: ln.d || '', fin: ln.fin || 0
+      };
+    });
+  });
+  return out;
+}
+
+/* Qué se va a escribir: lo corregido ahora, y lo que se mandó antes y
+   ya no está —que vuelve a su valor de la norma—. */
+function pmePlanEnvio(id){
+  const rev = pmeRevisionViva(id);
+  const idx = pmeIndiceLlaves(id);
+  const antes = pmeEnviadas(id);
+  const q = rev.q || {};
+  const cambios = [], deshechos = [], envio = {};
+
+  Object.keys(q).forEach(k => {
+    const l = idx[k] || {cods: k.split('|')[0], c: k.split('|')[1], d: '(no está en el PME publicado)', fin: 0};
+    const v = Math.max(0, Math.trunc(Number(q[k])) || 0);
+    envio[k] = v;
+    cambios.push({k: k, l: l, de: (k in antes) ? antes[k] : l.fin, a: v, suelta: !idx[k]});
+  });
+  Object.keys(antes).forEach(k => {
+    if(k in q) return;
+    const l = idx[k];
+    if(!l) return;                       // ya no existe esa línea: nada que devolver
+    if(antes[k] === l.fin) return;       // se mandó su propio valor: ya está bien
+    envio[k] = l.fin;
+    deshechos.push({k: k, l: l, de: antes[k], a: l.fin});
+  });
+
+  return {
+    rev: rev, envio: envio, cambios: cambios, deshechos: deshechos,
+    react: Object.keys(rev.forz || {}).length,
+    extra: (rev.extra || []).length,
+    obs: Object.keys(rev.obs || {}).length + Object.keys(rev.obsr || {}).length
+  };
+}
+
+/* ── La ventana ── */
+
+function pmeCerrarEnvio(){
+  const e = document.getElementById('pmeEnvio');
+  if(e) e.remove();
+  document.body.classList.remove('con-envio');
+}
+
+function pmeAbrirEnvio(){
+  const id = pmeId();
+  const p = pmePlanEnvio(id);
+  const n = p.cambios.length + p.deshechos.length;
+
+  const fila = (x, vuelta) => `<tr${vuelta ? ' class="vuelta"' : ''}>
+    <td class="pme-cod">${esc(x.l.cods)}</td>
+    <td class="pme-cod">${esc(x.l.c)}</td>
+    <td class="pme-desc">${esc(x.l.d)}</td>
+    <td class="n pme-de">${nf(x.de)}</td>
+    <td class="n pme-fl">→</td>
+    <td class="n pme-a">${nf(x.a)}</td>
+  </tr>`;
+
+  const tabla = (titulo, ls, vuelta) => !ls.length ? '' : `
+    <h6 class="pme-env-h">${esc(titulo)} <b>${nf(ls.length)}</b></h6>
+    <div class="pme-env-tab"><table class="ex-tabla">
+      <thead><tr><th>Cód. amb.</th><th>Código</th><th>Descripción</th>
+        <th class="n">En la hoja</th><th></th><th class="n">Queda en</th></tr></thead>
+      <tbody>${ls.map(x => fila(x, vuelta)).join('')}</tbody>
+    </table></div>`;
+
+  const fuera = [];
+  if(p.react) fuera.push(nf(p.react) + (p.react === 1 ? ' renglón reactivado' : ' renglones reactivados'));
+  if(p.extra) fuera.push(nf(p.extra) + (p.extra === 1 ? ' ambiente del plano' : ' ambientes del plano'));
+  if(p.obs) fuera.push(nf(p.obs) + (p.obs === 1 ? ' observación' : ' observaciones'));
+
+  const caja = document.createElement('div');
+  caja.id = 'pmeEnvio';
+  caja.className = 'pme-envio';
+  caja.innerHTML = `<div class="pme-envio-c" role="dialog" aria-label="Enviar al LS del Drive">
+    <div class="pme-envio-h">
+      <div>
+        <b>Enviar al LS del Drive</b>
+        <span>Hoja <code>PI_POR_ESPECILIDAD_F5</code> · columna CANTIDAD</span>
+      </div>
+      <button type="button" class="ex-btn" onclick="pmeCerrarEnvio()">Cerrar ✕</button>
+    </div>
+
+    <div class="pme-envio-b">
+      ${n ? `
+        ${tabla('Cantidades que cambian', p.cambios, false)}
+        ${tabla('Correcciones que deshaces — vuelven a lo que manda la norma', p.deshechos, true)}
+      ` : `<p class="pme-no">No hay cantidades que escribir: no has corregido ninguna, o lo que
+            corregiste ya está en la hoja.</p>`}
+
+      ${fuera.length ? `<div class="pme-env-fuera">
+        <b>No viajan ahora:</b> ${esc(fuera.join(' · '))}.
+        Se guardan en el Drive y entran <b>al regenerar el LS</b>, que es donde viven las reglas
+        —los unificados no suman, lo anulado se declara en cero, el OC queda fuera—.
+        Por eso, después de enviar, corre la automatización igual.</div>` : ''}
+
+      <p id="pmeEnvMsg" class="pme-env-msg"></p>
+    </div>
+
+    <div class="pme-envio-p">
+      <button type="button" class="ex-btn" onclick="pmeCerrarEnvio()">Cancelar</button>
+      <button type="button" class="ex-btn ver pme-env-ok" onclick="pmeEnviarLS()"
+        ${n ? '' : 'disabled'}>Escribir ${n ? nf(n) + (n === 1 ? ' cantidad' : ' cantidades') : ''} en la hoja</button>
+    </div>
+  </div>`;
+  document.body.appendChild(caja);
+  document.body.classList.add('con-envio');
+  caja.addEventListener('click', e => { if(e.target === caja) pmeCerrarEnvio(); });
+}
+
+function pmeEnvMsg(txt, mal){
+  const e = document.getElementById('pmeEnvMsg');
+  if(!e) return;
+  e.textContent = txt;
+  e.className = 'pme-env-msg' + (mal ? ' mal' : ' bien');
+}
+
 async function pmeEnviarLS(){
   const id = pmeId();
-  const rev = pmeRevisionViva(id);
-  const nQ = Object.keys(rev.q || {}).length;
-  const nF = Object.keys(rev.forz || {}).length;
-  const nE = (rev.extra || []).length;
-  const nO = Object.keys(rev.obs || {}).length + Object.keys(rev.obsr || {}).length;
-
-  if(!nQ && !nF && !nE && !nO){
-    pmeEnvMsg('No hay nada que enviar: no has corregido nada todavía.', true);
-    return;
-  }
-  /* El aviso se arma con una lista y se une: así no hacen falta escapes
-     dentro de la cadena, que es justo lo que partió este archivo una vez
-     y dejó la pestaña entera en «Trayendo el PME…». */
-  const aviso = [
-    'Se va a escribir en el LS del Drive:',
-    '',
-    '  · ' + nQ + ' cantidades corregidas',
-    '  · ' + nF + ' renglones reactivados',
-    '  · ' + nE + ' ambientes del plano',
-    '  · ' + nO + ' observaciones',
-    '',
-    'Las cantidades se escriben en la hoja. Los ambientes del plano y los',
-    'reactivados quedan guardados en el Drive y entran al regenerar el LS.',
-    '',
-    '¿Seguir?'
-  ].join(String.fromCharCode(10));
-  if(!confirm(aviso)) return;
-
-  pmeEnvMsg('Enviando…');
-  const b = document.querySelector('.pme-env');
+  const p = pmePlanEnvio(id);
+  const b = document.querySelector('.pme-env-ok');
   if(b) b.disabled = true;
+  pmeEnvMsg('Enviando…');
+
+  const rev = Object.assign({}, p.rev, {q: p.envio});
   try{
     /* text/plain a propósito: con application/json el navegador manda
        antes una petición de permiso que Apps Script no contesta. */
@@ -1422,24 +1536,39 @@ async function pmeEnviarLS(){
     const txt = await r.text();
     let d = null;
     try{ d = JSON.parse(txt); }catch(e){}
+
     if(d && d.ok){
-      pmeEnvMsg('Enviado · ' + nf(d.puestas_en_la_hoja || 0) + ' de ' + nf(d.cantidades || 0)
-        + ' cantidades escritas en la hoja'
-        + ((d.sin_sitio || []).length ? ' · ' + d.sin_sitio.length + ' sin fila en el LS' : ''));
+      /* Lo escrito pasa a ser lo conocido: así el próximo deshacer sabe
+         de dónde viene. Las que no tenían fila no se apuntan. */
+      const sin = {};
+      (d.sin_sitio || []).forEach(k => { sin[k] = 1; });
+      const nuevo = {};
+      Object.keys(p.envio).forEach(k => { if(!sin[k]) nuevo[k] = p.envio[k]; });
+      pmeGuardarEnviadas(id, nuevo);
+
+      pmeEnvMsg('Escritas ' + nf(d.puestas_en_la_hoja || 0) + ' de ' + nf(d.cantidades || 0)
+        + ' en la hoja'
+        + ((d.sin_sitio || []).length
+            ? ' · ' + (d.sin_sitio || []).length + ' sin fila en el LS: ' + (d.sin_sitio || []).slice(0, 3).join(', ')
+            : '')
+        + ' · la revisión quedó guardada en el Drive.');
+      if(b) b.textContent = 'Enviado ✓';
     }else if(d && d.motivo){
       pmeEnvMsg('No se escribió: ' + d.motivo, true);
+      if(b) b.disabled = false;
     }else if(/<!DOCTYPE|<html/i.test(txt)){
       /* Apps Script devuelve su página de error cuando la versión
          PUBLICADA no tiene el doPost: el editor puede tener el archivo
          y la implementación seguir siendo la anterior. */
       pmeEnvMsg('El Apps Script no está publicado con la última versión: '
         + 'Implementar → Administrar implementaciones → editar → Versión: nueva.', true);
+      if(b) b.disabled = false;
     }else{
       pmeEnvMsg('Se envió, pero la respuesta no se entiende. Comprueba la hoja.', true);
+      if(b) b.disabled = false;
     }
   }catch(e){
     pmeEnvMsg('No se pudo enviar: ' + (e && e.message ? e.message : e), true);
+    if(b) b.disabled = false;
   }
-  if(b) b.disabled = false;
 }
-

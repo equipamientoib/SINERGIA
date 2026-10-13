@@ -351,9 +351,53 @@ body.pme-cotejo .pme-marco{position:fixed;top:0;right:0;bottom:0;left:0;
   height:auto;z-index:200;margin:0;border:0;border-radius:0}
 body.pme-cotejo .pme-marco iframe{height:100% !important;min-height:0}
 
-/* El botón de enviar al Drive y su recado. */
+
+
+/* ══════════ LA VENTANA DE ENVÍO AL DRIVE ══════════
+   Antes esto era un confirm() del navegador: un bloque de texto donde no
+   se distinguía qué iba a cambiar. Escribir en el LS merece verlo línea
+   a línea antes de darle. */
 .pme-env{border-color:var(--bronce);color:var(--cobre-d,#8A5A12)}
 .pme-env:hover:not([disabled]){background:#FDF7E6}
 .pme-env[disabled]{opacity:.5;cursor:default}
-.pme-env-msg{font-size:11.5px;color:var(--grafito)}
+
+body.con-envio{overflow:hidden}
+.pme-envio{position:fixed;top:0;right:0;bottom:0;left:0;z-index:300;
+  background:rgba(23,25,29,.42);display:flex;align-items:center;justify-content:center;padding:20px}
+.pme-envio-c{display:flex;flex-direction:column;max-height:88vh;width:min(820px,100%);
+  background:var(--blanco);border-radius:var(--r-sm);box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden}
+.pme-envio-h{display:flex;align-items:center;gap:12px;padding:14px 18px;
+  border-bottom:1px solid var(--linea);background:#FCFBF9}
+.pme-envio-h b{display:block;font-family:var(--ff-d);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--grafito)}
+.pme-envio-h span{display:block;margin-top:3px;font-size:12.5px;color:var(--onix)}
+.pme-envio-h code{font-size:11.5px;background:#F2EFEA;padding:1px 5px;border-radius:3px}
+.pme-envio-h .ex-btn{margin-left:auto}
+.pme-envio-b{flex:1;min-height:0;overflow:auto;padding:4px 18px 14px}
+.pme-envio-p{display:flex;gap:10px;justify-content:flex-end;padding:12px 18px;
+  border-top:1px solid var(--linea);background:#FCFBF9}
+
+.pme-env-h{margin:16px 0 6px;font-family:var(--ff-d);font-size:10.5px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--grafito)}
+.pme-env-h b{color:var(--onix)}
+.pme-env-tab{border:1px solid var(--linea);border-radius:var(--r-sm);overflow:auto;max-height:34vh}
+.pme-env-tab table{font-size:12px}
+.pme-env-tab th{position:sticky;top:0;background:var(--crema);z-index:1}
+.pme-de{color:var(--gris)}
+.pme-fl{color:var(--gris);width:18px}
+.pme-a{font-weight:700;color:var(--cobre-d,#8A5A12)}
+/* Lo que se deshace se lee al revés: el valor nuevo es el de la norma. */
+.pme-env-tab tr.vuelta .pme-a{color:var(--grafito);font-weight:400}
+.pme-env-tab tr.vuelta td{background:#FCFBF9}
+
+.pme-env-fuera{margin-top:16px;padding:10px 12px;border-left:3px solid var(--bronce);
+  background:#FDFBF6;font-size:12px;color:var(--grafito);line-height:1.5}
+.pme-env-msg{margin-top:12px;font-size:12.5px;color:var(--grafito);min-height:18px}
 .pme-env-msg.mal{color:#9E342C}
+.pme-env-msg.bien{color:#226B51}
+
+@media (max-width:860px){
+  .pme-envio{padding:0}
+  .pme-envio-c{max-height:100vh;height:100%;border-radius:0}
+  .pme-env-tab{max-height:40vh}
+}
