@@ -154,3 +154,21 @@
   .pm-d b{font-size:13.5px}
   .pm-p{font-size:16px}
 }
+
+
+/* ── Condiciones de venta en la ficha del equipo ──────────────────────
+   Garantía, entrega, pago y qué incluye. Estaban solo dentro de la
+   cotización, o sea después de que el cliente se decidiera a escribir;
+   quien compara proveedores no llega hasta ahí. Van aquí, discretas, que
+   es donde se decide la compra. */
+.cond{margin:16px 0 0;padding:14px 16px;border:1px solid var(--linea);border-radius:12px;
+  background:var(--fondo2,#FBFAF6);display:grid;gap:9px}
+.cond div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:baseline}
+.cond dt{font-family:var(--ff-t,inherit);font-size:11px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--cobre-d,#7E6234)}
+.cond dd{margin:0;font-size:13.5px;line-height:1.5;color:var(--onix)}
+@media(max-width:560px){
+  .cond{padding:12px 13px;gap:8px}
+  .cond div{grid-template-columns:1fr;gap:1px}
+  .cond dd{font-size:13px}
+}

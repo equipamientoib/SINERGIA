@@ -197,6 +197,37 @@ NOMBRE_DOC = {'CTR': 'Ficha técnica', 'COR': 'Catálogo del fabricante',
               'RGS': 'Registro sanitario', 'OTR': 'Registro sanitario'}
 
 
+TERMINOS = {}
+try:
+    with open(os.path.join(ROOT, 'data', 'terminos-venta.json'), encoding='utf-8') as _f:
+        TERMINOS = json.load(_f)
+except Exception:
+    TERMINOS = {'garantiaMeses': 12, 'plazoStock': 'de 2 a 5 días hábiles',
+                'plazoPedido': 'se confirma al emitir la cotización',
+                'pago': '50 % con la orden de compra y 50 % contra entrega.',
+                'incluye': 'Manual de usuario, certificado de garantía y capacitación de uso.'}
+
+
+def condiciones(p):
+    """Lo que un comprador de hospital necesita saber ANTES de pedir precio.
+
+    Garantía, plazo de entrega, forma de pago y qué incluye ya estaban en
+    data/terminos-venta.json, pero solo se veían dentro de la cotización:
+    es decir, después de que el cliente se decidiera a escribir. Quien
+    compara proveedores no llega hasta ahí. Ahora van en la ficha, que es
+    donde se decide la compra.
+    """
+    con_stock = isinstance(p.get('stock'), (int, float)) and p['stock'] > 0
+    filas = [
+        ('Garantía', '%s meses del fabricante' % TERMINOS.get('garantiaMeses', 12)),
+        ('Entrega', (TERMINOS.get('plazoStock') or '') if con_stock else (TERMINOS.get('plazoPedido') or '')),
+        ('Pago', TERMINOS.get('pago') or ''),
+        ('Incluye', TERMINOS.get('incluye') or ''),
+    ]
+    return ('<dl class="cond">%s</dl>' % ''.join(
+        '<div><dt>%s</dt><dd>%s</dd></div>' % (e(k), e(v)) for k, v in filas if v))
+
+
 def pdf_venta(pid):
     return '/fichas/venta/ficha-tecnica-%s.pdf' % pid
 
@@ -390,6 +421,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
           <a class="btn" href="{wa}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         {doc}
+        {condiciones(p)}
       </div>
     </article>
     <div class="pest" data-tabs>
