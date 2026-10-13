@@ -310,7 +310,7 @@ def franja(p):
         '<div class="ft-%s"><dt>%s</dt><dd>%s</dd></div>' % (c, k, e(v)) for k, c, v in d)
 
 
-def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
+def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, locales):
     texto = 'Hola Sinergia Biomédica, quiero cotizar: %s%s%s.' % (
         p['nom'], ' ' + p['marca'] if p.get('marca') else '', ' ' + p['modelo'] if p.get('modelo') else '')
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
@@ -401,8 +401,10 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
     nav = '<nav class="sig" aria-label="Más equipos">%s%s</nav>' % (
         ('<a class="ant" href="/venta/%s/"><small>‹ Anterior</small><b>%s</b></a>' % (prev['id'], e(prev['nom']))) if prev else '<span></span>',
         ('<a class="pos" href="/venta/%s/"><small>Siguiente ›</small><b>%s</b></a>' % (sig['id'], e(sig['nom']))) if sig else '<span></span>')
-    otros = ''.join('<a href="/venta/%s/">%s</a>' % (o['id'], e(o['nom'] + (' ' + o['modelo'] if o.get('modelo') else '')))
-                    for o in mismos[:12])
+    # Con foto y precio, no como lista de nombres: es el sitio donde el
+    # cliente que ya se decidió por un equipo descubre que necesita otro.
+    # Se usa la misma tarjeta de la tienda, para que se vean iguales.
+    otros = ''.join(tarjeta_venta(o, base, fijas, locales, promos) for o in mismos[:6])
     return f'''
     <button type="button" class="sb-atras" onclick="sbAtras()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -431,7 +433,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos):
     {nav}
     {f"""<section class="otros">
     <h2>Más en {e(cat)}</h2>
-    <div class="chips">{otros}</div>
+    <div class="vts">{otros}</div>
   </section>""" if otros else ''}
   <p class="volver"><a class="btn" href="/#/venta/tienda">← Ver toda la tienda</a></p>'''
 
@@ -454,7 +456,7 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
     descripcion = '%s %s%s Venta con ficha técnica, entrega en Lima y provincias y mantenimiento.' % (
         nombre + '.', (p.get('resumen') or '').rstrip('.') + '. ' if p.get('resumen') else '',
         ('%s (%s, NTS 113-MINSA).' % (nts, p['expediente'])) if nts and p.get('expediente') else (nts + '.' if nts else ''))
-    cuerpo = producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos) + VIG_JS
+    cuerpo = producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, locales) + VIG_JS
     oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
               'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/PreOrder',
               'seller': {'@id': SITIO + '/#negocio'}}
