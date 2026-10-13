@@ -788,7 +788,7 @@ const LS_COLS = ['NTS', 'PISO', 'UPSS/UPS', 'I-1', 'I-2', 'I-3', 'I-4',
   /* La U no está en el LS de Huari: la añadimos nosotros. El color dice
      cómo quedó cada renglón, pero el color no se puede filtrar ni leer
      en una impresión; esto sí. */
-  'OBSERVACION'];
+  'OBSERVACIONES'];
 const LS_N = LS_COLS.length;
 
 /* Los anchos y las columnas escondidas del LS de Huari, columna a
@@ -870,7 +870,11 @@ function lsBlob(){
 
     fisIdx().lista.forEach(a => {
       const m = a.m;
-      if(!a.ren.length) return;            // sin lista de norma no hay metrado
+      /* Sin lista de norma no hay metrado. Y tampoco lo hay cuando la
+         lista es toda OC —el tablero de baja tensión, el tanque de
+         petróleo—: abrir una banda sin una sola línea debajo es ruido, y
+         el generador del expediente tampoco la abre. */
+      if(!a.ren.some(x => x.p !== 'OC')) return;
       nAmb++;
       const nombre = (m.ambnts || m.amb || '').toUpperCase();
 
@@ -886,6 +890,12 @@ function lsBlob(){
       }
       filas.push(lsFila(tit, d));
 
+      /* Los anulados por unificación van TODOS al final del ambiente, no
+         intercalados: así el descarte se lee de un golpe en vez de
+         salpicado entre las líneas que sí cuentan. Es como los escribe el
+         generador del expediente, y las dos hojas tienen que salir
+         iguales o el LS se barajaría según quién lo hubiera hecho. */
+      const anulados = [];
       a.ren.forEach(x => {
         if(x.p === 'OC') return;           // el OC no se metra, nunca estuvo
         const q = x.ln ? pmeQ(x.ln) : 0;
@@ -893,9 +903,12 @@ function lsBlob(){
           : (x.est === 'react' ? 'react' : (q === 0 ? 'cero' : 'ok'));
         if(estado === 'anul') nAnul++;
         else { nLin++; if(q === 0) nCero++; if(estado === 'react') nReac++; unid += q; }
-        filas.push(lsFila(lsBase(estado), lsDatos({
+        (estado === 'anul' ? anulados : filas).push(lsFila(lsBase(estado), lsDatos({
           upss: m.upss, cods: m.cods, nombre: nombre,
-          c: x.c, d: x.d, t: x.t, p: x.p, zona: m.zona,
+          /* La descripción sale del CATÁLOGO, no de cómo la escriba la
+             NTS: la 110 y la 113 redactan distinto el mismo código, y el
+             LS tiene que decir siempre lo mismo para un código. */
+          c: x.c, d: (PME_D.cat[x.c] || [])[0] || x.d, t: x.t, p: x.p, zona: m.zona,
           norma: x.ln && x.ln.nEq ? 'NTS ' + x.ln.nEq
                : (a.nts && a.nts.n ? 'NTS ' + a.nts.n : 'Propuesta'),
           q: q,
@@ -907,6 +920,7 @@ function lsBlob(){
             react: 'REACTIVADO por ti: la unificación lo había anulado y lo volviste a meter',
           }[estado] || ''})));
       });
+      anulados.forEach(f => filas.push(f));
 
       filas.push(lsFila(new Array(LS_N).fill(LS_SEP), []));
     });
@@ -922,6 +936,9 @@ function lsBlob(){
     const dia = String(h.getDate()).padStart(2, '0') + String(h.getMonth() + 1).padStart(2, '0') + h.getFullYear();
     return {
       blob: blob,
+      /* Las filas en crudo, para quien no quiera el archivo sino el
+         contenido: subir la hoja al Drive manda esto, no un .xlsx. */
+      filas: filas,
       nombre: 'PI_POR_ESPECIALIDAD_F5_' + pmeSlug() + '_' + dia + '.xlsx',
       resumen: 'Listo: ' + pmeNum(nAmb) + ' ambientes, ' + pmeNum(nLin) +
         ' líneas y ' + pmeNum(unid) + ' unidades' +

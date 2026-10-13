@@ -1492,15 +1492,20 @@ function pmeAbrirEnvio(){
 
       ${fuera.length ? `<div class="pme-env-fuera">
         <b>No viajan ahora:</b> ${esc(fuera.join(' · '))}.
-        Se guardan en el Drive y entran <b>al regenerar el LS</b>, que es donde viven las reglas
-        —los unificados no suman, lo anulado se declara en cero, el OC queda fuera—.
-        Por eso, después de enviar, corre la automatización igual.</div>` : ''}
+        Para que entren hace falta <b>rehacer la hoja entera</b>, porque son filas nuevas y
+        colocarlas bien son las reglas del metrado —los unificados no suman, lo anulado se
+        declara en cero, el OC queda fuera—. Lo hace el botón <b>«Reescribir la hoja entera»</b>
+        de aquí abajo, o <code>py run.py ls</code> desde tu equipo.</div>` : ''}
 
       <p id="pmeEnvMsg" class="pme-env-msg"></p>
     </div>
 
     <div class="pme-envio-p">
       <button type="button" class="ex-btn" onclick="pmeCerrarEnvio()">Cancelar</button>
+      ${(p.extra || p.react) ? `<button type="button" class="ex-btn pme-env-hoja"
+        onclick="pmeEscribirHoja()"
+        title="Rehace la hoja entera: es la única forma de meter filas nuevas"
+        >Reescribir la hoja entera</button>` : ''}
       <button type="button" class="ex-btn ver pme-env-ok" onclick="pmeEnviarLS()"
         ${n ? '' : 'disabled'}>Escribir ${n ? nf(n) + (n === 1 ? ' cantidad' : ' cantidades') : ''} en la hoja</button>
     </div>
@@ -1560,6 +1565,93 @@ async function pmeEnviarLS(){
       /* Apps Script devuelve su página de error cuando la versión
          PUBLICADA no tiene el doPost: el editor puede tener el archivo
          y la implementación seguir siendo la anterior. */
+      pmeEnvMsg('El Apps Script no está publicado con la última versión: '
+        + 'Implementar → Administrar implementaciones → editar → Versión: nueva.', true);
+      if(b) b.disabled = false;
+    }else{
+      pmeEnvMsg('Se envió, pero la respuesta no se entiende. Comprueba la hoja.', true);
+      if(b) b.disabled = false;
+    }
+  }catch(e){
+    pmeEnvMsg('No se pudo enviar: ' + (e && e.message ? e.message : e), true);
+    if(b) b.disabled = false;
+  }
+}
+
+/* ═══════════ ESCRIBIR LA HOJA ENTERA ═══════════
+
+   Cambiar una cantidad es escribir en una celda que ya existe. Añadir un
+   ambiente del plano o reactivar un renglón anulado son FILAS NUEVAS, y
+   para colocarlas bien hay que rehacer la hoja entera.
+
+   La hoja la arma la herramienta, no esta página: es la misma `lsBlob()`
+   del botón «Descargar la hoja del LS», con las mismas reglas. Y no es
+   un acto de fe: se comparó celda a celda con la que genera el motor del
+   expediente —1 483 filas × 21 columnas, 31 143 celdas— y salen iguales
+   salvo una, la redacción de E-103, donde los dos catálogos del proyecto
+   no coinciden entre sí.
+
+   Por eso aquí no se decide nada del metrado: se recoge lo que la
+   herramienta ya calculó y se manda. */
+
+function pmeHojaDelMarco(){
+  const f = document.querySelector('.pme-marco iframe');
+  if(!f || !f.contentWindow) return {error: 'la herramienta no está abierta'};
+  let r;
+  try{ r = f.contentWindow.eval('lsBlob()'); }
+  catch(e){ return {error: 'no se pudo armar la hoja: ' + e.message}; }
+  if(!r || r.error) return {error: (r && r.error) || 'la herramienta no devolvió la hoja'};
+
+  /* Valores y color de fondo. El color no es adorno: distingue una línea
+     en cero o anulada de una normal, y sin él el descarte no se lee. */
+  const filas = [], fondos = [];
+  (r.filas || []).forEach(fila => {
+    const celdas = fila.celdas || [];
+    const v = [], c = [];
+    for(let i = 0; i < 21; i++){
+      const x = celdas[i];
+      v.push(x && x.v !== undefined && x.v !== null ? x.v : '');
+      c.push(x && x.s && x.s.fondo ? '#' + x.s.fondo : null);
+    }
+    filas.push(v); fondos.push(c);
+  });
+  return {filas: filas, fondos: fondos, resumen: r.resumen};
+}
+
+async function pmeEscribirHoja(){
+  const id = pmeId();
+  const h = pmeHojaDelMarco();
+  if(h.error){ pmeEnvMsg(h.error, true); return; }
+
+  const b = document.querySelector('.pme-env-hoja');
+  if(b) b.disabled = true;
+  pmeEnvMsg('Armando y enviando la hoja entera… son ' + nf(h.filas.length) + ' filas, tarda un poco.');
+
+  try{
+    const r = await fetch(PME_ENVIO.url + '?pme=1', {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({token: PME_ENVIO.token, id: id, modo: 'hoja',
+                            hoja: 'PI_POR_ESPECILIDAD_F5',
+                            filas: h.filas, fondos: h.fondos})
+    });
+    const txt = await r.text();
+    let d = null;
+    try{ d = JSON.parse(txt); }catch(e){}
+
+    if(d && d.ok){
+      /* La hoja pasa a ser exactamente lo que hay en la revisión, así que
+         ya no queda nada «mandado antes» que deshacer. */
+      pmeGuardarEnviadas(id, {});
+      pmeEnvMsg('Hoja reescrita: ' + nf(d.filas_ahora) + ' filas'
+        + (d.filas_antes && d.filas_antes !== d.filas_ahora
+            ? ' (antes ' + nf(d.filas_antes) + ')' : '')
+        + ' · ' + (h.resumen || ''));
+      if(b) b.textContent = 'Hoja reescrita ✓';
+    }else if(d && d.motivo){
+      pmeEnvMsg('No se escribió: ' + d.motivo, true);
+      if(b) b.disabled = false;
+    }else if(/<!DOCTYPE|<html/i.test(txt)){
       pmeEnvMsg('El Apps Script no está publicado con la última versión: '
         + 'Implementar → Administrar implementaciones → editar → Versión: nueva.', true);
       if(b) b.disabled = false;
