@@ -1118,7 +1118,8 @@ function pmeRev(id){
   PME_REV[id] = {
     v: 2,
     q: (d && d.q) || {}, obs: (d && d.obs) || {}, obsr: (d && d.obsr) || {},
-    extra: (d && d.extra) || [], forz: (d && d.forz) || {}
+    extra: (d && d.extra) || [], forz: (d && d.forz) || {},
+    off: (d && d.off) || {}, add: (d && d.add) || {}
   };
   return PME_REV[id];
 }
@@ -1318,7 +1319,8 @@ function pmeCargarJson(input){
     try{
       const o = JSON.parse(fr.result);
       PME_REV[id] = {v: 2, q: o.q || {}, obs: o.obs || {}, obsr: o.obsr || {},
-                     extra: o.extra || [], forz: o.forz || {}};
+                     extra: o.extra || [], forz: o.forz || {},
+                     off: o.off || {}, add: o.add || {}};
       pmeGuardarRev(id);
     }catch(e){ alert('Ese archivo no se pudo leer como revisión del PME.'); }
     input.value = '';
@@ -1434,6 +1436,11 @@ function pmePlanEnvio(id){
     rev: rev, envio: envio, cambios: cambios, deshechos: deshechos,
     react: Object.keys(rev.forz || {}).length,
     extra: (rev.extra || []).length,
+    /* Retirados y equipos añadidos: tampoco son celdas que ya existan, así
+       que tampoco viajan por la vía rápida. Contarlos es lo que hace que
+       se ofrezca rehacer la hoja. */
+    off: Object.keys(rev.off || {}).length,
+    add: Object.keys(rev.add || {}).reduce((s, k) => s + (rev.add[k] || []).length, 0),
     obs: Object.keys(rev.obs || {}).length + Object.keys(rev.obsr || {}).length
   };
 }
@@ -1471,6 +1478,8 @@ function pmeAbrirEnvio(){
   const fuera = [];
   if(p.react) fuera.push(nf(p.react) + (p.react === 1 ? ' renglón reactivado' : ' renglones reactivados'));
   if(p.extra) fuera.push(nf(p.extra) + (p.extra === 1 ? ' ambiente del plano' : ' ambientes del plano'));
+  if(p.off) fuera.push(nf(p.off) + (p.off === 1 ? ' ambiente retirado' : ' ambientes retirados'));
+  if(p.add) fuera.push(nf(p.add) + (p.add === 1 ? ' equipo añadido' : ' equipos añadidos'));
   if(p.obs) fuera.push(nf(p.obs) + (p.obs === 1 ? ' observación' : ' observaciones'));
 
   const caja = document.createElement('div');
@@ -1504,7 +1513,7 @@ function pmeAbrirEnvio(){
 
     <div class="pme-envio-p">
       <button type="button" class="ex-btn" onclick="pmeCerrarEnvio()">Cancelar</button>
-      ${(p.extra || p.react) ? `<button type="button" class="ex-btn pme-env-hoja"
+      ${(p.extra || p.react || p.off || p.add) ? `<button type="button" class="ex-btn pme-env-hoja"
         onclick="pmeEscribirHoja()"
         title="Rehace la hoja entera: es la única forma de meter filas nuevas"
         >Reescribir la hoja entera</button>` : ''}
@@ -1695,13 +1704,15 @@ function pmeAvisoCorrida(d, id){
      la última corrida no las tiene. */
   let p = null;
   try{ p = pmePlanEnvio(id); }catch(e){}
-  const n = p ? (p.cambios.length + p.deshechos.length + p.extra + p.react) : 0;
+  const n = p ? (p.cambios.length + p.deshechos.length + p.extra + p.react + p.off + p.add) : 0;
   const trozos = [];
   if(p){
     const q = p.cambios.length + p.deshechos.length;
     if(q) trozos.push(nf(q) + (q === 1 ? ' cantidad' : ' cantidades'));
     if(p.extra) trozos.push(nf(p.extra) + (p.extra === 1 ? ' ambiente del plano' : ' ambientes del plano'));
     if(p.react) trozos.push(nf(p.react) + (p.react === 1 ? ' reactivado' : ' reactivados'));
+    if(p.off) trozos.push(nf(p.off) + (p.off === 1 ? ' ambiente retirado' : ' ambientes retirados'));
+    if(p.add) trozos.push(nf(p.add) + (p.add === 1 ? ' equipo añadido' : ' equipos añadidos'));
   }
 
   /* El descuadre: las unidades son el número que comparten los dos
