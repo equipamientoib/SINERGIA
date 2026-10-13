@@ -176,7 +176,10 @@ function vListaEnviar(via){
   const t = (document.getElementById('vLista')||{}).value||'';
   if(!t.trim()){ document.getElementById('vLista').focus(); return; }
   const msg = 'Hola Sinergia Biomédica, quiero cotizar esta lista de equipos:\n\n'+t.trim();
-  if(via==='wa') window.open(vWA(msg),'_blank','noopener');
+  /* Nada de window.open: en el celular deja al visitante en una pestaña
+     del navegador con la página de wa.me, no en la aplicación. */
+  if(via==='wa') (typeof SBWhatsApp !== 'undefined') ? SBWhatsApp.ir(vWA(msg))
+                                                     : window.open(vWA(msg),'_blank','noopener');
   else location.href = `mailto:${SITE.email}?subject=${encodeURIComponent('Cotización de lista de equipos')}&body=${encodeURIComponent(msg)}`;
 }
 
