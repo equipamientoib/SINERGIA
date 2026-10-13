@@ -60,4 +60,28 @@
   }
   new MutationObserver(avisar).observe(document.body, {childList: true, subtree: true});
   avisar();
+
+  /* El Excel de normas son 1,4 MB y leerlo con SheetJS tarda. Si se
+     empieza cuando se abre el cotejo, el tercer panel se queda en
+     «Leyendo el Excel de normas…» un buen rato, justo cuando se quiere
+     mirar. Se empieza a traer en cuanto la fiscalización está en
+     pantalla, en segundo plano: cuando se abra el cajón, ya está.
+
+     FIS_LIBRO es un `let` del módulo, no de window, pero este archivo
+     carga después, así que se alcanza por su nombre. Si alguien abre el
+     cotejo antes de que termine, fisCargarLibro() lo lee por su cuenta y
+     no pasa nada: el segundo en llegar ve FIS_LIBRO puesto. */
+  setTimeout(function(){
+    try{
+      if(typeof FIS_LIBRO !== 'undefined' && FIS_LIBRO) return;
+      pmeSheetJs().then(function(XLSX){
+        return fetch(FIS_DOCS.xls.src).then(function(r){
+          if(!r.ok) throw new Error('no está');
+          return r.arrayBuffer();
+        }).then(function(buf){
+          if(!FIS_LIBRO) FIS_LIBRO = XLSX.read(buf, {type: 'array'});
+        });
+      }).catch(function(){ /* sin red: se leerá al abrir el cotejo */ });
+    }catch(e){}
+  }, 800);
 })();

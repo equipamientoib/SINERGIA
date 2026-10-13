@@ -639,3 +639,18 @@ body.cabdet .fis-cabdet .fis-eq-copia{visibility:visible;height:auto;overflow:vi
    la del detalle se pegan arriba del todo, no a 70 px. */
 .pme-empotrado .fis-tabla thead th,
 .pme-empotrado .fis-nts-t th{ top: 0 }
+
+/* ── El cajón: que no se vaya el alto en adornos ──
+   El título de un ambiente unido («2 ambientes unidos») partía la
+   cabecera en dos líneas, y con tres paneles apilados cada línea de más
+   se paga tres veces. Se queda en una, con puntos suspensivos si no
+   cabe, y la barra de la hoja se aprieta. */
+.fis-pan>header{flex-wrap:nowrap;padding:4px 10px}
+.fis-pan-t{overflow:hidden}
+.fis-pan-t b{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.fis-mas-amb{flex:none;white-space:nowrap;font-size:10.5px}
+.fis-pan>header .ex-btns{flex:none;flex-wrap:nowrap}
+.fis-pan>header .ex-btn{padding:2px 7px;font-size:10.5px;white-space:nowrap}
+.xl-ires{margin:4px 0 0;gap:5px}
+.xl-ir{padding:2px 7px}
+.xl-caja{padding:5px 8px}
