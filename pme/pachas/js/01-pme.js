@@ -905,10 +905,17 @@ function lsBlob(){
         else { nLin++; if(q === 0) nCero++; if(estado === 'react') nReac++; unid += q; }
         (estado === 'anul' ? anulados : filas).push(lsFila(lsBase(estado), lsDatos({
           upss: m.upss, cods: m.cods, nombre: nombre,
-          /* La descripción sale del CATÁLOGO, no de cómo la escriba la
-             NTS: la 110 y la 113 redactan distinto el mismo código, y el
-             LS tiene que decir siempre lo mismo para un código. */
-          c: x.c, d: (PME_D.cat[x.c] || [])[0] || x.d, t: x.t, p: x.p, zona: m.zona,
+          /* La descripción la da la LÍNEA DEL METRADO —x.ln—, que es la
+             que declara su norma dos columnas más allá. La 110 y la 113
+             redactan distinto el mismo código: E-103 es «BALANZA DE
+             PLATAFORMA, FUERZA 100 KG, DIGITAL» en la 113 y «BALANZA DE
+             PLATAFORMA DIGITAL, FUERZA 100 KG» en la 110, y hay 141 así.
+             El renglón de la lista de la norma trae la primera redacción
+             que se encontró, así que una fila podía decir «NTS 110» con
+             la redacción de la 113 y contradecirse a sí misma. Para un
+             anulado no hay línea: entonces vale la del renglón. */
+          c: x.c, d: (x.ln && x.ln.d) || x.d || (PME_D.cat[x.c] || [])[0],
+          t: x.t, p: x.p, zona: m.zona,
           norma: x.ln && x.ln.nEq ? 'NTS ' + x.ln.nEq
                : (a.nts && a.nts.n ? 'NTS ' + a.nts.n : 'Propuesta'),
           q: q,
