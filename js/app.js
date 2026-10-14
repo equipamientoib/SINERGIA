@@ -842,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=25671478';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=f2b0c9c6';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=25671478';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=f2b0c9c6';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=25671478','js/06-tablero.js?v=25671478'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=f2b0c9c6','js/06-tablero.js?v=f2b0c9c6'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=25671478'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=f2b0c9c6'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -3182,13 +3182,20 @@ function cotHTML(d, formal){
   const u = COT_UNI[d.mod] || 'día', per = venta ? '' : cotPeriodo(d.mod, d.qty);
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
-  const neto = d.total / 1.18, igv = d.total - neto;
+  /* El subtotal del cuadro es la SUMA de lo que se imprime en las filas, no
+     el total dividido entre 1.18. Cada fila se redondea a dos decimales por
+     su cuenta, y con veinte filas esos redondeos se acumulan: el cuadro
+     sumaba un centimo mas de lo que decia el subtotal, y en un expediente
+     eso se pregunta. Asi, el que saque la calculadora encuentra que las
+     filas suman el subtotal y que subtotal + IGV da el total exacto. */
+  const MONTOS = [];
+  const neta = v => { const x = Math.round((v / 1.18) * 100) / 100; MONTOS.push(x); return x; };
   /* Precio unitario prorrateado sobre el total: la suma del cuadro cuadra
      exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   /* Venta: cada equipo con su cantidad y su precio unitario. */
   const filasVenta = () => d.items.map((e, i) => {
-    const pu = e.pu / 1.18, pt = e.t / 1.18;
+    const pu = e.pu / 1.18, pt = neta(e.t);
     const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
       : {nom: e.n || e.i || 'Equipo', mm: e.m || '', nts: e.nts || '', foto: e.f || ''};
     return `<tr>
@@ -3206,8 +3213,12 @@ function cotHTML(d, formal){
   const filasServicio = () => {
     const s = d.srv;
     if(!s) return '';
-    const n = d.items.length, sin = v => v / 1.18, f = v => sin(v).toFixed(2);
+    const n = d.items.length, sin = v => v / 1.18;
     const dias = Number(s.dias) || 1, per = Number(s.per) || 1;
+    /* Cada partida se registra UNA vez: el mismo importe se imprime en la
+       columna unitaria y en la total, pero al subtotal entra una sola. */
+    const vPers = neta(s.pers), vPas = s.pas ? neta(s.pas) : 0, vVia = s.via ? neta(s.via) : 0;
+    const f = v => Number(v).toFixed(2);
     const F = [];
     F.push(`<tr>
       <td class="c">${n + 1}</td>
@@ -3216,33 +3227,34 @@ function cotHTML(d, formal){
         capacitación del personal del cliente.<br>${per} ${per === 1 ? 'persona' : 'personas'} ·
         ${dias} ${dias === 1 ? 'día' : 'días'} en sitio.</span></td>
       <td class="c">DÍA</td><td class="c">${(dias * per).toFixed(2)}</td>
-      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(s.pers)}</td></tr>`);
+      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(vPers)}</td></tr>`);
     if(s.pas) F.push(`<tr>
       <td class="c">${n + 2}</td>
       <td><b>PASAJES IDA Y VUELTA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
         <span class="det">Traslado del personal a la ciudad del cliente y regreso.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
-      <td class="d">${f(s.pas)}</td><td class="d">${f(s.pas)}</td></tr>`);
+      <td class="d">${f(vPas)}</td><td class="d">${f(vPas)}</td></tr>`);
     if(s.via) F.push(`<tr>
       <td class="c">${n + (s.pas ? 3 : 2)}</td>
       <td><b>VIÁTICOS DEL PERSONAL</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${s.noc
           ? ' y hospedaje por ' + s.noc + (Number(s.noc) === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
-      <td class="d">${f(s.via)}</td><td class="d">${f(s.via)}</td></tr>`);
+      <td class="d">${f(vVia)}</td><td class="d">${f(vVia)}</td></tr>`);
     /* El descuento va como fila propia, con su monto en negativo: así el
        cliente ve lo que se le incluye y el cuadro sigue sumando. */
+    const vDto = s.dto ? neta(-s.dto) : 0;   // entra al subtotal restando
     if(s.dto) F.push(`<tr>
       <td class="c">${n + F.length + 1}</td>
       <td><b>INSTALACIÓN Y CAPACITACIÓN INCLUIDAS</b>
         <span class="det">Por el monto de esta cotización, Sinergia asume
         ${s.dto >= (s.pers + s.pas + s.via) ? 'el servicio completo' : 'parte del servicio'}.</span></td>
       <td class="c">DESCUENTO</td><td class="c">1.00</td>
-      <td class="d">−${f(s.dto)}</td><td class="d">−${f(s.dto)}</td></tr>`);
+      <td class="d">−${f(-vDto)}</td><td class="d">−${f(-vDto)}</td></tr>`);
     return F.join('');
   };
   const filasAlq = () => d.items.map((e, i) => {
-    const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
+    const pu = e.d * factor / 1.18, pt = neta(pu * d.qty * 1.18), pr = (e.m || '').split('·');
     return `<tr>
       <td class="c">${i + 1}</td>
       <td><b>${cotEsc(e.n.toUpperCase())}</b>
@@ -3257,28 +3269,30 @@ function cotHTML(d, formal){
       <td><b>INSTRUMENTISTA METROLÓGICO</b>
         <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.tec).toFixed(2)}</td></tr>` : '')
     + (d.mov ? `<tr>
       <td class="c">${d.items.length + 2}</td>
       <td><b>MOVILIZACIÓN DENTRO DE LIMA</b>
         <span class="det">Traslado del instrumentista y de los instrumentos al local del cliente,
         de ida y vuelta, por cada jornada de trabajo.</span></td>
       <td class="c">JORNADA</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.mov / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.mov).toFixed(2)}</td></tr>` : '')
     + (d.pas ? `<tr>
       <td class="c">${d.items.length + 3}</td>
       <td><b>PASAJES IDA Y VUELTA${d.ciu ? ' · ' + cotEsc(d.ciu.toUpperCase()) : ''}</b>
         <span class="det">Traslado del instrumentista y de los instrumentos a la ciudad del cliente.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
-      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${(d.pas / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${neta(d.pas).toFixed(2)}</td></tr>` : '')
     + (d.via ? `<tr>
       <td class="c">${d.items.length + 4}</td>
       <td><b>VIÁTICOS DEL INSTRUMENTISTA</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${d.noc
           ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
-      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${(d.via / 1.18).toFixed(2)}</td></tr>` : '');
+      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${neta(d.via).toFixed(2)}</td></tr>` : '');
   const filas = venta ? filasVenta() : filasAlq();
+  const neto = Math.round(MONTOS.reduce((a, c) => a + c, 0) * 100) / 100;
+  const igv = Math.round((d.total - neto) * 100) / 100;
   const cuadro = `<table>
       <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
         <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
@@ -3747,6 +3761,11 @@ function cotAbrir(id, intento){
 /* El carrito vive en js/carrito.js, que también usan las páginas sueltas
    de producto. Aquí solo se lee y se escribe a través de él. */
 const vcItems = () => (window.SBCarrito ? SBCarrito.items() : {});
+
+/* Largo máximo del enlace del resumen antes de aligerarlo. WhatsApp abre sin
+   problemas por debajo de los 2 000 caracteres de mensaje; el enlace es la
+   parte que más crece. */
+var VCOT_ENLACE_MAX = 1400;
 
 /* Términos de la cotización de venta: se pueden cambiar sin tocar código. */
 var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
@@ -4257,6 +4276,17 @@ function vcTexto(c, d){
   return L.join('\n');
 }
 
+/* El enlace del resumen, aligerado si hace falta (ver vcEnviar). */
+function vcEnlaceCorto(c, d){
+  const doc = vcDoc(c, d);
+  let e = cotEnlace(doc);
+  if(e.length > VCOT_ENLACE_MAX){
+    doc.items = doc.items.map(it => vcProducto(it.i) ? {i: it.i, q: it.q, pu: it.pu, t: it.t} : it);
+    e = cotEnlace(doc);
+  }
+  return e;
+}
+
 function vcEnviar(via){
   const c = vcCalcular();
   if(!c.items.length) return;
@@ -4281,8 +4311,17 @@ function vcEnviar(via){
     if(el) setTimeout(() => el.focus(), 350);
     return;
   }
-  const doc = vcDoc(c, d);
-  const enlace = cotEnlace(doc);
+  let doc = vcDoc(c, d);
+  let enlace = cotEnlace(doc);
+  /* El nombre, la marca y el código NTS viajan dentro del enlace para que un
+     resumen viejo se lea aunque el equipo ya no esté en la hoja. Con veinte
+     equipos eso dejaba el enlace en 3 700 caracteres y WhatsApp se atraganta.
+     Si se pasa, se quitan de los equipos que SÍ están en el catálogo: esos se
+     leen de ahí al abrir el enlace (cotConCatalogo). */
+  if(enlace.length > VCOT_ENLACE_MAX){
+    doc.items = doc.items.map(it => vcProducto(it.i) ? {i: it.i, q: it.q, pu: it.pu, t: it.t} : it);
+    enlace = cotEnlace(doc);
+  }
   let texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + enlace;
   /* WhatsApp se queda en blanco con direcciones muy largas: si el pedido
      es grande, va el resumen corto y el enlace, que lo tiene todo. */
@@ -4309,7 +4348,7 @@ function vcCopiar(){
   const c = vcCalcular();
   if(!c.items.length) return;
   const d = vcDatos();
-  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + cotEnlace(vcDoc(c, d));
+  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + vcEnlaceCorto(c, d);
   const ok = () => avisar('vcAviso', 'Mensaje copiado: pégalo donde quieras enviarlo.', 'ok');
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(texto).then(ok).catch(() => vcCopiarViejo(texto, ok));

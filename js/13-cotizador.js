@@ -711,13 +711,20 @@ function cotHTML(d, formal){
   const u = COT_UNI[d.mod] || 'día', per = venta ? '' : cotPeriodo(d.mod, d.qty);
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
-  const neto = d.total / 1.18, igv = d.total - neto;
+  /* El subtotal del cuadro es la SUMA de lo que se imprime en las filas, no
+     el total dividido entre 1.18. Cada fila se redondea a dos decimales por
+     su cuenta, y con veinte filas esos redondeos se acumulan: el cuadro
+     sumaba un centimo mas de lo que decia el subtotal, y en un expediente
+     eso se pregunta. Asi, el que saque la calculadora encuentra que las
+     filas suman el subtotal y que subtotal + IGV da el total exacto. */
+  const MONTOS = [];
+  const neta = v => { const x = Math.round((v / 1.18) * 100) / 100; MONTOS.push(x); return x; };
   /* Precio unitario prorrateado sobre el total: la suma del cuadro cuadra
      exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   /* Venta: cada equipo con su cantidad y su precio unitario. */
   const filasVenta = () => d.items.map((e, i) => {
-    const pu = e.pu / 1.18, pt = e.t / 1.18;
+    const pu = e.pu / 1.18, pt = neta(e.t);
     const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
       : {nom: e.n || e.i || 'Equipo', mm: e.m || '', nts: e.nts || '', foto: e.f || ''};
     return `<tr>
@@ -735,8 +742,12 @@ function cotHTML(d, formal){
   const filasServicio = () => {
     const s = d.srv;
     if(!s) return '';
-    const n = d.items.length, sin = v => v / 1.18, f = v => sin(v).toFixed(2);
+    const n = d.items.length, sin = v => v / 1.18;
     const dias = Number(s.dias) || 1, per = Number(s.per) || 1;
+    /* Cada partida se registra UNA vez: el mismo importe se imprime en la
+       columna unitaria y en la total, pero al subtotal entra una sola. */
+    const vPers = neta(s.pers), vPas = s.pas ? neta(s.pas) : 0, vVia = s.via ? neta(s.via) : 0;
+    const f = v => Number(v).toFixed(2);
     const F = [];
     F.push(`<tr>
       <td class="c">${n + 1}</td>
@@ -745,33 +756,34 @@ function cotHTML(d, formal){
         capacitación del personal del cliente.<br>${per} ${per === 1 ? 'persona' : 'personas'} ·
         ${dias} ${dias === 1 ? 'día' : 'días'} en sitio.</span></td>
       <td class="c">DÍA</td><td class="c">${(dias * per).toFixed(2)}</td>
-      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(s.pers)}</td></tr>`);
+      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(vPers)}</td></tr>`);
     if(s.pas) F.push(`<tr>
       <td class="c">${n + 2}</td>
       <td><b>PASAJES IDA Y VUELTA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
         <span class="det">Traslado del personal a la ciudad del cliente y regreso.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
-      <td class="d">${f(s.pas)}</td><td class="d">${f(s.pas)}</td></tr>`);
+      <td class="d">${f(vPas)}</td><td class="d">${f(vPas)}</td></tr>`);
     if(s.via) F.push(`<tr>
       <td class="c">${n + (s.pas ? 3 : 2)}</td>
       <td><b>VIÁTICOS DEL PERSONAL</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${s.noc
           ? ' y hospedaje por ' + s.noc + (Number(s.noc) === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
-      <td class="d">${f(s.via)}</td><td class="d">${f(s.via)}</td></tr>`);
+      <td class="d">${f(vVia)}</td><td class="d">${f(vVia)}</td></tr>`);
     /* El descuento va como fila propia, con su monto en negativo: así el
        cliente ve lo que se le incluye y el cuadro sigue sumando. */
+    const vDto = s.dto ? neta(-s.dto) : 0;   // entra al subtotal restando
     if(s.dto) F.push(`<tr>
       <td class="c">${n + F.length + 1}</td>
       <td><b>INSTALACIÓN Y CAPACITACIÓN INCLUIDAS</b>
         <span class="det">Por el monto de esta cotización, Sinergia asume
         ${s.dto >= (s.pers + s.pas + s.via) ? 'el servicio completo' : 'parte del servicio'}.</span></td>
       <td class="c">DESCUENTO</td><td class="c">1.00</td>
-      <td class="d">−${f(s.dto)}</td><td class="d">−${f(s.dto)}</td></tr>`);
+      <td class="d">−${f(-vDto)}</td><td class="d">−${f(-vDto)}</td></tr>`);
     return F.join('');
   };
   const filasAlq = () => d.items.map((e, i) => {
-    const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
+    const pu = e.d * factor / 1.18, pt = neta(pu * d.qty * 1.18), pr = (e.m || '').split('·');
     return `<tr>
       <td class="c">${i + 1}</td>
       <td><b>${cotEsc(e.n.toUpperCase())}</b>
@@ -786,28 +798,30 @@ function cotHTML(d, formal){
       <td><b>INSTRUMENTISTA METROLÓGICO</b>
         <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.tec).toFixed(2)}</td></tr>` : '')
     + (d.mov ? `<tr>
       <td class="c">${d.items.length + 2}</td>
       <td><b>MOVILIZACIÓN DENTRO DE LIMA</b>
         <span class="det">Traslado del instrumentista y de los instrumentos al local del cliente,
         de ida y vuelta, por cada jornada de trabajo.</span></td>
       <td class="c">JORNADA</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.mov / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.mov).toFixed(2)}</td></tr>` : '')
     + (d.pas ? `<tr>
       <td class="c">${d.items.length + 3}</td>
       <td><b>PASAJES IDA Y VUELTA${d.ciu ? ' · ' + cotEsc(d.ciu.toUpperCase()) : ''}</b>
         <span class="det">Traslado del instrumentista y de los instrumentos a la ciudad del cliente.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
-      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${(d.pas / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${neta(d.pas).toFixed(2)}</td></tr>` : '')
     + (d.via ? `<tr>
       <td class="c">${d.items.length + 4}</td>
       <td><b>VIÁTICOS DEL INSTRUMENTISTA</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${d.noc
           ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
-      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${(d.via / 1.18).toFixed(2)}</td></tr>` : '');
+      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${neta(d.via).toFixed(2)}</td></tr>` : '');
   const filas = venta ? filasVenta() : filasAlq();
+  const neto = Math.round(MONTOS.reduce((a, c) => a + c, 0) * 100) / 100;
+  const igv = Math.round((d.total - neto) * 100) / 100;
   const cuadro = `<table>
       <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
         <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>

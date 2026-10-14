@@ -13,6 +13,11 @@
    de producto. Aquí solo se lee y se escribe a través de él. */
 const vcItems = () => (window.SBCarrito ? SBCarrito.items() : {});
 
+/* Largo máximo del enlace del resumen antes de aligerarlo. WhatsApp abre sin
+   problemas por debajo de los 2 000 caracteres de mensaje; el enlace es la
+   parte que más crece. */
+var VCOT_ENLACE_MAX = 1400;
+
 /* Términos de la cotización de venta: se pueden cambiar sin tocar código. */
 var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
   plazoPedido: 'se confirma al emitir la cotización', garantiaMeses: 12,
@@ -522,6 +527,17 @@ function vcTexto(c, d){
   return L.join('\n');
 }
 
+/* El enlace del resumen, aligerado si hace falta (ver vcEnviar). */
+function vcEnlaceCorto(c, d){
+  const doc = vcDoc(c, d);
+  let e = cotEnlace(doc);
+  if(e.length > VCOT_ENLACE_MAX){
+    doc.items = doc.items.map(it => vcProducto(it.i) ? {i: it.i, q: it.q, pu: it.pu, t: it.t} : it);
+    e = cotEnlace(doc);
+  }
+  return e;
+}
+
 function vcEnviar(via){
   const c = vcCalcular();
   if(!c.items.length) return;
@@ -546,8 +562,17 @@ function vcEnviar(via){
     if(el) setTimeout(() => el.focus(), 350);
     return;
   }
-  const doc = vcDoc(c, d);
-  const enlace = cotEnlace(doc);
+  let doc = vcDoc(c, d);
+  let enlace = cotEnlace(doc);
+  /* El nombre, la marca y el código NTS viajan dentro del enlace para que un
+     resumen viejo se lea aunque el equipo ya no esté en la hoja. Con veinte
+     equipos eso dejaba el enlace en 3 700 caracteres y WhatsApp se atraganta.
+     Si se pasa, se quitan de los equipos que SÍ están en el catálogo: esos se
+     leen de ahí al abrir el enlace (cotConCatalogo). */
+  if(enlace.length > VCOT_ENLACE_MAX){
+    doc.items = doc.items.map(it => vcProducto(it.i) ? {i: it.i, q: it.q, pu: it.pu, t: it.t} : it);
+    enlace = cotEnlace(doc);
+  }
   let texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + enlace;
   /* WhatsApp se queda en blanco con direcciones muy largas: si el pedido
      es grande, va el resumen corto y el enlace, que lo tiene todo. */
@@ -574,7 +599,7 @@ function vcCopiar(){
   const c = vcCalcular();
   if(!c.items.length) return;
   const d = vcDatos();
-  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + cotEnlace(vcDoc(c, d));
+  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + vcEnlaceCorto(c, d);
   const ok = () => avisar('vcAviso', 'Mensaje copiado: pégalo donde quieras enviarlo.', 'ok');
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(texto).then(ok).catch(() => vcCopiarViejo(texto, ok));
