@@ -81,9 +81,96 @@ body.wa-propio .wafab{display:none}
   font-size:12.5px;font-weight:600;background:#c62828;color:#fff}
 .v-precio-caja.con-promo small b{color:#c62828}
 
-/* Sección «En promoción», arriba de la tienda. */
-.v-promos{padding-top:26px}
-.v-promos-c{padding:20px;border-radius:18px;background:rgba(198,40,40,.05);border:1px solid rgba(198,40,40,.22)}
-.v-promos-c h2{margin:0;font-size:clamp(20px,2.2vw,26px)}
-.v-promos-c h2 small{font-size:13px;color:var(--gris);font-weight:500;margin-left:7px}
-.v-promos-c > p{margin:5px 0 16px;font-size:13.5px;color:var(--gris)}
+
+/* ── Tarjeta única del catálogo de venta ─────────────────────────────
+   La misma que llevan las páginas estáticas (/venta/, css/venta-paginas.css
+   › .vt): foto pequeña, nombre, marca · modelo · código NTS y precio.
+   Antes la tienda usaba la tarjeta grande del alquiler (.eq, foto de
+   206 px y descripción): entraban 6 equipos por pantalla en vez de 18 y
+   comparar precios obligaba a bajar. Si se toca una, tocar la otra. */
+.grid.vts{grid-template-columns:repeat(auto-fill,minmax(318px,1fr));gap:12px}
+.vt{position:relative;display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:12px;
+  align-items:center;padding:10px;background:var(--blanco);border:1px solid var(--linea);
+  border-radius:12px;transition:border-color .2s}
+.vt:hover{border-color:var(--bronce)}
+.vt-l{position:absolute;inset:0;border-radius:12px;z-index:0}   /* el enlace cubre la tarjeta */
+.vt-f{position:relative;width:76px;height:64px;display:grid;place-items:center;background:#fff;
+  border-radius:8px;overflow:hidden;color:var(--bronce)}
+.vt-f img{max-width:100%;max-height:100%;object-fit:contain}
+.vt-f svg{width:30px;height:30px}
+.vt-of{position:absolute;top:3px;left:3px;padding:2px 6px;border-radius:5px;background:#c62828;
+  color:#fff;font-family:var(--ff-d);font-size:9px;font-weight:700;letter-spacing:.6px}
+.vt.en-oferta{border-color:rgba(198,40,40,.4)}
+.vt-t{min-width:0}
+.vt-t b{display:block;font-family:var(--ff-d);font-size:14.5px;font-weight:600;line-height:1.25}
+.vt-t small{display:block;font-size:12.5px;color:var(--gris);margin-top:1px}
+.vt-p{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-top:3px}
+.vt-t i{font-style:normal;font-family:var(--ff-d);font-size:13px;font-weight:600;color:var(--cobre-d)}
+.vt-t i.vt-cons{color:var(--gris);font-weight:500}
+.vt-st{font-style:normal;font-size:11px;color:var(--ok)}
+.vt-st.vt-ped{color:var(--gris)}
+.vt-add{position:relative;z-index:1;width:34px;height:34px;display:grid;place-items:center;
+  border:1px solid var(--linea);border-radius:999px;background:var(--blanco);cursor:pointer;
+  font-family:var(--ff-d);font-size:17px;font-weight:600;line-height:1;color:var(--grafito);
+  white-space:nowrap;padding:0}
+.vt-add:hover{border-color:var(--bronce);color:var(--cobre-d)}
+.vt-add[data-en]{border-color:var(--bronce);color:var(--cobre-d);font-size:13px}
+@media(max-width:620px){
+  .grid.vts{grid-template-columns:1fr}
+}
+
+/* Cabecera de la tienda: lo justo para saber dónde estás. El párrafo que
+   había aquí explicaba marca, modelo y código NTS; ahora eso se lee en
+   cada tarjeta, y en el celular ese texto se comía la pantalla entera. */
+.v-head{padding-top:34px}
+@media(max-width:620px){
+  .v-head{padding-top:20px}
+  .v-head h1{font-size:30px;margin-top:6px}
+}
+
+/* Aviso de «lista nueva» cuando se entra por el enlace de un equipo. */
+.vc-nueva{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 13px;
+  border:1px solid var(--linea);border-radius:10px;background:var(--fondo2,#FBFAF6);
+  font-size:13px;color:var(--gris)}
+.vc-nueva button{border:0;background:none;padding:0;cursor:pointer;font-family:var(--ff-d);
+  font-size:13px;font-weight:600;color:var(--cobre-d);text-decoration:underline;text-underline-offset:3px}
+
+/* ── Servicio fuera de Lima Metropolitana ───────────────────────────
+   Va debajo de los equipos, no en la columna del total: es una decisión
+   del cliente («¿dónde lo instalamos?»), no una cifra más. */
+.vc-srv{margin-top:22px;padding:16px 18px;border:1px solid var(--linea);border-radius:14px;
+  background:var(--blanco)}
+.vc-srv .cot-paso{margin-top:0}
+.vc-srv-f{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:10px}
+.vc-srv-f label{display:block;font-size:12.5px;color:var(--gris)}
+.vc-srv-f input,.vc-srv-f select{width:100%;margin-top:4px;padding:10px 12px;font:inherit;font-size:14px;
+  color:var(--onix);background:#fff;border:1px solid var(--linea);border-radius:10px}
+.vc-srv-f input:focus,.vc-srv-f select:focus{outline:0;border-color:var(--cobre-d)}
+.vc-falta{color:#c62828}
+
+/* El desglose del servicio, con las mismas partidas que el alquiler. */
+.vc-desg{margin-bottom:12px;padding:12px 14px;border:1px dashed var(--linea);border-radius:12px}
+.vc-desg-t{font-family:var(--ff-d);font-size:12px;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--cobre-d);margin-bottom:7px}
+@media(max-width:560px){
+  .vc-srv-f{grid-template-columns:1fr 1fr}
+  .vc-srv-f label:first-child{grid-column:1/-1}
+}
+
+/* Correo y teléfono plegados: con el nombre basta para enviar. */
+.vc-mas{margin-bottom:12px}
+/* .cot-f2 lleva display:grid y eso le ganaba al ocultado del navegador:
+   los dos campos se veían con el plegado cerrado. */
+.vc-mas:not([open]) > :not(summary){display:none}
+.vc-mas summary{cursor:pointer;font-size:12.5px;color:var(--cobre-d);font-weight:600;
+  font-family:var(--ff-d);list-style:none;padding:4px 0}
+.vc-mas summary::-webkit-details-marker{display:none}
+.vc-mas summary::before{content:'+ ';font-weight:700}
+.vc-mas[open] summary::before{content:'− '}
+.vc-mas[open] summary{margin-bottom:8px}
+
+/* El descuento del servicio, a la vista: si no se ve, el cliente no sabe
+   que se le incluyó nada, y la entidad no lo tiene en papel. */
+.vc-desg.vc-regalo{border-color:rgba(46,139,107,.45);background:rgba(46,139,107,.04)}
+.vc-desg .vc-dto span{color:var(--ok);font-weight:600}
+.cot-ayuda.vc-ok{color:var(--ok)}

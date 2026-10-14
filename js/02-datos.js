@@ -30,6 +30,10 @@ const KIT=["multimetro","destornillador-elec","set-46"];
 
 /* Parámetros del modelo (se sobreescriben desde la hoja vía loadData) */
 let TEC_DIA=120;         // instrumentista S/ por día
+/* Traslado del instrumentista al local del cliente, dentro de Lima, por
+   jornada de trabajo. Sin esto el servicio con instrumentista no cubría
+   el viaje de ida y vuelta de cada día. */
+let MOVIL_LIMA=35;
 let TEC_MIN=60;          // mínimo: medio día
 /* Descuento por combinar instrumentos: mientras más lleva, más baja el
    precio del día. Se puede cambiar desde data/tarifas-alquiler.json. */
@@ -53,7 +57,9 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
   .then(d => { if(!d) return;
     if(d.medioDiaDesde) MEDIO_MIN = d.medioDiaDesde;
     if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
+    if(d.instrumentistaDia) TEC_DIA = d.instrumentistaDia;
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
+    if(d.movilizacionLima >= 0) MOVIL_LIMA = d.movilizacionLima;
     if(d.descuentos) DESC_COMB = d.descuentos;
     if(d.garantiaProvincia > 0) GARANTIA_PROV = d.garantiaProvincia;
     if(d.viaje){

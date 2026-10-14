@@ -33,6 +33,7 @@ function tituloDe(h){
   if(h.startsWith('#/venta/')) return TITULOS['#/venta/tienda'];
   if(h.startsWith('#/catalogo/') || h.startsWith('#/equipo/')) return TITULOS['#/catalogo'];
   if(h.startsWith('#/cotizar/')) return TITULOS['#/cotizar'];
+  if(h.startsWith('#/cotizar-venta/')) return TITULOS['#/cotizar-venta'];
   if(h.startsWith('#/proyecto/')) return TITULOS['#/clientes'];
   return TITULOS['#/'];
 }
@@ -71,9 +72,12 @@ function route(sinMover){
     const cod = h.slice('#/emitir/'.length);
     setTimeout(() => { if(typeof cotEmitir === 'function') cotEmitir(cod); }, 0);
   }
-  else if(h === '#/cotizar-venta'){
+  else if(h === '#/cotizar-venta' || h.startsWith('#/cotizar-venta/')){
     pageId='page-vcot'; navKey='#/venta/tienda';
-    setTimeout(() => { if(typeof vcAbrir === 'function') vcAbrir(); }, 0);
+    /* #/cotizar-venta/<id>: el enlace que viaja en el mensaje de WhatsApp
+       de cada ficha. Abre el cotizador con ese equipo ya puesto. */
+    const idv = h.split('/')[2] || '';
+    setTimeout(() => { if(typeof vcAbrir === 'function') vcAbrir(idv); }, 0);
   }
   else if(h==='#/cotizar' || h.startsWith('#/cotizar/')){
     pageId='page-cotizador'; navKey='#/catalogo';
@@ -113,7 +117,7 @@ function route(sinMover){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  document.body.classList.toggle('wa-propio', h === '#/cotizar-venta');
+  document.body.classList.toggle('wa-propio', h.startsWith('#/cotizar-venta'));
   seguro('título', () => ponerTitulo(h));
   if(!sinMover) window.scrollTo(0,0);   // al sincronizar datos no se mueve la vista
 }

@@ -81,6 +81,13 @@ function cotCalcular(){
      cobra una sola vez y depende de la ciudad; la comida, por cada día de
      trabajo, y el hospedaje por cada noche (un trabajo de un día no tiene
      noche: sale de noche y regresa de noche). */
+  /* Movilización dentro de Lima: cuando va el instrumentista, el servicio
+     es en el local del cliente, así que él se traslada de ida y vuelta por
+     cada jornada de trabajo. Cuesta lo mismo medio día que día completo:
+     es el mismo viaje. Sin esta partida el servicio no cubría el traslado
+     y el alquiler con instrumentista no era rentable. A provincia no
+     aplica: ahí se cobra el pasaje. */
+  const movil = (conTecnico && !prov) ? MOVIL_LIMA * qty : 0;
   const viaja = prov && conTecnico;
   const ciudad = viaja ? ciudadDe(COT.ciudad) : null;
   const faltaCiudad = viaja && !ciudad;
@@ -97,8 +104,8 @@ function cotCalcular(){
   /* Lo único que ya no se cotiza solo: una semana o más. */
   const largo = mod === 'dia' && qty >= COT_LARGO;
   return {sel, base, desc, dia, mod, hayMedio, unit, qty, alquiler, conTecnico, tecnico, prov,
-          viaja, ciudad, faltaCiudad, noches, pasaje, comida, hospedaje, viatico, garantia,
-          total: alquiler + tecnico + pasaje + viatico, largo};
+          movil, viaja, ciudad, faltaCiudad, noches, pasaje, comida, hospedaje, viatico, garantia,
+          total: alquiler + tecnico + movil + pasaje + viatico, largo};
 }
 
 /* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
@@ -378,6 +385,7 @@ function cotResumen(){
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
       <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>${soles(c.alquiler)}</span></div>
       ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>${soles(c.tecnico)}</span></div>` : ''}
+      ${c.movil ? `<div><span>Movilización dentro de Lima · S/ ${fmt(MOVIL_LIMA)} × ${c.qty} ${c.qty === 1 ? 'jornada' : 'jornadas'}</span><span>${soles(c.movil)}</span></div>` : ''}
       ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>${soles(c.pasaje)}</span></div>
         <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
           ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>${soles(c.viatico)}</span></div>` : ''}
@@ -499,6 +507,8 @@ function cotTexto(c, nom, mail, tel){
   L.push('  Precio por ' + u + ': S/ ' + fmt(c.unit));
   L.push('  Alquiler (' + per + '): S/ ' + c.alquiler.toFixed(2));
   if(c.conTecnico) L.push('  Instrumentista metrológico: S/ ' + c.tecnico.toFixed(2));
+  if(c.movil) L.push('  Movilización dentro de Lima (S/ ' + fmt(MOVIL_LIMA) + ' × ' + c.qty +
+    (c.qty === 1 ? ' jornada' : ' jornadas') + '): S/ ' + c.movil.toFixed(2));
   if(c.viaja && c.ciudad){
     L.push('  Pasajes ida y vuelta a ' + c.ciudad.n + ' (una sola vez): S/ ' + c.pasaje.toFixed(2));
     L.push('  Viáticos (comida y hospedaje): S/ ' + c.viatico.toFixed(2));
@@ -614,7 +624,7 @@ function cotDoc(c, nom, mail, tel, numero){
     mod: c.mod, qty: c.qty, prov: !!c.prov,
     items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia, f: cotFotoAbs(e)})),
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
-    tec: c.tecnico, pas: c.pasaje, via: c.viatico, noc: c.noches,
+    tec: c.tecnico, mov: c.movil, pas: c.pasaje, via: c.viatico, noc: c.noches,
     ciu: c.ciudad ? c.ciudad.n : '', gar: c.garantia, total: c.total,
     inc: []
   };
@@ -661,7 +671,11 @@ function cotTerminos(c){
     ? ('Medio día corresponde a un turno de cuatro (4) horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.')
     : ('El día completo comprende los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.')]);
   T.push(['5. Entrega y devolución.', !c.prov
-    ? 'En nuestra oficina de Lima, en el horario indicado.'
+    ? (c.mov
+       ? ('En el local del cliente, dentro de Lima Metropolitana. La movilización del Cuadro N° 1 comprende ' +
+          'el traslado del instrumentista y de los instrumentos, de ida y vuelta, por cada jornada de trabajo; ' +
+          'se cobra igual en medio día que en día completo, porque es el mismo viaje.')
+       : 'En nuestra oficina de Lima, en el horario indicado.')
     : conTec
       ? ('El instrumentista metrológico traslada los instrumentos a ' + (c.ciu || 'la ciudad del cliente') +
          '. Los días de viaje no se facturan: se cobran únicamente los días de trabajo en sitio. El pasaje ' +
@@ -697,13 +711,20 @@ function cotHTML(d, formal){
   const u = COT_UNI[d.mod] || 'día', per = venta ? '' : cotPeriodo(d.mod, d.qty);
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
-  const neto = d.total / 1.18, igv = d.total - neto;
+  /* El subtotal del cuadro es la SUMA de lo que se imprime en las filas, no
+     el total dividido entre 1.18. Cada fila se redondea a dos decimales por
+     su cuenta, y con veinte filas esos redondeos se acumulan: el cuadro
+     sumaba un centimo mas de lo que decia el subtotal, y en un expediente
+     eso se pregunta. Asi, el que saque la calculadora encuentra que las
+     filas suman el subtotal y que subtotal + IGV da el total exacto. */
+  const MONTOS = [];
+  const neta = v => { const x = Math.round((v / 1.18) * 100) / 100; MONTOS.push(x); return x; };
   /* Precio unitario prorrateado sobre el total: la suma del cuadro cuadra
      exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   /* Venta: cada equipo con su cantidad y su precio unitario. */
   const filasVenta = () => d.items.map((e, i) => {
-    const pu = e.pu / 1.18, pt = e.t / 1.18;
+    const pu = e.pu / 1.18, pt = neta(e.t);
     const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
       : {nom: e.n || e.i || 'Equipo', mm: e.m || '', nts: e.nts || '', foto: e.f || ''};
     return `<tr>
@@ -714,9 +735,55 @@ function cotHTML(d, formal){
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
-  }).join('');
+  }).join('') + filasServicio();
+  /* Servicio fuera de Lima Metropolitana, desglosado por partidas como en
+     el alquiler: personal, pasajes y viáticos en filas propias. Un total
+     suelto no se puede sustentar en un expediente; estas filas sí. */
+  const filasServicio = () => {
+    const s = d.srv;
+    if(!s) return '';
+    const n = d.items.length, sin = v => v / 1.18;
+    const dias = Number(s.dias) || 1, per = Number(s.per) || 1;
+    /* Cada partida se registra UNA vez: el mismo importe se imprime en la
+       columna unitaria y en la total, pero al subtotal entra una sola. */
+    const vPers = neta(s.pers), vPas = s.pas ? neta(s.pas) : 0, vVia = s.via ? neta(s.via) : 0;
+    const f = v => Number(v).toFixed(2);
+    const F = [];
+    F.push(`<tr>
+      <td class="c">${n + 1}</td>
+      <td><b>SERVICIO FUERA DE LIMA METROPOLITANA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Personal calificado para la instalación, la puesta en funcionamiento y la
+        capacitación del personal del cliente.<br>${per} ${per === 1 ? 'persona' : 'personas'} ·
+        ${dias} ${dias === 1 ? 'día' : 'días'} en sitio.</span></td>
+      <td class="c">DÍA</td><td class="c">${(dias * per).toFixed(2)}</td>
+      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(vPers)}</td></tr>`);
+    if(s.pas) F.push(`<tr>
+      <td class="c">${n + 2}</td>
+      <td><b>PASAJES IDA Y VUELTA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Traslado del personal a la ciudad del cliente y regreso.<br>Se cobra una sola vez.</span></td>
+      <td class="c">SERVICIO</td><td class="c">1.00</td>
+      <td class="d">${f(vPas)}</td><td class="d">${f(vPas)}</td></tr>`);
+    if(s.via) F.push(`<tr>
+      <td class="c">${n + (s.pas ? 3 : 2)}</td>
+      <td><b>VIÁTICOS DEL PERSONAL</b>
+        <span class="det">Alimentación por cada día de trabajo en sitio${s.noc
+          ? ' y hospedaje por ' + s.noc + (Number(s.noc) === 1 ? ' noche' : ' noches') : ''}.</span></td>
+      <td class="c">GLOBAL</td><td class="c">1.00</td>
+      <td class="d">${f(vVia)}</td><td class="d">${f(vVia)}</td></tr>`);
+    /* El descuento va como fila propia, con su monto en negativo: así el
+       cliente ve lo que se le incluye y el cuadro sigue sumando. */
+    const vDto = s.dto ? neta(-s.dto) : 0;   // entra al subtotal restando
+    if(s.dto) F.push(`<tr>
+      <td class="c">${n + F.length + 1}</td>
+      <td><b>INSTALACIÓN Y CAPACITACIÓN INCLUIDAS</b>
+        <span class="det">Por el monto de esta cotización, Sinergia asume
+        ${s.dto >= (s.pers + s.pas + s.via) ? 'el servicio completo' : 'parte del servicio'}.</span></td>
+      <td class="c">DESCUENTO</td><td class="c">1.00</td>
+      <td class="d">−${f(-vDto)}</td><td class="d">−${f(-vDto)}</td></tr>`);
+    return F.join('');
+  };
   const filasAlq = () => d.items.map((e, i) => {
-    const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
+    const pu = e.d * factor / 1.18, pt = neta(pu * d.qty * 1.18), pr = (e.m || '').split('·');
     return `<tr>
       <td class="c">${i + 1}</td>
       <td><b>${cotEsc(e.n.toUpperCase())}</b>
@@ -731,21 +798,30 @@ function cotHTML(d, formal){
       <td><b>INSTRUMENTISTA METROLÓGICO</b>
         <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '')
-    + (d.pas ? `<tr>
+      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.tec).toFixed(2)}</td></tr>` : '')
+    + (d.mov ? `<tr>
       <td class="c">${d.items.length + 2}</td>
+      <td><b>MOVILIZACIÓN DENTRO DE LIMA</b>
+        <span class="det">Traslado del instrumentista y de los instrumentos al local del cliente,
+        de ida y vuelta, por cada jornada de trabajo.</span></td>
+      <td class="c">JORNADA</td><td class="c">${d.qty}.00</td>
+      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.mov).toFixed(2)}</td></tr>` : '')
+    + (d.pas ? `<tr>
+      <td class="c">${d.items.length + 3}</td>
       <td><b>PASAJES IDA Y VUELTA${d.ciu ? ' · ' + cotEsc(d.ciu.toUpperCase()) : ''}</b>
         <span class="det">Traslado del instrumentista y de los instrumentos a la ciudad del cliente.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
-      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${(d.pas / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${neta(d.pas).toFixed(2)}</td></tr>` : '')
     + (d.via ? `<tr>
-      <td class="c">${d.items.length + 3}</td>
+      <td class="c">${d.items.length + 4}</td>
       <td><b>VIÁTICOS DEL INSTRUMENTISTA</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${d.noc
           ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
-      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${(d.via / 1.18).toFixed(2)}</td></tr>` : '');
+      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${neta(d.via).toFixed(2)}</td></tr>` : '');
   const filas = venta ? filasVenta() : filasAlq();
+  const neto = Math.round(MONTOS.reduce((a, c) => a + c, 0) * 100) / 100;
+  const igv = Math.round((d.total - neto) * 100) / 100;
   const cuadro = `<table>
       <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
         <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
@@ -848,7 +924,12 @@ function cotHTML(d, formal){
         <ul class="lst">
           ${venta ? `<li>Equipos nuevos, con ${VCOT_TERM.garantiaMeses} meses de garantía del fabricante.</li>
             <li>${cotEsc(VCOT_TERM.incluye)}</li>
-            <li>Entrega en Lima; a provincia se envía por agencia, a cargo del cliente.</li>
+            ${d.srv
+              ? `<li>Nuestro personal viaja a ${cotEsc(d.srv.ciu || 'tu ciudad')} a instalar los equipos,
+                  ponerlos en funcionamiento y capacitar a tu personal durante ${d.srv.dias}
+                  ${Number(d.srv.dias) === 1 ? 'día' : 'días'}. El pasaje y los viáticos ya están en el cuadro de arriba.</li>
+                 <li>El envío de los equipos a provincia va por agencia de transporte, a cargo del cliente.</li>`
+              : '<li>Entrega, instalación y capacitación en Lima Metropolitana, sin costo adicional; a provincia se envía por agencia, a cargo del cliente.</li>'}
             <li>Factura electrónica a nombre de tu razón social.</li>` : `
           <li>Certificado de calibración vigente de cada instrumento.</li>
           ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'
@@ -999,6 +1080,20 @@ function cotModalCerrar(){
    formal que emite la empresa. El documento viaja dentro del propio
    enlace, así que no hace falta servidor ni base de datos. */
 var COT_DOC = null;
+/* Las solicitudes de VENTA guardan solo el código de cada equipo: el
+   nombre, la marca, el código NTS y la foto se leen del catálogo al abrir
+   el enlace, para que el enlace quepa en un mensaje de WhatsApp. Pero el
+   catálogo no se carga solo en estas pantallas, y sin él cada equipo salía
+   como «EDAN-H100B», sin marca y sin foto. Se pide una vez y se vuelve a
+   dibujar. */
+function cotConCatalogo(d, repintar){
+  if(!d || d.tipo !== 'venta') return false;
+  if((typeof VENTA !== 'undefined' && VENTA && VENTA.productos) ||
+     typeof cargarVenta !== 'function') return false;
+  cargarVenta().then(repintar).catch(() => {});
+  return true;
+}
+
 function cotVer(codigo){
   const caja = document.getElementById('cotVerBody');
   if(!caja) return;
@@ -1009,6 +1104,17 @@ function cotVer(codigo){
       El enlace puede estar incompleto. Vuelve a armarla en
       <a href="#/cotizar">el cotizador</a> o escríbenos y la preparamos.</p></div>`;
     return;
+  }
+  cotConCatalogo(d, () => cotVer(codigo));
+  /* La cabecera del sitio: una solicitud de venta no es de alquiler. */
+  if(d.tipo === 'venta'){
+    document.body.classList.add('modo-venta');
+    document.body.classList.remove('modo-alquiler');
+    document.querySelectorAll('[data-route]').forEach(a => {
+      const on = a.dataset.route === '#/venta/tienda';
+      a.classList.toggle('active', on);
+      if(on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const wa = urlWhatsApp(String(S.whatsapp || '').replace(/\D/g, ''),
@@ -1085,6 +1191,7 @@ function cotEmitir(codigo){
     caja.innerHTML = `<div class="wrap"><p class="cotv-mal">No pudimos leer esta solicitud.</p></div>`;
     return;
   }
+  cotConCatalogo(d, () => cotEmitir(codigo));
   if(!cotClaveOk()){
     caja.innerHTML = `<div class="wrap emi-puerta">
       <h1>Emitir cotización</h1>

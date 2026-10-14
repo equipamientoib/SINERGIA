@@ -156,19 +156,37 @@
 }
 
 
-/* ── Condiciones de venta en la ficha del equipo ──────────────────────
-   Garantía, entrega, pago y qué incluye. Estaban solo dentro de la
-   cotización, o sea después de que el cliente se decidiera a escribir;
-   quien compara proveedores no llega hasta ahí. Van aquí, discretas, que
-   es donde se decide la compra. */
-.cond{margin:16px 0 0;padding:14px 16px;border:1px solid var(--linea);border-radius:12px;
-  background:var(--fondo2,#FBFAF6);display:grid;gap:9px}
-.cond div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:baseline}
-.cond dt{font-family:var(--ff-t,inherit);font-size:11px;font-weight:700;letter-spacing:.9px;
-  text-transform:uppercase;color:var(--cobre-d,#7E6234)}
-.cond dd{margin:0;font-size:13.5px;line-height:1.5;color:var(--onix)}
-@media(max-width:560px){
-  .cond{padding:12px 13px;gap:8px}
-  .cond div{grid-template-columns:1fr;gap:1px}
-  .cond dd{font-size:13px}
+
+/* ── Barra fija del celular en la ficha del equipo ───────────────────
+   En un celular de 664 px de alto, el precio y los botones quedaban a
+   840 px: había que bajar casi una pantalla entera para saber cómo
+   contactar. Esta barra los deja siempre a mano y desaparece mientras
+   los botones de verdad están en pantalla. En computadora no aparece. */
+.pbar{display:none}
+@media(max-width:760px){
+  .pbar{position:fixed;left:0;right:0;bottom:0;z-index:60;
+    display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;
+    padding:9px 13px calc(9px + env(safe-area-inset-bottom,0px));
+    background:rgba(255,255,255,.97);border-top:1px solid var(--linea);
+    box-shadow:0 -4px 18px rgba(23,25,29,.09);
+    transform:translateY(110%);transition:transform .22s ease;pointer-events:none}
+  .pbar.on{transform:none;pointer-events:auto}
+  .pbar-p{display:block;line-height:1.1}
+  .pbar-p b{display:block;font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--onix)}
+  .pbar-p small{font-size:10.5px;color:var(--gris)}
+  .pbar-add{width:100%;padding:12px 10px;border:0;border-radius:11px;background:var(--onix);color:#fff;
+    font-family:var(--ff-d);font-size:13.5px;font-weight:600;cursor:pointer;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pbar-wa{display:grid;place-items:center;width:44px;height:44px;border-radius:11px;
+    background:#25D366;color:#fff;flex:0 0 auto}
+  /* El botón verde flotante estorbaba encima de la barra. */
+  body:has(.pbar.on) .wa-fab{display:none}
 }
+
+/* «Instalación y capacitación incluidas»: va pegada al precio, que es
+   donde el comprador está comparando contra otro proveedor. */
+.inst-inc{display:flex;align-items:flex-start;gap:8px;margin:12px 0 0;padding:10px 13px;
+  border:1px solid rgba(46,139,107,.35);border-radius:11px;background:rgba(46,139,107,.05);
+  font-size:13px;line-height:1.45;color:var(--onix)}
+.inst-inc span{color:var(--ok);font-weight:700;line-height:1.3}
+.inst-inc small{display:block;color:var(--gris);font-size:12px;margin-top:1px}

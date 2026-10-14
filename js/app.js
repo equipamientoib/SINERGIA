@@ -268,6 +268,10 @@ const KIT=["multimetro","destornillador-elec","set-46"];
 
 /* Parámetros del modelo (se sobreescriben desde la hoja vía loadData) */
 let TEC_DIA=120;         // instrumentista S/ por día
+/* Traslado del instrumentista al local del cliente, dentro de Lima, por
+   jornada de trabajo. Sin esto el servicio con instrumentista no cubría
+   el viaje de ida y vuelta de cada día. */
+let MOVIL_LIMA=35;
 let TEC_MIN=60;          // mínimo: medio día
 /* Descuento por combinar instrumentos: mientras más lleva, más baja el
    precio del día. Se puede cambiar desde data/tarifas-alquiler.json. */
@@ -291,7 +295,9 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
   .then(d => { if(!d) return;
     if(d.medioDiaDesde) MEDIO_MIN = d.medioDiaDesde;
     if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
+    if(d.instrumentistaDia) TEC_DIA = d.instrumentistaDia;
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
+    if(d.movilizacionLima >= 0) MOVIL_LIMA = d.movilizacionLima;
     if(d.descuentos) DESC_COMB = d.descuentos;
     if(d.garantiaProvincia > 0) GARANTIA_PROV = d.garantiaProvincia;
     if(d.viaje){
@@ -836,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=18bfba42';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4e5e2618';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=18bfba42';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4e5e2618';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=18bfba42','js/06-tablero.js?v=18bfba42'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=4e5e2618','js/06-tablero.js?v=4e5e2618'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=18bfba42'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=4e5e2618'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -943,6 +949,7 @@ function tituloDe(h){
   if(h.startsWith('#/venta/')) return TITULOS['#/venta/tienda'];
   if(h.startsWith('#/catalogo/') || h.startsWith('#/equipo/')) return TITULOS['#/catalogo'];
   if(h.startsWith('#/cotizar/')) return TITULOS['#/cotizar'];
+  if(h.startsWith('#/cotizar-venta/')) return TITULOS['#/cotizar-venta'];
   if(h.startsWith('#/proyecto/')) return TITULOS['#/clientes'];
   return TITULOS['#/'];
 }
@@ -981,9 +988,12 @@ function route(sinMover){
     const cod = h.slice('#/emitir/'.length);
     setTimeout(() => { if(typeof cotEmitir === 'function') cotEmitir(cod); }, 0);
   }
-  else if(h === '#/cotizar-venta'){
+  else if(h === '#/cotizar-venta' || h.startsWith('#/cotizar-venta/')){
     pageId='page-vcot'; navKey='#/venta/tienda';
-    setTimeout(() => { if(typeof vcAbrir === 'function') vcAbrir(); }, 0);
+    /* #/cotizar-venta/<id>: el enlace que viaja en el mensaje de WhatsApp
+       de cada ficha. Abre el cotizador con ese equipo ya puesto. */
+    const idv = h.split('/')[2] || '';
+    setTimeout(() => { if(typeof vcAbrir === 'function') vcAbrir(idv); }, 0);
   }
   else if(h==='#/cotizar' || h.startsWith('#/cotizar/')){
     pageId='page-cotizador'; navKey='#/catalogo';
@@ -1023,7 +1033,7 @@ function route(sinMover){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  document.body.classList.toggle('wa-propio', h === '#/cotizar-venta');
+  document.body.classList.toggle('wa-propio', h.startsWith('#/cotizar-venta'));
   seguro('título', () => ponerTitulo(h));
   if(!sinMover) window.scrollTo(0,0);   // al sincronizar datos no se mueve la vista
 }
@@ -1903,7 +1913,7 @@ function vBuscarEn(q, destino){
   const otros = document.querySelectorAll('[data-sin-busqueda]');
   otros.forEach(e => e.hidden = !corta);
   caja.innerHTML = corta ? '' : (r.length
-    ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid">${r.map(vCard).join('')}</div>`
+    ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid vts">${r.map(vCard).join('')}</div>`
     : `<div class="v-vacio"><h3>No encontramos «${vEsc(q)}» en el catálogo publicado</h3><p>Igual podemos conseguirlo. Escríbenos con el nombre o el código de tu listado y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+q)}" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div></div>`);
 }
 function vBuscador(destino, ph){
@@ -2037,45 +2047,48 @@ function vNotaPrecio(larga){
 /* Cada equipo tiene su página propia (venta/<id>/, la genera
    scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
    Si un equipo es nuevo y aún no tiene página, se abre la ficha interna. */
+function vMensajeWA(p){
+  const linea = [p.marca, p.modelo, p.clave ? 'Código NTS ' + p.clave : '',
+                 p.precio ? vSoles(p.precio) : ''].filter(Boolean).join(' · ');
+  const partes = ['Hola Sinergia Biomédica, quiero cotizar:', '', p.nom];
+  if(linea) partes.push(linea);
+  partes.push('', location.origin + '/#/cotizar-venta/' + p.id);
+  return partes.join('\n');
+}
+
 function vPagina(id){ return (window.PAGINA_VENTA || {})[id] || ''; }
 function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/venta/p/' + id); }
 
 /* Botón de carrito con los datos del equipo pegados: así funciona igual
    en la web y en las páginas sueltas de producto. */
-function vBotonAdd(p, clase, texto){
-  return `<button type="button" class="${clase}" data-add="${vEsc(p.id)}"
+function vBotonAdd(p, clase, texto, extra){
+  return `<button type="button" class="${clase}"${extra || ''} data-add="${vEsc(p.id)}"
     data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
     data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
-    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar al carrito'}</button>`;
+    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar a mi cotización'}</button>`;
 }
 
 function vCard(p){
-  const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
-  const url = `#/venta/p/${p.id}`;   // referencia; los clics van por vAbrir()
-  const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
-    (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const of = vPromo(p);
-  const tag = of ? '<span class="tier v-oferta">Promoción</span>'
-                 : (p._top ? '<span class="tier">Más pedido</span>' : '');
-  const pie = p.precio
-    ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? 'Precio especial' : 'Precio referencial'}</span>${vSoles(p.precio)}${
-        ''}<small>Incluye IGV · ${
-        of ? (of.fin ? 'hasta el ' + of.fin.toLocaleDateString('es-PE') : 'hasta agotar stock') : vNotaPrecio(false)}</small></div>`
-    : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
-  return `<div class="eq v-eq">
-    <div class="img${foto?' has-photo':''}" onclick="vAbrir('${p.id}')">
-      ${foto?'':'<span class="grid-bg"></span>'}${st}${tag}
-      ${foto?`<img class="photo" src="${vEsc(foto)}" alt="${vEsc(p.nom)} ${vEsc(p.marca||'')} ${vEsc(p.modelo||'')}" loading="lazy" decoding="async">`:`<span class="v-sinfoto">${vIco(p.cat,'v-ico-xl')}</span>`}
-    </div>
-    <div class="body">
-      <div class="cat">${vEsc(c?c.nombre:'')}</div>
-      <h3><a onclick="vAbrir('${p.id}')">${vEsc(p.nom)}</a></h3>
-      ${vMarcaModelo(p)}
-      ${p.clave?`<div class="v-exp" title="${vEsc(p.expediente||'Código NTS 113-MINSA')}">Código NTS ${vEsc(p.clave)}</div>`:''}
-      <div class="desc">${vEsc(p.resumen||'')}</div>
-      <div class="foot">${pie}${vBotonAdd(p, 'btn v-add')}</div>
-    </div>
+  /* Marca, modelo y código NTS en una sola línea: es lo que el comprador
+     compara de un vistazo cuando revisa veinte equipos seguidos. */
+  const sub = [[p.marca, p.modelo].filter(Boolean).join(' · '),
+               p.clave ? 'NTS ' + p.clave : ''].filter(Boolean).join(' · ');
+  const st = (p.stock === undefined || p.stock === null || p.stock === '') ? ''
+    : (Number(p.stock) > 0 ? '<em class="vt-st">En stock</em>'
+                           : '<em class="vt-st vt-ped">A pedido</em>');
+  const precio = p.precio ? `<i>${vSoles(p.precio)}</i>`
+                          : '<i class="vt-cons">Consultar precio</i>';
+  const href = vPagina(p.id) || ('#/venta/p/' + p.id);
+  return `<div class="vt${of ? ' en-oferta' : ''}">
+    <a class="vt-l" href="${vEsc(href)}" aria-label="${vEsc(p.nom)}"></a>
+    <span class="vt-f">${foto
+      ? `<img src="${vEsc(foto)}" alt="${vEsc([p.nom, p.marca, p.modelo].filter(Boolean).join(' '))}" loading="lazy" decoding="async">`
+      : vIco(p.cat)}${of ? '<span class="vt-of">PROMOCIÓN</span>' : ''}</span>
+    <span class="vt-t"><b>${vEsc(p.nom)}</b>${sub ? `<small>${vEsc(sub)}</small>` : ''}
+      <span class="vt-p">${precio}${st}</span></span>
+    ${vBotonAdd(p, 'vt-add', '+', ' data-corto="1" title="Agregar a mi cotización" aria-label="Agregar a mi cotización"')}
   </div>`;
 }
 
@@ -2116,7 +2129,7 @@ function vOrden(lista){
 
 /* Inicio: exactamente el mismo orden que la tienda, los 12 primeros. */
 function vPortadaTramos(){
-  return `<div class="grid">${vOrdenTienda(VENTA.productos).slice(0, 12).map(vCard).join('')}</div>`;
+  return `<div class="grid vts">${vOrdenTienda(VENTA.productos).slice(0, 12).map(vCard).join('')}</div>`;
 }
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
@@ -2226,24 +2239,6 @@ function vtConteo(campo){
   VENTA.productos.forEach(p => { const v = p[campo]; if(v) m.set(v, (m.get(v)||0)+1); });
   return m;
 }
-/* Sección de promociones, arriba de los filtros de la tienda. Es la misma
-   que lleva la página /venta/: los equipos con precio especial, con su
-   etiqueta y hasta cuándo. Si no hay ninguno, no ocupa nada. */
-function vSeccionPromos(){
-  const enof = (VENTA.productos || []).filter(p => vPromo(p));
-  if(!enof.length) return '';
-  const fechas = enof.map(p => vPromo(p).fin).filter(Boolean);
-  const fin = fechas.length ? new Date(Math.min(...fechas.map(f => f.getTime()))) : null;
-  return `<section class="v-promos"><div class="wrap">
-    <div class="v-promos-c">
-      <h2>En promoción <small>${enof.length}</small></h2>
-      <p>${fin ? `Precio especial hasta el ${fin.toLocaleDateString('es-PE')}. Después vuelven a su precio de siempre.`
-               : 'Precio especial por tiempo limitado. Lo que se va, se va.'}</p>
-      <div class="grid">${enof.map(vCard).join('')}</div>
-    </div>
-  </div></section>`;
-}
-
 function vTienda(catInicial, precioInicial){
   VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='dest';
   if(precioInicial != null && precioInicial !== '') VT.precio.add(String(precioInicial));
@@ -2258,13 +2253,11 @@ function vTienda(catInicial, precioInicial){
   const tramos = [...V_TRAMOS.keys(), V_TRAMOS.length].filter(i => ct.get(String(i))).map(i => [String(i), vTramoNombre(i), ct.get(String(i))]);
   const c1 = VT.cat.size===1 ? vCat([...VT.cat][0]) : null;
   return `
-  <div class="wrap pagehead">
+  <div class="wrap pagehead v-head">
     <div class="crumb"><a onclick="go('#/venta')">Venta</a> &nbsp;/&nbsp; Tienda</div>
     <div class="k">Tienda de equipamiento biomédico</div>
     <h1>${c1 ? vEsc(c1.nombre) : 'Todos los equipos'}</h1>
-    <p>Filtra por categoría, marca o procedencia. Cada equipo tiene su ficha con marca, modelo y el nombre con que aparece en los expedientes técnicos.</p>
   </div>
-  ${vSeccionPromos()}
   <section style="padding-top:30px"><div class="wrap">
     <button class="filtros-btn" onclick="document.getElementById('vtSide').classList.toggle('open')">Filtros ▾</button>
     <div class="catalog-layout">
@@ -2290,7 +2283,7 @@ function vTienda(catInicial, precioInicial){
         </div>
         <div class="vt-activos" id="vtActivos"></div>
         <div class="v-cuenta" id="vtCuenta"></div>
-        <div class="grid vt-grid" id="vtGrid"></div>
+        <div class="grid vts vt-grid" id="vtGrid"></div>
       </div>
     </div>
   </div></section>
@@ -2384,7 +2377,9 @@ function vProducto(id){
   const otros = vDeCat(p.cat).filter(x => x.id !== p.id).slice(0,3);
   const chips = [['Garantía',p.garantia]].filter(x=>x[1]);   // marca, modelo y origen ya van arriba (vMarcaModelo)
   const areas = (p.areas||[]).length ? `<div class="v-areas"><span>Se usa en</span>${p.areas.map(a=>`<i>${vEsc(a)}</i>`).join('')}</div>` : '';
-  const texto = 'Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:'');
+  /* Mismo mensaje que las páginas sueltas: con los datos del equipo y el
+     enlace que abre el cotizador con ese equipo ya puesto. */
+  const texto = vMensajeWA(p);
   return `
   <div class="wrap" style="padding-top:18px">
     <button type="button" class="sb-atras" onclick="sbAtras()">
@@ -2408,7 +2403,7 @@ function vProducto(id){
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
-          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar al carrito')}
+          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar a mi cotización')}
           <a class="btn btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         ${p.ficha_pdf?`<a class="v-doc" href="${vEsc(p.ficha_pdf)}" target="_blank" rel="noopener"><span class="doc-ico">PDF</span><span><b>Ficha técnica</b><small>Ver o descargar</small></span></a>`:''}
@@ -2418,7 +2413,7 @@ function vProducto(id){
       <div class="v-tabs" role="tablist">${pest.map((t,i)=>`<button type="button" role="tab" class="${i?'':'on'}" onclick="vTab(this,${i})">${t[0]}</button>`).join('')}</div>
       ${pest.map((t,i)=>`<div class="v-panel-t" ${i?'hidden':''}>${t[1]}</div>`).join('')}
     </div>`:''}
-    ${otros.length?`<section class="v-sec" style="padding-bottom:0"><div class="shead"><div><div class="k">Misma categoría</div><h2>También te puede interesar</h2></div></div><div class="grid">${otros.map(vCard).join('')}</div></section>`:''}
+    ${otros.length?`<section class="v-sec" style="padding-bottom:0"><div class="shead"><div><div class="k">Misma categoría</div><h2>También te puede interesar</h2></div></div><div class="grid vts">${otros.map(vCard).join('')}</div></section>`:''}
   </div>
   <section class="v-sec"></section>`;
 }
@@ -2557,6 +2552,13 @@ function cotCalcular(){
      cobra una sola vez y depende de la ciudad; la comida, por cada día de
      trabajo, y el hospedaje por cada noche (un trabajo de un día no tiene
      noche: sale de noche y regresa de noche). */
+  /* Movilización dentro de Lima: cuando va el instrumentista, el servicio
+     es en el local del cliente, así que él se traslada de ida y vuelta por
+     cada jornada de trabajo. Cuesta lo mismo medio día que día completo:
+     es el mismo viaje. Sin esta partida el servicio no cubría el traslado
+     y el alquiler con instrumentista no era rentable. A provincia no
+     aplica: ahí se cobra el pasaje. */
+  const movil = (conTecnico && !prov) ? MOVIL_LIMA * qty : 0;
   const viaja = prov && conTecnico;
   const ciudad = viaja ? ciudadDe(COT.ciudad) : null;
   const faltaCiudad = viaja && !ciudad;
@@ -2573,8 +2575,8 @@ function cotCalcular(){
   /* Lo único que ya no se cotiza solo: una semana o más. */
   const largo = mod === 'dia' && qty >= COT_LARGO;
   return {sel, base, desc, dia, mod, hayMedio, unit, qty, alquiler, conTecnico, tecnico, prov,
-          viaja, ciudad, faltaCiudad, noches, pasaje, comida, hospedaje, viatico, garantia,
-          total: alquiler + tecnico + pasaje + viatico, largo};
+          movil, viaja, ciudad, faltaCiudad, noches, pasaje, comida, hospedaje, viatico, garantia,
+          total: alquiler + tecnico + movil + pasaje + viatico, largo};
 }
 
 /* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
@@ -2854,6 +2856,7 @@ function cotResumen(){
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
       <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>${soles(c.alquiler)}</span></div>
       ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>${soles(c.tecnico)}</span></div>` : ''}
+      ${c.movil ? `<div><span>Movilización dentro de Lima · S/ ${fmt(MOVIL_LIMA)} × ${c.qty} ${c.qty === 1 ? 'jornada' : 'jornadas'}</span><span>${soles(c.movil)}</span></div>` : ''}
       ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>${soles(c.pasaje)}</span></div>
         <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
           ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>${soles(c.viatico)}</span></div>` : ''}
@@ -2975,6 +2978,8 @@ function cotTexto(c, nom, mail, tel){
   L.push('  Precio por ' + u + ': S/ ' + fmt(c.unit));
   L.push('  Alquiler (' + per + '): S/ ' + c.alquiler.toFixed(2));
   if(c.conTecnico) L.push('  Instrumentista metrológico: S/ ' + c.tecnico.toFixed(2));
+  if(c.movil) L.push('  Movilización dentro de Lima (S/ ' + fmt(MOVIL_LIMA) + ' × ' + c.qty +
+    (c.qty === 1 ? ' jornada' : ' jornadas') + '): S/ ' + c.movil.toFixed(2));
   if(c.viaja && c.ciudad){
     L.push('  Pasajes ida y vuelta a ' + c.ciudad.n + ' (una sola vez): S/ ' + c.pasaje.toFixed(2));
     L.push('  Viáticos (comida y hospedaje): S/ ' + c.viatico.toFixed(2));
@@ -3090,7 +3095,7 @@ function cotDoc(c, nom, mail, tel, numero){
     mod: c.mod, qty: c.qty, prov: !!c.prov,
     items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia, f: cotFotoAbs(e)})),
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
-    tec: c.tecnico, pas: c.pasaje, via: c.viatico, noc: c.noches,
+    tec: c.tecnico, mov: c.movil, pas: c.pasaje, via: c.viatico, noc: c.noches,
     ciu: c.ciudad ? c.ciudad.n : '', gar: c.garantia, total: c.total,
     inc: []
   };
@@ -3137,7 +3142,11 @@ function cotTerminos(c){
     ? ('Medio día corresponde a un turno de cuatro (4) horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.')
     : ('El día completo comprende los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.')]);
   T.push(['5. Entrega y devolución.', !c.prov
-    ? 'En nuestra oficina de Lima, en el horario indicado.'
+    ? (c.mov
+       ? ('En el local del cliente, dentro de Lima Metropolitana. La movilización del Cuadro N° 1 comprende ' +
+          'el traslado del instrumentista y de los instrumentos, de ida y vuelta, por cada jornada de trabajo; ' +
+          'se cobra igual en medio día que en día completo, porque es el mismo viaje.')
+       : 'En nuestra oficina de Lima, en el horario indicado.')
     : conTec
       ? ('El instrumentista metrológico traslada los instrumentos a ' + (c.ciu || 'la ciudad del cliente') +
          '. Los días de viaje no se facturan: se cobran únicamente los días de trabajo en sitio. El pasaje ' +
@@ -3173,13 +3182,20 @@ function cotHTML(d, formal){
   const u = COT_UNI[d.mod] || 'día', per = venta ? '' : cotPeriodo(d.mod, d.qty);
   const und = (d.mod === 'medio' ? 'MEDIO DÍA' : u.toUpperCase());
   const org = location.origin;
-  const neto = d.total / 1.18, igv = d.total - neto;
+  /* El subtotal del cuadro es la SUMA de lo que se imprime en las filas, no
+     el total dividido entre 1.18. Cada fila se redondea a dos decimales por
+     su cuenta, y con veinte filas esos redondeos se acumulan: el cuadro
+     sumaba un centimo mas de lo que decia el subtotal, y en un expediente
+     eso se pregunta. Asi, el que saque la calculadora encuentra que las
+     filas suman el subtotal y que subtotal + IGV da el total exacto. */
+  const MONTOS = [];
+  const neta = v => { const x = Math.round((v / 1.18) * 100) / 100; MONTOS.push(x); return x; };
   /* Precio unitario prorrateado sobre el total: la suma del cuadro cuadra
      exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   /* Venta: cada equipo con su cantidad y su precio unitario. */
   const filasVenta = () => d.items.map((e, i) => {
-    const pu = e.pu / 1.18, pt = e.t / 1.18;
+    const pu = e.pu / 1.18, pt = neta(e.t);
     const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
       : {nom: e.n || e.i || 'Equipo', mm: e.m || '', nts: e.nts || '', foto: e.f || ''};
     return `<tr>
@@ -3190,9 +3206,55 @@ function cotHTML(d, formal){
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
-  }).join('');
+  }).join('') + filasServicio();
+  /* Servicio fuera de Lima Metropolitana, desglosado por partidas como en
+     el alquiler: personal, pasajes y viáticos en filas propias. Un total
+     suelto no se puede sustentar en un expediente; estas filas sí. */
+  const filasServicio = () => {
+    const s = d.srv;
+    if(!s) return '';
+    const n = d.items.length, sin = v => v / 1.18;
+    const dias = Number(s.dias) || 1, per = Number(s.per) || 1;
+    /* Cada partida se registra UNA vez: el mismo importe se imprime en la
+       columna unitaria y en la total, pero al subtotal entra una sola. */
+    const vPers = neta(s.pers), vPas = s.pas ? neta(s.pas) : 0, vVia = s.via ? neta(s.via) : 0;
+    const f = v => Number(v).toFixed(2);
+    const F = [];
+    F.push(`<tr>
+      <td class="c">${n + 1}</td>
+      <td><b>SERVICIO FUERA DE LIMA METROPOLITANA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Personal calificado para la instalación, la puesta en funcionamiento y la
+        capacitación del personal del cliente.<br>${per} ${per === 1 ? 'persona' : 'personas'} ·
+        ${dias} ${dias === 1 ? 'día' : 'días'} en sitio.</span></td>
+      <td class="c">DÍA</td><td class="c">${(dias * per).toFixed(2)}</td>
+      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(vPers)}</td></tr>`);
+    if(s.pas) F.push(`<tr>
+      <td class="c">${n + 2}</td>
+      <td><b>PASAJES IDA Y VUELTA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Traslado del personal a la ciudad del cliente y regreso.<br>Se cobra una sola vez.</span></td>
+      <td class="c">SERVICIO</td><td class="c">1.00</td>
+      <td class="d">${f(vPas)}</td><td class="d">${f(vPas)}</td></tr>`);
+    if(s.via) F.push(`<tr>
+      <td class="c">${n + (s.pas ? 3 : 2)}</td>
+      <td><b>VIÁTICOS DEL PERSONAL</b>
+        <span class="det">Alimentación por cada día de trabajo en sitio${s.noc
+          ? ' y hospedaje por ' + s.noc + (Number(s.noc) === 1 ? ' noche' : ' noches') : ''}.</span></td>
+      <td class="c">GLOBAL</td><td class="c">1.00</td>
+      <td class="d">${f(vVia)}</td><td class="d">${f(vVia)}</td></tr>`);
+    /* El descuento va como fila propia, con su monto en negativo: así el
+       cliente ve lo que se le incluye y el cuadro sigue sumando. */
+    const vDto = s.dto ? neta(-s.dto) : 0;   // entra al subtotal restando
+    if(s.dto) F.push(`<tr>
+      <td class="c">${n + F.length + 1}</td>
+      <td><b>INSTALACIÓN Y CAPACITACIÓN INCLUIDAS</b>
+        <span class="det">Por el monto de esta cotización, Sinergia asume
+        ${s.dto >= (s.pers + s.pas + s.via) ? 'el servicio completo' : 'parte del servicio'}.</span></td>
+      <td class="c">DESCUENTO</td><td class="c">1.00</td>
+      <td class="d">−${f(-vDto)}</td><td class="d">−${f(-vDto)}</td></tr>`);
+    return F.join('');
+  };
   const filasAlq = () => d.items.map((e, i) => {
-    const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
+    const pu = e.d * factor / 1.18, pt = neta(pu * d.qty * 1.18), pr = (e.m || '').split('·');
     return `<tr>
       <td class="c">${i + 1}</td>
       <td><b>${cotEsc(e.n.toUpperCase())}</b>
@@ -3207,21 +3269,30 @@ function cotHTML(d, formal){
       <td><b>INSTRUMENTISTA METROLÓGICO</b>
         <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '')
-    + (d.pas ? `<tr>
+      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.tec).toFixed(2)}</td></tr>` : '')
+    + (d.mov ? `<tr>
       <td class="c">${d.items.length + 2}</td>
+      <td><b>MOVILIZACIÓN DENTRO DE LIMA</b>
+        <span class="det">Traslado del instrumentista y de los instrumentos al local del cliente,
+        de ida y vuelta, por cada jornada de trabajo.</span></td>
+      <td class="c">JORNADA</td><td class="c">${d.qty}.00</td>
+      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.mov).toFixed(2)}</td></tr>` : '')
+    + (d.pas ? `<tr>
+      <td class="c">${d.items.length + 3}</td>
       <td><b>PASAJES IDA Y VUELTA${d.ciu ? ' · ' + cotEsc(d.ciu.toUpperCase()) : ''}</b>
         <span class="det">Traslado del instrumentista y de los instrumentos a la ciudad del cliente.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
-      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${(d.pas / 1.18).toFixed(2)}</td></tr>` : '')
+      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${neta(d.pas).toFixed(2)}</td></tr>` : '')
     + (d.via ? `<tr>
-      <td class="c">${d.items.length + 3}</td>
+      <td class="c">${d.items.length + 4}</td>
       <td><b>VIÁTICOS DEL INSTRUMENTISTA</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${d.noc
           ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
-      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${(d.via / 1.18).toFixed(2)}</td></tr>` : '');
+      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${neta(d.via).toFixed(2)}</td></tr>` : '');
   const filas = venta ? filasVenta() : filasAlq();
+  const neto = Math.round(MONTOS.reduce((a, c) => a + c, 0) * 100) / 100;
+  const igv = Math.round((d.total - neto) * 100) / 100;
   const cuadro = `<table>
       <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
         <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
@@ -3324,7 +3395,12 @@ function cotHTML(d, formal){
         <ul class="lst">
           ${venta ? `<li>Equipos nuevos, con ${VCOT_TERM.garantiaMeses} meses de garantía del fabricante.</li>
             <li>${cotEsc(VCOT_TERM.incluye)}</li>
-            <li>Entrega en Lima; a provincia se envía por agencia, a cargo del cliente.</li>
+            ${d.srv
+              ? `<li>Nuestro personal viaja a ${cotEsc(d.srv.ciu || 'tu ciudad')} a instalar los equipos,
+                  ponerlos en funcionamiento y capacitar a tu personal durante ${d.srv.dias}
+                  ${Number(d.srv.dias) === 1 ? 'día' : 'días'}. El pasaje y los viáticos ya están en el cuadro de arriba.</li>
+                 <li>El envío de los equipos a provincia va por agencia de transporte, a cargo del cliente.</li>`
+              : '<li>Entrega, instalación y capacitación en Lima Metropolitana, sin costo adicional; a provincia se envía por agencia, a cargo del cliente.</li>'}
             <li>Factura electrónica a nombre de tu razón social.</li>` : `
           <li>Certificado de calibración vigente de cada instrumento.</li>
           ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'
@@ -3475,6 +3551,20 @@ function cotModalCerrar(){
    formal que emite la empresa. El documento viaja dentro del propio
    enlace, así que no hace falta servidor ni base de datos. */
 var COT_DOC = null;
+/* Las solicitudes de VENTA guardan solo el código de cada equipo: el
+   nombre, la marca, el código NTS y la foto se leen del catálogo al abrir
+   el enlace, para que el enlace quepa en un mensaje de WhatsApp. Pero el
+   catálogo no se carga solo en estas pantallas, y sin él cada equipo salía
+   como «EDAN-H100B», sin marca y sin foto. Se pide una vez y se vuelve a
+   dibujar. */
+function cotConCatalogo(d, repintar){
+  if(!d || d.tipo !== 'venta') return false;
+  if((typeof VENTA !== 'undefined' && VENTA && VENTA.productos) ||
+     typeof cargarVenta !== 'function') return false;
+  cargarVenta().then(repintar).catch(() => {});
+  return true;
+}
+
 function cotVer(codigo){
   const caja = document.getElementById('cotVerBody');
   if(!caja) return;
@@ -3485,6 +3575,17 @@ function cotVer(codigo){
       El enlace puede estar incompleto. Vuelve a armarla en
       <a href="#/cotizar">el cotizador</a> o escríbenos y la preparamos.</p></div>`;
     return;
+  }
+  cotConCatalogo(d, () => cotVer(codigo));
+  /* La cabecera del sitio: una solicitud de venta no es de alquiler. */
+  if(d.tipo === 'venta'){
+    document.body.classList.add('modo-venta');
+    document.body.classList.remove('modo-alquiler');
+    document.querySelectorAll('[data-route]').forEach(a => {
+      const on = a.dataset.route === '#/venta/tienda';
+      a.classList.toggle('active', on);
+      if(on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const wa = urlWhatsApp(String(S.whatsapp || '').replace(/\D/g, ''),
@@ -3561,6 +3662,7 @@ function cotEmitir(codigo){
     caja.innerHTML = `<div class="wrap"><p class="cotv-mal">No pudimos leer esta solicitud.</p></div>`;
     return;
   }
+  cotConCatalogo(d, () => cotEmitir(codigo));
   if(!cotClaveOk()){
     caja.innerHTML = `<div class="wrap emi-puerta">
       <h1>Emitir cotización</h1>
@@ -3660,14 +3762,101 @@ function cotAbrir(id, intento){
    de producto. Aquí solo se lee y se escribe a través de él. */
 const vcItems = () => (window.SBCarrito ? SBCarrito.items() : {});
 
+/* Largo máximo del enlace del resumen antes de aligerarlo. WhatsApp abre sin
+   problemas por debajo de los 2 000 caracteres de mensaje; el enlace es la
+   parte que más crece. */
+var VCOT_ENLACE_MAX = 1400;
+
 /* Términos de la cotización de venta: se pueden cambiar sin tocar código. */
 var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
   plazoPedido: 'se confirma al emitir la cotización', garantiaMeses: 12,
   pago: '50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.',
-  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.'};
+  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.',
+  /* Cuándo el viaje corre por cuenta de Sinergia. Ver data/terminos-venta.json. */
+  instalacionIncluida: {desde: 40000, topePasaje: 260, desdePasajeCompleto: 80000,
+                        diasIncluidos: 2, personasIncluidas: 1}};
 fetch('data/terminos-venta.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null)
   .then(d => { if(d) Object.keys(VCOT_TERM).forEach(k => { if(d[k] != null) VCOT_TERM[k] = d[k]; }); })
   .catch(() => {});
+
+/* ── Servicio fuera de Lima Metropolitana ───────────────────────────
+   Lo piden casi siempre: el equipo se entrega en provincia y alguien
+   tiene que ir a instalarlo y capacitar al personal.
+
+   NO tiene tarifas propias: usa las mismas que el simulador de alquiler
+   (data/tarifas-alquiler.json), que ya resuelve este problema desde hace
+   tiempo — TEC_DIA para el personal, VIAJE.viaticoDia y
+   VIAJE.hospedajeNoche para los viáticos y VIAJE.zonas para el pasaje
+   según la distancia. Así una sola tabla manda en los dos sitios y no
+   hay dos verdades que se contradigan. */
+var VCOT_SRV = {fuera: false, ciudad: '', dias: 1, personas: 1};
+
+/* Las tarifas del viaje, tal como las usa el alquiler. */
+function vcTarifas(){
+  return {personalDia: (typeof TEC_DIA !== 'undefined' ? TEC_DIA : 120),
+          viaticoDia: (typeof VIAJE !== 'undefined' ? VIAJE.viaticoDia : 50),
+          hospedajeNoche: (typeof VIAJE !== 'undefined' ? VIAJE.hospedajeNoche : 90)};
+}
+
+/* Cuánto del viaje corre por cuenta de Sinergia.
+
+   La idea es simple: cuando el margen del pedido es grande, regalar el
+   viaje compra la venta; cuando es chico, se la come. Como la web nunca
+   ve el margen (ni debe: con el margen se deduce lo que cuesta el equipo
+   en el proveedor), la regla mira el monto del pedido, que es su
+   equivalente público.
+
+   Dos escalones, porque el pasaje de avión no es el de un bus:
+     · desde S/ 40 000  → instalación, capacitación y viaje incluidos,
+       con el pasaje cubierto hasta topePasaje; si la ciudad es más cara
+       (avión), el cliente paga solo la diferencia.
+     · desde S/ 80 000  → el pasaje va completo, también en avión.
+   Lo que pase de los días o las personas incluidas se cobra normal: sin
+   ese borde, «incluido» sería un cheque en blanco. */
+function vcIncluido(base, s, T){
+  const R = VCOT_TERM.instalacionIncluida || {};
+  if(!R.desde || base < R.desde || !s.ciudad) return null;
+  const diasC = Math.min(s.dias, Math.max(0, Number(R.diasIncluidos) || 0));
+  const persC = Math.min(s.personas, Math.max(0, Number(R.personasIncluidas) || 0));
+  if(!diasC || !persC) return null;
+  const nochesC = Math.max(0, Math.min(s.noches, diasC - 1));
+  const unitario = s.personas ? s.pasaje / s.personas : 0;
+  const tope = base >= (R.desdePasajeCompleto || Infinity) ? unitario
+             : Math.min(unitario, Number(R.topePasaje) || 0);
+  const cub = {
+    personal: (T.personalDia || 0) * diasC * persC,
+    comida: (T.viaticoDia || 0) * diasC * persC,
+    hospedaje: (T.hospedajeNoche || 0) * nochesC * persC,
+    pasaje: tope * persC
+  };
+  cub.total = cub.personal + cub.comida + cub.hospedaje + cub.pasaje;
+  cub.todo = cub.total >= s.personal + s.viatico + s.pasaje;
+  cub.pasajeEntero = tope >= unitario;
+  cub.dias = diasC; cub.personas = persC;
+  return cub.total > 0 ? cub : null;
+}
+
+function vcServicio(base){
+  const T = vcTarifas();
+  const dias = Math.max(1, Number(VCOT_SRV.dias) || 1);
+  const per = Math.max(1, Number(VCOT_SRV.personas) || 1);
+  const ciudad = (typeof ciudadDe === 'function') ? ciudadDe(VCOT_SRV.ciudad) : null;
+  if(!VCOT_SRV.fuera) return {hay: false, total: 0, dias: dias, personas: per, falta: false};
+  /* Un trabajo de un día no tiene noche: se sale temprano y se vuelve. */
+  const noches = Math.max(0, dias - 1);
+  const pasaje = ciudad && typeof pasajeDe === 'function' ? pasajeDe(ciudad.n) * per : 0;
+  const personal = (T.personalDia || 0) * dias * per;
+  const comida = (T.viaticoDia || 0) * dias * per;
+  const hospedaje = (T.hospedajeNoche || 0) * noches * per;
+  const viatico = comida + hospedaje;
+  const s = {hay: true, ciudad: ciudad, falta: !ciudad, dias: dias, personas: per, noches: noches,
+             personal: personal, pasaje: pasaje, comida: comida, hospedaje: hospedaje,
+             viatico: viatico, bruto: personal + pasaje + viatico};
+  s.inc = vcIncluido(Number(base) || 0, s, T);
+  s.dto = s.inc ? Math.min(s.inc.total, s.bruto) : 0;
+  s.total = s.bruto - s.dto;
+  return s;
+}
 
 /* ── Carrito ────────────────────────────────────────────────────────── */
 const vcProducto = id => ((VENTA && VENTA.productos) || []).find(p => p.id === id);
@@ -3702,16 +3891,47 @@ function vcCalcular(){
     .filter(x => x.q > 0)
     .map(x => ({p: x.p, q: x.q, foto: x.foto, precio: Number(x.p.precio || 0),
                 total: Number(x.p.precio || 0) * x.q}));
-  const total = items.reduce((s, x) => s + x.total, 0);
+  const equipos = items.reduce((s, x) => s + x.total, 0);
+  const srv = vcServicio(equipos);
   const sinPrecio = items.filter(x => !x.precio).length;
-  return {items, total, sinPrecio, unidades: items.reduce((s, x) => s + x.q, 0)};
+  return {items, equipos, srv, total: equipos + srv.total, sinPrecio,
+          unidades: items.reduce((s, x) => s + x.q, 0)};
 }
 
 /* ── Página ─────────────────────────────────────────────────────────── */
-function vcAbrir(){
+/* Lista que había antes de que un enlace empezara una nueva, para poder
+   recuperarla de un toque. Solo vive mientras la pestaña está abierta. */
+var VC_ANTES = null;
+
+/* #/cotizar-venta/<id>: el enlace que viaja en el mensaje de WhatsApp de
+   cada ficha. Empieza una lista NUEVA con ese equipo, no lo suma a la que
+   hubiera: quien abre ese enlace casi siempre está atendiendo a un cliente
+   distinto cada vez, y arrastrar el pedido anterior los mezclaría. Lo que
+   había se guarda y se puede recuperar. */
+function vcSoloEste(id){
+  const g = vcItems(), ids = Object.keys(g);
+  if(ids.length === 1 && ids[0] === id) return;      // ya está así: no se toca
+  VC_ANTES = ids.length ? g : null;
+  if(window.SBCarrito) SBCarrito.vaciar();
+  vcAgregar(id, 1);
+}
+function vcDeshacer(){
+  if(!VC_ANTES || !window.SBCarrito) return;
+  SBCarrito.poner(VC_ANTES); VC_ANTES = null; vcPintarTodo();
+}
+
+function vcAbrir(id){
   /* La página ya tiene su botón de WhatsApp: el verde flotante sobraba y
      encima tapaba el formulario. */
   document.body.classList.add('wa-propio');
+  if(id){
+    /* Con el catálogo cargado, el equipo entra con nombre, precio y foto;
+       sin él entraría como un código suelto. */
+    const poner = () => { vcSoloEste(id); vcPintarTodo(); };
+    if(VENTA && VENTA.productos) poner();
+    else if(typeof cargarVenta === 'function') cargarVenta().then(poner).catch(poner);
+    else poner();
+  }
   vcPintarTodo();
   /* Si se vino del carrito tocando «Enviar por WhatsApp», se baja al
      formulario y se intenta enviar de una vez. */
@@ -3771,9 +3991,12 @@ function vcPintar(){
     </div>
     <div class="wrap vc-grid">
       <div>
+        ${VC_ANTES ? `<p class="vc-nueva">Empezamos una lista nueva con este equipo.
+          <button type="button" onclick="vcDeshacer()">Recuperar la lista anterior</button></p>` : ''}
         <div class="cot-paso uno"><b>1</b> Tus equipos <i>${c.unidades} ${c.unidades === 1 ? 'unidad' : 'unidades'}</i></div>
         <div class="vc-lista">${c.items.map(vcFila).join('')}</div>
         <button type="button" class="cot-limpiar" onclick="vcVaciar()">Vaciar la lista</button>
+        ${vcBloqueServicio(c.srv)}
       </div>
       <aside class="cot-res">
         <div class="cot-top">
@@ -3790,6 +4013,7 @@ function vcPintar(){
         <ul class="cot-sel">${c.items.map(x =>
           `<li><span>${vEsc(x.p.nom)}${x.q > 1 ? ' × ' + x.q : ''}</span><span>${vSoles(x.total)}</span></li>`).join('')}
         </ul>
+        ${vcDesglose(c.srv)}
         <div class="cot-cuenta">
   <div class="sub"><span>Subtotal</span><span>${vSoles(neto)}</span></div>
           <div class="sub"><span>IGV (18 %)</span><span>${vSoles(c.total - neto)}</span></div>
@@ -3801,13 +4025,19 @@ function vcPintar(){
         <div class="cot-paso"><b>3</b> Tus datos</div>
         <div class="cot-form" id="vcForm">
           <label>Nombre o institución<input id="vcNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></label>
-          <div class="cot-f2">
-            <label>Correo<input id="vcMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
-            <label>Teléfono<input id="vcTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></label>
-          </div>
+          <!-- Correo y teléfono, plegados: por WhatsApp el número ya viaja
+               solo, y tres campos a la vista parecían trabajo. Quien
+               prefiere correo los abre; al resto no le estorban. -->
+          <details class="vc-mas"${VCOT_DATOS.mail || VCOT_DATOS.tel ? ' open' : ''}>
+            <summary>Agregar correo y teléfono (opcional)</summary>
+            <div class="cot-f2">
+              <label>Correo<input id="vcMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
+              <label>Teléfono<input id="vcTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></label>
+            </div>
+          </details>
           <label>¿Algo que debamos saber?<textarea id="vcMsg" rows="2" placeholder="Para qué área, si es para un expediente, fechas…"></textarea></label>
           <div class="form-msg" id="vcAviso" role="status" aria-live="polite"></div>
-          <p class="cot-mail">Con tus datos listos, toca «Enviar mi pedido por WhatsApp».
+          <p class="cot-mail">Con tu nombre basta: toca «Enviar mi pedido por WhatsApp».
             ¿Prefieres correo? <button type="button" onclick="vcEnviar('correo')">Enviar por correo</button>
             · <button type="button" onclick="vcCopiar()">Copiar el mensaje</button></p>
         </div>
@@ -3816,6 +4046,73 @@ function vcPintar(){
       </aside>
     </div>`;
   vcRestaurar();
+}
+
+/* El bloque de «¿dónde se instala y capacita?», debajo de los equipos.
+   Cerrado no estorba a quien compra para Lima; abierto pide lo justo:
+   ciudad, días y cuántas personas viajan. */
+function vcBloqueServicio(s){
+  const ciudades = (typeof CIUDADES !== 'undefined' ? CIUDADES : []);
+  const zonas = (typeof VIAJE_ZONAS !== 'undefined' ? VIAJE_ZONAS : {});
+  const grupos = Object.keys(zonas).map(z => {
+    const l = ciudades.filter(x => String(x.z) === String(z));
+    if(!l.length) return '';
+    return `<optgroup label="${vEsc(zonas[z])}">${l.map(x =>
+      `<option${x.n === VCOT_SRV.ciudad ? ' selected' : ''}>${vEsc(x.n)}</option>`).join('')}</optgroup>`;
+  }).join('');
+  return `<div class="vc-srv">
+    <div class="cot-paso"><b>+</b> Instalación y capacitación</div>
+    <div class="cot-seg">
+      <button type="button" class="${s.hay ? '' : 'on'}" onclick="vcFuera(false)">En Lima Metropolitana</button>
+      <button type="button" class="${s.hay ? 'on' : ''}" onclick="vcFuera(true)">Fuera de Lima</button>
+    </div>
+    ${!s.hay
+      ? '<p class="cot-ayuda">La entrega, la instalación y la capacitación de uso en Lima Metropolitana van incluidas, sin costo.</p>'
+      : `<div class="vc-srv-f">
+          <label>¿A qué ciudad?
+            <select onchange="vcSrv('ciudad', this.value)">
+              <option value="">Elige la ciudad…</option>${grupos}
+            </select></label>
+          <label>Días en sitio
+            <input type="number" min="1" step="1" value="${s.dias}" onchange="vcSrv('dias', this.value)"></label>
+          <label>Personas
+            <input type="number" min="1" max="4" step="1" value="${s.personas}" onchange="vcSrv('personas', this.value)"></label>
+        </div>
+        ${s.falta ? '<p class="cot-ayuda vc-falta">Elige la ciudad para calcular el pasaje.</p>'
+          : s.inc ? `<p class="cot-ayuda vc-ok">Por el monto de tu pedido, ${s.inc.todo
+              ? 'este servicio va <b>incluido, sin costo</b>.'
+              : 'cubrimos <b>' + vSoles(s.dto) + '</b> de este servicio.'}</p>`
+          : '<p class="cot-ayuda">El pasaje se calcula por la distancia a Lima; los viáticos, por día de trabajo y por noche fuera.</p>'}`}
+  </div>`;
+}
+
+/* El desglose, con las mismas partidas que el simulador de alquiler: así
+   el cliente ve de dónde sale cada sol y no parece un recargo suelto. */
+function vcDesglose(s){
+  if(!s.hay || s.falta) return '';
+  const T = vcTarifas(), f = n => Number(n || 0).toLocaleString('es-PE');
+  const ciu = s.ciudad ? s.ciudad.n : '';
+  const inc = s.inc;
+  return `<div class="cot-cuenta vc-desg${inc ? ' vc-regalo' : ''}">
+    <div class="vc-desg-t">Servicio fuera de Lima Metropolitana${ciu ? ', en ' + vEsc(ciu) : ''}</div>
+    <div class="sub"><span>Personal calificado · S/ ${f(T.personalDia)} × ${s.dias} ${s.dias === 1 ? 'día' : 'días'}${
+      s.personas > 1 ? ' × ' + s.personas + ' personas' : ''}</span><span>${vSoles(s.personal)}</span></div>
+    <div class="sub"><span>Pasajes ida y vuelta${s.personas > 1 ? ' × ' + s.personas : ''}</span><span>${vSoles(s.pasaje)}</span></div>
+    <div class="sub"><span>Viáticos · comida S/ ${f(T.viaticoDia)} × ${s.dias}${
+      s.noches ? ' · hospedaje S/ ' + f(T.hospedajeNoche) + ' × ' + s.noches + (s.noches === 1 ? ' noche' : ' noches') : ''
+    }</span><span>${vSoles(s.viatico)}</span></div>
+    ${inc ? `<div class="sub vc-dto"><span>Incluido por Sinergia${
+      inc.todo ? '' : ' · ' + inc.dias + (inc.dias === 1 ? ' día' : ' días') +
+        (inc.pasajeEntero ? ' y el pasaje completo' : ' y hasta S/ ' + f((VCOT_TERM.instalacionIncluida || {}).topePasaje) + ' de pasaje')
+    }</span><span>− ${vSoles(s.dto)}</span></div>` : ''}
+    <div class="gran"><span>Total del servicio</span><span>${vSoles(s.total)}</span></div>
+  </div>`;
+}
+
+function vcFuera(si){ VCOT_SRV.fuera = !!si; vcPintarTodo(); }
+function vcSrv(k, v){
+  VCOT_SRV[k] = (k === 'ciudad') ? v : Math.max(1, parseInt(v, 10) || 1);
+  vcPintarTodo();
 }
 
 /* Pedir mas unidades de las que hay: antes seguia diciendo «En stock» y
@@ -3872,19 +4169,23 @@ function vcDoc(c, d){
     tipo: 'venta',
     num: vcNumero(), fecha: new Date().toLocaleDateString('es-PE'),
     nom: d.nom, mail: d.mail, tel: d.tel, nota: d.msg || '',
-    /* Solo lo imprescindible: id, cantidad y precio. El nombre, la marca y
-       el código NTS se leen del catálogo al abrir el enlace, y solo viajan
-       dentro cuando el equipo ya no está en el catálogo. Con esto el enlace
-       no crece sin control y WhatsApp siempre lo acepta. */
-    items: c.items.map(x => {
-      const it = {i: x.p.id, q: x.q, pu: x.precio, t: x.total};
-      if(!vcProducto(x.p.id)){
-        it.n = x.p.nom;
-        it.m = [x.p.marca, x.p.modelo].filter(Boolean).join(' · ');
-        it.nts = x.p.clave || '';
-      }
-      return it;
-    }),
+    /* Nombre, marca y código NTS viajan siempre dentro del enlace: son
+       cortos y hacen que el resumen se lea aunque el equipo ya no esté en
+       la hoja. La foto no: esa es larga y se saca del catálogo, que para
+       eso se carga al abrir el enlace (cotConCatalogo). */
+    items: c.items.map(x => ({
+      i: x.p.id, q: x.q, pu: x.precio, t: x.total,
+      n: x.p.nom,
+      m: [x.p.marca, x.p.modelo].filter(Boolean).join(' · '),
+      nts: x.p.clave || ''
+    })),
+    /* El servicio fuera de Lima, con sus partidas separadas: el documento
+       lo imprime como filas propias del cuadro, igual que el alquiler. */
+    srv: c.srv.hay && !c.srv.falta ? {
+      ciu: c.srv.ciudad ? c.srv.ciudad.n : '', dias: c.srv.dias, per: c.srv.personas,
+      noc: c.srv.noches, pers: c.srv.personal, pas: c.srv.pasaje, via: c.srv.viatico,
+      dto: c.srv.dto || 0
+    } : null,
     total: c.total, gar: 0, tec: 0, pas: 0, via: 0, inc: []
   };
 }
@@ -3920,9 +4221,22 @@ function vcTerminos(d){
     'se realiza por agencia de transporte y su costo lo asume el cliente.']);
   L.push(['5. Garantía.', T.garantiaMeses + ' meses de garantía del fabricante contra defectos de fabricación, ' +
     'con atención en nuestro taller de Lima. No cubre el daño por mal uso ni el desgaste de los consumibles.']);
-  L.push(['6. Incluye.', T.incluye]);
-  L.push(['7. Forma de pago.', T.pago]);
-  L.push(['8. Comprobante.', 'Se emite factura electrónica a nombre de la razón social indicada por el cliente.']);
+  L.push(['6. Incluye.', T.incluye + ' La instalación, la puesta en funcionamiento y la capacitación ' +
+    'de uso en Lima Metropolitana no tienen costo adicional.']);
+  if(d && d.srv){
+    L.push(['7. Servicio fuera de Lima Metropolitana' + (d.srv.ciu ? ', en ' + d.srv.ciu : '') + '.',
+      'Comprende el traslado del personal calificado, su permanencia por ' + d.srv.dias +
+      (d.srv.dias === 1 ? ' día' : ' días') + ' en sitio' + (d.srv.per > 1 ? ' (' + d.srv.per + ' personas)' : '') +
+      ', la instalación, la puesta en funcionamiento y la capacitación del personal del cliente. ' +
+      'Se detalla por partidas en el Cuadro N° 1: personal calificado, pasajes de ida y vuelta y viáticos ' +
+      '(alimentación por día de trabajo y hospedaje por noche fuera).' +
+      (d.srv.dto ? ' Por el monto de esta cotización, ' + (d.srv.dto >= (d.srv.pers + d.srv.pas + d.srv.via)
+        ? 'este servicio va incluido sin costo.'
+        : 'Sinergia asume S/ ' + Number(d.srv.dto).toFixed(2) + ' de este servicio.') : '') +
+      ' El envío de los equipos a provincia se realiza por agencia de transporte y su costo lo asume el cliente.']);
+  }
+  L.push([(d && d.srv ? '8' : '7') + '. Forma de pago.', T.pago]);
+  L.push([(d && d.srv ? '9' : '8') + '. Comprobante.', 'Se emite factura electrónica a nombre de la razón social indicada por el cliente.']);
   return L;
 }
 
@@ -3944,6 +4258,16 @@ function vcTexto(c, d){
            (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total) +
            (hay ? '  [PEDIDO ESPECIAL: en stock ' + hay + ']' : ''));
   });
+  if(c.srv.hay && !c.srv.falta){
+    L.push('');
+    L.push('SERVICIO FUERA DE LIMA METROPOLITANA' + (c.srv.ciudad ? ', EN ' + c.srv.ciudad.n.toUpperCase() : ''));
+    L.push('  Personal calificado (' + c.srv.dias + (c.srv.dias === 1 ? ' día' : ' días') +
+           (c.srv.personas > 1 ? ' × ' + c.srv.personas + ' personas' : '') + '): ' + vSoles(c.srv.personal));
+    L.push('  Pasajes ida y vuelta: ' + vSoles(c.srv.pasaje));
+    L.push('  Viáticos (comida y hospedaje): ' + vSoles(c.srv.viatico));
+    if(c.srv.dto) L.push('  Incluido por Sinergia: − ' + vSoles(c.srv.dto));
+    L.push('  Subtotal del servicio: ' + vSoles(c.srv.total));
+  }
   L.push('');
   L.push('  TOTAL REFERENCIAL (IGV incluido): ' + vSoles(c.total));
   if(d.msg){ L.push(''); L.push('NOTA DEL CLIENTE'); L.push('  ' + d.msg); }
@@ -3952,20 +4276,52 @@ function vcTexto(c, d){
   return L.join('\n');
 }
 
+/* El enlace del resumen, aligerado si hace falta (ver vcEnviar). */
+function vcEnlaceCorto(c, d){
+  const doc = vcDoc(c, d);
+  let e = cotEnlace(doc);
+  if(e.length > VCOT_ENLACE_MAX){
+    doc.items = doc.items.map(it => vcProducto(it.i) ? {i: it.i, q: it.q, pu: it.pu, t: it.t} : it);
+    e = cotEnlace(doc);
+  }
+  return e;
+}
+
 function vcEnviar(via){
   const c = vcCalcular();
   if(!c.items.length) return;
   const d = vcDatos();
-  const error = (typeof validarContacto === 'function') ? validarContacto(d.nom, d.mail, d.tel) : '';
+  /* Por WhatsApp el número del cliente viaja solo: pedirle además un
+     correo o un teléfono era pedir dos veces lo mismo. Basta el nombre.
+     Por correo sí hace falta el correo, que si no, no hay a dónde
+     responder. */
+  const vale = (f, x) => typeof window[f] !== 'function' || window[f](x);
+  let error = '';
+  if(!d.nom || d.nom.length < 2) error = 'Escribe tu nombre o el de la institución.';
+  else if(via === 'correo' && !d.mail) error = 'Para enviarlo por correo, escribe tu correo.';
+  else if(d.mail && !vale('correoValido', d.mail)) error = 'Revisa el correo: parece incompleto.';
+  else if(d.tel && !vale('telefonoValido', d.tel)) error = 'Revisa el teléfono: faltan dígitos.';
   if(error){
     const f = document.getElementById('vcForm');
     if(f) f.scrollIntoView({behavior: 'smooth', block: 'center'});
     avisar('vcAviso', error, 'err');
-    const el = document.getElementById('vcNom'); if(el && !d.nom) setTimeout(() => el.focus(), 350);
+    const det = document.querySelector('.vc-mas');
+    if(det && /correo|teléfono/i.test(error)) det.open = true;
+    const el = document.getElementById(!d.nom ? 'vcNom' : 'vcMail');
+    if(el) setTimeout(() => el.focus(), 350);
     return;
   }
-  const doc = vcDoc(c, d);
-  const enlace = cotEnlace(doc);
+  let doc = vcDoc(c, d);
+  let enlace = cotEnlace(doc);
+  /* El nombre, la marca y el código NTS viajan dentro del enlace para que un
+     resumen viejo se lea aunque el equipo ya no esté en la hoja. Con veinte
+     equipos eso dejaba el enlace en 3 700 caracteres y WhatsApp se atraganta.
+     Si se pasa, se quitan de los equipos que SÍ están en el catálogo: esos se
+     leen de ahí al abrir el enlace (cotConCatalogo). */
+  if(enlace.length > VCOT_ENLACE_MAX){
+    doc.items = doc.items.map(it => vcProducto(it.i) ? {i: it.i, q: it.q, pu: it.pu, t: it.t} : it);
+    enlace = cotEnlace(doc);
+  }
   let texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + enlace;
   /* WhatsApp se queda en blanco con direcciones muy largas: si el pedido
      es grande, va el resumen corto y el enlace, que lo tiene todo. */
@@ -3992,7 +4348,7 @@ function vcCopiar(){
   const c = vcCalcular();
   if(!c.items.length) return;
   const d = vcDatos();
-  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + cotEnlace(vcDoc(c, d));
+  const texto = vcTexto(c, d) + '\n\nResumen de este pedido:\n' + vcEnlaceCorto(c, d);
   const ok = () => avisar('vcAviso', 'Mensaje copiado: pégalo donde quieras enviarlo.', 'ok');
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(texto).then(ok).catch(() => vcCopiarViejo(texto, ok));

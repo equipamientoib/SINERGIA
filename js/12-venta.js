@@ -152,7 +152,7 @@ function vBuscarEn(q, destino){
   const otros = document.querySelectorAll('[data-sin-busqueda]');
   otros.forEach(e => e.hidden = !corta);
   caja.innerHTML = corta ? '' : (r.length
-    ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid">${r.map(vCard).join('')}</div>`
+    ? `<div class="v-cuenta">${r.length} ${r.length===1?'resultado':'resultados'} para «${vEsc(q)}»</div><div class="grid vts">${r.map(vCard).join('')}</div>`
     : `<div class="v-vacio"><h3>No encontramos «${vEsc(q)}» en el catálogo publicado</h3><p>Igual podemos conseguirlo. Escríbenos con el nombre o el código de tu listado y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, quiero cotizar: '+q)}" target="_blank" rel="noopener">Cotizar por WhatsApp</a></div></div>`);
 }
 function vBuscador(destino, ph){
@@ -286,45 +286,48 @@ function vNotaPrecio(larga){
 /* Cada equipo tiene su página propia (venta/<id>/, la genera
    scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
    Si un equipo es nuevo y aún no tiene página, se abre la ficha interna. */
+function vMensajeWA(p){
+  const linea = [p.marca, p.modelo, p.clave ? 'Código NTS ' + p.clave : '',
+                 p.precio ? vSoles(p.precio) : ''].filter(Boolean).join(' · ');
+  const partes = ['Hola Sinergia Biomédica, quiero cotizar:', '', p.nom];
+  if(linea) partes.push(linea);
+  partes.push('', location.origin + '/#/cotizar-venta/' + p.id);
+  return partes.join('\n');
+}
+
 function vPagina(id){ return (window.PAGINA_VENTA || {})[id] || ''; }
 function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/venta/p/' + id); }
 
 /* Botón de carrito con los datos del equipo pegados: así funciona igual
    en la web y en las páginas sueltas de producto. */
-function vBotonAdd(p, clase, texto){
-  return `<button type="button" class="${clase}" data-add="${vEsc(p.id)}"
+function vBotonAdd(p, clase, texto, extra){
+  return `<button type="button" class="${clase}"${extra || ''} data-add="${vEsc(p.id)}"
     data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
     data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
-    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar al carrito'}</button>`;
+    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar a mi cotización'}</button>`;
 }
 
 function vCard(p){
-  const c = vCat(p.cat);
   const foto = vFoto(p, 0, true);
-  const url = `#/venta/p/${p.id}`;   // referencia; los clics van por vAbrir()
-  const st = (p.stock === undefined || p.stock === null || p.stock === '') ? '' :
-    (Number(p.stock) > 0 ? '<span class="badge">EN STOCK</span>' : '<span class="badge v-apedido">A PEDIDO</span>');
   const of = vPromo(p);
-  const tag = of ? '<span class="tier v-oferta">Promoción</span>'
-                 : (p._top ? '<span class="tier">Más pedido</span>' : '');
-  const pie = p.precio
-    ? `<div class="price${of ? ' con-promo' : ''}"><span class="desde">${of ? 'Precio especial' : 'Precio referencial'}</span>${vSoles(p.precio)}${
-        ''}<small>Incluye IGV · ${
-        of ? (of.fin ? 'hasta el ' + of.fin.toLocaleDateString('es-PE') : 'hasta agotar stock') : vNotaPrecio(false)}</small></div>`
-    : `<div class="price v-consulta">Consultar precio<small>te respondemos con precio y plazo</small></div>`;
-  return `<div class="eq v-eq">
-    <div class="img${foto?' has-photo':''}" onclick="vAbrir('${p.id}')">
-      ${foto?'':'<span class="grid-bg"></span>'}${st}${tag}
-      ${foto?`<img class="photo" src="${vEsc(foto)}" alt="${vEsc(p.nom)} ${vEsc(p.marca||'')} ${vEsc(p.modelo||'')}" loading="lazy" decoding="async">`:`<span class="v-sinfoto">${vIco(p.cat,'v-ico-xl')}</span>`}
-    </div>
-    <div class="body">
-      <div class="cat">${vEsc(c?c.nombre:'')}</div>
-      <h3><a onclick="vAbrir('${p.id}')">${vEsc(p.nom)}</a></h3>
-      ${vMarcaModelo(p)}
-      ${p.clave?`<div class="v-exp" title="${vEsc(p.expediente||'Código NTS 113-MINSA')}">Código NTS ${vEsc(p.clave)}</div>`:''}
-      <div class="desc">${vEsc(p.resumen||'')}</div>
-      <div class="foot">${pie}${vBotonAdd(p, 'btn v-add')}</div>
-    </div>
+  /* Marca, modelo y código NTS en una sola línea: es lo que el comprador
+     compara de un vistazo cuando revisa veinte equipos seguidos. */
+  const sub = [[p.marca, p.modelo].filter(Boolean).join(' · '),
+               p.clave ? 'NTS ' + p.clave : ''].filter(Boolean).join(' · ');
+  const st = (p.stock === undefined || p.stock === null || p.stock === '') ? ''
+    : (Number(p.stock) > 0 ? '<em class="vt-st">En stock</em>'
+                           : '<em class="vt-st vt-ped">A pedido</em>');
+  const precio = p.precio ? `<i>${vSoles(p.precio)}</i>`
+                          : '<i class="vt-cons">Consultar precio</i>';
+  const href = vPagina(p.id) || ('#/venta/p/' + p.id);
+  return `<div class="vt${of ? ' en-oferta' : ''}">
+    <a class="vt-l" href="${vEsc(href)}" aria-label="${vEsc(p.nom)}"></a>
+    <span class="vt-f">${foto
+      ? `<img src="${vEsc(foto)}" alt="${vEsc([p.nom, p.marca, p.modelo].filter(Boolean).join(' '))}" loading="lazy" decoding="async">`
+      : vIco(p.cat)}${of ? '<span class="vt-of">PROMOCIÓN</span>' : ''}</span>
+    <span class="vt-t"><b>${vEsc(p.nom)}</b>${sub ? `<small>${vEsc(sub)}</small>` : ''}
+      <span class="vt-p">${precio}${st}</span></span>
+    ${vBotonAdd(p, 'vt-add', '+', ' data-corto="1" title="Agregar a mi cotización" aria-label="Agregar a mi cotización"')}
   </div>`;
 }
 
@@ -365,7 +368,7 @@ function vOrden(lista){
 
 /* Inicio: exactamente el mismo orden que la tienda, los 12 primeros. */
 function vPortadaTramos(){
-  return `<div class="grid">${vOrdenTienda(VENTA.productos).slice(0, 12).map(vCard).join('')}</div>`;
+  return `<div class="grid vts">${vOrdenTienda(VENTA.productos).slice(0, 12).map(vCard).join('')}</div>`;
 }
 
 /* ── Portada de venta ─────────────────────────────────────────────── */
@@ -475,24 +478,6 @@ function vtConteo(campo){
   VENTA.productos.forEach(p => { const v = p[campo]; if(v) m.set(v, (m.get(v)||0)+1); });
   return m;
 }
-/* Sección de promociones, arriba de los filtros de la tienda. Es la misma
-   que lleva la página /venta/: los equipos con precio especial, con su
-   etiqueta y hasta cuándo. Si no hay ninguno, no ocupa nada. */
-function vSeccionPromos(){
-  const enof = (VENTA.productos || []).filter(p => vPromo(p));
-  if(!enof.length) return '';
-  const fechas = enof.map(p => vPromo(p).fin).filter(Boolean);
-  const fin = fechas.length ? new Date(Math.min(...fechas.map(f => f.getTime()))) : null;
-  return `<section class="v-promos"><div class="wrap">
-    <div class="v-promos-c">
-      <h2>En promoción <small>${enof.length}</small></h2>
-      <p>${fin ? `Precio especial hasta el ${fin.toLocaleDateString('es-PE')}. Después vuelven a su precio de siempre.`
-               : 'Precio especial por tiempo limitado. Lo que se va, se va.'}</p>
-      <div class="grid">${enof.map(vCard).join('')}</div>
-    </div>
-  </div></section>`;
-}
-
 function vTienda(catInicial, precioInicial){
   VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='dest';
   if(precioInicial != null && precioInicial !== '') VT.precio.add(String(precioInicial));
@@ -507,13 +492,11 @@ function vTienda(catInicial, precioInicial){
   const tramos = [...V_TRAMOS.keys(), V_TRAMOS.length].filter(i => ct.get(String(i))).map(i => [String(i), vTramoNombre(i), ct.get(String(i))]);
   const c1 = VT.cat.size===1 ? vCat([...VT.cat][0]) : null;
   return `
-  <div class="wrap pagehead">
+  <div class="wrap pagehead v-head">
     <div class="crumb"><a onclick="go('#/venta')">Venta</a> &nbsp;/&nbsp; Tienda</div>
     <div class="k">Tienda de equipamiento biomédico</div>
     <h1>${c1 ? vEsc(c1.nombre) : 'Todos los equipos'}</h1>
-    <p>Filtra por categoría, marca o procedencia. Cada equipo tiene su ficha con marca, modelo y el nombre con que aparece en los expedientes técnicos.</p>
   </div>
-  ${vSeccionPromos()}
   <section style="padding-top:30px"><div class="wrap">
     <button class="filtros-btn" onclick="document.getElementById('vtSide').classList.toggle('open')">Filtros ▾</button>
     <div class="catalog-layout">
@@ -539,7 +522,7 @@ function vTienda(catInicial, precioInicial){
         </div>
         <div class="vt-activos" id="vtActivos"></div>
         <div class="v-cuenta" id="vtCuenta"></div>
-        <div class="grid vt-grid" id="vtGrid"></div>
+        <div class="grid vts vt-grid" id="vtGrid"></div>
       </div>
     </div>
   </div></section>
@@ -633,7 +616,9 @@ function vProducto(id){
   const otros = vDeCat(p.cat).filter(x => x.id !== p.id).slice(0,3);
   const chips = [['Garantía',p.garantia]].filter(x=>x[1]);   // marca, modelo y origen ya van arriba (vMarcaModelo)
   const areas = (p.areas||[]).length ? `<div class="v-areas"><span>Se usa en</span>${p.areas.map(a=>`<i>${vEsc(a)}</i>`).join('')}</div>` : '';
-  const texto = 'Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:'');
+  /* Mismo mensaje que las páginas sueltas: con los datos del equipo y el
+     enlace que abre el cotizador con ese equipo ya puesto. */
+  const texto = vMensajeWA(p);
   return `
   <div class="wrap" style="padding-top:18px">
     <button type="button" class="sb-atras" onclick="sbAtras()">
@@ -657,7 +642,7 @@ function vProducto(id){
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
-          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar al carrito')}
+          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar a mi cotización')}
           <a class="btn btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         ${p.ficha_pdf?`<a class="v-doc" href="${vEsc(p.ficha_pdf)}" target="_blank" rel="noopener"><span class="doc-ico">PDF</span><span><b>Ficha técnica</b><small>Ver o descargar</small></span></a>`:''}
@@ -667,7 +652,7 @@ function vProducto(id){
       <div class="v-tabs" role="tablist">${pest.map((t,i)=>`<button type="button" role="tab" class="${i?'':'on'}" onclick="vTab(this,${i})">${t[0]}</button>`).join('')}</div>
       ${pest.map((t,i)=>`<div class="v-panel-t" ${i?'hidden':''}>${t[1]}</div>`).join('')}
     </div>`:''}
-    ${otros.length?`<section class="v-sec" style="padding-bottom:0"><div class="shead"><div><div class="k">Misma categoría</div><h2>También te puede interesar</h2></div></div><div class="grid">${otros.map(vCard).join('')}</div></section>`:''}
+    ${otros.length?`<section class="v-sec" style="padding-bottom:0"><div class="shead"><div><div class="k">Misma categoría</div><h2>También te puede interesar</h2></div></div><div class="grid vts">${otros.map(vCard).join('')}</div></section>`:''}
   </div>
   <section class="v-sec"></section>`;
 }
