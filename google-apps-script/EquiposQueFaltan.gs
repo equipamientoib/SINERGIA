@@ -152,3 +152,160 @@ function equiposQueFaltan() {
   L.push('  En la pestaña «' + nom + '»: ' + nuevos.length + ' filas listas para revisar.');
   Logger.log(L.join('\n'));
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   Publicar los equipos que ya estaban en la hoja, tenían stock y
+   seguían en «publicar = no».
+
+   Eran 17. Se publican 13: cuatro quedan fuera a propósito, y la razón
+   está escrita en NO_PUBLICAR, abajo, para que dentro de seis meses se
+   sepa por qué.
+
+   Las filas venían con la descripción del proveedor como nombre
+   («Autoclave mesa 28 L clase B c/bomba d.vacio, generador d.vapor e
+   impres ST LIMIT TUTTNAUER»), sin modelo, sin resumen y sin áreas.
+   Publicarlas así habría puesto texto de almacén en la web, así que
+   esta tabla trae el nombre limpio y lo que falta.
+
+   El código NTS se deja vacío a propósito en los que no se pudo
+   confirmar: un código equivocado en un expediente es peor que ninguno.
+   ═══════════════════════════════════════════════════════════════════ */
+
+var PUBLICAR_ = [
+  { id: 'heine-097596', categoria: 'diagnostico',
+    nombre: 'Dermatoscopio LED con estuche y cargador', modelo: 'Delta 30',
+    resumen: 'Dermatoscopio de mano con luz LED para el examen de lesiones de piel en consulta.',
+    caracteristicas: 'Luz LED|Cable USB con fuente de alimentación|Examen con y sin inmersión|Estuche de transporte',
+    areas: 'Consulta externa, Dermatología' },
+
+  { id: 'heine-073492', categoria: 'diagnostico',
+    nombre: 'Oftalmoscopio indirecto binocular', modelo: 'Omega 500',
+    resumen: 'Oftalmoscopio binocular indirecto con cinta craneal para examen de retina y fondo de ojo.',
+    caracteristicas: 'Binocular indirecto|Cinta craneal|6 V|Maletín de transporte',
+    areas: 'Consulta externa, Oftalmología' },
+
+  { id: 'boeco-082785', categoria: 'laboratorio',
+    nombre: 'Termómetro digital de bolsillo con sonda', modelo: 'BOE 310',
+    resumen: 'Termómetro digital de bolsillo con sonda, para control de temperatura en laboratorio.',
+    caracteristicas: 'Rango de −50 °C a +300 °C|Pantalla LCD|Sonda de acero inoxidable',
+    areas: 'Laboratorio' },
+
+  { id: 'tuttnauer-087186', categoria: 'esterilizacion',
+    nombre: 'Autoclave de mesa de 28 litros clase B', modelo: 'Elara 11D',
+    resumen: 'Autoclave de mesa clase B con bomba de vacío e impresora, para esterilización de instrumental.',
+    caracteristicas: '28 litros|Clase B|Bomba de vacío|Generador de vapor|Impresora incorporada',
+    areas: 'Centro quirúrgico, Esterilización, Consulta externa' },
+
+  { id: 'mindray-097070', categoria: 'laboratorio',
+    nombre: 'Lavadora de microplacas', modelo: 'MW-12A',
+    resumen: 'Lavadora automática de microplacas para pruebas de ELISA en laboratorio clínico.',
+    caracteristicas: '12 canales|Programas configurables|Para microplacas de 96 pozos',
+    areas: 'Laboratorio' },
+
+  { id: 'boeco-030203', categoria: 'laboratorio',
+    nombre: 'Agitador orbital universal', modelo: 'OS-20',
+    resumen: 'Agitador orbital de laboratorio con plataforma universal para matraces y tubos.',
+    caracteristicas: 'Movimiento orbital|Plataforma PP-4 incluida|Velocidad regulable',
+    areas: 'Laboratorio' },
+
+  { id: 'gemmy-072210', categoria: 'laboratorio',
+    nombre: 'Agitador vórtex de mesa', modelo: 'VM 300P',
+    resumen: 'Agitador vórtex de mesa para mezclar muestras en tubos.',
+    caracteristicas: 'Velocidad regulable|Funcionamiento continuo o por contacto|Cabezal de goma',
+    areas: 'Laboratorio' },
+
+  { id: 'boeco-077672', categoria: 'laboratorio',
+    nombre: 'Balanza de precisión de 2 000 g', modelo: 'BWL 51',
+    resumen: 'Balanza de precisión para laboratorio, con capacidad de 2 000 gramos.',
+    caracteristicas: 'Capacidad 2 000 g|Precisión 0,01 g|Pantalla digital',
+    areas: 'Laboratorio' },
+
+  { id: 'boeco-076505', categoria: 'laboratorio',
+    nombre: 'Balanza de precisión de 600 g', modelo: 'BBL 64',
+    resumen: 'Balanza de precisión para laboratorio, con capacidad de 600 gramos.',
+    caracteristicas: 'Capacidad 600 g|Precisión 0,1 g|Pantalla digital',
+    areas: 'Laboratorio' },
+
+  { id: 'boeco-087895', categoria: 'laboratorio',
+    nombre: 'Balanza analítica de 750 g', modelo: 'BPS 40 Plus',
+    resumen: 'Balanza analítica de laboratorio con precisión de milésima de gramo.',
+    caracteristicas: 'Capacidad 750 g|Precisión 0,001 g|Pantalla digital',
+    areas: 'Laboratorio' },
+
+  { id: 'memmert-089258', categoria: 'laboratorio',
+    nombre: 'Incubadora de CO₂ de 56 litros', modelo: 'ICO 50',
+    resumen: 'Incubadora de CO₂ para cultivo celular en laboratorio e investigación.',
+    caracteristicas: '56 litros|Hasta 50 °C|Control de CO₂|Cámara de 40 × 42,5 × 33 cm',
+    areas: 'Laboratorio' },
+
+  { id: 'heine-083007', categoria: 'quirofano',
+    nombre: 'Lámpara de exploración con mordaza para mesa', modelo: 'EL3 LED',
+    resumen: 'Lámpara de exploración LED que se fija con mordaza al borde de la mesa o camilla.',
+    caracteristicas: 'Luz LED|Fijación por mordaza|Brazo flexible',
+    areas: 'Consulta externa, Centro quirúrgico, Emergencia' },
+
+  { id: 'heine-084116', categoria: 'quirofano',
+    nombre: 'Lámpara de exploración con trípode rodable', modelo: 'EL 10 LED',
+    resumen: 'Lámpara de exploración LED sobre trípode con ruedas, para consultorio y sala de procedimientos.',
+    caracteristicas: 'Luz LED|Trípode rodable|Brazo orientable',
+    areas: 'Consulta externa, Centro quirúrgico, Emergencia' }
+];
+
+/* Los que NO se publican, y por qué. Se deja escrito aquí para que la
+   decisión no se pierda y nadie los vuelva a encender sin saberlo. */
+var NO_PUBLICAR_ = [
+  ['cami-096611',       'Más caro que en Saga Falabella: S/ 634 contra S/ 547-560 del mismo CA-MI New Aspiret.'],
+  ['riester-082838',    'Más caro que en Saga Falabella: S/ 4 941 contra S/ 2 798-2 999 de la misma Riester ri-magic HP LED.'],
+  ['cami-096610',       'Duplicado: ya está publicado como cami-new-hospivac-350, al mismo precio.'],
+  ['cu-medical-081841', 'Duplicado: ya está publicado como cu-medical-hd1, al mismo precio.']
+];
+
+/**
+ * ▶ Limpia y publica los equipos de PUBLICAR_.
+ * Solo toca esas filas. Lo demás de la hoja queda igual.
+ */
+function publicarPendientes() {
+  var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss);
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var i = 0; i < Math.min(vals.length, 40); i++) {
+    if (s_(vals[i][0]).toLowerCase() === 'id') { fh = i; break; }
+  }
+  if (fh < 0) { Logger.log('No encuentro la fila de encabezados («id») en la hoja «Venta».'); return; }
+  var cab = vals[fh].map(function (c) { return s_(c).toLowerCase(); });
+  var col = {};
+  ['publicar', 'nombre', 'modelo', 'categoria', 'resumen', 'caracteristicas', 'areas'].forEach(function (k) {
+    col[k] = cab.indexOf(k);
+  });
+  if (col.publicar < 0) { Logger.log('La hoja «Venta» no tiene columna «publicar».'); return; }
+
+  var fila = {};
+  for (var r = fh + 1; r < vals.length; r++) {
+    var id = s_(vals[r][0]);
+    if (id) fila[id] = r + 1;          // fila real de la hoja (1-based)
+  }
+
+  var hechos = 0, faltantes = [];
+  PUBLICAR_.forEach(function (e) {
+    var f = fila[e.id];
+    if (!f) { faltantes.push(e.id); return; }
+    ['nombre', 'modelo', 'categoria', 'resumen', 'caracteristicas', 'areas'].forEach(function (k) {
+      if (e[k] && col[k] >= 0) sh.getRange(f, col[k] + 1).setValue(e[k]);
+    });
+    sh.getRange(f, col.publicar + 1).setValue('SI');
+    hechos++;
+    Logger.log('  publicado  fila ' + f + '  ' + e.id + '  →  ' + e.nombre);
+  });
+
+  var L = ['', '═══ RESUMEN ═══', '  Publicados: ' + hechos + ' de ' + PUBLICAR_.length];
+  if (faltantes.length) L.push('  NO encontrados en la hoja: ' + faltantes.join(', '));
+  L.push('');
+  L.push('  Dejados fuera a propósito:');
+  NO_PUBLICAR_.forEach(function (x) { L.push('    · ' + x[0] + ' — ' + x[1]); });
+  L.push('');
+  L.push('  Falta por revisar: estos equipos quedan sin código NTS.');
+  L.push('  Si alguno lo tiene en tus expedientes, ponlo en la columna «clave».');
+  Logger.log(L.join('\n'));
+
+  try { limpiarCache(); } catch (e) {}
+}
