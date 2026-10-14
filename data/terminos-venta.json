@@ -5,5 +5,11 @@
   "plazoPedido": "se confirma al emitir la cotización, según la programación del fabricante",
   "garantiaMeses": 12,
   "pago": "50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.",
-  "incluye": "Manual de usuario, certificado de garantía y capacitación de uso en la entrega."
+  "incluye": "Manual de usuario, certificado de garantía y capacitación de uso en la entrega.",
+  "servicioFuera": {
+    "_nota": "Servicio fuera de Lima Metropolitana: instalacion, puesta en funcionamiento y capacitacion. CAMBIA personalDia por tu tarifa real. Los pasajes salen de la zona de cada ciudad (data/datos.json > viaje.zonas), igual que en el simulador de alquiler.",
+    "personalDia": 350,
+    "viaticoDia": 50,
+    "hospedajeNoche": 90
+  }
 }

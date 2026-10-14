@@ -714,7 +714,39 @@ function cotHTML(d, formal){
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
-  }).join('');
+  }).join('') + filasServicio();
+  /* Servicio fuera de Lima Metropolitana, desglosado por partidas como en
+     el alquiler: personal, pasajes y viáticos en filas propias. Un total
+     suelto no se puede sustentar en un expediente; estas filas sí. */
+  const filasServicio = () => {
+    const s = d.srv;
+    if(!s) return '';
+    const n = d.items.length, sin = v => v / 1.18, f = v => sin(v).toFixed(2);
+    const dias = Number(s.dias) || 1, per = Number(s.per) || 1;
+    const F = [];
+    F.push(`<tr>
+      <td class="c">${n + 1}</td>
+      <td><b>SERVICIO FUERA DE LIMA METROPOLITANA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Personal calificado para la instalación, la puesta en funcionamiento y la
+        capacitación del personal del cliente.<br>${per} ${per === 1 ? 'persona' : 'personas'} ·
+        ${dias} ${dias === 1 ? 'día' : 'días'} en sitio.</span></td>
+      <td class="c">DÍA</td><td class="c">${(dias * per).toFixed(2)}</td>
+      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(s.pers)}</td></tr>`);
+    if(s.pas) F.push(`<tr>
+      <td class="c">${n + 2}</td>
+      <td><b>PASAJES IDA Y VUELTA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Traslado del personal a la ciudad del cliente y regreso.<br>Se cobra una sola vez.</span></td>
+      <td class="c">SERVICIO</td><td class="c">1.00</td>
+      <td class="d">${f(s.pas)}</td><td class="d">${f(s.pas)}</td></tr>`);
+    if(s.via) F.push(`<tr>
+      <td class="c">${n + (s.pas ? 3 : 2)}</td>
+      <td><b>VIÁTICOS DEL PERSONAL</b>
+        <span class="det">Alimentación por cada día de trabajo en sitio${s.noc
+          ? ' y hospedaje por ' + s.noc + (Number(s.noc) === 1 ? ' noche' : ' noches') : ''}.</span></td>
+      <td class="c">GLOBAL</td><td class="c">1.00</td>
+      <td class="d">${f(s.via)}</td><td class="d">${f(s.via)}</td></tr>`);
+    return F.join('');
+  };
   const filasAlq = () => d.items.map((e, i) => {
     const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
     return `<tr>
@@ -848,7 +880,12 @@ function cotHTML(d, formal){
         <ul class="lst">
           ${venta ? `<li>Equipos nuevos, con ${VCOT_TERM.garantiaMeses} meses de garantía del fabricante.</li>
             <li>${cotEsc(VCOT_TERM.incluye)}</li>
-            <li>Entrega en Lima; a provincia se envía por agencia, a cargo del cliente.</li>
+            ${d.srv
+              ? `<li>Nuestro personal viaja a ${cotEsc(d.srv.ciu || 'tu ciudad')} a instalar los equipos,
+                  ponerlos en funcionamiento y capacitar a tu personal durante ${d.srv.dias}
+                  ${Number(d.srv.dias) === 1 ? 'día' : 'días'}. El pasaje y los viáticos ya están en el cuadro de arriba.</li>
+                 <li>El envío de los equipos a provincia va por agencia de transporte, a cargo del cliente.</li>`
+              : '<li>Entrega, instalación y capacitación en Lima Metropolitana, sin costo adicional; a provincia se envía por agencia, a cargo del cliente.</li>'}
             <li>Factura electrónica a nombre de tu razón social.</li>` : `
           <li>Certificado de calibración vigente de cada instrumento.</li>
           ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'

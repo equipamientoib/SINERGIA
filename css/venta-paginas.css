@@ -156,3 +156,29 @@
 }
 
 
+
+/* ── Barra fija del celular en la ficha del equipo ───────────────────
+   En un celular de 664 px de alto, el precio y los botones quedaban a
+   840 px: había que bajar casi una pantalla entera para saber cómo
+   contactar. Esta barra los deja siempre a mano y desaparece mientras
+   los botones de verdad están en pantalla. En computadora no aparece. */
+.pbar{display:none}
+@media(max-width:760px){
+  .pbar{position:fixed;left:0;right:0;bottom:0;z-index:60;
+    display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;
+    padding:9px 13px calc(9px + env(safe-area-inset-bottom,0px));
+    background:rgba(255,255,255,.97);border-top:1px solid var(--linea);
+    box-shadow:0 -4px 18px rgba(23,25,29,.09);
+    transform:translateY(110%);transition:transform .22s ease;pointer-events:none}
+  .pbar.on{transform:none;pointer-events:auto}
+  .pbar-p{display:block;line-height:1.1}
+  .pbar-p b{display:block;font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--onix)}
+  .pbar-p small{font-size:10.5px;color:var(--gris)}
+  .pbar-add{width:100%;padding:12px 10px;border:0;border-radius:11px;background:var(--onix);color:#fff;
+    font-family:var(--ff-d);font-size:13.5px;font-weight:600;cursor:pointer;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pbar-wa{display:grid;place-items:center;width:44px;height:44px;border-radius:11px;
+    background:#25D366;color:#fff;flex:0 0 auto}
+  /* El botón verde flotante estorbaba encima de la barra. */
+  body:has(.pbar.on) .wa-fab{display:none}
+}

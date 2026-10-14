@@ -178,14 +178,42 @@ def fotos(p, base, fijas, locales=()):
     return out
 
 
-def boton_carrito(p, foto):
-    """Botón «Agregar al carrito» con los datos del equipo: la página suelta
-    no carga el catálogo, así que los lleva encima."""
-    return ('<button type="button" class="btn fill" data-add="%s" data-nom="%s" data-mm="%s" '
-            'data-nts="%s" data-precio="%s" data-foto="%s">Agregar al carrito</button>'
-            % (e(p['id']), e(p['nom']),
+def boton_carrito(p, foto, clase='btn fill', texto='Agregar a mi cotización'):
+    """Botón de la cotización con los datos del equipo: la página suelta
+    no carga el catálogo, así que los lleva encima.
+
+    Dice «Agregar a mi cotización» y no «Agregar al carrito»: quien compra
+    para un hospital no llena un carrito, arma una cotización para su
+    expediente, y la palabra «carrito» hacía pensar en una tienda de ropa.
+    """
+    return ('<button type="button" class="%s" data-add="%s" data-nom="%s" data-mm="%s" '
+            'data-nts="%s" data-precio="%s" data-foto="%s">%s</button>'
+            % (clase, e(p['id']), e(p['nom']),
                e(' '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
-               e(p.get('clave') or ''), int(p.get('precio') or 0), e(foto or '')))
+               e(p.get('clave') or ''), int(p.get('precio') or 0), e(foto or ''), texto))
+
+
+def barra_movil(p, wa, foto):
+    """Barra fija al pie, solo en el celular.
+
+    En un celular de 664 px de alto, el precio y los botones de la ficha
+    quedaban a 840 px: había que bajar casi una pantalla entera para
+    encontrar cómo contactar. Esta barra los deja siempre a la vista y se
+    esconde sola mientras los botones de verdad están en pantalla.
+    """
+    precio = ('<span class="pbar-p"><b>%s</b><small>IGV incl.</small></span>' % soles(p['precio'])) \
+        if p.get('precio') else '<span class="pbar-p"><b>Consultar</b><small>precio</small></span>'
+    return ('<div class="pbar" id="pbar" aria-hidden="true">%s%s'
+            '<a class="pbar-wa" href="%s" target="_blank" rel="noopener" aria-label="Preguntar por WhatsApp">'
+            '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">'
+            '<path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 '
+            '4.79 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.17c-.25.69-1.44 1.32-1.99 '
+            '1.37-.51.05-1.16.07-1.87-.12-.43-.12-.99-.3-1.7-.61-2.99-1.29-4.94-4.3-5.09-4.5-.15-.2-1.22-1.62-1.22-3.09 '
+            '0-1.47.77-2.19 1.04-2.49.27-.3.59-.37.79-.37.2 0 .4 0 .57.01.18.01.43-.07.67.51.25.59.84 2.06.91 2.21.07.15.12.32.02.52'
+            '-.1.2-.15.32-.3.5-.15.17-.31.39-.45.52-.15.15-.3.31-.13.61.17.3.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.36 '
+            '1.46.3.15.47.12.65-.07.17-.2.74-.87.94-1.17.2-.3.4-.25.67-.15.27.1 1.72.81 2.01.96.3.15.5.22.57.35.07.12.07.72-.18 1.41z"/>'
+            '</svg></a></div>'
+            % (precio, boton_carrito(p, foto, 'pbar-add', 'Agregar a mi cotización'), wa))
 
 
 def ficha_venta(pid):
@@ -466,6 +494,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
       <div class="tabs" role="tablist">{tabs}</div>
       {panels}
     </div>
+    {barra_movil(p, wa, fts[0][0] if fts else '')}
     {nav}
     {f"""<section class="otros">
     <h2>Más en {e(cat)}</h2>
@@ -479,6 +508,17 @@ VIG_JS = '''<script>
   document.querySelectorAll('[data-vig]').forEach(function(b){
     if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial, por confirmar en la cotización';
   });
+  /* La barra del celular se esconde mientras los botones de verdad están
+     en pantalla: así no los tapa ni se repite al pie de la ficha. */
+  (function(){
+    var bar = document.getElementById('pbar'), btns = document.querySelector('.prod-btns');
+    if(!bar || !btns) return;
+    bar.removeAttribute('aria-hidden');
+    if(!('IntersectionObserver' in window)){ bar.classList.add('on'); return; }
+    new IntersectionObserver(function(e){
+      bar.classList.toggle('on', !e[0].isIntersecting);
+    }, {rootMargin: '-10px 0px -70px 0px'}).observe(btns);
+  })();
 </script>'''
 
 

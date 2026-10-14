@@ -109,8 +109,8 @@
     if(p) return p;
     p = document.createElement('div');
     p.id = 'sbCart'; p.className = 'sb-cart';
-    p.innerHTML = '<div class="sb-cart-p" role="dialog" aria-modal="true" aria-label="Mi carrito">' +
-      '<div class="sb-cart-c"><b>Mi carrito</b>' +
+    p.innerHTML = '<div class="sb-cart-p" role="dialog" aria-modal="true" aria-label="Mi cotización">' +
+      '<div class="sb-cart-c"><b>Mi cotización</b>' +
       '<button type="button" class="sb-cart-x" aria-label="Cerrar">✕</button></div>' +
       '<div class="sb-cart-l"></div><div class="sb-cart-f"></div></div>';
     document.body.appendChild(p);
@@ -143,7 +143,7 @@
     var g = leer(), ids = Object.keys(g);
     var lista = p.querySelector('.sb-cart-l'), pie = p.querySelector('.sb-cart-f');
     if(!ids.length){
-      lista.innerHTML = '<p class="sb-cart-v">Tu carrito está vacío.<br>Toca «Agregar al carrito» en los equipos que te interesen.</p>';
+      lista.innerHTML = '<p class="sb-cart-v">Tu cotización está vacía.<br>Toca «Agregar a mi cotización» en los equipos que te interesen.</p>';
       pie.innerHTML = '<button type="button" class="sb-cart-ir" data-ir="/#/venta/tienda">Ver la tienda</button>';
       enlazarPie(pie);
       return;
@@ -221,7 +221,7 @@
       document.body.appendChild(t);
     }
     t.innerHTML = '<span>Agregado: <b>' + esc(nom) + '</b></span>' +
-      '<button type="button">Ver carrito</button>';
+      '<button type="button">Ver mi cotización</button>';
     t.querySelector('button').onclick = function(){ C.cerrar(); C.abrir(); };
     t.classList.add('on');
     clearTimeout(tToast); tToast = setTimeout(function(){ t.classList.remove('on'); }, 4000);
@@ -243,7 +243,7 @@
       i.hidden = !n;
       b.classList.toggle('lleno', !!n);
     }
-    /* Botones «Agregar al carrito» de la página: los que ya están puestos
+    /* Botones «Agregar a mi cotización» de la página: los que ya están puestos
        muestran cuántos lleva. */
     var g = leer();
     document.querySelectorAll('[data-add]').forEach(function(el){

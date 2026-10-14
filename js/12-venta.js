@@ -304,7 +304,7 @@ function vBotonAdd(p, clase, texto, extra){
   return `<button type="button" class="${clase}"${extra || ''} data-add="${vEsc(p.id)}"
     data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
     data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
-    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar al carrito'}</button>`;
+    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar a mi cotización'}</button>`;
 }
 
 function vCard(p){
@@ -327,7 +327,7 @@ function vCard(p){
       : vIco(p.cat)}${of ? '<span class="vt-of">PROMOCIÓN</span>' : ''}</span>
     <span class="vt-t"><b>${vEsc(p.nom)}</b>${sub ? `<small>${vEsc(sub)}</small>` : ''}
       <span class="vt-p">${precio}${st}</span></span>
-    ${vBotonAdd(p, 'vt-add', '+', ' data-corto="1" title="Agregar al carrito" aria-label="Agregar al carrito"')}
+    ${vBotonAdd(p, 'vt-add', '+', ' data-corto="1" title="Agregar a mi cotización" aria-label="Agregar a mi cotización"')}
   </div>`;
 }
 
@@ -642,7 +642,7 @@ function vProducto(id){
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
-          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar al carrito')}
+          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar a mi cotización')}
           <a class="btn btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         ${p.ficha_pdf?`<a class="v-doc" href="${vEsc(p.ficha_pdf)}" target="_blank" rel="noopener"><span class="doc-ico">PDF</span><span><b>Ficha técnica</b><small>Ver o descargar</small></span></a>`:''}

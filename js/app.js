@@ -836,17 +836,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=1e3080d8';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2bc976f3';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=1e3080d8';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2bc976f3';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=1e3080d8','js/06-tablero.js?v=1e3080d8'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=2bc976f3','js/06-tablero.js?v=2bc976f3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=1e3080d8'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=2bc976f3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2059,7 +2059,7 @@ function vBotonAdd(p, clase, texto, extra){
   return `<button type="button" class="${clase}"${extra || ''} data-add="${vEsc(p.id)}"
     data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
     data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
-    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar al carrito'}</button>`;
+    data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar a mi cotización'}</button>`;
 }
 
 function vCard(p){
@@ -2082,7 +2082,7 @@ function vCard(p){
       : vIco(p.cat)}${of ? '<span class="vt-of">PROMOCIÓN</span>' : ''}</span>
     <span class="vt-t"><b>${vEsc(p.nom)}</b>${sub ? `<small>${vEsc(sub)}</small>` : ''}
       <span class="vt-p">${precio}${st}</span></span>
-    ${vBotonAdd(p, 'vt-add', '+', ' data-corto="1" title="Agregar al carrito" aria-label="Agregar al carrito"')}
+    ${vBotonAdd(p, 'vt-add', '+', ' data-corto="1" title="Agregar a mi cotización" aria-label="Agregar a mi cotización"')}
   </div>`;
 }
 
@@ -2397,7 +2397,7 @@ function vProducto(id){
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">
-          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar al carrito')}
+          ${vBotonAdd(p, 'btn btn-fill btn-lg v-add', 'Agregar a mi cotización')}
           <a class="btn btn-lg" href="${vWA(texto)}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         ${p.ficha_pdf?`<a class="v-doc" href="${vEsc(p.ficha_pdf)}" target="_blank" rel="noopener"><span class="doc-ico">PDF</span><span><b>Ficha técnica</b><small>Ver o descargar</small></span></a>`:''}
@@ -3179,7 +3179,39 @@ function cotHTML(d, formal){
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
-  }).join('');
+  }).join('') + filasServicio();
+  /* Servicio fuera de Lima Metropolitana, desglosado por partidas como en
+     el alquiler: personal, pasajes y viáticos en filas propias. Un total
+     suelto no se puede sustentar en un expediente; estas filas sí. */
+  const filasServicio = () => {
+    const s = d.srv;
+    if(!s) return '';
+    const n = d.items.length, sin = v => v / 1.18, f = v => sin(v).toFixed(2);
+    const dias = Number(s.dias) || 1, per = Number(s.per) || 1;
+    const F = [];
+    F.push(`<tr>
+      <td class="c">${n + 1}</td>
+      <td><b>SERVICIO FUERA DE LIMA METROPOLITANA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Personal calificado para la instalación, la puesta en funcionamiento y la
+        capacitación del personal del cliente.<br>${per} ${per === 1 ? 'persona' : 'personas'} ·
+        ${dias} ${dias === 1 ? 'día' : 'días'} en sitio.</span></td>
+      <td class="c">DÍA</td><td class="c">${(dias * per).toFixed(2)}</td>
+      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(s.pers)}</td></tr>`);
+    if(s.pas) F.push(`<tr>
+      <td class="c">${n + 2}</td>
+      <td><b>PASAJES IDA Y VUELTA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
+        <span class="det">Traslado del personal a la ciudad del cliente y regreso.<br>Se cobra una sola vez.</span></td>
+      <td class="c">SERVICIO</td><td class="c">1.00</td>
+      <td class="d">${f(s.pas)}</td><td class="d">${f(s.pas)}</td></tr>`);
+    if(s.via) F.push(`<tr>
+      <td class="c">${n + (s.pas ? 3 : 2)}</td>
+      <td><b>VIÁTICOS DEL PERSONAL</b>
+        <span class="det">Alimentación por cada día de trabajo en sitio${s.noc
+          ? ' y hospedaje por ' + s.noc + (Number(s.noc) === 1 ? ' noche' : ' noches') : ''}.</span></td>
+      <td class="c">GLOBAL</td><td class="c">1.00</td>
+      <td class="d">${f(s.via)}</td><td class="d">${f(s.via)}</td></tr>`);
+    return F.join('');
+  };
   const filasAlq = () => d.items.map((e, i) => {
     const pu = e.d * factor / 1.18, pt = pu * d.qty, pr = (e.m || '').split('·');
     return `<tr>
@@ -3313,7 +3345,12 @@ function cotHTML(d, formal){
         <ul class="lst">
           ${venta ? `<li>Equipos nuevos, con ${VCOT_TERM.garantiaMeses} meses de garantía del fabricante.</li>
             <li>${cotEsc(VCOT_TERM.incluye)}</li>
-            <li>Entrega en Lima; a provincia se envía por agencia, a cargo del cliente.</li>
+            ${d.srv
+              ? `<li>Nuestro personal viaja a ${cotEsc(d.srv.ciu || 'tu ciudad')} a instalar los equipos,
+                  ponerlos en funcionamiento y capacitar a tu personal durante ${d.srv.dias}
+                  ${Number(d.srv.dias) === 1 ? 'día' : 'días'}. El pasaje y los viáticos ya están en el cuadro de arriba.</li>
+                 <li>El envío de los equipos a provincia va por agencia de transporte, a cargo del cliente.</li>`
+              : '<li>Entrega, instalación y capacitación en Lima Metropolitana, sin costo adicional; a provincia se envía por agencia, a cargo del cliente.</li>'}
             <li>Factura electrónica a nombre de tu razón social.</li>` : `
           <li>Certificado de calibración vigente de cada instrumento.</li>
           ${d.tec ? '<li>Instrumentista metrológico, ya incluido en el total de arriba.</li>'
@@ -3679,10 +3716,40 @@ const vcItems = () => (window.SBCarrito ? SBCarrito.items() : {});
 var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
   plazoPedido: 'se confirma al emitir la cotización', garantiaMeses: 12,
   pago: '50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.',
-  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.'};
+  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.',
+  /* Instalación, puesta en funcionamiento y capacitación fuera de Lima
+     Metropolitana. El pasaje sale de la zona de cada ciudad, la misma
+     tabla del simulador de alquiler (data/datos.json › viaje.zonas), así
+     que una sola tabla manda en los dos sitios. */
+  servicioFuera: {personalDia: 350, viaticoDia: 50, hospedajeNoche: 90}};
 fetch('data/terminos-venta.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null)
   .then(d => { if(d) Object.keys(VCOT_TERM).forEach(k => { if(d[k] != null) VCOT_TERM[k] = d[k]; }); })
   .catch(() => {});
+
+/* ── Servicio fuera de Lima Metropolitana ───────────────────────────
+   Lo piden casi siempre: el equipo se entrega en provincia y alguien
+   tiene que ir a instalarlo y capacitar al personal. Se cotiza igual que
+   en el simulador de alquiler: el pasaje según la distancia (zona de la
+   ciudad), el personal por día y los viáticos por día y por noche. */
+var VCOT_SRV = {fuera: false, ciudad: '', dias: 1, personas: 1};
+
+function vcServicio(){
+  const T = VCOT_TERM.servicioFuera || {};
+  const dias = Math.max(1, Number(VCOT_SRV.dias) || 1);
+  const per = Math.max(1, Number(VCOT_SRV.personas) || 1);
+  const ciudad = (typeof ciudadDe === 'function') ? ciudadDe(VCOT_SRV.ciudad) : null;
+  if(!VCOT_SRV.fuera) return {hay: false, total: 0, dias: dias, personas: per, falta: false};
+  /* Un trabajo de un día no tiene noche: se sale temprano y se vuelve. */
+  const noches = Math.max(0, dias - 1);
+  const pasaje = ciudad && typeof pasajeDe === 'function' ? pasajeDe(ciudad.n) * per : 0;
+  const personal = (T.personalDia || 0) * dias * per;
+  const comida = (T.viaticoDia || 0) * dias * per;
+  const hospedaje = (T.hospedajeNoche || 0) * noches * per;
+  const viatico = comida + hospedaje;
+  return {hay: true, ciudad: ciudad, falta: !ciudad, dias: dias, personas: per, noches: noches,
+          personal: personal, pasaje: pasaje, comida: comida, hospedaje: hospedaje,
+          viatico: viatico, total: personal + pasaje + viatico};
+}
 
 /* ── Carrito ────────────────────────────────────────────────────────── */
 const vcProducto = id => ((VENTA && VENTA.productos) || []).find(p => p.id === id);
@@ -3717,9 +3784,11 @@ function vcCalcular(){
     .filter(x => x.q > 0)
     .map(x => ({p: x.p, q: x.q, foto: x.foto, precio: Number(x.p.precio || 0),
                 total: Number(x.p.precio || 0) * x.q}));
-  const total = items.reduce((s, x) => s + x.total, 0);
+  const equipos = items.reduce((s, x) => s + x.total, 0);
+  const srv = vcServicio();
   const sinPrecio = items.filter(x => !x.precio).length;
-  return {items, total, sinPrecio, unidades: items.reduce((s, x) => s + x.q, 0)};
+  return {items, equipos, srv, total: equipos + srv.total, sinPrecio,
+          unidades: items.reduce((s, x) => s + x.q, 0)};
 }
 
 /* ── Página ─────────────────────────────────────────────────────────── */
@@ -3820,6 +3889,7 @@ function vcPintar(){
         <div class="cot-paso uno"><b>1</b> Tus equipos <i>${c.unidades} ${c.unidades === 1 ? 'unidad' : 'unidades'}</i></div>
         <div class="vc-lista">${c.items.map(vcFila).join('')}</div>
         <button type="button" class="cot-limpiar" onclick="vcVaciar()">Vaciar la lista</button>
+        ${vcBloqueServicio(c.srv)}
       </div>
       <aside class="cot-res">
         <div class="cot-top">
@@ -3836,6 +3906,7 @@ function vcPintar(){
         <ul class="cot-sel">${c.items.map(x =>
           `<li><span>${vEsc(x.p.nom)}${x.q > 1 ? ' × ' + x.q : ''}</span><span>${vSoles(x.total)}</span></li>`).join('')}
         </ul>
+        ${vcDesglose(c.srv)}
         <div class="cot-cuenta">
   <div class="sub"><span>Subtotal</span><span>${vSoles(neto)}</span></div>
           <div class="sub"><span>IGV (18 %)</span><span>${vSoles(c.total - neto)}</span></div>
@@ -3847,13 +3918,19 @@ function vcPintar(){
         <div class="cot-paso"><b>3</b> Tus datos</div>
         <div class="cot-form" id="vcForm">
           <label>Nombre o institución<input id="vcNom" type="text" autocomplete="organization" placeholder="Clínica, hospital o nombre"></label>
-          <div class="cot-f2">
-            <label>Correo<input id="vcMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
-            <label>Teléfono<input id="vcTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></label>
-          </div>
+          <!-- Correo y teléfono, plegados: por WhatsApp el número ya viaja
+               solo, y tres campos a la vista parecían trabajo. Quien
+               prefiere correo los abre; al resto no le estorban. -->
+          <details class="vc-mas"${VCOT_DATOS.mail || VCOT_DATOS.tel ? ' open' : ''}>
+            <summary>Agregar correo y teléfono (opcional)</summary>
+            <div class="cot-f2">
+              <label>Correo<input id="vcMail" type="email" autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
+              <label>Teléfono<input id="vcTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="999 999 999"></label>
+            </div>
+          </details>
           <label>¿Algo que debamos saber?<textarea id="vcMsg" rows="2" placeholder="Para qué área, si es para un expediente, fechas…"></textarea></label>
           <div class="form-msg" id="vcAviso" role="status" aria-live="polite"></div>
-          <p class="cot-mail">Con tus datos listos, toca «Enviar mi pedido por WhatsApp».
+          <p class="cot-mail">Con tu nombre basta: toca «Enviar mi pedido por WhatsApp».
             ¿Prefieres correo? <button type="button" onclick="vcEnviar('correo')">Enviar por correo</button>
             · <button type="button" onclick="vcCopiar()">Copiar el mensaje</button></p>
         </div>
@@ -3862,6 +3939,65 @@ function vcPintar(){
       </aside>
     </div>`;
   vcRestaurar();
+}
+
+/* El bloque de «¿dónde se instala y capacita?», debajo de los equipos.
+   Cerrado no estorba a quien compra para Lima; abierto pide lo justo:
+   ciudad, días y cuántas personas viajan. */
+function vcBloqueServicio(s){
+  const ciudades = (typeof CIUDADES !== 'undefined' ? CIUDADES : []);
+  const zonas = (typeof VIAJE_ZONAS !== 'undefined' ? VIAJE_ZONAS : {});
+  const grupos = Object.keys(zonas).map(z => {
+    const l = ciudades.filter(x => String(x.z) === String(z));
+    if(!l.length) return '';
+    return `<optgroup label="${vEsc(zonas[z])}">${l.map(x =>
+      `<option${x.n === VCOT_SRV.ciudad ? ' selected' : ''}>${vEsc(x.n)}</option>`).join('')}</optgroup>`;
+  }).join('');
+  return `<div class="vc-srv">
+    <div class="cot-paso"><b>+</b> Instalación y capacitación</div>
+    <div class="cot-seg">
+      <button type="button" class="${s.hay ? '' : 'on'}" onclick="vcFuera(false)">En Lima Metropolitana</button>
+      <button type="button" class="${s.hay ? 'on' : ''}" onclick="vcFuera(true)">Fuera de Lima</button>
+    </div>
+    ${!s.hay
+      ? '<p class="cot-ayuda">La entrega, la instalación y la capacitación de uso en Lima Metropolitana van incluidas, sin costo.</p>'
+      : `<div class="vc-srv-f">
+          <label>¿A qué ciudad?
+            <select onchange="vcSrv('ciudad', this.value)">
+              <option value="">Elige la ciudad…</option>${grupos}
+            </select></label>
+          <label>Días en sitio
+            <input type="number" min="1" step="1" value="${s.dias}" onchange="vcSrv('dias', this.value)"></label>
+          <label>Personas
+            <input type="number" min="1" max="4" step="1" value="${s.personas}" onchange="vcSrv('personas', this.value)"></label>
+        </div>
+        ${s.falta ? '<p class="cot-ayuda vc-falta">Elige la ciudad para calcular el pasaje.</p>'
+                  : '<p class="cot-ayuda">El pasaje se calcula por la distancia a Lima; los viáticos, por día de trabajo y por noche fuera.</p>'}`}
+  </div>`;
+}
+
+/* El desglose, con las mismas partidas que el simulador de alquiler: así
+   el cliente ve de dónde sale cada sol y no parece un recargo suelto. */
+function vcDesglose(s){
+  if(!s.hay || s.falta) return '';
+  const T = VCOT_TERM.servicioFuera || {}, f = n => Number(n || 0).toLocaleString('es-PE');
+  const ciu = s.ciudad ? s.ciudad.n : '';
+  return `<div class="cot-cuenta vc-desg">
+    <div class="vc-desg-t">Servicio fuera de Lima Metropolitana${ciu ? ', en ' + vEsc(ciu) : ''}</div>
+    <div class="sub"><span>Personal calificado · S/ ${f(T.personalDia)} × ${s.dias} ${s.dias === 1 ? 'día' : 'días'}${
+      s.personas > 1 ? ' × ' + s.personas + ' personas' : ''}</span><span>${vSoles(s.personal)}</span></div>
+    <div class="sub"><span>Pasajes ida y vuelta${s.personas > 1 ? ' × ' + s.personas : ''}</span><span>${vSoles(s.pasaje)}</span></div>
+    <div class="sub"><span>Viáticos · comida S/ ${f(T.viaticoDia)} × ${s.dias}${
+      s.noches ? ' · hospedaje S/ ' + f(T.hospedajeNoche) + ' × ' + s.noches + (s.noches === 1 ? ' noche' : ' noches') : ''
+    }</span><span>${vSoles(s.viatico)}</span></div>
+    <div class="gran"><span>Total del servicio</span><span>${vSoles(s.total)}</span></div>
+  </div>`;
+}
+
+function vcFuera(si){ VCOT_SRV.fuera = !!si; vcPintarTodo(); }
+function vcSrv(k, v){
+  VCOT_SRV[k] = (k === 'ciudad') ? v : Math.max(1, parseInt(v, 10) || 1);
+  vcPintarTodo();
 }
 
 /* Pedir mas unidades de las que hay: antes seguia diciendo «En stock» y
@@ -3928,6 +4064,12 @@ function vcDoc(c, d){
       m: [x.p.marca, x.p.modelo].filter(Boolean).join(' · '),
       nts: x.p.clave || ''
     })),
+    /* El servicio fuera de Lima, con sus partidas separadas: el documento
+       lo imprime como filas propias del cuadro, igual que el alquiler. */
+    srv: c.srv.hay && !c.srv.falta ? {
+      ciu: c.srv.ciudad ? c.srv.ciudad.n : '', dias: c.srv.dias, per: c.srv.personas,
+      noc: c.srv.noches, pers: c.srv.personal, pas: c.srv.pasaje, via: c.srv.viatico
+    } : null,
     total: c.total, gar: 0, tec: 0, pas: 0, via: 0, inc: []
   };
 }
@@ -3963,9 +4105,20 @@ function vcTerminos(d){
     'se realiza por agencia de transporte y su costo lo asume el cliente.']);
   L.push(['5. Garantía.', T.garantiaMeses + ' meses de garantía del fabricante contra defectos de fabricación, ' +
     'con atención en nuestro taller de Lima. No cubre el daño por mal uso ni el desgaste de los consumibles.']);
-  L.push(['6. Incluye.', T.incluye]);
-  L.push(['7. Forma de pago.', T.pago]);
-  L.push(['8. Comprobante.', 'Se emite factura electrónica a nombre de la razón social indicada por el cliente.']);
+  L.push(['6. Incluye.', T.incluye + ' La instalación, la puesta en funcionamiento y la capacitación ' +
+    'de uso en Lima Metropolitana no tienen costo adicional.']);
+  if(d && d.srv){
+    const S = T.servicioFuera || {};
+    L.push(['7. Servicio fuera de Lima Metropolitana' + (d.srv.ciu ? ', en ' + d.srv.ciu : '') + '.',
+      'Comprende el traslado del personal calificado, su permanencia por ' + d.srv.dias +
+      (d.srv.dias === 1 ? ' día' : ' días') + ' en sitio' + (d.srv.per > 1 ? ' (' + d.srv.per + ' personas)' : '') +
+      ', la instalación, la puesta en funcionamiento y la capacitación del personal del cliente. ' +
+      'Se detalla por partidas en el Cuadro N° 1: personal calificado, pasajes de ida y vuelta y viáticos ' +
+      '(alimentación por día de trabajo y hospedaje por noche fuera). El envío de los equipos a provincia ' +
+      'se realiza por agencia de transporte y su costo lo asume el cliente.']);
+  }
+  L.push([(d && d.srv ? '8' : '7') + '. Forma de pago.', T.pago]);
+  L.push([(d && d.srv ? '9' : '8') + '. Comprobante.', 'Se emite factura electrónica a nombre de la razón social indicada por el cliente.']);
   return L;
 }
 
@@ -3987,6 +4140,15 @@ function vcTexto(c, d){
            (x.q > 1 ? ' × ' + x.q : '') + ' · ' + vSoles(x.total) +
            (hay ? '  [PEDIDO ESPECIAL: en stock ' + hay + ']' : ''));
   });
+  if(c.srv.hay && !c.srv.falta){
+    L.push('');
+    L.push('SERVICIO FUERA DE LIMA METROPOLITANA' + (c.srv.ciudad ? ', EN ' + c.srv.ciudad.n.toUpperCase() : ''));
+    L.push('  Personal calificado (' + c.srv.dias + (c.srv.dias === 1 ? ' día' : ' días') +
+           (c.srv.personas > 1 ? ' × ' + c.srv.personas + ' personas' : '') + '): ' + vSoles(c.srv.personal));
+    L.push('  Pasajes ida y vuelta: ' + vSoles(c.srv.pasaje));
+    L.push('  Viáticos (comida y hospedaje): ' + vSoles(c.srv.viatico));
+    L.push('  Subtotal del servicio: ' + vSoles(c.srv.total));
+  }
   L.push('');
   L.push('  TOTAL REFERENCIAL (IGV incluido): ' + vSoles(c.total));
   if(d.msg){ L.push(''); L.push('NOTA DEL CLIENTE'); L.push('  ' + d.msg); }
@@ -3999,12 +4161,24 @@ function vcEnviar(via){
   const c = vcCalcular();
   if(!c.items.length) return;
   const d = vcDatos();
-  const error = (typeof validarContacto === 'function') ? validarContacto(d.nom, d.mail, d.tel) : '';
+  /* Por WhatsApp el número del cliente viaja solo: pedirle además un
+     correo o un teléfono era pedir dos veces lo mismo. Basta el nombre.
+     Por correo sí hace falta el correo, que si no, no hay a dónde
+     responder. */
+  const vale = (f, x) => typeof window[f] !== 'function' || window[f](x);
+  let error = '';
+  if(!d.nom || d.nom.length < 2) error = 'Escribe tu nombre o el de la institución.';
+  else if(via === 'correo' && !d.mail) error = 'Para enviarlo por correo, escribe tu correo.';
+  else if(d.mail && !vale('correoValido', d.mail)) error = 'Revisa el correo: parece incompleto.';
+  else if(d.tel && !vale('telefonoValido', d.tel)) error = 'Revisa el teléfono: faltan dígitos.';
   if(error){
     const f = document.getElementById('vcForm');
     if(f) f.scrollIntoView({behavior: 'smooth', block: 'center'});
     avisar('vcAviso', error, 'err');
-    const el = document.getElementById('vcNom'); if(el && !d.nom) setTimeout(() => el.focus(), 350);
+    const det = document.querySelector('.vc-mas');
+    if(det && /correo|teléfono/i.test(error)) det.open = true;
+    const el = document.getElementById(!d.nom ? 'vcNom' : 'vcMail');
+    if(el) setTimeout(() => el.focus(), 350);
     return;
   }
   const doc = vcDoc(c, d);
