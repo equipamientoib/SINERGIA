@@ -479,7 +479,7 @@ function vtConteo(campo){
   return m;
 }
 function vTienda(catInicial, precioInicial){
-  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='dest';
+  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='cat';
   if(precioInicial != null && precioInicial !== '') VT.precio.add(String(precioInicial));
   VT.cat = new Set(catInicial && vCat(catInicial) ? [catInicial] : []);
   const cc = vtConteo('cat'), cm = vtConteo('marca'), co = vtConteo('origen');
@@ -515,6 +515,7 @@ function vTienda(catInicial, precioInicial){
             <input type="search" placeholder="Buscar equipo, marca, modelo o código (ej. D-18)" oninput="VT.q=this.value;vtPintar()" aria-label="Buscar en la tienda">
           </label>
           <select class="vt-orden" onchange="VT.orden=this.value;vtPintar()" aria-label="Ordenar">
+            <option value="cat">Por categoría</option>
             <option value="dest">Por precio y más pedidos</option>
             <option value="az">Nombre (A–Z)</option>
             ${hayPrecio ? '<option value="pmen">Precio: menor a mayor</option><option value="pmay">Precio: mayor a menor</option>' : ''}
@@ -561,7 +562,8 @@ function vtFiltrados(){
     }
     return true;
   });
-  if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
+  if(VT.orden==='cat') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
+  else if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
   else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
   else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
   else l = vOrdenTienda(l);
@@ -569,6 +571,28 @@ function vtFiltrados(){
 }
 function vCarritoEngancha(){
   if(window.SBCarrito) setTimeout(() => { SBCarrito.enganchar(); SBCarrito.pintar(); }, 0);
+}
+
+/* Los equipos en bloques por categoría, con su título y su cuenta.
+
+   Todo va de más barato a más caro, en los dos niveles: los equipos
+   dentro de cada bloque, y los bloques entre sí según el equipo más caro
+   que tenga cada uno. Así el comprador entra por lo accesible y los
+   equipos de seis cifras quedan al final, donde se llega con la decisión
+   ya tomada. */
+function vtPorCategoria(l){
+  const g = new Map();
+  l.forEach(p => { const k = vCat(p.cat) ? p.cat : '_otros';
+                   if(!g.has(k)) g.set(k, []); g.get(k).push(p); });
+  const tope = k => g.get(k).reduce((m, p) => Math.max(m, Number(p.precio) || 0), 0) || Infinity;
+  const claves = [...g.keys()].sort((a, b) => tope(a) - tope(b));
+  return claves.map(k => {
+    const c = vCat(k), ps = g.get(k);
+    return `<section class="vt-cat" id="vtc-${vEsc(k)}">
+      <h2>${vEsc(c ? c.nombre : 'Otros equipos')} <small>${ps.length}</small></h2>
+      <div class="grid vts">${ps.map(vCard).join('')}</div>
+    </section>`;
+  }).join('');
 }
 
 function vtPintar(){
@@ -582,7 +606,12 @@ function vtPintar(){
   VT.precio.forEach(v => chips.push(['precio',v,vTramoNombre(Number(v))]));
   document.getElementById('vtActivos').innerHTML = chips.map(([k,v,t]) =>
     `<button onclick="vtMarcar('${k}','${vEsc(v)}',false,true)">${vEsc(t)} ✕</button>`).join('');
-  const html = l.map(vCard).join('');
+  /* «Por categoría»: el mismo orden que la página /venta/, que es como el
+     comprador busca de verdad — primero sabe qué tipo de equipo necesita y
+     recién después compara precios. Dentro de cada grupo, del más barato
+     al más caro. Con cualquier otro orden, la lista va corrida. */
+  const html = VT.orden === 'cat' ? vtPorCategoria(l) : l.map(vCard).join('');
+  g.classList.toggle('vt-porcat', VT.orden === 'cat' && l.length > 0);
   g.innerHTML = l.length ? html : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
   vCarritoEngancha();
 }

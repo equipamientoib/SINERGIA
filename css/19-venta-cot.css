@@ -174,3 +174,14 @@ body.wa-propio .wafab{display:none}
 .vc-desg.vc-regalo{border-color:rgba(46,139,107,.45);background:rgba(46,139,107,.04)}
 .vc-desg .vc-dto span{color:var(--ok);font-weight:600}
 .cot-ayuda.vc-ok{color:var(--ok)}
+
+/* ── La tienda en bloques por categoría ──────────────────────────────
+   El contenedor deja de ser una rejilla: cada bloque trae la suya. Así
+   los títulos ocupan el ancho entero y los equipos siguen en columnas. */
+.grid.vts.vt-porcat{display:block}
+/* section lleva padding:70px del sitio; aquí es un bloque de lista, no una sección. */
+.vt-cat{padding:0;margin-bottom:26px;scroll-margin-top:90px}
+.vt-cat:last-child{margin-bottom:0}
+.vt-cat h2{margin:0 0 11px;font-size:clamp(17px,1.8vw,21px);font-weight:600;
+  padding-bottom:7px;border-bottom:1px solid var(--linea)}
+.vt-cat h2 small{font-size:12.5px;color:var(--gris);font-weight:500;margin-left:7px}
