@@ -763,12 +763,28 @@ function docsPorCodigo_(ss) {
   return m;
 }
 
+/* Códigos que YA se revisaron, tengan documentos o no. Es distinto de
+   docsPorCodigo_, que solo devuelve los que tienen enlace: la fila
+   «NINGUNO» de un equipo sin documentos no trae enlace, así que allí no
+   aparecía y el equipo volvía a la lista de pendientes en cada corrida.
+   Resultado: se le preguntaba al portal una y otra vez por los mismos 20
+   equipos y la lista nunca bajaba de 538. */
+function docsVistos_(ss) {
+  var sh = ss.getSheetByName('Documentos'), m = {};
+  if (!sh) return m;
+  sh.getDataRange().getValues().slice(1).forEach(function (r) {
+    var c = codAtl_(r[0]);
+    if (c) m[c] = 1;
+  });
+  return m;
+}
+
 /* Equipos a los que todavía no se les ha buscado documentos. Mismo orden
    que las fotos: primero los publicados, luego los que tienen stock. */
 function atlDocsPendientes_() {
   var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss), pv = ss.getSheetByName('Proveedor');
   if (!pv) return [];
-  var hechos = docsPorCodigo_(ss);
+  var hechos = docsVistos_(ss);
   var vals = sh.getDataRange().getValues(), fh = -1, prio = {};
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
   var heads = vals[fh].map(function (h) { return s_(h); }), col = function (n) { return heads.indexOf(n); };

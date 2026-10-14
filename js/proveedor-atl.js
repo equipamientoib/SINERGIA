@@ -267,6 +267,20 @@
     return ult;
   }
 
+  /* ¿El portal devolvió de verdad el panel de documentos?
+
+     Si la sesión se cayó, o el portal cambió la consulta, la respuesta
+     llega vacía o es una pantalla de ingreso. Sin esta comprobación, cada
+     equipo de la tanda se anotaba como «no tiene ninguno» y no se le
+     volvía a preguntar NUNCA: 20 equipos perdidos por cada corrida rota.
+     Ante la duda no se anota nada y se vuelve a intentar otro día. */
+  function panelValido(html) {
+    var t = String(html || '');
+    if (/descargarDoc\(/.test(t)) return true;             // trae documentos
+    if (t.replace(/\s+/g, '').length < 20) return false;   // respuesta vacía
+    return !/iniciar\s*sesi|ingrese\s*su|login|password|no\s*autorizado|sesi[oó]n[^<]{0,30}(expir|caduc|finaliz|cerrad)/i.test(t);
+  }
+
   function leerDocs(html) {
     var partes = String(html || '').split('descargarDoc('), out = [], visto = {};
     for (var i = 1; i < partes.length; i++) {
@@ -306,15 +320,18 @@
         '<span style="color:#9be3b5">' + docs + ' documentos guardados</span>' +
         '<br><span style="color:#aeb4bc">No cierres esta pestaña.</span>');
       bar(i / lista.length);
-      var hallados = [];
+      var hallados = [], respondio = false;
       try {
         var fd = new FormData();
         fd.append('tipoAccion', 'viewArchivosProd');
         fd.append('codProd', visible);
         var html = await xhr('POST', '/controlador/controller_pedido.php', fd, 30000);
-        hallados = leerDocs(html);
-      } catch (e) { fallas++; }
-      if (!hallados.length) {
+        respondio = panelValido(html);
+        if (respondio) hallados = leerDocs(html);
+      } catch (e) { }
+      if (!respondio) {
+        fallas++;                         // no se anota: se reintenta otro día
+      } else if (!hallados.length) {
         sin++;
         await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
       } else {
@@ -339,7 +356,11 @@
     bar(1);
     txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
       (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron' : '') + '.' +
-      '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
+      (fallas >= lista.length
+        ? '<br><span style="color:#f0c674">El portal no devolvió la lista de documentos en ningún equipo. ' +
+          'Puede que la sesión se haya caído: entra de nuevo al portal y vuelve a tocar el favorito. ' +
+          'No se anotó nada, así que no se pierde ningún equipo.</span>'
+        : '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>'));
   }
 
   async function copiarFotos(lista) {
