@@ -1720,14 +1720,23 @@ function pmeAvisoCorrida(d, id){
   const u1 = Math.round(Number(c.unid) || 0), u2 = Math.round(Number(res.unidades_eq) || 0);
   const descuadre = u1 && u2 && u1 !== u2;
 
+  /* Quien revisa necesita saber qué hacer; quien sólo mira, no. A un
+     cliente no se le manda correr un comando del equipo de Luis: ni le
+     sirve ni es suyo. El hecho —de qué fecha es lo que está viendo— sí
+     le interesa a los dos, porque es lo que le dice si está al día. */
+  const revisando = (typeof PME_EDITA !== 'undefined') && PME_EDITA;
+
   return `<div class="pme-corrida${descuadre ? ' mal' : (n ? ' ojo' : '')}">
     <b>Lo que ves en las otras pestañas es de la corrida del
       ${esc(d.generado || 'fecha sin anotar')}.</b>
-    Esta pestaña no: aquí se lee el PME y lo que corrijas se ve al instante.
+    ${revisando
+      ? 'Esta pestaña no: aquí se lee el PME y lo que corrijas se ve al instante.'
+      : 'Esta pestaña no: se arma del PME, que es la fuente del metrado.'}
     ${descuadre ? `<span class="pme-corr-mal">No cuadran: el PME dice
-        ${esc(nf(u1))} unidades y el resumen ${esc(nf(u2))}. El expediente se armó
-        con otro LS — vuelve a correr <code>run.py base</code>.</span>` : ''}
-    ${n ? `<span class="pme-corr-ojo">Hay ${esc(trozos.join(', '))} que todavía
+        ${esc(nf(u1))} unidades y el resumen ${esc(nf(u2))}.${revisando
+          ? ' El expediente se armó con otro LS — vuelve a correr <code>run.py base</code>.'
+          : ' El expediente se generó con otra versión del metrado; lo estamos poniendo al día.'}</span>` : ''}
+    ${(n && revisando) ? `<span class="pme-corr-ojo">Hay ${esc(trozos.join(', '))} que todavía
         ${n === 1 ? 'no está' : 'no están'} en el resumen ni en los anexos. «Enviar al LS» y «Reescribir la hoja entera»
         los dejan en el Sheet del Drive, que es la fuente del metrado; rehacer el
         expediente pide Word y Excel, así que eso va desde tu equipo:
