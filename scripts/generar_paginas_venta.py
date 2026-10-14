@@ -239,6 +239,25 @@ def condiciones(p):
             'con el plazo contado desde la orden de compra.</p>' % cuerpo)
 
 
+def mensaje_wa(p):
+    """El mensaje que el comprador manda por WhatsApp desde la ficha.
+
+    Antes llegaba solo «quiero cotizar: <equipo>» y había que buscar el
+    equipo a mano en la web para saber precio, código y stock. Ahora
+    lleva esos datos y, sobre todo, el enlace que abre el cotizador con
+    ese equipo ya puesto: de ahí sale la cotización formal sin buscar
+    nada.
+    """
+    linea = ' · '.join(x for x in (p.get('marca'), p.get('modelo'),
+                                   'Código NTS ' + p['clave'] if p.get('clave') else '',
+                                   soles(p['precio']) if p.get('precio') else '') if x)
+    partes = ['Hola Sinergia Biomédica, quiero cotizar:', '', p['nom']]
+    if linea:
+        partes.append(linea)
+    partes += ['', SITIO + '/#/cotizar-venta/' + p['id']]
+    return '\n'.join(partes)
+
+
 def pdf_venta(pid):
     return '/fichas/venta/ficha-tecnica-%s.pdf' % pid
 
@@ -322,8 +341,7 @@ def franja(p):
 
 
 def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, locales):
-    texto = 'Hola Sinergia Biomédica, quiero cotizar: %s%s%s.' % (
-        p['nom'], ' ' + p['marca'] if p.get('marca') else '', ' ' + p['modelo'] if p.get('modelo') else '')
+    texto = mensaje_wa(p)
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
     correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote('Cotización: ' + p['nom']),
                                                 urllib.parse.quote(texto))

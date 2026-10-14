@@ -836,17 +836,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=71bbcc5b';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=25a6aa88';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=71bbcc5b';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=25a6aa88';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=71bbcc5b','js/06-tablero.js?v=71bbcc5b'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=25a6aa88','js/06-tablero.js?v=25a6aa88'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=71bbcc5b'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=25a6aa88'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -943,6 +943,7 @@ function tituloDe(h){
   if(h.startsWith('#/venta/')) return TITULOS['#/venta/tienda'];
   if(h.startsWith('#/catalogo/') || h.startsWith('#/equipo/')) return TITULOS['#/catalogo'];
   if(h.startsWith('#/cotizar/')) return TITULOS['#/cotizar'];
+  if(h.startsWith('#/cotizar-venta/')) return TITULOS['#/cotizar-venta'];
   if(h.startsWith('#/proyecto/')) return TITULOS['#/clientes'];
   return TITULOS['#/'];
 }
@@ -981,9 +982,12 @@ function route(sinMover){
     const cod = h.slice('#/emitir/'.length);
     setTimeout(() => { if(typeof cotEmitir === 'function') cotEmitir(cod); }, 0);
   }
-  else if(h === '#/cotizar-venta'){
+  else if(h === '#/cotizar-venta' || h.startsWith('#/cotizar-venta/')){
     pageId='page-vcot'; navKey='#/venta/tienda';
-    setTimeout(() => { if(typeof vcAbrir === 'function') vcAbrir(); }, 0);
+    /* #/cotizar-venta/<id>: el enlace que viaja en el mensaje de WhatsApp
+       de cada ficha. Abre el cotizador con ese equipo ya puesto. */
+    const idv = h.split('/')[2] || '';
+    setTimeout(() => { if(typeof vcAbrir === 'function') vcAbrir(idv); }, 0);
   }
   else if(h==='#/cotizar' || h.startsWith('#/cotizar/')){
     pageId='page-cotizador'; navKey='#/catalogo';
@@ -1023,7 +1027,7 @@ function route(sinMover){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pageId); if(el)el.classList.add('active');
   document.querySelectorAll('[data-route]').forEach(a=>{const on=a.dataset.route===navKey;a.classList.toggle('active',on);if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  document.body.classList.toggle('wa-propio', h === '#/cotizar-venta');
+  document.body.classList.toggle('wa-propio', h.startsWith('#/cotizar-venta'));
   seguro('título', () => ponerTitulo(h));
   if(!sinMover) window.scrollTo(0,0);   // al sincronizar datos no se mueve la vista
 }
@@ -2037,6 +2041,15 @@ function vNotaPrecio(larga){
 /* Cada equipo tiene su página propia (venta/<id>/, la genera
    scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
    Si un equipo es nuevo y aún no tiene página, se abre la ficha interna. */
+function vMensajeWA(p){
+  const linea = [p.marca, p.modelo, p.clave ? 'Código NTS ' + p.clave : '',
+                 p.precio ? vSoles(p.precio) : ''].filter(Boolean).join(' · ');
+  const partes = ['Hola Sinergia Biomédica, quiero cotizar:', '', p.nom];
+  if(linea) partes.push(linea);
+  partes.push('', location.origin + '/#/cotizar-venta/' + p.id);
+  return partes.join('\n');
+}
+
 function vPagina(id){ return (window.PAGINA_VENTA || {})[id] || ''; }
 function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/venta/p/' + id); }
 
@@ -2358,7 +2371,9 @@ function vProducto(id){
   const otros = vDeCat(p.cat).filter(x => x.id !== p.id).slice(0,3);
   const chips = [['Garantía',p.garantia]].filter(x=>x[1]);   // marca, modelo y origen ya van arriba (vMarcaModelo)
   const areas = (p.areas||[]).length ? `<div class="v-areas"><span>Se usa en</span>${p.areas.map(a=>`<i>${vEsc(a)}</i>`).join('')}</div>` : '';
-  const texto = 'Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:'');
+  /* Mismo mensaje que las páginas sueltas: con los datos del equipo y el
+     enlace que abre el cotizador con ese equipo ya puesto. */
+  const texto = vMensajeWA(p);
   return `
   <div class="wrap" style="padding-top:18px">
     <button type="button" class="sb-atras" onclick="sbAtras()">
@@ -3682,10 +3697,39 @@ function vcCalcular(){
 }
 
 /* ── Página ─────────────────────────────────────────────────────────── */
-function vcAbrir(){
+/* Lista que había antes de que un enlace empezara una nueva, para poder
+   recuperarla de un toque. Solo vive mientras la pestaña está abierta. */
+var VC_ANTES = null;
+
+/* #/cotizar-venta/<id>: el enlace que viaja en el mensaje de WhatsApp de
+   cada ficha. Empieza una lista NUEVA con ese equipo, no lo suma a la que
+   hubiera: quien abre ese enlace casi siempre está atendiendo a un cliente
+   distinto cada vez, y arrastrar el pedido anterior los mezclaría. Lo que
+   había se guarda y se puede recuperar. */
+function vcSoloEste(id){
+  const g = vcItems(), ids = Object.keys(g);
+  if(ids.length === 1 && ids[0] === id) return;      // ya está así: no se toca
+  VC_ANTES = ids.length ? g : null;
+  if(window.SBCarrito) SBCarrito.vaciar();
+  vcAgregar(id, 1);
+}
+function vcDeshacer(){
+  if(!VC_ANTES || !window.SBCarrito) return;
+  SBCarrito.poner(VC_ANTES); VC_ANTES = null; vcPintarTodo();
+}
+
+function vcAbrir(id){
   /* La página ya tiene su botón de WhatsApp: el verde flotante sobraba y
      encima tapaba el formulario. */
   document.body.classList.add('wa-propio');
+  if(id){
+    /* Con el catálogo cargado, el equipo entra con nombre, precio y foto;
+       sin él entraría como un código suelto. */
+    const poner = () => { vcSoloEste(id); vcPintarTodo(); };
+    if(VENTA && VENTA.productos) poner();
+    else if(typeof cargarVenta === 'function') cargarVenta().then(poner).catch(poner);
+    else poner();
+  }
   vcPintarTodo();
   /* Si se vino del carrito tocando «Enviar por WhatsApp», se baja al
      formulario y se intenta enviar de una vez. */
@@ -3745,6 +3789,8 @@ function vcPintar(){
     </div>
     <div class="wrap vc-grid">
       <div>
+        ${VC_ANTES ? `<p class="vc-nueva">Empezamos una lista nueva con este equipo.
+          <button type="button" onclick="vcDeshacer()">Recuperar la lista anterior</button></p>` : ''}
         <div class="cot-paso uno"><b>1</b> Tus equipos <i>${c.unidades} ${c.unidades === 1 ? 'unidad' : 'unidades'}</i></div>
         <div class="vc-lista">${c.items.map(vcFila).join('')}</div>
         <button type="button" class="cot-limpiar" onclick="vcVaciar()">Vaciar la lista</button>

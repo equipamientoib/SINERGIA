@@ -127,3 +127,10 @@ body.wa-propio .wafab{display:none}
   .v-head{padding-top:20px}
   .v-head h1{font-size:30px;margin-top:6px}
 }
+
+/* Aviso de «lista nueva» cuando se entra por el enlace de un equipo. */
+.vc-nueva{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 13px;
+  border:1px solid var(--linea);border-radius:10px;background:var(--fondo2,#FBFAF6);
+  font-size:13px;color:var(--gris)}
+.vc-nueva button{border:0;background:none;padding:0;cursor:pointer;font-family:var(--ff-d);
+  font-size:13px;font-weight:600;color:var(--cobre-d);text-decoration:underline;text-underline-offset:3px}

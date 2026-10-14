@@ -65,6 +65,9 @@
   };
   C.quitar = function(id){ var g = leer(); delete g[id]; escribir(g); };
   C.vaciar = function(){ escribir({}); };
+  /* Reponer la lista entera de golpe: lo usa el «deshacer» del
+     cotizador cuando un enlace de WhatsApp empieza una lista nueva. */
+  C.poner = function(g){ escribir(g && typeof g === 'object' ? g : {}); };
 
   var soles = function(n){ return 'S/ ' + Number(n || 0).toLocaleString('es-PE', {maximumFractionDigits: 0}); };
   var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){

@@ -286,6 +286,15 @@ function vNotaPrecio(larga){
 /* Cada equipo tiene su página propia (venta/<id>/, la genera
    scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
    Si un equipo es nuevo y aún no tiene página, se abre la ficha interna. */
+function vMensajeWA(p){
+  const linea = [p.marca, p.modelo, p.clave ? 'Código NTS ' + p.clave : '',
+                 p.precio ? vSoles(p.precio) : ''].filter(Boolean).join(' · ');
+  const partes = ['Hola Sinergia Biomédica, quiero cotizar:', '', p.nom];
+  if(linea) partes.push(linea);
+  partes.push('', location.origin + '/#/cotizar-venta/' + p.id);
+  return partes.join('\n');
+}
+
 function vPagina(id){ return (window.PAGINA_VENTA || {})[id] || ''; }
 function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/venta/p/' + id); }
 
@@ -607,7 +616,9 @@ function vProducto(id){
   const otros = vDeCat(p.cat).filter(x => x.id !== p.id).slice(0,3);
   const chips = [['Garantía',p.garantia]].filter(x=>x[1]);   // marca, modelo y origen ya van arriba (vMarcaModelo)
   const areas = (p.areas||[]).length ? `<div class="v-areas"><span>Se usa en</span>${p.areas.map(a=>`<i>${vEsc(a)}</i>`).join('')}</div>` : '';
-  const texto = 'Hola Sinergia Biomédica, quiero cotizar: '+p.nom+(p.marca?' '+p.marca:'')+(p.modelo?' '+p.modelo:'');
+  /* Mismo mensaje que las páginas sueltas: con los datos del equipo y el
+     enlace que abre el cotizador con ese equipo ya puesto. */
+  const texto = vMensajeWA(p);
   return `
   <div class="wrap" style="padding-top:18px">
     <button type="button" class="sb-atras" onclick="sbAtras()">

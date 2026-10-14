@@ -61,10 +61,39 @@ function vcCalcular(){
 }
 
 /* ── Página ─────────────────────────────────────────────────────────── */
-function vcAbrir(){
+/* Lista que había antes de que un enlace empezara una nueva, para poder
+   recuperarla de un toque. Solo vive mientras la pestaña está abierta. */
+var VC_ANTES = null;
+
+/* #/cotizar-venta/<id>: el enlace que viaja en el mensaje de WhatsApp de
+   cada ficha. Empieza una lista NUEVA con ese equipo, no lo suma a la que
+   hubiera: quien abre ese enlace casi siempre está atendiendo a un cliente
+   distinto cada vez, y arrastrar el pedido anterior los mezclaría. Lo que
+   había se guarda y se puede recuperar. */
+function vcSoloEste(id){
+  const g = vcItems(), ids = Object.keys(g);
+  if(ids.length === 1 && ids[0] === id) return;      // ya está así: no se toca
+  VC_ANTES = ids.length ? g : null;
+  if(window.SBCarrito) SBCarrito.vaciar();
+  vcAgregar(id, 1);
+}
+function vcDeshacer(){
+  if(!VC_ANTES || !window.SBCarrito) return;
+  SBCarrito.poner(VC_ANTES); VC_ANTES = null; vcPintarTodo();
+}
+
+function vcAbrir(id){
   /* La página ya tiene su botón de WhatsApp: el verde flotante sobraba y
      encima tapaba el formulario. */
   document.body.classList.add('wa-propio');
+  if(id){
+    /* Con el catálogo cargado, el equipo entra con nombre, precio y foto;
+       sin él entraría como un código suelto. */
+    const poner = () => { vcSoloEste(id); vcPintarTodo(); };
+    if(VENTA && VENTA.productos) poner();
+    else if(typeof cargarVenta === 'function') cargarVenta().then(poner).catch(poner);
+    else poner();
+  }
   vcPintarTodo();
   /* Si se vino del carrito tocando «Enviar por WhatsApp», se baja al
      formulario y se intenta enviar de una vez. */
@@ -124,6 +153,8 @@ function vcPintar(){
     </div>
     <div class="wrap vc-grid">
       <div>
+        ${VC_ANTES ? `<p class="vc-nueva">Empezamos una lista nueva con este equipo.
+          <button type="button" onclick="vcDeshacer()">Recuperar la lista anterior</button></p>` : ''}
         <div class="cot-paso uno"><b>1</b> Tus equipos <i>${c.unidades} ${c.unidades === 1 ? 'unidad' : 'unidades'}</i></div>
         <div class="vc-lista">${c.items.map(vcFila).join('')}</div>
         <button type="button" class="cot-limpiar" onclick="vcVaciar()">Vaciar la lista</button>
