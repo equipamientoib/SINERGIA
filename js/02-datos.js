@@ -53,6 +53,7 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
   .then(d => { if(!d) return;
     if(d.medioDiaDesde) MEDIO_MIN = d.medioDiaDesde;
     if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
+    if(d.instrumentistaDia) TEC_DIA = d.instrumentistaDia;
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
     if(d.descuentos) DESC_COMB = d.descuentos;
     if(d.garantiaProvincia > 0) GARANTIA_PROV = d.garantiaProvincia;

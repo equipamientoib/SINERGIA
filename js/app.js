@@ -291,6 +291,7 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
   .then(d => { if(!d) return;
     if(d.medioDiaDesde) MEDIO_MIN = d.medioDiaDesde;
     if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
+    if(d.instrumentistaDia) TEC_DIA = d.instrumentistaDia;
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
     if(d.descuentos) DESC_COMB = d.descuentos;
     if(d.garantiaProvincia > 0) GARANTIA_PROV = d.garantiaProvincia;
@@ -836,17 +837,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2bc976f3';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=24f083d4';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2bc976f3';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=24f083d4';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=2bc976f3','js/06-tablero.js?v=2bc976f3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=24f083d4','js/06-tablero.js?v=24f083d4'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=2bc976f3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=24f083d4'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -3716,25 +3717,32 @@ const vcItems = () => (window.SBCarrito ? SBCarrito.items() : {});
 var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
   plazoPedido: 'se confirma al emitir la cotización', garantiaMeses: 12,
   pago: '50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.',
-  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.',
-  /* Instalación, puesta en funcionamiento y capacitación fuera de Lima
-     Metropolitana. El pasaje sale de la zona de cada ciudad, la misma
-     tabla del simulador de alquiler (data/datos.json › viaje.zonas), así
-     que una sola tabla manda en los dos sitios. */
-  servicioFuera: {personalDia: 350, viaticoDia: 50, hospedajeNoche: 90}};
+  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.'};
 fetch('data/terminos-venta.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null)
   .then(d => { if(d) Object.keys(VCOT_TERM).forEach(k => { if(d[k] != null) VCOT_TERM[k] = d[k]; }); })
   .catch(() => {});
 
 /* ── Servicio fuera de Lima Metropolitana ───────────────────────────
    Lo piden casi siempre: el equipo se entrega en provincia y alguien
-   tiene que ir a instalarlo y capacitar al personal. Se cotiza igual que
-   en el simulador de alquiler: el pasaje según la distancia (zona de la
-   ciudad), el personal por día y los viáticos por día y por noche. */
+   tiene que ir a instalarlo y capacitar al personal.
+
+   NO tiene tarifas propias: usa las mismas que el simulador de alquiler
+   (data/tarifas-alquiler.json), que ya resuelve este problema desde hace
+   tiempo — TEC_DIA para el personal, VIAJE.viaticoDia y
+   VIAJE.hospedajeNoche para los viáticos y VIAJE.zonas para el pasaje
+   según la distancia. Así una sola tabla manda en los dos sitios y no
+   hay dos verdades que se contradigan. */
 var VCOT_SRV = {fuera: false, ciudad: '', dias: 1, personas: 1};
 
+/* Las tarifas del viaje, tal como las usa el alquiler. */
+function vcTarifas(){
+  return {personalDia: (typeof TEC_DIA !== 'undefined' ? TEC_DIA : 120),
+          viaticoDia: (typeof VIAJE !== 'undefined' ? VIAJE.viaticoDia : 50),
+          hospedajeNoche: (typeof VIAJE !== 'undefined' ? VIAJE.hospedajeNoche : 90)};
+}
+
 function vcServicio(){
-  const T = VCOT_TERM.servicioFuera || {};
+  const T = vcTarifas();
   const dias = Math.max(1, Number(VCOT_SRV.dias) || 1);
   const per = Math.max(1, Number(VCOT_SRV.personas) || 1);
   const ciudad = (typeof ciudadDe === 'function') ? ciudadDe(VCOT_SRV.ciudad) : null;
@@ -3980,7 +3988,7 @@ function vcBloqueServicio(s){
    el cliente ve de dónde sale cada sol y no parece un recargo suelto. */
 function vcDesglose(s){
   if(!s.hay || s.falta) return '';
-  const T = VCOT_TERM.servicioFuera || {}, f = n => Number(n || 0).toLocaleString('es-PE');
+  const T = vcTarifas(), f = n => Number(n || 0).toLocaleString('es-PE');
   const ciu = s.ciudad ? s.ciudad.n : '';
   return `<div class="cot-cuenta vc-desg">
     <div class="vc-desg-t">Servicio fuera de Lima Metropolitana${ciu ? ', en ' + vEsc(ciu) : ''}</div>
@@ -4108,7 +4116,6 @@ function vcTerminos(d){
   L.push(['6. Incluye.', T.incluye + ' La instalación, la puesta en funcionamiento y la capacitación ' +
     'de uso en Lima Metropolitana no tienen costo adicional.']);
   if(d && d.srv){
-    const S = T.servicioFuera || {};
     L.push(['7. Servicio fuera de Lima Metropolitana' + (d.srv.ciu ? ', en ' + d.srv.ciu : '') + '.',
       'Comprende el traslado del personal calificado, su permanencia por ' + d.srv.dias +
       (d.srv.dias === 1 ? ' día' : ' días') + ' en sitio' + (d.srv.per > 1 ? ' (' + d.srv.per + ' personas)' : '') +

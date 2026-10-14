@@ -15,6 +15,7 @@
   },
   "medioDiaDesde": 60,
   "medioDiaMinimo": 50,
+  "instrumentistaDia": 120,
   "instrumentistaMedioDia": 50,
   "descuentos": {
     "2": 0.1,
