@@ -286,6 +286,29 @@ def mensaje_wa(p):
     return '\n'.join(partes)
 
 
+def instalacion_incluida(p):
+    """Etiqueta «instalación y capacitación incluidas», en los equipos que
+    pasan el monto de data/terminos-venta.json › instalacionIncluida.
+
+    Hoy Sinergia ya lo hace y nadie se entera: no estaba escrito en
+    ninguna parte. En un equipo de este tamaño es lo que inclina la
+    decisión frente a un proveedor que cobra el viaje aparte.
+    """
+    R = TERMINOS.get('instalacionIncluida') or {}
+    desde = R.get('desde') or 0
+    if not desde or not p.get('precio') or p['precio'] < desde:
+        return ''
+    completo = p['precio'] >= (R.get('desdePasajeCompleto') or 10 ** 12)
+    detalle = ('viaje, viáticos y pasaje aéreo incluidos'
+               if completo else
+               'incluye el viaje y hasta S/ %s de pasaje' % format(R.get('topePasaje') or 0, ','))
+    return ('<p class="inst-inc"><span aria-hidden="true">✓</span> '
+            '<b>Instalación y capacitación incluidas</b>, también fuera de Lima '
+            '<small>(%s · %s %s en sitio)</small></p>'
+            % (e(detalle), R.get('diasIncluidos') or 1,
+               'día' if (R.get('diasIncluidos') or 1) == 1 else 'días'))
+
+
 def pdf_venta(pid):
     return '/fichas/venta/ficha-tecnica-%s.pdf' % pid
 
@@ -483,6 +506,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
         <p class="prod-desc">{e(p.get('resumen') or '')}</p>
         {franja(p)}
         {caja}
+        {instalacion_incluida(p)}
         <div class="prod-btns">
           {add}
           <a class="btn" href="{wa}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>

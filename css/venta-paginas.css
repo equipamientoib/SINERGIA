@@ -182,3 +182,11 @@
   /* El botón verde flotante estorbaba encima de la barra. */
   body:has(.pbar.on) .wa-fab{display:none}
 }
+
+/* «Instalación y capacitación incluidas»: va pegada al precio, que es
+   donde el comprador está comparando contra otro proveedor. */
+.inst-inc{display:flex;align-items:flex-start;gap:8px;margin:12px 0 0;padding:10px 13px;
+  border:1px solid rgba(46,139,107,.35);border-radius:11px;background:rgba(46,139,107,.05);
+  font-size:13px;line-height:1.45;color:var(--onix)}
+.inst-inc span{color:var(--ok);font-weight:700;line-height:1.3}
+.inst-inc small{display:block;color:var(--gris);font-size:12px;margin-top:1px}

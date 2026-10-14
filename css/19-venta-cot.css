@@ -168,3 +168,9 @@ body.wa-propio .wafab{display:none}
 .vc-mas summary::before{content:'+ ';font-weight:700}
 .vc-mas[open] summary::before{content:'− '}
 .vc-mas[open] summary{margin-bottom:8px}
+
+/* El descuento del servicio, a la vista: si no se ve, el cliente no sabe
+   que se le incluyó nada, y la entidad no lo tiene en papel. */
+.vc-desg.vc-regalo{border-color:rgba(46,139,107,.45);background:rgba(46,139,107,.04)}
+.vc-desg .vc-dto span{color:var(--ok);font-weight:600}
+.cot-ayuda.vc-ok{color:var(--ok)}

@@ -5,5 +5,13 @@
   "plazoPedido": "se confirma al emitir la cotización, según la programación del fabricante",
   "garantiaMeses": 12,
   "pago": "50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.",
-  "incluye": "Manual de usuario, certificado de garantía y capacitación de uso en la entrega."
+  "incluye": "Manual de usuario, certificado de garantía y capacitación de uso en la entrega.",
+  "instalacionIncluida": {
+    "_nota": "Cuando la cotizacion llega a estos montos (con IGV), la instalacion, la capacitacion y el viaje van incluidos. desde: 40000 equivale a un margen aproximado de S/ 10,000. desdePasajeCompleto: 80000, margen aproximado de S/ 20,000; de ahi para arriba el pasaje va completo aunque sea en avion. Debajo de ese monto se cubre el pasaje hasta topePasaje y el cliente paga la diferencia. diasIncluidos y personasIncluidas: lo que va sin costo; el dia o la persona de mas se cobran normal. Poner desde en 0 apaga la regla.",
+    "desde": 40000,
+    "topePasaje": 260,
+    "desdePasajeCompleto": 80000,
+    "diasIncluidos": 2,
+    "personasIncluidas": 1
+  }
 }

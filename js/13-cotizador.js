@@ -745,6 +745,15 @@ function cotHTML(d, formal){
           ? ' y hospedaje por ' + s.noc + (Number(s.noc) === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
       <td class="d">${f(s.via)}</td><td class="d">${f(s.via)}</td></tr>`);
+    /* El descuento va como fila propia, con su monto en negativo: así el
+       cliente ve lo que se le incluye y el cuadro sigue sumando. */
+    if(s.dto) F.push(`<tr>
+      <td class="c">${n + F.length + 1}</td>
+      <td><b>INSTALACIÓN Y CAPACITACIÓN INCLUIDAS</b>
+        <span class="det">Por el monto de esta cotización, Sinergia asume
+        ${s.dto >= (s.pers + s.pas + s.via) ? 'el servicio completo' : 'parte del servicio'}.</span></td>
+      <td class="c">DESCUENTO</td><td class="c">1.00</td>
+      <td class="d">−${f(s.dto)}</td><td class="d">−${f(s.dto)}</td></tr>`);
     return F.join('');
   };
   const filasAlq = () => d.items.map((e, i) => {

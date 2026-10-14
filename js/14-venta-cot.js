@@ -17,7 +17,10 @@ const vcItems = () => (window.SBCarrito ? SBCarrito.items() : {});
 var VCOT_TERM = {vigenciaDias: 15, plazoStock: 'de 2 a 5 días hábiles',
   plazoPedido: 'se confirma al emitir la cotización', garantiaMeses: 12,
   pago: '50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.',
-  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.'};
+  incluye: 'Manual de usuario, certificado de garantía y capacitación de uso en la entrega.',
+  /* Cuándo el viaje corre por cuenta de Sinergia. Ver data/terminos-venta.json. */
+  instalacionIncluida: {desde: 40000, topePasaje: 260, desdePasajeCompleto: 80000,
+                        diasIncluidos: 2, personasIncluidas: 1}};
 fetch('data/terminos-venta.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null)
   .then(d => { if(d) Object.keys(VCOT_TERM).forEach(k => { if(d[k] != null) VCOT_TERM[k] = d[k]; }); })
   .catch(() => {});
@@ -41,7 +44,45 @@ function vcTarifas(){
           hospedajeNoche: (typeof VIAJE !== 'undefined' ? VIAJE.hospedajeNoche : 90)};
 }
 
-function vcServicio(){
+/* Cuánto del viaje corre por cuenta de Sinergia.
+
+   La idea es simple: cuando el margen del pedido es grande, regalar el
+   viaje compra la venta; cuando es chico, se la come. Como la web nunca
+   ve el margen (ni debe: con el margen se deduce lo que cuesta el equipo
+   en el proveedor), la regla mira el monto del pedido, que es su
+   equivalente público.
+
+   Dos escalones, porque el pasaje de avión no es el de un bus:
+     · desde S/ 40 000  → instalación, capacitación y viaje incluidos,
+       con el pasaje cubierto hasta topePasaje; si la ciudad es más cara
+       (avión), el cliente paga solo la diferencia.
+     · desde S/ 80 000  → el pasaje va completo, también en avión.
+   Lo que pase de los días o las personas incluidas se cobra normal: sin
+   ese borde, «incluido» sería un cheque en blanco. */
+function vcIncluido(base, s, T){
+  const R = VCOT_TERM.instalacionIncluida || {};
+  if(!R.desde || base < R.desde || !s.ciudad) return null;
+  const diasC = Math.min(s.dias, Math.max(0, Number(R.diasIncluidos) || 0));
+  const persC = Math.min(s.personas, Math.max(0, Number(R.personasIncluidas) || 0));
+  if(!diasC || !persC) return null;
+  const nochesC = Math.max(0, Math.min(s.noches, diasC - 1));
+  const unitario = s.personas ? s.pasaje / s.personas : 0;
+  const tope = base >= (R.desdePasajeCompleto || Infinity) ? unitario
+             : Math.min(unitario, Number(R.topePasaje) || 0);
+  const cub = {
+    personal: (T.personalDia || 0) * diasC * persC,
+    comida: (T.viaticoDia || 0) * diasC * persC,
+    hospedaje: (T.hospedajeNoche || 0) * nochesC * persC,
+    pasaje: tope * persC
+  };
+  cub.total = cub.personal + cub.comida + cub.hospedaje + cub.pasaje;
+  cub.todo = cub.total >= s.personal + s.viatico + s.pasaje;
+  cub.pasajeEntero = tope >= unitario;
+  cub.dias = diasC; cub.personas = persC;
+  return cub.total > 0 ? cub : null;
+}
+
+function vcServicio(base){
   const T = vcTarifas();
   const dias = Math.max(1, Number(VCOT_SRV.dias) || 1);
   const per = Math.max(1, Number(VCOT_SRV.personas) || 1);
@@ -54,9 +95,13 @@ function vcServicio(){
   const comida = (T.viaticoDia || 0) * dias * per;
   const hospedaje = (T.hospedajeNoche || 0) * noches * per;
   const viatico = comida + hospedaje;
-  return {hay: true, ciudad: ciudad, falta: !ciudad, dias: dias, personas: per, noches: noches,
-          personal: personal, pasaje: pasaje, comida: comida, hospedaje: hospedaje,
-          viatico: viatico, total: personal + pasaje + viatico};
+  const s = {hay: true, ciudad: ciudad, falta: !ciudad, dias: dias, personas: per, noches: noches,
+             personal: personal, pasaje: pasaje, comida: comida, hospedaje: hospedaje,
+             viatico: viatico, bruto: personal + pasaje + viatico};
+  s.inc = vcIncluido(Number(base) || 0, s, T);
+  s.dto = s.inc ? Math.min(s.inc.total, s.bruto) : 0;
+  s.total = s.bruto - s.dto;
+  return s;
 }
 
 /* ── Carrito ────────────────────────────────────────────────────────── */
@@ -93,7 +138,7 @@ function vcCalcular(){
     .map(x => ({p: x.p, q: x.q, foto: x.foto, precio: Number(x.p.precio || 0),
                 total: Number(x.p.precio || 0) * x.q}));
   const equipos = items.reduce((s, x) => s + x.total, 0);
-  const srv = vcServicio();
+  const srv = vcServicio(equipos);
   const sinPrecio = items.filter(x => !x.precio).length;
   return {items, equipos, srv, total: equipos + srv.total, sinPrecio,
           unidades: items.reduce((s, x) => s + x.q, 0)};
@@ -280,7 +325,10 @@ function vcBloqueServicio(s){
             <input type="number" min="1" max="4" step="1" value="${s.personas}" onchange="vcSrv('personas', this.value)"></label>
         </div>
         ${s.falta ? '<p class="cot-ayuda vc-falta">Elige la ciudad para calcular el pasaje.</p>'
-                  : '<p class="cot-ayuda">El pasaje se calcula por la distancia a Lima; los viáticos, por día de trabajo y por noche fuera.</p>'}`}
+          : s.inc ? `<p class="cot-ayuda vc-ok">Por el monto de tu pedido, ${s.inc.todo
+              ? 'este servicio va <b>incluido, sin costo</b>.'
+              : 'cubrimos <b>' + vSoles(s.dto) + '</b> de este servicio.'}</p>`
+          : '<p class="cot-ayuda">El pasaje se calcula por la distancia a Lima; los viáticos, por día de trabajo y por noche fuera.</p>'}`}
   </div>`;
 }
 
@@ -290,7 +338,8 @@ function vcDesglose(s){
   if(!s.hay || s.falta) return '';
   const T = vcTarifas(), f = n => Number(n || 0).toLocaleString('es-PE');
   const ciu = s.ciudad ? s.ciudad.n : '';
-  return `<div class="cot-cuenta vc-desg">
+  const inc = s.inc;
+  return `<div class="cot-cuenta vc-desg${inc ? ' vc-regalo' : ''}">
     <div class="vc-desg-t">Servicio fuera de Lima Metropolitana${ciu ? ', en ' + vEsc(ciu) : ''}</div>
     <div class="sub"><span>Personal calificado · S/ ${f(T.personalDia)} × ${s.dias} ${s.dias === 1 ? 'día' : 'días'}${
       s.personas > 1 ? ' × ' + s.personas + ' personas' : ''}</span><span>${vSoles(s.personal)}</span></div>
@@ -298,6 +347,10 @@ function vcDesglose(s){
     <div class="sub"><span>Viáticos · comida S/ ${f(T.viaticoDia)} × ${s.dias}${
       s.noches ? ' · hospedaje S/ ' + f(T.hospedajeNoche) + ' × ' + s.noches + (s.noches === 1 ? ' noche' : ' noches') : ''
     }</span><span>${vSoles(s.viatico)}</span></div>
+    ${inc ? `<div class="sub vc-dto"><span>Incluido por Sinergia${
+      inc.todo ? '' : ' · ' + inc.dias + (inc.dias === 1 ? ' día' : ' días') +
+        (inc.pasajeEntero ? ' y el pasaje completo' : ' y hasta S/ ' + f((VCOT_TERM.instalacionIncluida || {}).topePasaje) + ' de pasaje')
+    }</span><span>− ${vSoles(s.dto)}</span></div>` : ''}
     <div class="gran"><span>Total del servicio</span><span>${vSoles(s.total)}</span></div>
   </div>`;
 }
@@ -376,7 +429,8 @@ function vcDoc(c, d){
        lo imprime como filas propias del cuadro, igual que el alquiler. */
     srv: c.srv.hay && !c.srv.falta ? {
       ciu: c.srv.ciudad ? c.srv.ciudad.n : '', dias: c.srv.dias, per: c.srv.personas,
-      noc: c.srv.noches, pers: c.srv.personal, pas: c.srv.pasaje, via: c.srv.viatico
+      noc: c.srv.noches, pers: c.srv.personal, pas: c.srv.pasaje, via: c.srv.viatico,
+      dto: c.srv.dto || 0
     } : null,
     total: c.total, gar: 0, tec: 0, pas: 0, via: 0, inc: []
   };
@@ -421,8 +475,11 @@ function vcTerminos(d){
       (d.srv.dias === 1 ? ' día' : ' días') + ' en sitio' + (d.srv.per > 1 ? ' (' + d.srv.per + ' personas)' : '') +
       ', la instalación, la puesta en funcionamiento y la capacitación del personal del cliente. ' +
       'Se detalla por partidas en el Cuadro N° 1: personal calificado, pasajes de ida y vuelta y viáticos ' +
-      '(alimentación por día de trabajo y hospedaje por noche fuera). El envío de los equipos a provincia ' +
-      'se realiza por agencia de transporte y su costo lo asume el cliente.']);
+      '(alimentación por día de trabajo y hospedaje por noche fuera).' +
+      (d.srv.dto ? ' Por el monto de esta cotización, ' + (d.srv.dto >= (d.srv.pers + d.srv.pas + d.srv.via)
+        ? 'este servicio va incluido sin costo.'
+        : 'Sinergia asume S/ ' + Number(d.srv.dto).toFixed(2) + ' de este servicio.') : '') +
+      ' El envío de los equipos a provincia se realiza por agencia de transporte y su costo lo asume el cliente.']);
   }
   L.push([(d && d.srv ? '8' : '7') + '. Forma de pago.', T.pago]);
   L.push([(d && d.srv ? '9' : '8') + '. Comprobante.', 'Se emite factura electrónica a nombre de la razón social indicada por el cliente.']);
@@ -454,6 +511,7 @@ function vcTexto(c, d){
            (c.srv.personas > 1 ? ' × ' + c.srv.personas + ' personas' : '') + '): ' + vSoles(c.srv.personal));
     L.push('  Pasajes ida y vuelta: ' + vSoles(c.srv.pasaje));
     L.push('  Viáticos (comida y hospedaje): ' + vSoles(c.srv.viatico));
+    if(c.srv.dto) L.push('  Incluido por Sinergia: − ' + vSoles(c.srv.dto));
     L.push('  Subtotal del servicio: ' + vSoles(c.srv.total));
   }
   L.push('');
