@@ -32,9 +32,19 @@
      marco— y mide su ancho con innerWidth. Al empotrar, la ventana es
      más estrecha que la pantalla: se le deja la mitad justa y se olvida
      el ancho guardado de cuando se usó suelta. */
+  /* Medir puede salir mal: el marco todavía no está maquetado, o la
+     pestaña está escondida, y entonces innerWidth es 0. Guardar ese 0
+     no deja un cajón estrecho, deja un cajón de cero píxeles —y como se
+     guarda, se lo lleva a la siguiente sesión, cuando ya no hay forma
+     de ensancharlo porque no se ve ni el tirador—. Así que una medida
+     que no llega al mínimo no se usa ni se guarda: se deja la que
+     hubiera, que la herramienta ya sabe acotar. */
+  var CAJON_MIN = 420;
   function anchoCajon(){
     try{
-      var n = Math.round(window.innerWidth * 0.5);
+      var w = window.innerWidth;
+      if(!w || w < CAJON_MIN + 120) return;        // no cabe: no se toca nada
+      var n = Math.min(Math.max(Math.round(w * 0.5), CAJON_MIN), Math.round(w * 0.8));
       localStorage.setItem('pme-cajon-ancho', n);
       document.documentElement.style.setProperty('--cajon', n + 'px');
     }catch(e){}
