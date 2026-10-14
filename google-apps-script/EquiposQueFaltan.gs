@@ -261,8 +261,18 @@ var NO_PUBLICAR_ = [
   ['cu-medical-081841', 'Duplicado: ya está publicado como cu-medical-hd1, al mismo precio.']
 ];
 
+/* Los que hay que APAGAR. El estudio de precios del 4 de octubre
+   (docs/comparacion-falabella-2026-10-04.md) los retiró por estar más
+   caros que el mismo modelo en Saga Falabella, pero se retiraron del
+   catálogo estático y la hoja siguió con «publicar = SI», así que
+   volvieron a salir solos. Aquí se apagan donde manda de verdad. */
+var RETIRAR_ = [
+  ['riester-exacta',        'Más caro que en Falabella: S/ 403 contra S/ 280 del mismo Riester Exacta (+44 %).'],
+  ['riester-ri-champion-n', 'Más caro que en Falabella: S/ 745 contra S/ 426 del mismo Riester Ri-champion N (+75 %).']
+];
+
 /**
- * ▶ Limpia y publica los equipos de PUBLICAR_.
+ * ▶ Limpia y publica los equipos de PUBLICAR_, y apaga los de RETIRAR_.
  * Solo toca esas filas. Lo demás de la hoja queda igual.
  */
 function publicarPendientes() {
@@ -297,7 +307,18 @@ function publicarPendientes() {
     Logger.log('  publicado  fila ' + f + '  ' + e.id + '  →  ' + e.nombre);
   });
 
+  var apagados = 0;
+  RETIRAR_.forEach(function (x) {
+    var f = fila[x[0]];
+    if (!f) return;
+    if (s_(vals[f - 1][col.publicar]).toUpperCase() !== 'SI') return;   // ya estaba apagado
+    sh.getRange(f, col.publicar + 1).setValue('NO');
+    apagados++;
+    Logger.log('  RETIRADO   fila ' + f + '  ' + x[0] + '  →  ' + x[1]);
+  });
+
   var L = ['', '═══ RESUMEN ═══', '  Publicados: ' + hechos + ' de ' + PUBLICAR_.length];
+  L.push('  Retirados por precio: ' + apagados + ' de ' + RETIRAR_.length);
   if (faltantes.length) L.push('  NO encontrados en la hoja: ' + faltantes.join(', '));
   L.push('');
   L.push('  Dejados fuera a propósito:');
