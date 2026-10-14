@@ -153,10 +153,12 @@ function json_(obj) {
 }
 
 // ═════════════════════ venta ═════════════════════
-/* Arriba de los encabezados van dos parámetros:
+/* Arriba de los encabezados van los parámetros:
      A1 margen      B1 35          (% que se suma al precio del proveedor)
      A2 actualizado B2 06/10/2026  (fecha de la última revisión, cada lunes)
      A3 stock %     B3 30          (% del stock del proveedor que se muestra)
+     A4 instalacion desde      B4 10000   (utilidad desde la que va incluida)
+     A5 pasaje completo desde  B5 20000   (utilidad desde la que el pasaje va entero)
    Solo se envían a la web las filas con publicar = SI y solo las columnas
    públicas: el precio y el stock del proveedor NO salen de aquí.        */
 function hojaVenta_(ss) {
@@ -173,11 +175,17 @@ function venta_() {
   var fotoCod = fotosPorCodigo_(libro);
   var vals = sh.getDataRange().getValues();
   var margen = 35, actualizado = '', fh = -1, soloStock = true;
+  /* Instalación incluida: se decide con la UTILIDAD de cada equipo (lo que
+     queda después de pagarle al proveedor), no con el precio de venta. El
+     número nunca sale de aquí: a la web solo viaja inst = 1 o 2. */
+  var instDesde = 10000, instPasaje = 20000;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
     var et = s_(vals[k][0]).toLowerCase();
     if (et === 'margen' && num_(vals[k][1]) !== null) margen = num_(vals[k][1]);
     if (et === 'solo con stock' && s_(vals[k][1]).toUpperCase() === 'NO') soloStock = false;
     if (et === 'actualizado') actualizado = fecha_(vals[k][1]);
+    if (et === 'instalacion desde' && num_(vals[k][1]) !== null) instDesde = num_(vals[k][1]);
+    if (et === 'pasaje completo desde' && num_(vals[k][1]) !== null) instPasaje = num_(vals[k][1]);
     if (et === 'id') { fh = k; break; }
   }
   if (fh < 0) return null;
@@ -211,6 +219,19 @@ function venta_() {
     if (num_(r.ranking)) p.ranking = num_(r.ranking);      // puesto del tipo en el estudio de compras públicas
     if (precio) p.precio = precio;
     if (stock !== null) p.stock = stock;
+
+    /* INSTALACIÓN INCLUIDA (lo único que la utilidad le cuenta a la web)
+         inst = 1   la instalación, la capacitación y el viaje van incluidos,
+                    con el pasaje cubierto hasta el tope de terminos-venta
+         inst = 2   además el pasaje va entero, aunque sea en avión
+       Viaja un 1 o un 2, nunca la utilidad ni el precio del proveedor: con
+       el flag solo se sabe que ese equipo deja buen margen, que es lo mismo
+       que ya dice la etiqueta de la ficha. Si la fila no tiene precio de
+       proveedor no se manda nada y la web usa su regla por monto.      */
+    if (precio && prov !== null && instDesde > 0) {
+      var util = precio - prov;
+      p.inst = util >= instPasaje ? 2 : (util >= instDesde ? 1 : 0);
+    }
 
     /* PROMOCIONES (tres columnas que se llenan a mano en la hoja):
          precio_promo   el precio rebajado que paga el cliente

@@ -296,9 +296,20 @@ def instalacion_incluida(p):
     """
     R = TERMINOS.get('instalacionIncluida') or {}
     desde = R.get('desde') or 0
-    if not desde or not p.get('precio') or p['precio'] < desde:
+    if not desde or not p.get('precio'):
         return ''
-    completo = p['precio'] >= (R.get('desdePasajeCompleto') or 10 ** 12)
+    # La hoja ya decidió el escalón con la utilidad del equipo (inst = 0, 1
+    # o 2) y manda solo ese número. Si no viene (despliegue viejo o fila sin
+    # precio de proveedor), se usa la regla de siempre por monto.
+    inst = p.get('inst')
+    if inst is None:
+        if p['precio'] < desde:
+            return ''
+        completo = p['precio'] >= (R.get('desdePasajeCompleto') or 10 ** 12)
+    else:
+        if not inst:
+            return ''
+        completo = inst >= 2
     detalle = ('viaje, viáticos y pasaje aéreo incluidos'
                if completo else
                'incluye el viaje y hasta S/ %s de pasaje' % format(R.get('topePasaje') or 0, ','))
@@ -914,10 +925,16 @@ def sitemap(paginas, cambios):
     otras = [u for u in re.findall(r'  <url>.*?</url>', txt) if '/venta/' not in u]
     hoy = datetime.date.today().isoformat()
     nuevas = []
+    mias = set()
     for ruta, rel in paginas:
         loc = SITIO + ruta
         fecha = hoy if (rel in cambios or loc not in previas) else previas[loc]
         nuevas.append('  <url><loc>%s</loc><lastmod>%s</lastmod></url>' % (loc, fecha))
+        mias.add('<loc>%s</loc>' % loc)
+    # /promociones/ la escribe este generador pero su URL no lleva /venta/,
+    # asi que sobrevivia en «otras» y volvia a entrar en «nuevas»: dos veces
+    # la misma URL en el sitemap. Se queda la que acabamos de calcular.
+    otras = [u for u in otras if not any(m in u for m in mias)]
     gp.escribir('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n'
                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
                 + '\n'.join(otras + nuevas) + '\n</urlset>\n', cambios)
