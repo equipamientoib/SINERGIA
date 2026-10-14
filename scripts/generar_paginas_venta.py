@@ -208,14 +208,21 @@ except Exception:
                 'incluye': 'Manual de usuario, certificado de garantía y capacitación de uso.'}
 
 
-def condiciones(p):
-    """Lo que un comprador de hospital necesita saber ANTES de pedir precio.
+# Mientras las fichas técnicas no estén completas, la página no las
+# ofrece. Cambiar a True y volver a generar para publicarlas.
+MOSTRAR_FICHA_PDF = False
 
-    Garantía, plazo de entrega, forma de pago y qué incluye ya estaban en
-    data/terminos-venta.json, pero solo se veían dentro de la cotización:
-    es decir, después de que el cliente se decidiera a escribir. Quien
-    compara proveedores no llega hasta ahí. Ahora van en la ficha, que es
-    donde se decide la compra.
+
+def condiciones(p):
+    """Garantía, entrega, pago y qué incluye, como una pestaña más.
+
+    Estos datos ya estaban en data/terminos-venta.json, pero solo se veían
+    dentro de la cotización: es decir, después de que el cliente se
+    decidiera a escribir. Quien compara proveedores no llega hasta ahí.
+
+    Van en una pestaña y no en la columna del precio: ahí alargaban la
+    primera pantalla y empujaban las pestañas y los equipos de abajo,
+    repitiendo el mismo espacio dos veces.
     """
     con_stock = isinstance(p.get('stock'), (int, float)) and p['stock'] > 0
     filas = [
@@ -224,8 +231,12 @@ def condiciones(p):
         ('Pago', TERMINOS.get('pago') or ''),
         ('Incluye', TERMINOS.get('incluye') or ''),
     ]
-    return ('<dl class="cond">%s</dl>' % ''.join(
-        '<div><dt>%s</dt><dd>%s</dd></div>' % (e(k), e(v)) for k, v in filas if v))
+    cuerpo = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(v)) for k, v in filas if v)
+    if not cuerpo:
+        return ''
+    return ('<table>%s</table>'
+            '<p class="nota-p">Las condiciones definitivas van escritas en la cotización, '
+            'con el plazo contado desde la orden de compra.</p>' % cuerpo)
 
 
 def pdf_venta(pid):
@@ -340,10 +351,12 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
         caja = '<div class="precio"><div class="pc-fila"><b class="pc-monto consulta">Consultar precio</b>%s</div></div>' % badge
-    # Ficha técnica: activa si ya existe el PDF; si no, el espacio listo
+    # Ficha técnica: todavía no se ofrece. El PDF se sigue generando, pero
+    # le falta información del fabricante y publicarlo a medias resta más
+    # de lo que suma. Poner MOSTRAR_FICHA_PDF = True cuando esté completa.
     pdf = pdf_venta(p['id'])
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
-    if os.path.exists(ruta_pdf):
+    if MOSTRAR_FICHA_PDF and os.path.exists(ruta_pdf):
         kb = max(1, round(os.path.getsize(ruta_pdf) / 1024))
         doc = f'''<div class="doc">
           <span class="doc-ico" aria-hidden="true">PDF</span>
@@ -351,11 +364,13 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
           <button type="button" class="btn doc-ver" data-ver="{pdf}" data-pdf="{pdf}" data-titulo="Ficha técnica — {e(p['nom'])}">Ver</button>
           <a class="btn fill doc-dl" href="{pdf}" download>Descargar</a>
         </div>'''
-    else:
+    elif MOSTRAR_FICHA_PDF:
         wa_f = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(
             'Hola Sinergia Biomédica, me envían la ficha técnica de: %s %s %s' % (p['nom'], p.get('marca', ''), p.get('modelo', ''))))
         doc = f'''<p class="doc-linea"><span class="doc-mini" aria-hidden="true">PDF</span>
           Ficha técnica en preparación · <a href="{wa_f}" target="_blank" rel="noopener">pídela por WhatsApp</a></p>'''
+    else:
+        doc = ''
 
     # Pestañas: Descripción · Parámetros técnicos · Código NTS
     areas = ''.join('<li>%s</li>' % e(a) for a in p.get('areas') or [])
@@ -381,7 +396,11 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
                 '<tr><td colspan="2" class="car">%s</td></tr>' % e(c) for c in car)
         pie = ('<p class="nota-p fuente">Los parámetros completos del fabricante van en la ficha técnica, '
                'que te enviamos con la cotización.</p>')
-    pest = [('Descripción', desc), ('Parámetros técnicos', '<table>%s</table>%s' % (filas, pie))]
+    pest = [('Descripción', desc)]
+    cond = condiciones(p)
+    if cond:
+        pest.append(('Garantía y entrega', cond))
+    pest.append(('Parámetros técnicos', '<table>%s</table>%s' % (filas, pie)))
     if p.get('expediente') or p.get('clave'):
         exp = '<table>'
         if p.get('clave'):
@@ -423,7 +442,6 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
           <a class="btn" href="{wa}" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
         </div>
         {doc}
-        {condiciones(p)}
       </div>
     </article>
     <div class="pest" data-tabs>
