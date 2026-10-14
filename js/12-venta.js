@@ -573,16 +573,19 @@ function vCarritoEngancha(){
   if(window.SBCarrito) setTimeout(() => { SBCarrito.enganchar(); SBCarrito.pintar(); }, 0);
 }
 
-/* Los equipos en bloques por categoría, con su título y su cuenta. El
-   orden de las categorías es el del catálogo, no el alfabético: lo decide
-   la hoja. */
+/* Los equipos en bloques por categoría, con su título y su cuenta.
+
+   Todo va de más barato a más caro, en los dos niveles: los equipos
+   dentro de cada bloque, y los bloques entre sí según el equipo más caro
+   que tenga cada uno. Así el comprador entra por lo accesible y los
+   equipos de seis cifras quedan al final, donde se llega con la decisión
+   ya tomada. */
 function vtPorCategoria(l){
-  const orden = (VENTA.categorias || []).map(c => c.id);
   const g = new Map();
-  l.forEach(p => { const k = orden.indexOf(p.cat) >= 0 ? p.cat : '_otros';
+  l.forEach(p => { const k = vCat(p.cat) ? p.cat : '_otros';
                    if(!g.has(k)) g.set(k, []); g.get(k).push(p); });
-  const claves = [...g.keys()].sort((a, b) =>
-    (orden.indexOf(a) < 0 ? 999 : orden.indexOf(a)) - (orden.indexOf(b) < 0 ? 999 : orden.indexOf(b)));
+  const tope = k => g.get(k).reduce((m, p) => Math.max(m, Number(p.precio) || 0), 0) || Infinity;
+  const claves = [...g.keys()].sort((a, b) => tope(a) - tope(b));
   return claves.map(k => {
     const c = vCat(k), ps = g.get(k);
     return `<section class="vt-cat" id="vtc-${vEsc(k)}">

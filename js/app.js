@@ -842,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=8aac5818';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=f8cb85e3';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=8aac5818';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=f8cb85e3';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=8aac5818','js/06-tablero.js?v=8aac5818'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=f8cb85e3','js/06-tablero.js?v=f8cb85e3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=8aac5818'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=f8cb85e3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2334,16 +2334,19 @@ function vCarritoEngancha(){
   if(window.SBCarrito) setTimeout(() => { SBCarrito.enganchar(); SBCarrito.pintar(); }, 0);
 }
 
-/* Los equipos en bloques por categoría, con su título y su cuenta. El
-   orden de las categorías es el del catálogo, no el alfabético: lo decide
-   la hoja. */
+/* Los equipos en bloques por categoría, con su título y su cuenta.
+
+   Todo va de más barato a más caro, en los dos niveles: los equipos
+   dentro de cada bloque, y los bloques entre sí según el equipo más caro
+   que tenga cada uno. Así el comprador entra por lo accesible y los
+   equipos de seis cifras quedan al final, donde se llega con la decisión
+   ya tomada. */
 function vtPorCategoria(l){
-  const orden = (VENTA.categorias || []).map(c => c.id);
   const g = new Map();
-  l.forEach(p => { const k = orden.indexOf(p.cat) >= 0 ? p.cat : '_otros';
+  l.forEach(p => { const k = vCat(p.cat) ? p.cat : '_otros';
                    if(!g.has(k)) g.set(k, []); g.get(k).push(p); });
-  const claves = [...g.keys()].sort((a, b) =>
-    (orden.indexOf(a) < 0 ? 999 : orden.indexOf(a)) - (orden.indexOf(b) < 0 ? 999 : orden.indexOf(b)));
+  const tope = k => g.get(k).reduce((m, p) => Math.max(m, Number(p.precio) || 0), 0) || Infinity;
+  const claves = [...g.keys()].sort((a, b) => tope(a) - tope(b));
   return claves.map(k => {
     const c = vCat(k), ps = g.get(k);
     return `<section class="vt-cat" id="vtc-${vEsc(k)}">
