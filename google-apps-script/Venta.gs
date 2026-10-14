@@ -54,13 +54,6 @@ function num_(v) {
   return f === Math.floor(f) ? Math.floor(f) : f;
 }
 
-function num_(v) {
-  if (v === null || v === undefined || v === '') return null;
-  var f = Number(String(v).replace('%', '').replace(',', '.'));
-  if (isNaN(f)) return null;
-  return f === Math.floor(f) ? Math.floor(f) : f;
-}
-
 function fecha_(v) {
   if (v instanceof Date) {
     var d = v.getDate(), m = v.getMonth() + 1, y = v.getFullYear();
@@ -153,10 +146,12 @@ function json_(obj) {
 }
 
 // ═════════════════════ venta ═════════════════════
-/* Arriba de los encabezados van dos parámetros:
+/* Arriba de los encabezados van los parámetros:
      A1 margen      B1 35          (% que se suma al precio del proveedor)
      A2 actualizado B2 06/10/2026  (fecha de la última revisión, cada lunes)
      A3 stock %     B3 30          (% del stock del proveedor que se muestra)
+     A4 instalacion desde      B4 10000   (utilidad desde la que va incluida)
+     A5 pasaje completo desde  B5 20000   (utilidad desde la que el pasaje va entero)
    Solo se envían a la web las filas con publicar = SI y solo las columnas
    públicas: el precio y el stock del proveedor NO salen de aquí.        */
 function hojaVenta_(ss) {
@@ -173,11 +168,17 @@ function venta_() {
   var fotoCod = fotosPorCodigo_(libro);
   var vals = sh.getDataRange().getValues();
   var margen = 35, actualizado = '', fh = -1, soloStock = true;
+  /* Instalación incluida: se decide con la UTILIDAD de cada equipo (lo que
+     queda después de pagarle al proveedor), no con el precio de venta. El
+     número nunca sale de aquí: a la web solo viaja inst = 1 o 2. */
+  var instDesde = 10000, instPasaje = 20000;
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
     var et = s_(vals[k][0]).toLowerCase();
     if (et === 'margen' && num_(vals[k][1]) !== null) margen = num_(vals[k][1]);
     if (et === 'solo con stock' && s_(vals[k][1]).toUpperCase() === 'NO') soloStock = false;
     if (et === 'actualizado') actualizado = fecha_(vals[k][1]);
+    if (et === 'instalacion desde' && num_(vals[k][1]) !== null) instDesde = num_(vals[k][1]);
+    if (et === 'pasaje completo desde' && num_(vals[k][1]) !== null) instPasaje = num_(vals[k][1]);
     if (et === 'id') { fh = k; break; }
   }
   if (fh < 0) return null;
@@ -211,6 +212,19 @@ function venta_() {
     if (num_(r.ranking)) p.ranking = num_(r.ranking);      // puesto del tipo en el estudio de compras públicas
     if (precio) p.precio = precio;
     if (stock !== null) p.stock = stock;
+
+    /* INSTALACIÓN INCLUIDA (lo único que la utilidad le cuenta a la web)
+         inst = 1   la instalación, la capacitación y el viaje van incluidos,
+                    con el pasaje cubierto hasta el tope de terminos-venta
+         inst = 2   además el pasaje va entero, aunque sea en avión
+       Viaja un 1 o un 2, nunca la utilidad ni el precio del proveedor: con
+       el flag solo se sabe que ese equipo deja buen margen, que es lo mismo
+       que ya dice la etiqueta de la ficha. Si la fila no tiene precio de
+       proveedor no se manda nada y la web usa su regla por monto.      */
+    if (precio && prov !== null && instDesde > 0) {
+      var util = precio - prov;
+      p.inst = util >= instPasaje ? 2 : (util >= instDesde ? 1 : 0);
+    }
 
     /* PROMOCIONES (tres columnas que se llenan a mano en la hoja):
          precio_promo   el precio rebajado que paga el cliente
@@ -423,10 +437,14 @@ function matchModelo_(marca, modelo, nombre, lista) {
 function hojaProveedor_(ss, lista, tc) {
   var sh = ss.getSheetByName('Proveedor') || ss.insertSheet('Proveedor');
   sh.clear();
-  var filas = [['codigo', 'descripcion', 'modelo_proveedor', 'stock', 'precio_usd', 'precio_soles', 'imagen']];
+  /* «enlace» es la dirección de la ficha del equipo en el portal. El portal
+     identifica cada producto con un código cifrado (?cd=…) y no con el
+     101.127, así que sin guardarlo aquí no hay manera de volver a abrir su
+     ficha, que es donde están los documentos. */
+  var filas = [['codigo', 'descripcion', 'modelo_proveedor', 'stock', 'precio_usd', 'precio_soles', 'imagen', 'enlace']];
   lista.slice().sort(function (a, b) { return a.dn < b.dn ? -1 : 1; }).forEach(function (x) {
     filas.push(["'" + x.c, x.d || '', x.mo || '', Number(x.s) || 0, Number(x.p) || '',
-      tc && Number(x.p) ? Math.round(Number(x.p) * tc * 100) / 100 : '', x.img || '']);
+      tc && Number(x.p) ? Math.round(Number(x.p) * tc * 100) / 100 : '', x.img || '', x.u || '']);
   });
   sh.getRange(1, 1, filas.length, filas[0].length).setValues(filas);
   sh.getRange(1, 1, 1, filas[0].length).setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36');
@@ -742,12 +760,30 @@ function docsPorCodigo_(ss) {
   return m;
 }
 
+/* Códigos que YA se revisaron, tengan documentos o no. Es distinto de
+   docsPorCodigo_, que solo devuelve los que tienen enlace: la fila
+   «NINGUNO» de un equipo sin documentos no trae enlace, así que allí no
+   aparecía y el equipo volvía a la lista de pendientes en cada corrida.
+   Resultado: se le preguntaba al portal una y otra vez por los mismos 20
+   equipos y la lista nunca bajaba de 538. */
+function docsVistos_(ss) {
+  var sh = ss.getSheetByName('Documentos'), m = {};
+  if (!sh) return m;
+  sh.getDataRange().getValues().slice(1).forEach(function (r) {
+    var c = codAtl_(r[0]), t = s_(r[1]).toUpperCase();
+    /* Solo las marcas cierran el equipo. Una fila de documento no basta:
+       puede faltarle el registro sanitario, que se pide aparte. */
+    if (c && (t === 'NINGUNO' || t === 'REVISADO')) m[c] = 1;
+  });
+  return m;
+}
+
 /* Equipos a los que todavía no se les ha buscado documentos. Mismo orden
    que las fotos: primero los publicados, luego los que tienen stock. */
 function atlDocsPendientes_() {
   var ss = SpreadsheetApp.openById(VENTA_ID), sh = hojaVenta_(ss), pv = ss.getSheetByName('Proveedor');
   if (!pv) return [];
-  var hechos = docsPorCodigo_(ss);
+  var hechos = docsVistos_(ss);
   var vals = sh.getDataRange().getValues(), fh = -1, prio = {};
   for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
   var heads = vals[fh].map(function (h) { return s_(h); }), col = function (n) { return heads.indexOf(n); };
@@ -755,41 +791,71 @@ function atlDocsPendientes_() {
     var cd = codAtl_(vals[i][col('codigo_proveedor')]); if (!cd) continue;
     if (s_(vals[i][col('publicar')]).toUpperCase() === 'SI') prio[cd] = 1;
   }
+  /* La columna «enlace» puede no existir todavía (hojas de antes de que se
+     guardara): se busca por nombre y, si no está, se manda vacío. */
+  var pvVals = pv.getDataRange().getValues();
+  var cEnl = (pvVals[0] || []).map(function (h) { return s_(h); }).indexOf('enlace');
   var out = [];
-  pv.getDataRange().getValues().slice(1).forEach(function (r) {
+  pvVals.slice(1).forEach(function (r) {
     var cd = codAtl_(r[0]);
     if (!cd || hechos[cd]) return;
-    out.push({ c: cd, p: prio[cd] || (Number(r[3]) > 0 ? 2 : 3) });
+    out.push({ c: cd, p: prio[cd] || (Number(r[3]) > 0 ? 2 : 3), u: cEnl >= 0 ? s_(r[cEnl]) : '' });
   });
   out.sort(function (a, b) { return a.p - b.p; });
   return out;
 }
 
+/* Un equipo puede traer varios documentos con el MISMO tipo: la ficha
+   técnica del 101.127 trae «CATALOGO ORIGINAL» y «EE.TT. COMPLETA MARCA»,
+   los dos con tipo OTR. Descartando por tipo solo se guardaba el primero,
+   y los dos archivos salían con el mismo nombre. Se compara tipo + nombre,
+   y el archivo se llama como el documento. */
 function atlGuardarDoc_(d) {
   var cd = codAtl_(d.c), tipo = s_(d.t).toUpperCase();
   if (!cd || !tipo) return { ok: false, motivo: 'sin código o tipo' };
   var ss = SpreadsheetApp.openById(VENTA_ID);
+  var titulo = s_(d.n) || DOC_NOMBRES[tipo] || 'Documento';
   var ya = docsPorCodigo_(ss)[cd] || [];
-  for (var i = 0; i < ya.length; i++) if (ya[i].t === tipo) return { ok: true, repetido: true };
-  var nombre = cd.slice(0, 3) + '.' + cd.slice(3) + ' - ' + (DOC_NOMBRES[tipo] || tipo) + '.pdf';
+  for (var i = 0; i < ya.length; i++) {
+    if (ya[i].t === tipo && nrmDoc_(ya[i].n) === nrmDoc_(titulo)) return { ok: true, repetido: true };
+  }
+  var nombre = cd.slice(0, 3) + '.' + cd.slice(3) + ' - ' + limpiarNombre_(titulo) + '.pdf';
   var file = carpetaDocs_().createFile(Utilities.newBlob(Utilities.base64Decode(d.b64), d.mime || 'application/pdf', nombre));
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), tipo,
-                           s_(d.n) || DOC_NOMBRES[tipo] || 'Documento',
+  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), tipo, titulo,
                            'https://drive.google.com/file/d/' + file.getId() + '/view', new Date()]);
   limpiarCache();
   return { ok: true };
 }
 
-/* Un equipo SIN documentos también se anota, con tipo «NINGUNO», para no
-   volver a preguntarle al portal en cada corrida. */
-function atlSinDocs_(cod) {
+function nrmDoc_(v) { return s_(v).toUpperCase().replace(/\s+/g, ' ').trim(); }
+
+/* Para el nombre del archivo en Drive: sin barras ni dos puntos. */
+function limpiarNombre_(v) {
+  return s_(v).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) || 'Documento';
+}
+
+/* Dos marcas, y las dos cierran el equipo para que no se le vuelva a
+   preguntar al portal:
+     NINGUNO    se le miró todo y no tiene ningún documento
+     REVISADO   se le miró todo y lo que había ya está guardado
+   La marca se pone SOLO cuando el portal contestó las dos partes (ficha
+   técnica y registro sanitario). Si una falló, el equipo se queda sin
+   marca y vuelve a la cola otro día: los documentos que sí se bajaron no
+   se repiten porque atlGuardarDoc_ los reconoce. */
+function atlMarcaDocs_(cod, marca) {
   var cd = codAtl_(cod); if (!cd) return { ok: false };
   var ss = SpreadsheetApp.openById(VENTA_ID);
-  if ((docsPorCodigo_(ss)[cd] || []).length) return { ok: true, repetido: true };
-  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), 'NINGUNO', '', '', new Date()]);
+  var filas = hojaDocs_(ss).getDataRange().getValues();
+  for (var i = 1; i < filas.length; i++) {
+    var t = s_(filas[i][1]).toUpperCase();
+    if (codAtl_(filas[i][0]) === cd && (t === 'NINGUNO' || t === 'REVISADO')) return { ok: true, repetido: true };
+  }
+  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), marca, '', '', new Date()]);
   return { ok: true };
 }
+function atlSinDocs_(cod) { return atlMarcaDocs_(cod, 'NINGUNO'); }
+function atlRevisado_(cod) { return atlMarcaDocs_(cod, 'REVISADO'); }
 
 function atlGuardarFoto_(f) {
   var cd = codAtl_(f.c);
@@ -843,6 +909,9 @@ function doPost(e) {
   }
   if (datos.doc) {
     try { return json_(atlGuardarDoc_(datos.doc)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
+  }
+  if (datos.revisado) {
+    try { return json_(atlRevisado_(datos.revisado)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
   }
   if (datos.sinDoc) {
     try { return json_(atlSinDocs_(datos.sinDoc)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }

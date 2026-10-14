@@ -842,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=f8cb85e3';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=c4493f37';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=f8cb85e3';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=c4493f37';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=f8cb85e3','js/06-tablero.js?v=f8cb85e3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=c4493f37','js/06-tablero.js?v=c4493f37'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=f8cb85e3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=c4493f37'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -3829,29 +3829,50 @@ function vcTarifas(){
 
 /* Cuánto del viaje corre por cuenta de Sinergia.
 
-   La idea es simple: cuando el margen del pedido es grande, regalar el
-   viaje compra la venta; cuando es chico, se la come. Como la web nunca
-   ve el margen (ni debe: con el margen se deduce lo que cuesta el equipo
-   en el proveedor), la regla mira el monto del pedido, que es su
-   equivalente público.
+   La idea es simple: cuando la utilidad del pedido es grande, regalar el
+   viaje compra la venta; cuando es chica, se la come.
 
-   Dos escalones, porque el pasaje de avión no es el de un bus:
-     · desde S/ 40 000  → instalación, capacitación y viaje incluidos,
-       con el pasaje cubierto hasta topePasaje; si la ciudad es más cara
-       (avión), el cliente paga solo la diferencia.
-     · desde S/ 80 000  → el pasaje va completo, también en avión.
+   Quien decide es la hoja, no la web. La web nunca ve la utilidad (con
+   ella se deduciría lo que cuesta el equipo en el proveedor): lo que le
+   llega de cada equipo es un número chico, p.inst, que ya trae decidido
+   el escalón:
+     · inst = 1  → instalación, capacitación y viaje incluidos, con el
+       pasaje cubierto hasta topePasaje; si la ciudad es más cara (avión),
+       el cliente paga solo la diferencia.
+     · inst = 2  → además el pasaje va completo, también en avión.
+     · inst = 0  → ese equipo no da para regalar el viaje.
+   Manda el equipo más alto del pedido: basta con que uno lo alcance.
+
+   Si ningún equipo trae inst (catálogo viejo, o filas sin precio de
+   proveedor), se usa la regla de siempre por monto del pedido, que es el
+   equivalente público de la utilidad.
+
    Lo que pase de los días o las personas incluidas se cobra normal: sin
    ese borde, «incluido» sería un cheque en blanco. */
-function vcIncluido(base, s, T){
+function vcNivelInst(items){
+  let hay = false, n = 0;
+  (items || []).forEach(x => {
+    const v = x && x.p ? x.p.inst : undefined;
+    if(v === undefined || v === null) return;
+    hay = true;
+    if(Number(v) > n) n = Number(v);
+  });
+  return hay ? n : null;              // null = el catálogo no lo dice
+}
+function vcIncluido(base, s, T, nivel){
   const R = VCOT_TERM.instalacionIncluida || {};
-  if(!R.desde || base < R.desde || !s.ciudad) return null;
+  if(!R.desde || !s.ciudad) return null;
+  if(nivel === null || nivel === undefined){ if(base < R.desde) return null; }
+  else if(!nivel) return null;
   const diasC = Math.min(s.dias, Math.max(0, Number(R.diasIncluidos) || 0));
   const persC = Math.min(s.personas, Math.max(0, Number(R.personasIncluidas) || 0));
   if(!diasC || !persC) return null;
   const nochesC = Math.max(0, Math.min(s.noches, diasC - 1));
   const unitario = s.personas ? s.pasaje / s.personas : 0;
-  const tope = base >= (R.desdePasajeCompleto || Infinity) ? unitario
-             : Math.min(unitario, Number(R.topePasaje) || 0);
+  const entero = (nivel === null || nivel === undefined)
+    ? base >= (R.desdePasajeCompleto || Infinity)
+    : nivel >= 2;
+  const tope = entero ? unitario : Math.min(unitario, Number(R.topePasaje) || 0);
   const cub = {
     personal: (T.personalDia || 0) * diasC * persC,
     comida: (T.viaticoDia || 0) * diasC * persC,
@@ -3865,7 +3886,7 @@ function vcIncluido(base, s, T){
   return cub.total > 0 ? cub : null;
 }
 
-function vcServicio(base){
+function vcServicio(base, items){
   const T = vcTarifas();
   const dias = Math.max(1, Number(VCOT_SRV.dias) || 1);
   const per = Math.max(1, Number(VCOT_SRV.personas) || 1);
@@ -3881,7 +3902,7 @@ function vcServicio(base){
   const s = {hay: true, ciudad: ciudad, falta: !ciudad, dias: dias, personas: per, noches: noches,
              personal: personal, pasaje: pasaje, comida: comida, hospedaje: hospedaje,
              viatico: viatico, bruto: personal + pasaje + viatico};
-  s.inc = vcIncluido(Number(base) || 0, s, T);
+  s.inc = vcIncluido(Number(base) || 0, s, T, vcNivelInst(items));
   s.dto = s.inc ? Math.min(s.inc.total, s.bruto) : 0;
   s.total = s.bruto - s.dto;
   return s;
@@ -3921,7 +3942,7 @@ function vcCalcular(){
     .map(x => ({p: x.p, q: x.q, foto: x.foto, precio: Number(x.p.precio || 0),
                 total: Number(x.p.precio || 0) * x.q}));
   const equipos = items.reduce((s, x) => s + x.total, 0);
-  const srv = vcServicio(equipos);
+  const srv = vcServicio(equipos, items);
   const sinPrecio = items.filter(x => !x.precio).length;
   return {items, equipos, srv, total: equipos + srv.total, sinPrecio,
           unidades: items.reduce((s, x) => s + x.q, 0)};

@@ -145,8 +145,14 @@
       var al = (t.match(/class="alert[^"]*"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '';
       var src = (t.match(/<img[^>]*src="([^"]+)"/) || [])[1] || '';
       try { src = src && !/img_default/.test(src) ? new URL(src, location.href).href : ''; } catch (e) { src = ''; }
+      /* Enlace a la ficha del equipo. El portal identifica cada producto con
+         un código cifrado (?cd=…), no con el 101.127, así que sin guardar
+         este enlace no hay forma de volver a abrir su ficha después. Y es en
+         esa ficha donde están los documentos. */
+      var ur = (t.match(/href="([^"]*product-details[^"]*)"/) || [])[1] || '';
+      try { ur = ur ? new URL(ur.replace(/&amp;/g, '&'), location.href).href : ''; } catch (e) { ur = ''; }
       var k = cod6(m[1]); if (!mapa[k]) nuevos++;
-      mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src };
+      mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src, u: ur };
     });
     return { nuevos: nuevos, tarjetas: /card card-product/.test(html || '') ? trozos.length : nuevos };
   }
@@ -167,19 +173,30 @@
   function conLimite(p, ms) {
     return Promise.race([p, new Promise(function (_, no) { setTimeout(function () { no(new Error('tiempo')); }, ms); })]);
   }
-  function xhr(metodo, url, cuerpo, ms) {
+  /* Devuelve {estado, texto}. El estado importa: onload también se dispara
+     con un 404 o un 500, así que sin mirarlo una página de error se leía
+     como si fuera la respuesta buena. */
+  function xhrFull(metodo, url, cuerpo, ms, cab) {
     return new Promise(function (ok, no) {
       var x = new XMLHttpRequest();
       x.open(metodo, url, true);
       x.timeout = ms;
+      var tipoPuesto = false;
+      if (cab) for (var k in cab) if (Object.prototype.hasOwnProperty.call(cab, k)) {
+        x.setRequestHeader(k, cab[k]);
+        if (k.toLowerCase() === 'content-type') tipoPuesto = true;
+      }
       /* Solo para texto: a un FormData hay que dejar que el navegador ponga
          su propio Content-Type, que lleva el «boundary». */
-      if (cuerpo && typeof cuerpo === 'string') x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-      x.onload = function () { ok(x.responseText); };
+      if (!tipoPuesto && cuerpo && typeof cuerpo === 'string') x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
+      x.onload = function () { ok({ estado: x.status, texto: x.responseText }); };
       x.onerror = function () { no(new Error('red')); };
       x.ontimeout = function () { no(new Error('tiempo')); };
       x.send(cuerpo || null);
     });
+  }
+  function xhr(metodo, url, cuerpo, ms) {
+    return xhrFull(metodo, url, cuerpo, ms).then(function (r) { return r.texto; });
   }
   async function pedirJSON(url) {
     var errores = [];
@@ -267,6 +284,114 @@
     return ult;
   }
 
+  /* ── Blindaje ──────────────────────────────────────────────────────
+     Un equipo marcado como «sin documentos» no se vuelve a consultar
+     NUNCA. Así que esa marca solo se pone cuando hay certeza, y la
+     certeza es que el portal haya devuelto el panel de documentos.
+
+     La primera corrida real devolvió 0 de 20 en equipos que sí tienen
+     documentos en el portal: la consulta no le llegó como él la espera,
+     y los 20 se iban a perder. De ahí estas tres reglas:
+
+       1. Se prueban varias formas de preguntar hasta que una devuelva el
+          panel. La que funciona se recuerda y se usa primero la próxima
+          vez, así el portal puede cambiar sin que haya que tocar nada.
+       2. Ante la duda NO se anota nada. Ni la respuesta vacía, ni el
+          error del servidor, ni la pantalla de ingreso: se reintenta.
+       3. Si los primeros equipos fallan, la corrida se detiene sola en
+          vez de gastar la tanda, y muestra lo que contestó el portal
+          para poder arreglarlo de raíz.                                */
+  function esPanel(t) {
+    t = String(t || '');
+    if (/descargarDoc\(/.test(t)) return true;             // trae documentos: seguro
+    if (t.replace(/\s+/g, '').length < 20) return false;   // respuesta vacía
+    if (/iniciar\s*sesi|ingrese\s*su|login|password|no\s*autorizado|sesi[oó]n[^<]{0,30}(expir|caduc|finaliz|cerrad)/i.test(t)) return false;
+    /* Sin documentos, pero contestando: el panel tiene que hablar de
+       archivos. Si no dice nada de eso, no sabemos qué nos devolvió y
+       preferimos volver a preguntar otro día. */
+    return /archivo|adjunt|document|descarg|no\s*se\s*(encontr|hall)|sin\s*registr/i.test(t);
+  }
+
+  /* Formas de pedir el panel. La primera es exactamente la del portal:
+     jQuery manda FormData y añade solo él la cabecera X-Requested-With,
+     que muchos controladores en PHP exigen para contestar. Esa cabecera
+     es lo que le faltaba a la primera corrida. */
+  var FORMAS_DOCS = [
+    { n: 'formdata+ajax',        multi: true,  punto: true,  ajax: true },
+    { n: 'formdata',             multi: true,  punto: true,  ajax: false },
+    { n: 'urlencoded',           multi: false, punto: true,  ajax: true },
+    { n: 'urlencoded-sin-punto', multi: false, punto: false, ajax: true }
+  ];
+  function formaRecordada() {
+    try { return localStorage.getItem('sbAtlFormaDocs') || ''; } catch (e) { return ''; }
+  }
+  /* El camino bueno: abrir la ficha del equipo, igual que una persona.
+
+     La ficha YA trae los documentos dentro, en el bloque «divDocProd»: no
+     hace falta pedirle nada aparte al portal. Lo que no se puede es
+     adivinar su dirección, porque el portal identifica cada producto con
+     un código cifrado (?cd=…) y no con el 101.127; por eso el enlace se
+     guarda en la pestaña «Proveedor» cada vez que se actualizan precios. */
+  function fichaValida(t) {
+    t = String(t || '');
+    return /divDocProd|id="technicalSheet"/.test(t);
+  }
+  function docsDeFicha(html) {
+    var t = String(html || ''), i = t.indexOf('divDocProd');
+    if (i < 0) return [];
+    var j = t.indexOf('id="healthRegistration"', i);
+    return leerDocs(t.slice(i, j > i ? j : i + 30000));
+  }
+  async function pedirFicha(url) {
+    var r;
+    try { r = await xhrFull('GET', url, null, 30000, { 'X-Requested-With': 'XMLHttpRequest' }); }
+    catch (e) { return { ok: false, ultimo: { forma: 'ficha', estado: 0, texto: String((e && e.message) || e) } }; }
+    if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto) };
+    return { ok: false, ultimo: { forma: 'ficha', estado: r.estado, texto: r.texto } };
+  }
+
+  /* accion: 'viewArchivosProd' (ficha técnica, catálogo del fabricante) o
+     'viewRRSSProd' (registro sanitario), que son dos consultas distintas.
+     vacioVale: para el registro sanitario, una respuesta vacía con código
+     200 significa «este equipo no tiene registro», y es una respuesta
+     válida. Solo se acepta cuando ya sabemos que la sesión está viva. */
+  async function pedirPanel(cod, accion, vacioVale) {
+    accion = accion || 'viewArchivosProd';
+    var visible = cod.slice(0, 3) + '.' + cod.slice(3);
+    var orden = FORMAS_DOCS.slice(), buena = formaRecordada();
+    if (buena) orden.sort(function (a, b) { return (b.n === buena) - (a.n === buena); });
+    var ultimo = null;
+    for (var i = 0; i < orden.length && !parar; i++) {
+      var f = orden[i], cab = {}, cuerpo;
+      var cp = f.punto ? visible : cod;
+      if (f.multi) {
+        cuerpo = new FormData();
+        cuerpo.append('tipoAccion', accion);
+        cuerpo.append('codProd', cp);
+      } else {
+        cuerpo = 'tipoAccion=' + accion + '&codProd=' + encodeURIComponent(cp);
+        cab['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+      }
+      if (f.ajax) cab['X-Requested-With'] = 'XMLHttpRequest';
+      var r;
+      try {
+        r = await xhrFull('POST', '/controlador/controller_pedido.php', cuerpo, 30000, cab);
+      } catch (e) {
+        ultimo = { forma: f.n, estado: 0, texto: String((e && e.message) || e) };
+        continue;
+      }
+      ultimo = { forma: f.n, estado: r.estado, texto: r.texto };
+      var bien = r.estado >= 200 && r.estado < 400 &&
+        (esPanel(r.texto) || (vacioVale && String(r.texto || '').replace(/\s+/g, '').length < 20));
+      if (bien) {
+        try { localStorage.setItem('sbAtlFormaDocs', f.n); } catch (e) { }
+        return { ok: true, docs: leerDocs(r.texto) };
+      }
+      await espera(800);
+    }
+    return { ok: false, ultimo: ultimo };
+  }
+
   function leerDocs(html) {
     var partes = String(html || '').split('descargarDoc('), out = [], visto = {};
     for (var i = 1; i < partes.length; i++) {
@@ -293,52 +418,100 @@
     p.innerHTML = '📄 Hay <b>' + lista.length + '</b> equipos a los que no se les han buscado documentos ' +
       '(ficha técnica, catálogo del fabricante y <b>registro sanitario</b>). Se guardan una sola vez.';
     document.getElementById('sbAtlTxt').appendChild(p);
-    var lote = lista.slice(0, LOTE_DOCS);
+    /* Los documentos viven en la ficha de cada equipo, y la dirección de esa
+       ficha se guarda al actualizar precios. Sin ninguna guardada no hay por
+       dónde empezar: se avisa en vez de gastar la tanda contra el portal. */
+    if (!lista.some(function (x) { return x.u; })) {
+      p.innerHTML += '<br><br><span style="color:#f0c674">Para buscar documentos hace falta primero <b>actualizar precios y stock</b> una vez: ' +
+        'ahí se guarda la dirección de la ficha de cada equipo, que es donde el portal tiene los documentos. ' +
+        'Hazlo y vuelve a tocar el favorito.</span>';
+      return;
+    }
+    var lote = lista.filter(function (x) { return x.u; }).slice(0, LOTE_DOCS);
     if (lista.length > LOTE_DOCS) p.innerHTML += '<br>Se revisan de ' + LOTE_DOCS + ' en ' + LOTE_DOCS + ': vuelve a tocar el favorito otro día para seguir.';
     boton('Buscar documentos de ' + lote.length + ' equipos', function () { this.remove(); bajarDocs(lote); });
   }
 
+  /* Un pedacito de lo que contestó el portal, para poder enseñarlo sin que
+     el navegador intente dibujarlo. */
+  function recorte(t) {
+    return String(t || '').replace(/\s+/g, ' ').trim().slice(0, 200)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
   async function bajarDocs(lista) {
-    var docs = 0, equipos = 0, sin = 0, fallas = 0;
+    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null;
     for (var i = 0; i < lista.length && !parar; i++) {
       var cod = lista[i].c, visible = cod.slice(0, 3) + '.' + cod.slice(3);
       txt('Buscando documentos: <b>' + (i + 1) + ' de ' + lista.length + '</b> equipos…<br>' +
         '<span style="color:#9be3b5">' + docs + ' documentos guardados</span>' +
         '<br><span style="color:#aeb4bc">No cierres esta pestaña.</span>');
       bar(i / lista.length);
-      var hallados = [];
-      try {
-        var fd = new FormData();
-        fd.append('tipoAccion', 'viewArchivosProd');
-        fd.append('codProd', visible);
-        var html = await xhr('POST', '/controlador/controller_pedido.php', fd, 30000);
-        hallados = leerDocs(html);
-      } catch (e) { fallas++; }
+      /* Un equipo tiene documentos en DOS sitios y hay que traerlos todos:
+           · ficha técnica y catálogo del fabricante → vienen en su página
+           · registro sanitario → una consulta aparte (viewRRSSProd)
+         Si cualquiera de las dos falla, el equipo NO se marca y vuelve a la
+         cola: así no se pierde el registro sanitario por un tropiezo. Lo
+         que ya se bajó no se vuelve a bajar, la hoja lo reconoce. */
+      var ft = lista[i].u ? await pedirFicha(lista[i].u) : { ok: false, ultimo: null };
+      if (!ft.ok) ft = await pedirPanel(cod, 'viewArchivosProd');
+      var rs = ft.ok ? await pedirPanel(cod, 'viewRRSSProd', true) : { ok: false, ultimo: null };
+      if (!ft.ok || !rs.ok) {
+        /* No se anota NADA: este equipo vuelve a la cola otro día. */
+        fallas++; seguidas++;
+        if (!diag) diag = (ft.ok ? rs.ultimo : ft.ultimo);
+        if (seguidas >= 3) { cortado = true; break; }
+        await espera(2000);
+        continue;
+      }
+      seguidas = 0;
+      var vistos = {}, hallados = [];
+      ft.docs.concat(rs.docs).forEach(function (d) {
+        var k = d.op + '|' + d.sis + '|' + d.tipo;
+        if (vistos[k]) return;
+        vistos[k] = 1; hallados.push(d);
+      });
       if (!hallados.length) {
         sin++;
         await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
       } else {
         equipos++;
+        var bajados = true;
         for (var j = 0; j < hallados.length && !parar; j++) {
           var h = hallados[j];
           try {
             var u = '/controlador/ctr_descargarDoc.php?op=' + encodeURIComponent(h.op) +
                     '&tipo=' + encodeURIComponent(h.sis) + '&t=' + encodeURIComponent(h.tipo);
-            var r = await fetch(new URL(u, location.href).href, { credentials: 'include' });
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            var b = await r.blob();
+            var resp = await fetch(new URL(u, location.href).href, { credentials: 'include' });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            var b = await resp.blob();
             if (b.size < 1000 || b.size > 2e7) throw new Error('vacío o enorme');
             await enviar(JSON.stringify({ k: CFG.k, doc: { c: cod, t: h.tipo, n: h.nom, mime: b.type || 'application/pdf', b64: await aBase64(b) } }));
             docs++;
-          } catch (e) { fallas++; }
+          } catch (e) { fallas++; bajados = false; }
           await espera(1500);
         }
+        /* Solo si bajaron TODOS: si uno falló, el equipo se queda sin marca
+           y mañana se reintenta lo que falta. */
+        if (bajados) await enviar(JSON.stringify({ k: CFG.k, revisado: cod }));
       }
       await espera(2000);
     }
     bar(1);
+    if (cortado || (fallas && !docs && !sin)) {
+      /* Nada que celebrar y, sobre todo, nada anotado: los equipos siguen
+         en la cola. Se muestra lo que contestó el portal para arreglarlo. */
+      txt('<b style="color:#f0c674">El portal no devolvió la lista de documentos.</b> ' +
+        'Me detuve a propósito para no marcar equipos por error: <b>no se anotó nada</b> ' +
+        'y los ' + lista.length + ' siguen en la cola para otro día.' +
+        '<br><br><span style="color:#aeb4bc">Primero entra de nuevo al portal (puede ser que la sesión se haya caído) ' +
+        'y vuelve a tocar el favorito. Si sigue igual, manda esta pantalla:</span>' +
+        (diag ? '<br><span style="color:#8f949b;font-size:12px">forma: ' + diag.forma +
+                ' · código: ' + diag.estado + '<br>' + recorte(diag.texto) + '</span>' : ''));
+      return;
+    }
     txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
-      (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron' : '') + '.' +
+      (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron (se reintentan otro día)' : '') + '.' +
       '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
   }
 

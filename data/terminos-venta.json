@@ -7,7 +7,7 @@
   "pago": "50 % con la orden de compra y 50 % contra entrega, salvo acuerdo distinto por escrito.",
   "incluye": "Manual de usuario, certificado de garantía y capacitación de uso en la entrega.",
   "instalacionIncluida": {
-    "_nota": "Cuando la cotizacion llega a estos montos (con IGV), la instalacion, la capacitacion y el viaje van incluidos. desde: 40000 equivale a un margen aproximado de S/ 10,000. desdePasajeCompleto: 80000, margen aproximado de S/ 20,000; de ahi para arriba el pasaje va completo aunque sea en avion. Debajo de ese monto se cubre el pasaje hasta topePasaje y el cliente paga la diferencia. diasIncluidos y personasIncluidas: lo que va sin costo; el dia o la persona de mas se cobran normal. Poner desde en 0 apaga la regla.",
+    "_nota": "Quien decide es la hoja, no la web: Venta.gs calcula la utilidad de cada equipo (precio publicado menos el del proveedor) y manda solo inst = 0, 1 o 2. inst 1: instalacion, capacitacion y viaje incluidos, con el pasaje cubierto hasta topePasaje y el cliente pagando la diferencia si la ciudad es mas cara. inst 2: ademas el pasaje va entero, aunque sea en avion. Los escalones de utilidad viven en la hoja, en las filas de arriba: 'instalacion desde' (10000) y 'pasaje completo desde' (20000). desde y desdePasajeCompleto son solo el respaldo por monto del pedido, para cuando ningun equipo trae inst (despliegue viejo o fila sin precio de proveedor); 40000 y 80000 equivalen a esas utilidades con el margen de 35%. diasIncluidos y personasIncluidas: lo que va sin costo; el dia o la persona de mas se cobran normal. Poner desde en 0 apaga la regla.",
     "desde": 40000,
     "topePasaje": 260,
     "desdePasajeCompleto": 80000,
