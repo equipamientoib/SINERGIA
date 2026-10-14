@@ -167,19 +167,30 @@
   function conLimite(p, ms) {
     return Promise.race([p, new Promise(function (_, no) { setTimeout(function () { no(new Error('tiempo')); }, ms); })]);
   }
-  function xhr(metodo, url, cuerpo, ms) {
+  /* Devuelve {estado, texto}. El estado importa: onload también se dispara
+     con un 404 o un 500, así que sin mirarlo una página de error se leía
+     como si fuera la respuesta buena. */
+  function xhrFull(metodo, url, cuerpo, ms, cab) {
     return new Promise(function (ok, no) {
       var x = new XMLHttpRequest();
       x.open(metodo, url, true);
       x.timeout = ms;
+      var tipoPuesto = false;
+      if (cab) for (var k in cab) if (Object.prototype.hasOwnProperty.call(cab, k)) {
+        x.setRequestHeader(k, cab[k]);
+        if (k.toLowerCase() === 'content-type') tipoPuesto = true;
+      }
       /* Solo para texto: a un FormData hay que dejar que el navegador ponga
          su propio Content-Type, que lleva el «boundary». */
-      if (cuerpo && typeof cuerpo === 'string') x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-      x.onload = function () { ok(x.responseText); };
+      if (!tipoPuesto && cuerpo && typeof cuerpo === 'string') x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
+      x.onload = function () { ok({ estado: x.status, texto: x.responseText }); };
       x.onerror = function () { no(new Error('red')); };
       x.ontimeout = function () { no(new Error('tiempo')); };
       x.send(cuerpo || null);
     });
+  }
+  function xhr(metodo, url, cuerpo, ms) {
+    return xhrFull(metodo, url, cuerpo, ms).then(function (r) { return r.texto; });
   }
   async function pedirJSON(url) {
     var errores = [];
@@ -267,18 +278,76 @@
     return ult;
   }
 
-  /* ¿El portal devolvió de verdad el panel de documentos?
+  /* ── Blindaje ──────────────────────────────────────────────────────
+     Un equipo marcado como «sin documentos» no se vuelve a consultar
+     NUNCA. Así que esa marca solo se pone cuando hay certeza, y la
+     certeza es que el portal haya devuelto el panel de documentos.
 
-     Si la sesión se cayó, o el portal cambió la consulta, la respuesta
-     llega vacía o es una pantalla de ingreso. Sin esta comprobación, cada
-     equipo de la tanda se anotaba como «no tiene ninguno» y no se le
-     volvía a preguntar NUNCA: 20 equipos perdidos por cada corrida rota.
-     Ante la duda no se anota nada y se vuelve a intentar otro día. */
-  function panelValido(html) {
-    var t = String(html || '');
-    if (/descargarDoc\(/.test(t)) return true;             // trae documentos
+     La primera corrida real devolvió 0 de 20 en equipos que sí tienen
+     documentos en el portal: la consulta no le llegó como él la espera,
+     y los 20 se iban a perder. De ahí estas tres reglas:
+
+       1. Se prueban varias formas de preguntar hasta que una devuelva el
+          panel. La que funciona se recuerda y se usa primero la próxima
+          vez, así el portal puede cambiar sin que haya que tocar nada.
+       2. Ante la duda NO se anota nada. Ni la respuesta vacía, ni el
+          error del servidor, ni la pantalla de ingreso: se reintenta.
+       3. Si los primeros equipos fallan, la corrida se detiene sola en
+          vez de gastar la tanda, y muestra lo que contestó el portal
+          para poder arreglarlo de raíz.                                */
+  function esPanel(t) {
+    t = String(t || '');
+    if (/descargarDoc\(/.test(t)) return true;             // trae documentos: seguro
     if (t.replace(/\s+/g, '').length < 20) return false;   // respuesta vacía
-    return !/iniciar\s*sesi|ingrese\s*su|login|password|no\s*autorizado|sesi[oó]n[^<]{0,30}(expir|caduc|finaliz|cerrad)/i.test(t);
+    if (/iniciar\s*sesi|ingrese\s*su|login|password|no\s*autorizado|sesi[oó]n[^<]{0,30}(expir|caduc|finaliz|cerrad)/i.test(t)) return false;
+    /* Sin documentos, pero contestando: el panel tiene que hablar de
+       archivos. Si no dice nada de eso, no sabemos qué nos devolvió y
+       preferimos volver a preguntar otro día. */
+    return /archivo|adjunt|document|descarg|no\s*se\s*(encontr|hall)|sin\s*registr/i.test(t);
+  }
+
+  /* Formas de pedir el panel, de la más probable a la menos. */
+  var FORMAS_DOCS = [
+    { n: 'formdata',            multi: true,  punto: true,  ajax: false },
+    { n: 'formdata+ajax',       multi: true,  punto: true,  ajax: true },
+    { n: 'urlencoded',          multi: false, punto: true,  ajax: true },
+    { n: 'urlencoded-sin-punto', multi: false, punto: false, ajax: true }
+  ];
+  function formaRecordada() {
+    try { return localStorage.getItem('sbAtlFormaDocs') || ''; } catch (e) { return ''; }
+  }
+  async function pedirPanel(cod) {
+    var visible = cod.slice(0, 3) + '.' + cod.slice(3);
+    var orden = FORMAS_DOCS.slice(), buena = formaRecordada();
+    if (buena) orden.sort(function (a, b) { return (b.n === buena) - (a.n === buena); });
+    var ultimo = null;
+    for (var i = 0; i < orden.length && !parar; i++) {
+      var f = orden[i], cab = {}, cuerpo;
+      var cp = f.punto ? visible : cod;
+      if (f.multi) {
+        cuerpo = new FormData();
+        cuerpo.append('tipoAccion', 'viewArchivosProd');
+        cuerpo.append('codProd', cp);
+      } else {
+        cuerpo = 'tipoAccion=viewArchivosProd&codProd=' + encodeURIComponent(cp);
+        cab['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+      }
+      if (f.ajax) cab['X-Requested-With'] = 'XMLHttpRequest';
+      var r;
+      try {
+        r = await xhrFull('POST', '/controlador/controller_pedido.php', cuerpo, 30000, cab);
+      } catch (e) {
+        ultimo = { forma: f.n, estado: 0, texto: String((e && e.message) || e) };
+        continue;
+      }
+      ultimo = { forma: f.n, estado: r.estado, texto: r.texto };
+      if (r.estado >= 200 && r.estado < 400 && esPanel(r.texto)) {
+        try { localStorage.setItem('sbAtlFormaDocs', f.n); } catch (e) { }
+        return { ok: true, docs: leerDocs(r.texto) };
+      }
+      await espera(800);
+    }
+    return { ok: false, ultimo: ultimo };
   }
 
   function leerDocs(html) {
@@ -312,26 +381,33 @@
     boton('Buscar documentos de ' + lote.length + ' equipos', function () { this.remove(); bajarDocs(lote); });
   }
 
+  /* Un pedacito de lo que contestó el portal, para poder enseñarlo sin que
+     el navegador intente dibujarlo. */
+  function recorte(t) {
+    return String(t || '').replace(/\s+/g, ' ').trim().slice(0, 200)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
   async function bajarDocs(lista) {
-    var docs = 0, equipos = 0, sin = 0, fallas = 0;
+    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null;
     for (var i = 0; i < lista.length && !parar; i++) {
       var cod = lista[i].c, visible = cod.slice(0, 3) + '.' + cod.slice(3);
       txt('Buscando documentos: <b>' + (i + 1) + ' de ' + lista.length + '</b> equipos…<br>' +
         '<span style="color:#9be3b5">' + docs + ' documentos guardados</span>' +
         '<br><span style="color:#aeb4bc">No cierres esta pestaña.</span>');
       bar(i / lista.length);
-      var hallados = [], respondio = false;
-      try {
-        var fd = new FormData();
-        fd.append('tipoAccion', 'viewArchivosProd');
-        fd.append('codProd', visible);
-        var html = await xhr('POST', '/controlador/controller_pedido.php', fd, 30000);
-        respondio = panelValido(html);
-        if (respondio) hallados = leerDocs(html);
-      } catch (e) { }
-      if (!respondio) {
-        fallas++;                         // no se anota: se reintenta otro día
-      } else if (!hallados.length) {
+      var r = await pedirPanel(cod);
+      var hallados = r.ok ? r.docs : [];
+      if (!r.ok) {
+        /* No se anota NADA: este equipo vuelve a la cola otro día. */
+        fallas++; seguidas++;
+        if (!diag) diag = r.ultimo;
+        if (seguidas >= 3) { cortado = true; break; }
+        await espera(2000);
+        continue;
+      }
+      seguidas = 0;
+      if (!hallados.length) {
         sin++;
         await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
       } else {
@@ -341,9 +417,9 @@
           try {
             var u = '/controlador/ctr_descargarDoc.php?op=' + encodeURIComponent(h.op) +
                     '&tipo=' + encodeURIComponent(h.sis) + '&t=' + encodeURIComponent(h.tipo);
-            var r = await fetch(new URL(u, location.href).href, { credentials: 'include' });
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            var b = await r.blob();
+            var resp = await fetch(new URL(u, location.href).href, { credentials: 'include' });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            var b = await resp.blob();
             if (b.size < 1000 || b.size > 2e7) throw new Error('vacío o enorme');
             await enviar(JSON.stringify({ k: CFG.k, doc: { c: cod, t: h.tipo, n: h.nom, mime: b.type || 'application/pdf', b64: await aBase64(b) } }));
             docs++;
@@ -354,13 +430,21 @@
       await espera(2000);
     }
     bar(1);
+    if (cortado || (fallas && !docs && !sin)) {
+      /* Nada que celebrar y, sobre todo, nada anotado: los equipos siguen
+         en la cola. Se muestra lo que contestó el portal para arreglarlo. */
+      txt('<b style="color:#f0c674">El portal no devolvió la lista de documentos.</b> ' +
+        'Me detuve a propósito para no marcar equipos por error: <b>no se anotó nada</b> ' +
+        'y los ' + lista.length + ' siguen en la cola para otro día.' +
+        '<br><br><span style="color:#aeb4bc">Primero entra de nuevo al portal (puede ser que la sesión se haya caído) ' +
+        'y vuelve a tocar el favorito. Si sigue igual, manda esta pantalla:</span>' +
+        (diag ? '<br><span style="color:#8f949b;font-size:12px">forma: ' + diag.forma +
+                ' · código: ' + diag.estado + '<br>' + recorte(diag.texto) + '</span>' : ''));
+      return;
+    }
     txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
-      (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron' : '') + '.' +
-      (fallas >= lista.length
-        ? '<br><span style="color:#f0c674">El portal no devolvió la lista de documentos en ningún equipo. ' +
-          'Puede que la sesión se haya caído: entra de nuevo al portal y vuelve a tocar el favorito. ' +
-          'No se anotó nada, así que no se pierde ningún equipo.</span>'
-        : '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>'));
+      (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron (se reintentan otro día)' : '') + '.' +
+      '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
   }
 
   async function copiarFotos(lista) {
