@@ -999,6 +999,20 @@ function cotModalCerrar(){
    formal que emite la empresa. El documento viaja dentro del propio
    enlace, así que no hace falta servidor ni base de datos. */
 var COT_DOC = null;
+/* Las solicitudes de VENTA guardan solo el código de cada equipo: el
+   nombre, la marca, el código NTS y la foto se leen del catálogo al abrir
+   el enlace, para que el enlace quepa en un mensaje de WhatsApp. Pero el
+   catálogo no se carga solo en estas pantallas, y sin él cada equipo salía
+   como «EDAN-H100B», sin marca y sin foto. Se pide una vez y se vuelve a
+   dibujar. */
+function cotConCatalogo(d, repintar){
+  if(!d || d.tipo !== 'venta') return false;
+  if((typeof VENTA !== 'undefined' && VENTA && VENTA.productos) ||
+     typeof cargarVenta !== 'function') return false;
+  cargarVenta().then(repintar).catch(() => {});
+  return true;
+}
+
 function cotVer(codigo){
   const caja = document.getElementById('cotVerBody');
   if(!caja) return;
@@ -1009,6 +1023,17 @@ function cotVer(codigo){
       El enlace puede estar incompleto. Vuelve a armarla en
       <a href="#/cotizar">el cotizador</a> o escríbenos y la preparamos.</p></div>`;
     return;
+  }
+  cotConCatalogo(d, () => cotVer(codigo));
+  /* La cabecera del sitio: una solicitud de venta no es de alquiler. */
+  if(d.tipo === 'venta'){
+    document.body.classList.add('modo-venta');
+    document.body.classList.remove('modo-alquiler');
+    document.querySelectorAll('[data-route]').forEach(a => {
+      const on = a.dataset.route === '#/venta/tienda';
+      a.classList.toggle('active', on);
+      if(on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const wa = urlWhatsApp(String(S.whatsapp || '').replace(/\D/g, ''),
@@ -1085,6 +1110,7 @@ function cotEmitir(codigo){
     caja.innerHTML = `<div class="wrap"><p class="cotv-mal">No pudimos leer esta solicitud.</p></div>`;
     return;
   }
+  cotConCatalogo(d, () => cotEmitir(codigo));
   if(!cotClaveOk()){
     caja.innerHTML = `<div class="wrap emi-puerta">
       <h1>Emitir cotización</h1>

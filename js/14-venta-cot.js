@@ -256,19 +256,16 @@ function vcDoc(c, d){
     tipo: 'venta',
     num: vcNumero(), fecha: new Date().toLocaleDateString('es-PE'),
     nom: d.nom, mail: d.mail, tel: d.tel, nota: d.msg || '',
-    /* Solo lo imprescindible: id, cantidad y precio. El nombre, la marca y
-       el código NTS se leen del catálogo al abrir el enlace, y solo viajan
-       dentro cuando el equipo ya no está en el catálogo. Con esto el enlace
-       no crece sin control y WhatsApp siempre lo acepta. */
-    items: c.items.map(x => {
-      const it = {i: x.p.id, q: x.q, pu: x.precio, t: x.total};
-      if(!vcProducto(x.p.id)){
-        it.n = x.p.nom;
-        it.m = [x.p.marca, x.p.modelo].filter(Boolean).join(' · ');
-        it.nts = x.p.clave || '';
-      }
-      return it;
-    }),
+    /* Nombre, marca y código NTS viajan siempre dentro del enlace: son
+       cortos y hacen que el resumen se lea aunque el equipo ya no esté en
+       la hoja. La foto no: esa es larga y se saca del catálogo, que para
+       eso se carga al abrir el enlace (cotConCatalogo). */
+    items: c.items.map(x => ({
+      i: x.p.id, q: x.q, pu: x.precio, t: x.total,
+      n: x.p.nom,
+      m: [x.p.marca, x.p.modelo].filter(Boolean).join(' · '),
+      nts: x.p.clave || ''
+    })),
     total: c.total, gar: 0, tec: 0, pas: 0, via: 0, inc: []
   };
 }
