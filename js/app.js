@@ -268,6 +268,10 @@ const KIT=["multimetro","destornillador-elec","set-46"];
 
 /* Parámetros del modelo (se sobreescriben desde la hoja vía loadData) */
 let TEC_DIA=120;         // instrumentista S/ por día
+/* Traslado del instrumentista al local del cliente, dentro de Lima, por
+   jornada de trabajo. Sin esto el servicio con instrumentista no cubría
+   el viaje de ida y vuelta de cada día. */
+let MOVIL_LIMA=35;
 let TEC_MIN=60;          // mínimo: medio día
 /* Descuento por combinar instrumentos: mientras más lleva, más baja el
    precio del día. Se puede cambiar desde data/tarifas-alquiler.json. */
@@ -293,6 +297,7 @@ fetch('data/tarifas-alquiler.json', {cache:'no-cache'}).then(r => r.ok ? r.json(
     if(d.medioDiaMinimo) MEDIO_PISO = d.medioDiaMinimo;
     if(d.instrumentistaDia) TEC_DIA = d.instrumentistaDia;
     if(d.instrumentistaMedioDia) TEC_MIN = d.instrumentistaMedioDia;
+    if(d.movilizacionLima >= 0) MOVIL_LIMA = d.movilizacionLima;
     if(d.descuentos) DESC_COMB = d.descuentos;
     if(d.garantiaProvincia > 0) GARANTIA_PROV = d.garantiaProvincia;
     if(d.viaje){
@@ -837,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=2e71b2c1';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=25671478';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=2e71b2c1';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=25671478';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=2e71b2c1','js/06-tablero.js?v=2e71b2c1'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=25671478','js/06-tablero.js?v=25671478'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=2e71b2c1'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=25671478'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2547,6 +2552,13 @@ function cotCalcular(){
      cobra una sola vez y depende de la ciudad; la comida, por cada día de
      trabajo, y el hospedaje por cada noche (un trabajo de un día no tiene
      noche: sale de noche y regresa de noche). */
+  /* Movilización dentro de Lima: cuando va el instrumentista, el servicio
+     es en el local del cliente, así que él se traslada de ida y vuelta por
+     cada jornada de trabajo. Cuesta lo mismo medio día que día completo:
+     es el mismo viaje. Sin esta partida el servicio no cubría el traslado
+     y el alquiler con instrumentista no era rentable. A provincia no
+     aplica: ahí se cobra el pasaje. */
+  const movil = (conTecnico && !prov) ? MOVIL_LIMA * qty : 0;
   const viaja = prov && conTecnico;
   const ciudad = viaja ? ciudadDe(COT.ciudad) : null;
   const faltaCiudad = viaja && !ciudad;
@@ -2563,8 +2575,8 @@ function cotCalcular(){
   /* Lo único que ya no se cotiza solo: una semana o más. */
   const largo = mod === 'dia' && qty >= COT_LARGO;
   return {sel, base, desc, dia, mod, hayMedio, unit, qty, alquiler, conTecnico, tecnico, prov,
-          viaja, ciudad, faltaCiudad, noches, pasaje, comida, hospedaje, viatico, garantia,
-          total: alquiler + tecnico + pasaje + viatico, largo};
+          movil, viaja, ciudad, faltaCiudad, noches, pasaje, comida, hospedaje, viatico, garantia,
+          total: alquiler + tecnico + movil + pasaje + viatico, largo};
 }
 
 /* ── Ofertas: «por S/ X más, llévate también…» ─────────────────────────
@@ -2844,6 +2856,7 @@ function cotResumen(){
       <div><span>Precio por ${u}</span><span>S/ ${fmt(c.unit)}</span></div>
       <div><span>× ${cotPeriodo(c.mod, c.qty)}</span><span>${soles(c.alquiler)}</span></div>
       ${c.conTecnico ? `<div><span>Instrumentista metrológico (mínimo medio día)</span><span>${soles(c.tecnico)}</span></div>` : ''}
+      ${c.movil ? `<div><span>Movilización dentro de Lima · S/ ${fmt(MOVIL_LIMA)} × ${c.qty} ${c.qty === 1 ? 'jornada' : 'jornadas'}</span><span>${soles(c.movil)}</span></div>` : ''}
       ${c.viaja && c.ciudad ? `<div><span>Pasajes ida y vuelta a ${cotEsc(c.ciudad.n)} (una sola vez)</span><span>${soles(c.pasaje)}</span></div>
         <div><span>Viáticos · comida S/ ${fmt(VIAJE.viaticoDia)} × ${c.qty}${c.noches
           ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches + (c.noches === 1 ? ' noche' : ' noches') : ''}</span><span>${soles(c.viatico)}</span></div>` : ''}
@@ -2965,6 +2978,8 @@ function cotTexto(c, nom, mail, tel){
   L.push('  Precio por ' + u + ': S/ ' + fmt(c.unit));
   L.push('  Alquiler (' + per + '): S/ ' + c.alquiler.toFixed(2));
   if(c.conTecnico) L.push('  Instrumentista metrológico: S/ ' + c.tecnico.toFixed(2));
+  if(c.movil) L.push('  Movilización dentro de Lima (S/ ' + fmt(MOVIL_LIMA) + ' × ' + c.qty +
+    (c.qty === 1 ? ' jornada' : ' jornadas') + '): S/ ' + c.movil.toFixed(2));
   if(c.viaja && c.ciudad){
     L.push('  Pasajes ida y vuelta a ' + c.ciudad.n + ' (una sola vez): S/ ' + c.pasaje.toFixed(2));
     L.push('  Viáticos (comida y hospedaje): S/ ' + c.viatico.toFixed(2));
@@ -3080,7 +3095,7 @@ function cotDoc(c, nom, mail, tel, numero){
     mod: c.mod, qty: c.qty, prov: !!c.prov,
     items: c.sel.map(e => ({n: e.nom, m: e.marca || '', d: e.dia, f: cotFotoAbs(e)})),
     base: c.base, desc: c.desc, unit: c.unit, alquiler: c.alquiler,
-    tec: c.tecnico, pas: c.pasaje, via: c.viatico, noc: c.noches,
+    tec: c.tecnico, mov: c.movil, pas: c.pasaje, via: c.viatico, noc: c.noches,
     ciu: c.ciudad ? c.ciudad.n : '', gar: c.garantia, total: c.total,
     inc: []
   };
@@ -3127,7 +3142,11 @@ function cotTerminos(c){
     ? ('Medio día corresponde a un turno de cuatro (4) horas: ' + HORARIO_MANANA + ' o ' + HORARIO_TARDE + '.')
     : ('El día completo comprende los dos turnos: ' + HORARIO_MANANA + ' y ' + HORARIO_TARDE + '.')]);
   T.push(['5. Entrega y devolución.', !c.prov
-    ? 'En nuestra oficina de Lima, en el horario indicado.'
+    ? (c.mov
+       ? ('En el local del cliente, dentro de Lima Metropolitana. La movilización del Cuadro N° 1 comprende ' +
+          'el traslado del instrumentista y de los instrumentos, de ida y vuelta, por cada jornada de trabajo; ' +
+          'se cobra igual en medio día que en día completo, porque es el mismo viaje.')
+       : 'En nuestra oficina de Lima, en el horario indicado.')
     : conTec
       ? ('El instrumentista metrológico traslada los instrumentos a ' + (c.ciu || 'la ciudad del cliente') +
          '. Los días de viaje no se facturan: se cobran únicamente los días de trabajo en sitio. El pasaje ' +
@@ -3239,14 +3258,21 @@ function cotHTML(d, formal){
         <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
       <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.tec / 1.18).toFixed(2)}</td></tr>` : '')
-    + (d.pas ? `<tr>
+    + (d.mov ? `<tr>
       <td class="c">${d.items.length + 2}</td>
+      <td><b>MOVILIZACIÓN DENTRO DE LIMA</b>
+        <span class="det">Traslado del instrumentista y de los instrumentos al local del cliente,
+        de ida y vuelta, por cada jornada de trabajo.</span></td>
+      <td class="c">JORNADA</td><td class="c">${d.qty}.00</td>
+      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${(d.mov / 1.18).toFixed(2)}</td></tr>` : '')
+    + (d.pas ? `<tr>
+      <td class="c">${d.items.length + 3}</td>
       <td><b>PASAJES IDA Y VUELTA${d.ciu ? ' · ' + cotEsc(d.ciu.toUpperCase()) : ''}</b>
         <span class="det">Traslado del instrumentista y de los instrumentos a la ciudad del cliente.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
       <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${(d.pas / 1.18).toFixed(2)}</td></tr>` : '')
     + (d.via ? `<tr>
-      <td class="c">${d.items.length + 3}</td>
+      <td class="c">${d.items.length + 4}</td>
       <td><b>VIÁTICOS DEL INSTRUMENTISTA</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${d.noc
           ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
