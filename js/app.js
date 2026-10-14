@@ -842,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=4e5e2618';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=8aac5818';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=4e5e2618';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=8aac5818';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=4e5e2618','js/06-tablero.js?v=4e5e2618'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=8aac5818','js/06-tablero.js?v=8aac5818'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=4e5e2618'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=8aac5818'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2240,7 +2240,7 @@ function vtConteo(campo){
   return m;
 }
 function vTienda(catInicial, precioInicial){
-  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='dest';
+  VT.q=''; VT.marca.clear(); VT.origen.clear(); VT.precio.clear(); VT.stock=false; VT.orden='cat';
   if(precioInicial != null && precioInicial !== '') VT.precio.add(String(precioInicial));
   VT.cat = new Set(catInicial && vCat(catInicial) ? [catInicial] : []);
   const cc = vtConteo('cat'), cm = vtConteo('marca'), co = vtConteo('origen');
@@ -2276,6 +2276,7 @@ function vTienda(catInicial, precioInicial){
             <input type="search" placeholder="Buscar equipo, marca, modelo o código (ej. D-18)" oninput="VT.q=this.value;vtPintar()" aria-label="Buscar en la tienda">
           </label>
           <select class="vt-orden" onchange="VT.orden=this.value;vtPintar()" aria-label="Ordenar">
+            <option value="cat">Por categoría</option>
             <option value="dest">Por precio y más pedidos</option>
             <option value="az">Nombre (A–Z)</option>
             ${hayPrecio ? '<option value="pmen">Precio: menor a mayor</option><option value="pmay">Precio: mayor a menor</option>' : ''}
@@ -2322,7 +2323,8 @@ function vtFiltrados(){
     }
     return true;
   });
-  if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
+  if(VT.orden==='cat') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
+  else if(VT.orden==='az') l.sort((a,b) => a.nom.localeCompare(b.nom));
   else if(VT.orden==='pmen') l.sort((a,b) => (a.precio||Infinity)-(b.precio||Infinity));
   else if(VT.orden==='pmay') l.sort((a,b) => (b.precio||0)-(a.precio||0));
   else l = vOrdenTienda(l);
@@ -2330,6 +2332,25 @@ function vtFiltrados(){
 }
 function vCarritoEngancha(){
   if(window.SBCarrito) setTimeout(() => { SBCarrito.enganchar(); SBCarrito.pintar(); }, 0);
+}
+
+/* Los equipos en bloques por categoría, con su título y su cuenta. El
+   orden de las categorías es el del catálogo, no el alfabético: lo decide
+   la hoja. */
+function vtPorCategoria(l){
+  const orden = (VENTA.categorias || []).map(c => c.id);
+  const g = new Map();
+  l.forEach(p => { const k = orden.indexOf(p.cat) >= 0 ? p.cat : '_otros';
+                   if(!g.has(k)) g.set(k, []); g.get(k).push(p); });
+  const claves = [...g.keys()].sort((a, b) =>
+    (orden.indexOf(a) < 0 ? 999 : orden.indexOf(a)) - (orden.indexOf(b) < 0 ? 999 : orden.indexOf(b)));
+  return claves.map(k => {
+    const c = vCat(k), ps = g.get(k);
+    return `<section class="vt-cat" id="vtc-${vEsc(k)}">
+      <h2>${vEsc(c ? c.nombre : 'Otros equipos')} <small>${ps.length}</small></h2>
+      <div class="grid vts">${ps.map(vCard).join('')}</div>
+    </section>`;
+  }).join('');
 }
 
 function vtPintar(){
@@ -2343,7 +2364,12 @@ function vtPintar(){
   VT.precio.forEach(v => chips.push(['precio',v,vTramoNombre(Number(v))]));
   document.getElementById('vtActivos').innerHTML = chips.map(([k,v,t]) =>
     `<button onclick="vtMarcar('${k}','${vEsc(v)}',false,true)">${vEsc(t)} ✕</button>`).join('');
-  const html = l.map(vCard).join('');
+  /* «Por categoría»: el mismo orden que la página /venta/, que es como el
+     comprador busca de verdad — primero sabe qué tipo de equipo necesita y
+     recién después compara precios. Dentro de cada grupo, del más barato
+     al más caro. Con cualquier otro orden, la lista va corrida. */
+  const html = VT.orden === 'cat' ? vtPorCategoria(l) : l.map(vCard).join('');
+  g.classList.toggle('vt-porcat', VT.orden === 'cat' && l.length > 0);
   g.innerHTML = l.length ? html : `<div class="v-vacio" style="grid-column:1/-1"><h3>No hay equipos con esos filtros</h3><p>Igual podemos conseguirlo. Escríbenos qué necesitas y te enviamos opciones con su ficha técnica.</p><div class="hero-cta"><a class="btn btn-fill" href="${vWA('Hola Sinergia Biomédica, busco: '+(VT.q||'un equipo'))}" target="_blank" rel="noopener">Cotizar por WhatsApp</a><button class="btn" onclick="vtLimpiar()">Limpiar filtros</button></div></div>`;
   vCarritoEngancha();
 }
