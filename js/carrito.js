@@ -247,7 +247,10 @@
       var y = g[el.dataset.add];
       el.classList.toggle('on', !!y);
       if(el.dataset.textoOrig == null) el.dataset.textoOrig = el.textContent;
-      el.textContent = y ? ('En el carrito · ' + y.q) : el.dataset.textoOrig;
+      /* Las tarjetas del catálogo llevan un botón redondo de un solo
+         carácter: ahí «En el carrito · 2» no entra, va «✓ 2». */
+      el.textContent = y ? (el.dataset.corto ? '\u2713 ' + y.q : 'En el carrito · ' + y.q)
+                         : el.dataset.textoOrig;
     });
     pintarPanel();
   }

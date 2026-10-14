@@ -1220,3 +1220,50 @@ body.wa-propio .wafab{display:none}
 .v-precio-caja .v-baja{margin-left:12px;padding:4px 11px;border-radius:999px;font-family:var(--ff-d);
   font-size:12.5px;font-weight:600;background:#c62828;color:#fff}
 .v-precio-caja.con-promo small b{color:#c62828}
+
+
+/* ── Tarjeta única del catálogo de venta ─────────────────────────────
+   La misma que llevan las páginas estáticas (/venta/, css/venta-paginas.css
+   › .vt): foto pequeña, nombre, marca · modelo · código NTS y precio.
+   Antes la tienda usaba la tarjeta grande del alquiler (.eq, foto de
+   206 px y descripción): entraban 6 equipos por pantalla en vez de 18 y
+   comparar precios obligaba a bajar. Si se toca una, tocar la otra. */
+.grid.vts{grid-template-columns:repeat(auto-fill,minmax(318px,1fr));gap:12px}
+.vt{position:relative;display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:12px;
+  align-items:center;padding:10px;background:var(--blanco);border:1px solid var(--linea);
+  border-radius:12px;transition:border-color .2s}
+.vt:hover{border-color:var(--bronce)}
+.vt-l{position:absolute;inset:0;border-radius:12px;z-index:0}   /* el enlace cubre la tarjeta */
+.vt-f{position:relative;width:76px;height:64px;display:grid;place-items:center;background:#fff;
+  border-radius:8px;overflow:hidden;color:var(--bronce)}
+.vt-f img{max-width:100%;max-height:100%;object-fit:contain}
+.vt-f svg{width:30px;height:30px}
+.vt-of{position:absolute;top:3px;left:3px;padding:2px 6px;border-radius:5px;background:#c62828;
+  color:#fff;font-family:var(--ff-d);font-size:9px;font-weight:700;letter-spacing:.6px}
+.vt.en-oferta{border-color:rgba(198,40,40,.4)}
+.vt-t{min-width:0}
+.vt-t b{display:block;font-family:var(--ff-d);font-size:14.5px;font-weight:600;line-height:1.25}
+.vt-t small{display:block;font-size:12.5px;color:var(--gris);margin-top:1px}
+.vt-p{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-top:3px}
+.vt-t i{font-style:normal;font-family:var(--ff-d);font-size:13px;font-weight:600;color:var(--cobre-d)}
+.vt-t i.vt-cons{color:var(--gris);font-weight:500}
+.vt-st{font-style:normal;font-size:11px;color:var(--ok)}
+.vt-st.vt-ped{color:var(--gris)}
+.vt-add{position:relative;z-index:1;width:34px;height:34px;display:grid;place-items:center;
+  border:1px solid var(--linea);border-radius:999px;background:var(--blanco);cursor:pointer;
+  font-family:var(--ff-d);font-size:17px;font-weight:600;line-height:1;color:var(--grafito);
+  white-space:nowrap;padding:0}
+.vt-add:hover{border-color:var(--bronce);color:var(--cobre-d)}
+.vt-add[data-en]{border-color:var(--bronce);color:var(--cobre-d);font-size:13px}
+@media(max-width:620px){
+  .grid.vts{grid-template-columns:1fr}
+}
+
+/* Cabecera de la tienda: lo justo para saber dónde estás. El párrafo que
+   había aquí explicaba marca, modelo y código NTS; ahora eso se lee en
+   cada tarjeta, y en el celular ese texto se comía la pantalla entera. */
+.v-head{padding-top:34px}
+@media(max-width:620px){
+  .v-head{padding-top:20px}
+  .v-head h1{font-size:30px;margin-top:6px}
+}
