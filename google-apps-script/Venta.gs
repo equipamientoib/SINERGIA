@@ -444,10 +444,14 @@ function matchModelo_(marca, modelo, nombre, lista) {
 function hojaProveedor_(ss, lista, tc) {
   var sh = ss.getSheetByName('Proveedor') || ss.insertSheet('Proveedor');
   sh.clear();
-  var filas = [['codigo', 'descripcion', 'modelo_proveedor', 'stock', 'precio_usd', 'precio_soles', 'imagen']];
+  /* «enlace» es la dirección de la ficha del equipo en el portal. El portal
+     identifica cada producto con un código cifrado (?cd=…) y no con el
+     101.127, así que sin guardarlo aquí no hay manera de volver a abrir su
+     ficha, que es donde están los documentos. */
+  var filas = [['codigo', 'descripcion', 'modelo_proveedor', 'stock', 'precio_usd', 'precio_soles', 'imagen', 'enlace']];
   lista.slice().sort(function (a, b) { return a.dn < b.dn ? -1 : 1; }).forEach(function (x) {
     filas.push(["'" + x.c, x.d || '', x.mo || '', Number(x.s) || 0, Number(x.p) || '',
-      tc && Number(x.p) ? Math.round(Number(x.p) * tc * 100) / 100 : '', x.img || '']);
+      tc && Number(x.p) ? Math.round(Number(x.p) * tc * 100) / 100 : '', x.img || '', x.u || '']);
   });
   sh.getRange(1, 1, filas.length, filas[0].length).setValues(filas);
   sh.getRange(1, 1, 1, filas[0].length).setFontWeight('bold').setFontColor('#ffffff').setBackground('#1f2a36');
@@ -792,11 +796,15 @@ function atlDocsPendientes_() {
     var cd = codAtl_(vals[i][col('codigo_proveedor')]); if (!cd) continue;
     if (s_(vals[i][col('publicar')]).toUpperCase() === 'SI') prio[cd] = 1;
   }
+  /* La columna «enlace» puede no existir todavía (hojas de antes de que se
+     guardara): se busca por nombre y, si no está, se manda vacío. */
+  var pvVals = pv.getDataRange().getValues();
+  var cEnl = (pvVals[0] || []).map(function (h) { return s_(h); }).indexOf('enlace');
   var out = [];
-  pv.getDataRange().getValues().slice(1).forEach(function (r) {
+  pvVals.slice(1).forEach(function (r) {
     var cd = codAtl_(r[0]);
     if (!cd || hechos[cd]) return;
-    out.push({ c: cd, p: prio[cd] || (Number(r[3]) > 0 ? 2 : 3) });
+    out.push({ c: cd, p: prio[cd] || (Number(r[3]) > 0 ? 2 : 3), u: cEnl >= 0 ? s_(r[cEnl]) : '' });
   });
   out.sort(function (a, b) { return a.p - b.p; });
   return out;

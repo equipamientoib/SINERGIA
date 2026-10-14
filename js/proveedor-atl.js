@@ -145,8 +145,14 @@
       var al = (t.match(/class="alert[^"]*"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '';
       var src = (t.match(/<img[^>]*src="([^"]+)"/) || [])[1] || '';
       try { src = src && !/img_default/.test(src) ? new URL(src, location.href).href : ''; } catch (e) { src = ''; }
+      /* Enlace a la ficha del equipo. El portal identifica cada producto con
+         un código cifrado (?cd=…), no con el 101.127, así que sin guardar
+         este enlace no hay forma de volver a abrir su ficha después. Y es en
+         esa ficha donde están los documentos. */
+      var ur = (t.match(/href="([^"]*product-details[^"]*)"/) || [])[1] || '';
+      try { ur = ur ? new URL(ur.replace(/&amp;/g, '&'), location.href).href : ''; } catch (e) { ur = ''; }
       var k = cod6(m[1]); if (!mapa[k]) nuevos++;
-      mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src };
+      mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src, u: ur };
     });
     return { nuevos: nuevos, tarjetas: /card card-product/.test(html || '') ? trozos.length : nuevos };
   }
@@ -316,6 +322,31 @@
   function formaRecordada() {
     try { return localStorage.getItem('sbAtlFormaDocs') || ''; } catch (e) { return ''; }
   }
+  /* El camino bueno: abrir la ficha del equipo, igual que una persona.
+
+     La ficha YA trae los documentos dentro, en el bloque «divDocProd»: no
+     hace falta pedirle nada aparte al portal. Lo que no se puede es
+     adivinar su dirección, porque el portal identifica cada producto con
+     un código cifrado (?cd=…) y no con el 101.127; por eso el enlace se
+     guarda en la pestaña «Proveedor» cada vez que se actualizan precios. */
+  function fichaValida(t) {
+    t = String(t || '');
+    return /divDocProd|id="technicalSheet"/.test(t);
+  }
+  function docsDeFicha(html) {
+    var t = String(html || ''), i = t.indexOf('divDocProd');
+    if (i < 0) return [];
+    var j = t.indexOf('id="healthRegistration"', i);
+    return leerDocs(t.slice(i, j > i ? j : i + 30000));
+  }
+  async function pedirFicha(url) {
+    var r;
+    try { r = await xhrFull('GET', url, null, 30000, { 'X-Requested-With': 'XMLHttpRequest' }); }
+    catch (e) { return { ok: false, ultimo: { forma: 'ficha', estado: 0, texto: String((e && e.message) || e) } }; }
+    if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto) };
+    return { ok: false, ultimo: { forma: 'ficha', estado: r.estado, texto: r.texto } };
+  }
+
   async function pedirPanel(cod) {
     var visible = cod.slice(0, 3) + '.' + cod.slice(3);
     var orden = FORMAS_DOCS.slice(), buena = formaRecordada();
@@ -376,7 +407,16 @@
     p.innerHTML = '📄 Hay <b>' + lista.length + '</b> equipos a los que no se les han buscado documentos ' +
       '(ficha técnica, catálogo del fabricante y <b>registro sanitario</b>). Se guardan una sola vez.';
     document.getElementById('sbAtlTxt').appendChild(p);
-    var lote = lista.slice(0, LOTE_DOCS);
+    /* Los documentos viven en la ficha de cada equipo, y la dirección de esa
+       ficha se guarda al actualizar precios. Sin ninguna guardada no hay por
+       dónde empezar: se avisa en vez de gastar la tanda contra el portal. */
+    if (!lista.some(function (x) { return x.u; })) {
+      p.innerHTML += '<br><br><span style="color:#f0c674">Para buscar documentos hace falta primero <b>actualizar precios y stock</b> una vez: ' +
+        'ahí se guarda la dirección de la ficha de cada equipo, que es donde el portal tiene los documentos. ' +
+        'Hazlo y vuelve a tocar el favorito.</span>';
+      return;
+    }
+    var lote = lista.filter(function (x) { return x.u; }).slice(0, LOTE_DOCS);
     if (lista.length > LOTE_DOCS) p.innerHTML += '<br>Se revisan de ' + LOTE_DOCS + ' en ' + LOTE_DOCS + ': vuelve a tocar el favorito otro día para seguir.';
     boton('Buscar documentos de ' + lote.length + ' equipos', function () { this.remove(); bajarDocs(lote); });
   }
@@ -396,7 +436,8 @@
         '<span style="color:#9be3b5">' + docs + ' documentos guardados</span>' +
         '<br><span style="color:#aeb4bc">No cierres esta pestaña.</span>');
       bar(i / lista.length);
-      var r = await pedirPanel(cod);
+      var r = lista[i].u ? await pedirFicha(lista[i].u) : { ok: false, ultimo: null };
+      if (!r.ok) r = await pedirPanel(cod);      // sin enlace guardado, o la ficha falló
       var hallados = r.ok ? r.docs : [];
       if (!r.ok) {
         /* No se anota NADA: este equipo vuelve a la cola otro día. */
