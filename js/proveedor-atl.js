@@ -312,11 +312,14 @@
     return /archivo|adjunt|document|descarg|no\s*se\s*(encontr|hall)|sin\s*registr/i.test(t);
   }
 
-  /* Formas de pedir el panel, de la más probable a la menos. */
+  /* Formas de pedir el panel. La primera es exactamente la del portal:
+     jQuery manda FormData y añade solo él la cabecera X-Requested-With,
+     que muchos controladores en PHP exigen para contestar. Esa cabecera
+     es lo que le faltaba a la primera corrida. */
   var FORMAS_DOCS = [
-    { n: 'formdata',            multi: true,  punto: true,  ajax: false },
-    { n: 'formdata+ajax',       multi: true,  punto: true,  ajax: true },
-    { n: 'urlencoded',          multi: false, punto: true,  ajax: true },
+    { n: 'formdata+ajax',        multi: true,  punto: true,  ajax: true },
+    { n: 'formdata',             multi: true,  punto: true,  ajax: false },
+    { n: 'urlencoded',           multi: false, punto: true,  ajax: true },
     { n: 'urlencoded-sin-punto', multi: false, punto: false, ajax: true }
   ];
   function formaRecordada() {
@@ -347,7 +350,13 @@
     return { ok: false, ultimo: { forma: 'ficha', estado: r.estado, texto: r.texto } };
   }
 
-  async function pedirPanel(cod) {
+  /* accion: 'viewArchivosProd' (ficha técnica, catálogo del fabricante) o
+     'viewRRSSProd' (registro sanitario), que son dos consultas distintas.
+     vacioVale: para el registro sanitario, una respuesta vacía con código
+     200 significa «este equipo no tiene registro», y es una respuesta
+     válida. Solo se acepta cuando ya sabemos que la sesión está viva. */
+  async function pedirPanel(cod, accion, vacioVale) {
+    accion = accion || 'viewArchivosProd';
     var visible = cod.slice(0, 3) + '.' + cod.slice(3);
     var orden = FORMAS_DOCS.slice(), buena = formaRecordada();
     if (buena) orden.sort(function (a, b) { return (b.n === buena) - (a.n === buena); });
@@ -357,10 +366,10 @@
       var cp = f.punto ? visible : cod;
       if (f.multi) {
         cuerpo = new FormData();
-        cuerpo.append('tipoAccion', 'viewArchivosProd');
+        cuerpo.append('tipoAccion', accion);
         cuerpo.append('codProd', cp);
       } else {
-        cuerpo = 'tipoAccion=viewArchivosProd&codProd=' + encodeURIComponent(cp);
+        cuerpo = 'tipoAccion=' + accion + '&codProd=' + encodeURIComponent(cp);
         cab['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
       }
       if (f.ajax) cab['X-Requested-With'] = 'XMLHttpRequest';
@@ -372,7 +381,9 @@
         continue;
       }
       ultimo = { forma: f.n, estado: r.estado, texto: r.texto };
-      if (r.estado >= 200 && r.estado < 400 && esPanel(r.texto)) {
+      var bien = r.estado >= 200 && r.estado < 400 &&
+        (esPanel(r.texto) || (vacioVale && String(r.texto || '').replace(/\s+/g, '').length < 20));
+      if (bien) {
         try { localStorage.setItem('sbAtlFormaDocs', f.n); } catch (e) { }
         return { ok: true, docs: leerDocs(r.texto) };
       }
@@ -436,23 +447,36 @@
         '<span style="color:#9be3b5">' + docs + ' documentos guardados</span>' +
         '<br><span style="color:#aeb4bc">No cierres esta pestaña.</span>');
       bar(i / lista.length);
-      var r = lista[i].u ? await pedirFicha(lista[i].u) : { ok: false, ultimo: null };
-      if (!r.ok) r = await pedirPanel(cod);      // sin enlace guardado, o la ficha falló
-      var hallados = r.ok ? r.docs : [];
-      if (!r.ok) {
+      /* Un equipo tiene documentos en DOS sitios y hay que traerlos todos:
+           · ficha técnica y catálogo del fabricante → vienen en su página
+           · registro sanitario → una consulta aparte (viewRRSSProd)
+         Si cualquiera de las dos falla, el equipo NO se marca y vuelve a la
+         cola: así no se pierde el registro sanitario por un tropiezo. Lo
+         que ya se bajó no se vuelve a bajar, la hoja lo reconoce. */
+      var ft = lista[i].u ? await pedirFicha(lista[i].u) : { ok: false, ultimo: null };
+      if (!ft.ok) ft = await pedirPanel(cod, 'viewArchivosProd');
+      var rs = ft.ok ? await pedirPanel(cod, 'viewRRSSProd', true) : { ok: false, ultimo: null };
+      if (!ft.ok || !rs.ok) {
         /* No se anota NADA: este equipo vuelve a la cola otro día. */
         fallas++; seguidas++;
-        if (!diag) diag = r.ultimo;
+        if (!diag) diag = (ft.ok ? rs.ultimo : ft.ultimo);
         if (seguidas >= 3) { cortado = true; break; }
         await espera(2000);
         continue;
       }
       seguidas = 0;
+      var vistos = {}, hallados = [];
+      ft.docs.concat(rs.docs).forEach(function (d) {
+        var k = d.op + '|' + d.sis + '|' + d.tipo;
+        if (vistos[k]) return;
+        vistos[k] = 1; hallados.push(d);
+      });
       if (!hallados.length) {
         sin++;
         await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
       } else {
         equipos++;
+        var bajados = true;
         for (var j = 0; j < hallados.length && !parar; j++) {
           var h = hallados[j];
           try {
@@ -464,9 +488,12 @@
             if (b.size < 1000 || b.size > 2e7) throw new Error('vacío o enorme');
             await enviar(JSON.stringify({ k: CFG.k, doc: { c: cod, t: h.tipo, n: h.nom, mime: b.type || 'application/pdf', b64: await aBase64(b) } }));
             docs++;
-          } catch (e) { fallas++; }
+          } catch (e) { fallas++; bajados = false; }
           await espera(1500);
         }
+        /* Solo si bajaron TODOS: si uno falló, el equipo se queda sin marca
+           y mañana se reintenta lo que falta. */
+        if (bajados) await enviar(JSON.stringify({ k: CFG.k, revisado: cod }));
       }
       await espera(2000);
     }

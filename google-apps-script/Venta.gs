@@ -777,8 +777,10 @@ function docsVistos_(ss) {
   var sh = ss.getSheetByName('Documentos'), m = {};
   if (!sh) return m;
   sh.getDataRange().getValues().slice(1).forEach(function (r) {
-    var c = codAtl_(r[0]);
-    if (c) m[c] = 1;
+    var c = codAtl_(r[0]), t = s_(r[1]).toUpperCase();
+    /* Solo las marcas cierran el equipo. Una fila de documento no basta:
+       puede faltarle el registro sanitario, que se pide aparte. */
+    if (c && (t === 'NINGUNO' || t === 'REVISADO')) m[c] = 1;
   });
   return m;
 }
@@ -810,31 +812,57 @@ function atlDocsPendientes_() {
   return out;
 }
 
+/* Un equipo puede traer varios documentos con el MISMO tipo: la ficha
+   técnica del 101.127 trae «CATALOGO ORIGINAL» y «EE.TT. COMPLETA MARCA»,
+   los dos con tipo OTR. Descartando por tipo solo se guardaba el primero,
+   y los dos archivos salían con el mismo nombre. Se compara tipo + nombre,
+   y el archivo se llama como el documento. */
 function atlGuardarDoc_(d) {
   var cd = codAtl_(d.c), tipo = s_(d.t).toUpperCase();
   if (!cd || !tipo) return { ok: false, motivo: 'sin código o tipo' };
   var ss = SpreadsheetApp.openById(VENTA_ID);
+  var titulo = s_(d.n) || DOC_NOMBRES[tipo] || 'Documento';
   var ya = docsPorCodigo_(ss)[cd] || [];
-  for (var i = 0; i < ya.length; i++) if (ya[i].t === tipo) return { ok: true, repetido: true };
-  var nombre = cd.slice(0, 3) + '.' + cd.slice(3) + ' - ' + (DOC_NOMBRES[tipo] || tipo) + '.pdf';
+  for (var i = 0; i < ya.length; i++) {
+    if (ya[i].t === tipo && nrmDoc_(ya[i].n) === nrmDoc_(titulo)) return { ok: true, repetido: true };
+  }
+  var nombre = cd.slice(0, 3) + '.' + cd.slice(3) + ' - ' + limpiarNombre_(titulo) + '.pdf';
   var file = carpetaDocs_().createFile(Utilities.newBlob(Utilities.base64Decode(d.b64), d.mime || 'application/pdf', nombre));
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), tipo,
-                           s_(d.n) || DOC_NOMBRES[tipo] || 'Documento',
+  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), tipo, titulo,
                            'https://drive.google.com/file/d/' + file.getId() + '/view', new Date()]);
   limpiarCache();
   return { ok: true };
 }
 
-/* Un equipo SIN documentos también se anota, con tipo «NINGUNO», para no
-   volver a preguntarle al portal en cada corrida. */
-function atlSinDocs_(cod) {
+function nrmDoc_(v) { return s_(v).toUpperCase().replace(/\s+/g, ' ').trim(); }
+
+/* Para el nombre del archivo en Drive: sin barras ni dos puntos. */
+function limpiarNombre_(v) {
+  return s_(v).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) || 'Documento';
+}
+
+/* Dos marcas, y las dos cierran el equipo para que no se le vuelva a
+   preguntar al portal:
+     NINGUNO    se le miró todo y no tiene ningún documento
+     REVISADO   se le miró todo y lo que había ya está guardado
+   La marca se pone SOLO cuando el portal contestó las dos partes (ficha
+   técnica y registro sanitario). Si una falló, el equipo se queda sin
+   marca y vuelve a la cola otro día: los documentos que sí se bajaron no
+   se repiten porque atlGuardarDoc_ los reconoce. */
+function atlMarcaDocs_(cod, marca) {
   var cd = codAtl_(cod); if (!cd) return { ok: false };
   var ss = SpreadsheetApp.openById(VENTA_ID);
-  if ((docsPorCodigo_(ss)[cd] || []).length) return { ok: true, repetido: true };
-  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), 'NINGUNO', '', '', new Date()]);
+  var filas = hojaDocs_(ss).getDataRange().getValues();
+  for (var i = 1; i < filas.length; i++) {
+    var t = s_(filas[i][1]).toUpperCase();
+    if (codAtl_(filas[i][0]) === cd && (t === 'NINGUNO' || t === 'REVISADO')) return { ok: true, repetido: true };
+  }
+  hojaDocs_(ss).appendRow(["'" + cd.slice(0, 3) + '.' + cd.slice(3), marca, '', '', new Date()]);
   return { ok: true };
 }
+function atlSinDocs_(cod) { return atlMarcaDocs_(cod, 'NINGUNO'); }
+function atlRevisado_(cod) { return atlMarcaDocs_(cod, 'REVISADO'); }
 
 function atlGuardarFoto_(f) {
   var cd = codAtl_(f.c);
@@ -888,6 +916,9 @@ function doPost(e) {
   }
   if (datos.doc) {
     try { return json_(atlGuardarDoc_(datos.doc)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
+  }
+  if (datos.revisado) {
+    try { return json_(atlRevisado_(datos.revisado)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
   }
   if (datos.sinDoc) {
     try { return json_(atlSinDocs_(datos.sinDoc)); } catch (err) { return json_({ ok: false, motivo: String(err) }); }
