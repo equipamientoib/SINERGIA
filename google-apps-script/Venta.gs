@@ -54,13 +54,6 @@ function num_(v) {
   return f === Math.floor(f) ? Math.floor(f) : f;
 }
 
-function num_(v) {
-  if (v === null || v === undefined || v === '') return null;
-  var f = Number(String(v).replace('%', '').replace(',', '.'));
-  if (isNaN(f)) return null;
-  return f === Math.floor(f) ? Math.floor(f) : f;
-}
-
 function fecha_(v) {
   if (v instanceof Date) {
     var d = v.getDate(), m = v.getMonth() + 1, y = v.getFullYear();
