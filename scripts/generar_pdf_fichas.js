@@ -17,17 +17,41 @@ const RAIZ = path.join(__dirname, '..');
 const BASE = process.env.SITIO_LOCAL || 'http://localhost:8765';
 
 (async () => {
-  const dir = path.join(RAIZ, 'fichas');
-  const ids = fs.existsSync(dir) ? fs.readdirSync(dir).filter(d =>
-    fs.existsSync(path.join(dir, d, 'index.html'))) : [];
-  if (!ids.length) { console.log('No hay fichas.'); return; }
+  /* Dos juegos de fichas con la misma plantilla: las de alquiler viven en
+     fichas/<id>/ y las de venta en fichas/venta/<id>/. */
+  const juegos = [
+    { dir: path.join(RAIZ, 'fichas'), url: '/fichas/' },
+    { dir: path.join(RAIZ, 'fichas', 'venta'), url: '/fichas/venta/' },
+  ];
+  const tareas = [];
+  for (const j of juegos) {
+    if (!fs.existsSync(j.dir)) continue;
+    for (const id of fs.readdirSync(j.dir)) {
+      if (fs.existsSync(path.join(j.dir, id, 'index.html'))) tareas.push({ id, ...j });
+    }
+  }
+  if (!tareas.length) { console.log('No hay fichas.'); return; }
   const b = await pw.chromium.launch();
   const p = await b.newPage();
-  for (const id of ids) {
-    await p.goto(`${BASE}/fichas/${id}/`, { waitUntil: 'networkidle' });
+  for (const { id, dir, url } of tareas) {
+    await p.goto(`${BASE}${url}${id}/`, { waitUntil: 'networkidle' });
     await p.evaluate(() => document.fonts.ready);
     const out = path.join(dir, `ficha-tecnica-${id}.pdf`);
-    await p.pdf({ path: out, format: 'A4', printBackground: true, preferCSSPageSize: true });
+    /* Se genera en memoria y se fija la fecha antes de escribir. Sin esto
+       cada PDF cambia en cada corrida —solo por la hora— y cada
+       actualizacion del catalogo metia 27 MB de PDF nuevos en el
+       repositorio sin que el contenido hubiera cambiado. La fecha se
+       reemplaza por otra del mismo largo, para no mover los desplazamientos
+       internos del PDF. */
+    let buf = await p.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
+    buf = Buffer.from(String(buf.toString('latin1'))
+      .replace(/\/(CreationDate|ModDate)\s*\(D:\d{14}\+00'00'\)/g,
+               (m, k) => `/${k} (D:20260101000000+00'00')`), 'latin1');
+    if (fs.existsSync(out) && Buffer.compare(fs.readFileSync(out), buf) === 0) {
+      console.log(`igual: ${path.relative(RAIZ, out)}`);
+      continue;
+    }
+    fs.writeFileSync(out, buf);
     console.log('PDF:', path.relative(RAIZ, out));
   }
   await b.close();

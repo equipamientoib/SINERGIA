@@ -30,6 +30,11 @@
   var PAUSA = 3000;           // ms entre una consulta y la siguiente
   var REUSO_MIN = 60;         // si se usó hace menos de esto, pide confirmar
   var LOTE_FOTOS = 100;       // fotos por clic (una descarga cada ~3 s)
+  /* 20 y no más: cada equipo son 1 consulta de lista + hasta 3 descargas,
+     así que 20 equipos ya son ~80 peticiones, parecido a un lote de fotos.
+     Con 40 serían 160, más tráfico del que hemos hecho nunca, y un PDF pesa
+     bastante más que una foto. */
+  var LOTE_DOCS = 20;         // equipos a los que se les piden documentos por clic
   var ESPERA_MAX = 45000;     // ms por bloque
 
   /* ── Panel flotante ─────────────────────────────────────────────── */
@@ -121,6 +126,7 @@
      stock) cuentan para avanzar de página pero no se guardan. */
   var DEC = document.createElement('textarea');
   function texto(t) { DEC.innerHTML = String(t || '').replace(/<[^>]*>/g, ' '); return DEC.value.replace(/\s+/g, ' ').trim(); }
+
   function leer(html, mapa) {
     var trozos = String(html || '').split(/class="card card-product/).slice(1), nuevos = 0;
     if (!trozos.length) trozos = [String(html || '')];
@@ -166,7 +172,9 @@
       var x = new XMLHttpRequest();
       x.open(metodo, url, true);
       x.timeout = ms;
-      if (cuerpo) x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
+      /* Solo para texto: a un FormData hay que dejar que el navegador ponga
+         su propio Content-Type, que lleva el «boundary». */
+      if (cuerpo && typeof cuerpo === 'string') x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
       x.onload = function () { ok(x.responseText); };
       x.onerror = function () { no(new Error('red')); };
       x.ontimeout = function () { no(new Error('tiempo')); };
@@ -199,7 +207,8 @@
   if (ultimo && hace < REUSO_MIN) {
     txt('Ya actualizaste hace <b>' + hace + ' min</b>. Para no cargar al portal del proveedor, ' +
       'conviene usarlo solo una vez por semana (o cuando cambien precios).');
-    boton('Solo copiar fotos', function () { document.getElementById('sbAtlBtns').innerHTML = ''; txt('Buscando fotos pendientes…'); ofrecerFotos(true).then(function () { boton('Cerrar', cerrar); }); });
+    boton('Solo fotos y documentos', function () { document.getElementById('sbAtlBtns').innerHTML = ''; txt('Buscando pendientes…');
+      ofrecerFotos(true).then(ofrecerDocs.bind(null, true)).then(function () { boton('Cerrar', cerrar); }); });
     boton('Actualizar igual', function () { document.getElementById('sbAtlBtns').innerHTML = ''; correr(); });
     boton('Cerrar', cerrar);
   } else correr();
@@ -230,6 +239,109 @@
     if (lista.length > LOTE_FOTOS) p.innerHTML += '<br>Se copian de ' + LOTE_FOTOS + ' en ' + LOTE_FOTOS + ': vuelve a tocar el favorito otro día para seguir.';
     boton('Copiar ' + lote.length + ' fotos', function () { this.remove(); copiarFotos(lote); });
   }
+  /* ── Documentos: ficha técnica, catálogo del fabricante y registro
+     sanitario ────────────────────────────────────────────────────────
+     El portal los guarda por equipo y los entrega con dos llamadas:
+
+       1. POST controller_pedido.php  tipoAccion=viewArchivosProd
+          codProd=008.014            → el HTML con la lista de documentos
+       2. GET  ctr_descargarDoc.php?op=<código en base64>&tipo=…&t=…
+                                     → el PDF
+
+     Se piden de LOTE_DOCS en LOTE_DOCS equipos, de uno en uno y con pausa,
+     igual que las fotos. Un equipo que no tiene ninguno se anota también,
+     para no volver a preguntar por él la próxima vez. */
+  var RX_DESCARGA = /descargarDoc\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/g;
+
+  /* El nombre visible va ANTES del botón en el HTML del portal:
+
+       <span …>Catálogo Traducido</span> … <button onclick="descargarDoc(…)">
+
+     así que se busca en el trozo que PRECEDE a la llamada, no en el que
+     sigue. Mirando el de después, cada documento se quedaba con el nombre
+     del siguiente. */
+  function nombreDoc(antes) {
+    var t = String(antes || '').slice(-600), m, ult = '';
+    var rx = /<span[^>]*>([^<]{3,80})<\/span>/g;
+    while ((m = rx.exec(t))) { var v = texto(m[1]); if (v) ult = v; }
+    return ult;
+  }
+
+  function leerDocs(html) {
+    var partes = String(html || '').split('descargarDoc('), out = [], visto = {};
+    for (var i = 1; i < partes.length; i++) {
+      var m = ('descargarDoc(' + partes[i]).match(/descargarDoc\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/);
+      if (!m) continue;
+      var clave = m[1] + '|' + m[2] + '|' + m[3];
+      if (visto[clave]) continue;
+      visto[clave] = 1;
+      out.push({ op: m[1], sis: m[2], tipo: m[3], nom: nombreDoc(partes[i - 1]) });
+    }
+    return out;
+  }
+
+  async function ofrecerDocs(solo) {
+    var d;
+    try { d = await pedirJSON(CFG.u + '?atl=docs&k=' + encodeURIComponent(CFG.k)); } catch (e) { return; }
+    var lista = (d && d.docs) || [];
+    if (!lista.length) {
+      if (solo) txt('No hay equipos pendientes de documentos.');
+      return;
+    }
+    var p = document.createElement('p');
+    p.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #333';
+    p.innerHTML = '📄 Hay <b>' + lista.length + '</b> equipos a los que no se les han buscado documentos ' +
+      '(ficha técnica, catálogo del fabricante y <b>registro sanitario</b>). Se guardan una sola vez.';
+    document.getElementById('sbAtlTxt').appendChild(p);
+    var lote = lista.slice(0, LOTE_DOCS);
+    if (lista.length > LOTE_DOCS) p.innerHTML += '<br>Se revisan de ' + LOTE_DOCS + ' en ' + LOTE_DOCS + ': vuelve a tocar el favorito otro día para seguir.';
+    boton('Buscar documentos de ' + lote.length + ' equipos', function () { this.remove(); bajarDocs(lote); });
+  }
+
+  async function bajarDocs(lista) {
+    var docs = 0, equipos = 0, sin = 0, fallas = 0;
+    for (var i = 0; i < lista.length && !parar; i++) {
+      var cod = lista[i].c, visible = cod.slice(0, 3) + '.' + cod.slice(3);
+      txt('Buscando documentos: <b>' + (i + 1) + ' de ' + lista.length + '</b> equipos…<br>' +
+        '<span style="color:#9be3b5">' + docs + ' documentos guardados</span>' +
+        '<br><span style="color:#aeb4bc">No cierres esta pestaña.</span>');
+      bar(i / lista.length);
+      var hallados = [];
+      try {
+        var fd = new FormData();
+        fd.append('tipoAccion', 'viewArchivosProd');
+        fd.append('codProd', visible);
+        var html = await xhr('POST', '/controlador/controller_pedido.php', fd, 30000);
+        hallados = leerDocs(html);
+      } catch (e) { fallas++; }
+      if (!hallados.length) {
+        sin++;
+        await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
+      } else {
+        equipos++;
+        for (var j = 0; j < hallados.length && !parar; j++) {
+          var h = hallados[j];
+          try {
+            var u = '/controlador/ctr_descargarDoc.php?op=' + encodeURIComponent(h.op) +
+                    '&tipo=' + encodeURIComponent(h.sis) + '&t=' + encodeURIComponent(h.tipo);
+            var r = await fetch(new URL(u, location.href).href, { credentials: 'include' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            var b = await r.blob();
+            if (b.size < 1000 || b.size > 2e7) throw new Error('vacío o enorme');
+            await enviar(JSON.stringify({ k: CFG.k, doc: { c: cod, t: h.tipo, n: h.nom, mime: b.type || 'application/pdf', b64: await aBase64(b) } }));
+            docs++;
+          } catch (e) { fallas++; }
+          await espera(1500);
+        }
+      }
+      await espera(2000);
+    }
+    bar(1);
+    txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
+      (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron' : '') + '.' +
+      '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
+  }
+
   async function copiarFotos(lista) {
     var hechas = 0, fallas = 0;
     for (var i = 0; i < lista.length && !parar; i++) {
@@ -326,6 +438,7 @@
         (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal: mira la columna «coincidencia».<br>' : '') +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
       await ofrecerFotos();
+      await ofrecerDocs();
       boton('Cerrar', cerrar);
     } catch (e) {
       error(String(e && e.message || e));
