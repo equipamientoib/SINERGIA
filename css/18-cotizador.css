@@ -33,6 +33,15 @@
 @media(min-width:901px){
   .cot-res{position:sticky;top:86px;max-height:calc(100vh - 104px);overflow:auto;scrollbar-gutter:stable}
   .cot-res .cot-top{position:sticky;top:0;z-index:2}
+  /* El bloque oscuro se sale de la caja con margin:-18px para pegarse a sus
+     bordes. Pero «sticky» no lo deja subir por encima del borde interior de
+     la caja: ocupaba sitio 18 px más arriba de donde se dibujaba, así que
+     tapaba la primera línea de lo que viene debajo. Se le quita el relleno
+     de arriba a la caja y el margen negativo de arriba al bloque: el sitio
+     que ocupa y donde se dibuja vuelven a ser el mismo, y al pegarse ya no
+     se mueve ni se corta. */
+  .cot-res:has(> .cot-top){padding-top:0}
+  .cot-res:has(> .cot-top) > .cot-top{margin-top:0;margin-bottom:18px}
 }
 .cot-rh{font-family:var(--ff-d);font-size:16px;font-weight:600;color:var(--onix);margin-bottom:12px}
 .cot-vacio{font-size:14px;color:var(--gris);line-height:1.6}

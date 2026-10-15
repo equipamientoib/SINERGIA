@@ -3,15 +3,122 @@
   "equiposPropios": {
     "_nota": "Equipos de stock PROPIO: no vienen de la hoja ni del portal del proveedor, se publican desde aquí. Llevan su precio y su stock tal cual (no se les aplica el porcentaje de stock de la hoja) y su foto sale de img/venta/<id>.jpg. Con «remate»: 1 salen en la ventana flotante y en la sección de la tienda; con «promoHasta» en AAAA-MM-DD, el remate termina solo ese día. Para dejar de publicar uno, bórralo de aquí o ponlo en noPublicar.",
     "equipos": [
-      {"id": "biobase-bkm-z60b", "cat": "esterilizacion", "nom": "Autoclave de mesa 60 L clase B", "marca": "Biobase", "modelo": "BKM-Z60B", "origen": "China", "resumen": "Autoclave de vapor clase B de 60 litros para centrales de esterilización y clínicas.", "caracteristicas": ["60 litros", "Clase B con prevacío", "Generador de vapor", "Pantalla digital y manómetros", "220 V"], "areas": ["Central de esterilización", "Centro quirúrgico"], "aviso": "img/promos/biobase-bkm-z60b.jpg", "fotos": ["img/venta/biobase-bkm-z60b.jpg"], "precio": 29350, "stock": 2, "remate": 1},
-      {"id": "biobase-bkm-z45b", "cat": "esterilizacion", "nom": "Autoclave de mesa 45 L clase B", "marca": "Biobase", "modelo": "BKM-Z45B", "origen": "China", "resumen": "Autoclave de vapor clase B de 45 litros para centrales de esterilización y clínicas.", "caracteristicas": ["45 litros", "Clase B con prevacío", "Generador de vapor", "Pantalla digital y manómetros", "220 V"], "areas": ["Central de esterilización", "Centro quirúrgico"], "aviso": "img/promos/biobase-bkm-z45b.jpg", "fotos": ["img/venta/biobase-bkm-z45b.jpg"], "precio": 24050, "stock": 2, "remate": 1},
-      {"id": "biobase-bkm-zb", "cat": "esterilizacion", "nom": "Autoclave de mesa 23 L clase B", "marca": "Biobase", "modelo": "BKM-ZB", "origen": "China", "resumen": "Autoclave de vapor clase B de 23 litros para consultorios, odontología y centros de salud.", "caracteristicas": ["23 litros", "Clase B con prevacío", "Impresora incorporada", "Puerto USB", "220 V"], "areas": ["Consulta externa", "Odontología"], "aviso": "img/promos/biobase-bkm-zb.jpg", "fotos": ["img/venta/biobase-bkm-zb.jpg"], "precio": 10250, "stock": 2, "remate": 1},
-      {"id": "biobase-bkm-za", "cat": "esterilizacion", "nom": "Autoclave de mesa 18 L clase B", "marca": "Biobase", "modelo": "BKM-ZA", "origen": "China", "resumen": "Autoclave de vapor clase B de 18 litros para consultorios y odontología.", "caracteristicas": ["18 litros", "Clase B con prevacío", "Impresora incorporada", "220 V"], "areas": ["Consulta externa", "Odontología"], "aviso": "img/promos/biobase-bkm-za.jpg", "fotos": ["img/venta/biobase-bkm-za.jpg"], "precio": 8000, "stock": 2, "remate": 1}
+      {
+        "id": "biobase-bkm-z60b",
+        "cat": "esterilizacion",
+        "nom": "Autoclave de mesa 60 L clase B",
+        "marca": "Biobase",
+        "modelo": "BKM-Z60B",
+        "origen": "China",
+        "resumen": "Autoclave de vapor clase B de 60 litros para centrales de esterilización y clínicas.",
+        "caracteristicas": [
+          "60 litros",
+          "Clase B con prevacío",
+          "Generador de vapor",
+          "Pantalla digital y manómetros",
+          "220 V"
+        ],
+        "areas": [
+          "Central de esterilización",
+          "Centro quirúrgico"
+        ],
+        "aviso": "img/promos/biobase-bkm-z60b.jpg",
+        "fotos": [
+          "img/venta/biobase-bkm-z60b.jpg"
+        ],
+        "precio": 29350,
+        "stock": 2,
+        "remate": 1
+      },
+      {
+        "id": "biobase-bkm-z45b",
+        "cat": "esterilizacion",
+        "nom": "Autoclave de mesa 45 L clase B",
+        "marca": "Biobase",
+        "modelo": "BKM-Z45B",
+        "origen": "China",
+        "resumen": "Autoclave de vapor clase B de 45 litros para centrales de esterilización y clínicas.",
+        "caracteristicas": [
+          "45 litros",
+          "Clase B con prevacío",
+          "Generador de vapor",
+          "Pantalla digital y manómetros",
+          "220 V"
+        ],
+        "areas": [
+          "Central de esterilización",
+          "Centro quirúrgico"
+        ],
+        "aviso": "img/promos/biobase-bkm-z45b.jpg",
+        "fotos": [
+          "img/venta/biobase-bkm-z45b.jpg"
+        ],
+        "precio": 24050,
+        "stock": 2,
+        "remate": 1
+      },
+      {
+        "id": "biobase-bkm-zb",
+        "cat": "esterilizacion",
+        "nom": "Autoclave de mesa 23 L clase B",
+        "marca": "Biobase",
+        "modelo": "BKM-ZB",
+        "origen": "China",
+        "resumen": "Autoclave de vapor clase B de 23 litros para consultorios, odontología y centros de salud.",
+        "caracteristicas": [
+          "23 litros",
+          "Clase B con prevacío",
+          "Impresora incorporada",
+          "Puerto USB",
+          "220 V"
+        ],
+        "areas": [
+          "Consulta externa",
+          "Odontología"
+        ],
+        "aviso": "img/promos/biobase-bkm-zb.jpg",
+        "fotos": [
+          "img/venta/biobase-bkm-zb.jpg"
+        ],
+        "precio": 10250,
+        "stock": 2,
+        "remate": 1
+      },
+      {
+        "id": "biobase-bkm-za",
+        "cat": "esterilizacion",
+        "nom": "Autoclave de mesa 18 L clase B",
+        "marca": "Biobase",
+        "modelo": "BKM-ZA",
+        "origen": "China",
+        "resumen": "Autoclave de vapor clase B de 18 litros para consultorios y odontología.",
+        "caracteristicas": [
+          "18 litros",
+          "Clase B con prevacío",
+          "Impresora incorporada",
+          "220 V"
+        ],
+        "areas": [
+          "Consulta externa",
+          "Odontología"
+        ],
+        "aviso": "img/promos/biobase-bkm-za.jpg",
+        "fotos": [
+          "img/venta/biobase-bkm-za.jpg"
+        ],
+        "precio": 8000,
+        "stock": 2,
+        "remate": 1
+      }
     ]
   },
   "promociones": {
     "_nota": "PROMOCIONES cargadas desde aquí. Lo normal es manejarlas en la hoja de venta (columnas precio_promo, promo_hasta y remate); esto es el camino alterno, y si un equipo está en los dos sitios manda la hoja. Por equipo: «ahora» es el precio rebajado que paga el cliente, «hasta» el último día (AAAA-MM-DD) y «remate» true para que además salte en la ventana flotante de la tienda. El precio tachado sale solo de la hoja, no se escribe. Pasada la fecha, o si «ahora» no es menor que el precio de la hoja, la promoción desaparece sola.",
-    "_ejemplo": {"ahora": 849, "hasta": "2026-10-31", "remate": true}
+    "_ejemplo": {
+      "ahora": 849,
+      "hasta": "2026-10-31",
+      "remate": true
+    }
   },
   "noPublicar": {
     "_nota": "Equipos que NO se publican aunque la hoja diga publicar = SI. Motivo: en Falabella se vende el mismo modelo más barato que nuestro propio costo de proveedor, así que no hay precio con el que competir (estudio del 4/10/2026 en docs/comparacion-falabella-2026-10-04.md). Para volver a publicar uno, borra su línea de aquí.",
@@ -1589,6 +1696,119 @@
     "monitoreo-cx15": {
       "marca": "Edan",
       "origen": "China"
+    }
+  },
+  "landings": {
+    "_nota": "Páginas de aterrizaje por categoría: una página por familia de equipos, pensada para lo que la gente escribe en Google («autoclave de vapor precio», «esterilizador clase B»), no para el modelo. La ficha de cada equipo sigue existiendo; esta es la puerta de entrada que las reúne, compara precios y explica cómo elegir. El cuadro de precios, el rango y la lista de equipos se arman solos con el catálogo: aquí solo va el texto. Para crear otra, copia este bloque con el id de la categoría (los ids están en «categorias»).",
+    "esterilizacion": {
+      "slug": "autoclaves-y-esterilizadores",
+      "h1": "Autoclaves y esterilizadores",
+      "titulo": "Autoclaves de vapor clase B en Perú: precios y modelos",
+      "descripcion": "Autoclaves de vapor clase B de 18 a 430 litros, esterilizador de calor seco y lavador desinfector, con stock en Lima. Precios con IGV, código NTS para licitaciones, garantía de 12 meses y entrega en Lima y provincias.",
+      "entrada": "Vendemos autoclaves de vapor clase B, esterilizadores de calor seco y equipos de apoyo para la central de esterilización. Abajo está el cuadro con los modelos que tenemos, su capacidad y su precio con IGV, y después una guía corta para elegir sin equivocarse.",
+      "guia": [
+        {
+          "h": "¿Clase B, clase S o clase N? Esta es la diferencia que importa",
+          "p": "La norma europea EN 13060 separa los autoclaves de mesa en tres clases según lo que son capaces de esterilizar.<br><br><b>Clase N</b> es la más básica: solo sirve para instrumental sólido y sin empaquetar. Si metes una bolsa o una manguera, el aire no sale y el vapor no llega adentro.<br><b>Clase S</b> esteriliza lo que el fabricante declare en su ficha, ni más ni menos: hay que leer la ficha de ese modelo en concreto.<br><b>Clase B</b> hace vacío fraccionado antes de inyectar el vapor, así que saca el aire de los lúmenes y de las telas. Es la única clase que esteriliza material poroso, instrumental hueco y cargas empaquetadas, que es el caso de casi cualquier consultorio, clínica o central.<br><br>En la práctica: si vas a esterilizar en bolsa, o tienes turbinas, cánulas, mangueras o campos de tela, necesitas clase B. Todos los autoclaves de vapor de este cuadro son clase B, salvo donde dice otra cosa."
+        },
+        {
+          "h": "¿Qué capacidad necesito?",
+          "p": "La capacidad se mide por el volumen de la cámara y manda el tamaño de tu carga por turno, no el tamaño del local. Como orientación:<br><br><b>18 a 23 litros</b> · consultorio dental, podología, medicina estética, curaciones. Una o dos bandejas por ciclo.<br><b>25 a 30 litros</b> · consultorio médico, tópico, laboratorio pequeño. Cabe instrumental empaquetado sin apretarlo.<br><b>45 a 60 litros</b> · clínica, centro odontológico de varios sillones, central de esterilización chica. Menos ciclos al día y menos desgaste.<br><b>85 litros o más</b> · central de esterilización de clínica u hospital, normalmente con generador de vapor propio y, desde cierto tamaño, con doble puerta para separar el lado sucio del limpio.<br><br>Un consejo que ahorra plata: si hoy llenas la cámara dos veces por turno, el modelo de arriba te sale más barato en el tiempo, porque cada ciclo gasta luz, agua y vida útil del equipo."
+        },
+        {
+          "h": "Vapor o calor seco",
+          "p": "El <b>autoclave de vapor</b> es el estándar para instrumental quirúrgico, textiles y material empaquetado: esteriliza a 121 °C o 134 °C en ciclos de minutos.<br><br>El <b>esterilizador de calor seco</b> (estufa) trabaja a 160–180 °C durante una o dos horas y se usa para vidrio de laboratorio, polvos, aceites y grasas, es decir donde el vapor no entra o estropea el material. No reemplaza al autoclave para instrumental empaquetado.<br><br>Si vas a esterilizar material termosensible que no aguanta 121 °C, lo que corresponde es un equipo de baja temperatura (peróxido de hidrógeno), no un autoclave."
+        },
+        {
+          "h": "Si compras para el Estado: el código NTS",
+          "p": "En las licitaciones y compras del Estado, los esterilizadores se piden por su denominación de la NTS 113-MINSA, y la capacidad forma parte del código. Los que más salen son el <b>D-212</b> (20 litros), el <b>D-213</b> (30 litros), el <b>D-214</b> (40 litros), el <b>D-217</b> (50 litros), el <b>D-352</b> (30 litros vertical) y el <b>D-342</b> (100 litros); el <b>D-301</b> es el esterilizador por calor seco de 50 litros y el <b>D-218</b> el de baja temperatura por peróxido de hidrógeno de 70 litros.<br><br>Un equipo cumple el código si su capacidad es igual o mayor a la pedida y cumple el resto de las especificaciones. Si nos mandas la ficha técnica de tu expediente, te devolvemos el cuadro de cumplimiento punto por punto con el modelo que ofertamos."
+        }
+      ],
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta un autoclave de vapor en Perú?",
+          "r": "Depende de la capacidad y de la marca. En nuestro catálogo los autoclaves de vapor clase B van desde {min} (18 litros, de mesa) hasta {max} (430 litros, horizontal de dos puertas para central de esterilización). Un equipo de 23 litros para consultorio está alrededor de S/ 10,000 y uno de 60 litros para clínica alrededor de S/ 29,000. Todos los precios incluyen IGV."
+        },
+        {
+          "q": "¿Qué significa que un autoclave sea clase B?",
+          "r": "Que hace vacío fraccionado antes de inyectar el vapor, según la norma EN 13060. Eso saca el aire de los instrumentos huecos y de los materiales porosos, así que puede esterilizar material empaquetado, textiles y lúmenes. Las clases N y S no pueden con todo eso."
+        },
+        {
+          "q": "¿Entregan en provincias?",
+          "r": "Sí. Entregamos en Lima y en provincias. Los equipos con stock salen en {plazo} desde la orden de compra; los que van por pedido al fabricante se confirman al emitir la cotización."
+        },
+        {
+          "q": "¿Qué garantía tienen?",
+          "r": "Garantía de {garantia} meses del fabricante. La entrega incluye manual de usuario, certificado de garantía y capacitación de uso, y hacemos el mantenimiento después de la venta."
+        },
+        {
+          "q": "¿Puedo pedir una cotización formal?",
+          "r": "Sí, y la armas tú mismo en segundos: marca los equipos que te interesan, pon las cantidades y te sale el documento con el detalle, el IGV y el total, listo para adjuntarlo a tu expediente. También puedes escribirnos por WhatsApp y te la mandamos."
+        }
+      ]
+    },
+    "monitoreo": {
+      "slug": "monitores-de-signos-vitales",
+      "h1": "Monitores de signos vitales",
+      "titulo": "Monitores de signos vitales: precios en Perú",
+      "descripcion": "Monitores multiparámetro, pulsioxímetros y monitores para UCI, con stock en Lima. Precios con IGV, código NTS para licitaciones, garantía de 12 meses y entrega en Lima y provincias.",
+      "entrada": "Monitores de cabecera, de transporte y de UCI, pulsioxímetros de mesa y de mano. Abajo está el cuadro con los modelos que tenemos y su precio con IGV. Lo que define el precio es el número de parámetros (ECG, SpO2, presión, temperatura, capnografía), el tamaño de la pantalla y si lleva impresora."
+    },
+    "reanimacion": {
+      "slug": "desfibriladores-y-dea",
+      "h1": "Desfibriladores y reanimación",
+      "titulo": "Desfibriladores y DEA: precios en Perú",
+      "descripcion": "Desfibriladores con monitor, DEA de acceso público y coches de paro, con stock en Lima. Precios con IGV, código NTS para licitaciones y entrega en Lima y provincias.",
+      "entrada": "Desfibriladores bifásicos con monitor para emergencia y UCI, desfibriladores externos automáticos (DEA) para ambulancias, colegios y empresas, y coches de paro equipados. El DEA es el de uso guiado por voz, pensado para que lo use personal no médico; el desfibrilador con monitor es el de uso hospitalario, con paletas y marcapaso."
+    },
+    "diagnostico": {
+      "slug": "equipos-de-diagnostico-clinico",
+      "h1": "Equipos de diagnóstico",
+      "titulo": "Electrocardiógrafos, tensiómetros y equipos de diagnóstico: precios en Perú",
+      "descripcion": "Electrocardiógrafos, espirómetros, MAPA, tensiómetros, estetoscopios y equipos de otorrino y oftalmología, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Es la familia más variada: desde un estetoscopio hasta un electrocardiógrafo de 12 canales o un oftalmoscopio indirecto. Abajo está el cuadro completo con los precios con IGV, ordenado de menor a mayor, para que ubiques rápido lo que buscas."
+    },
+    "neonatal": {
+      "slug": "incubadoras-y-equipos-neonatales",
+      "h1": "Neonatología y obstetricia",
+      "titulo": "Incubadoras, cunas de calor radiante y monitores fetales: precios en Perú",
+      "descripcion": "Incubadoras, cunas de calor radiante, monitores fetales y detectores de latidos, con stock en Lima. Precios con IGV, código NTS para licitaciones y entrega en Lima y provincias.",
+      "entrada": "Equipos para sala de partos, neonatología y control prenatal: incubadoras estándar y de transporte, cunas de calor radiante, monitores fetales de uno y dos bebés, y detectores de latidos de mano y de mesa."
+    },
+    "quirofano": {
+      "slug": "equipos-de-quirofano",
+      "h1": "Quirófano y aspiración",
+      "titulo": "Mesas de operaciones, lámparas quirúrgicas y electrobisturíes: precios en Perú",
+      "descripcion": "Mesas de operaciones, lámparas quirúrgicas, electrobisturíes, máquinas de anestesia y aspiradores de secreciones, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Todo lo que lleva una sala de operaciones: la mesa, la lámpara de techo o rodable, el electrobisturí, la máquina de anestesia y el aspirador. Si estás equipando un quirófano completo, arma la cotización con todo junto y te la mandamos en un solo documento."
+    },
+    "uci": {
+      "slug": "ventiladores-mecanicos-y-bombas-de-infusion",
+      "h1": "Ventilación e infusión",
+      "titulo": "Ventiladores mecánicos y bombas de infusión: precios en Perú",
+      "descripcion": "Ventiladores mecánicos de UCI y de transporte y bombas de infusión, con stock en Lima. Precios con IGV, código NTS para licitaciones y entrega en Lima y provincias.",
+      "entrada": "Ventiladores mecánicos para cuidados intensivos y para traslado, y bombas de infusión volumétricas. Son equipos de soporte vital: la instalación, la capacitación del personal y el mantenimiento después de la venta van incluidos en la entrega."
+    },
+    "imagenes": {
+      "slug": "ecografos-y-rayos-x",
+      "h1": "Imagenología",
+      "titulo": "Ecógrafos y equipos de rayos X: precios en Perú",
+      "descripcion": "Ecógrafos Doppler color portátiles y rodables y equipos de rayos X digitales, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Ecógrafos Doppler color, portátiles y rodables, con sus transductores, y equipos de rayos X digitales. Lo que marca la diferencia de precio es el número y el tipo de transductores que incluye y las aplicaciones que trae cargadas. Dinos para qué especialidad es y te decimos qué configuración te conviene."
+    },
+    "laboratorio": {
+      "slug": "equipos-de-laboratorio-clinico",
+      "h1": "Equipos de laboratorio",
+      "titulo": "Analizadores, microscopios y centrífugas de laboratorio: precios en Perú",
+      "descripcion": "Analizadores hematológicos y bioquímicos, microscopios, centrífugas, balanzas, incubadoras de cultivo y cabinas de flujo laminar, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Equipamiento para laboratorio clínico y de investigación: analizadores de hematología, bioquímica y coagulación, microscopios binoculares y estereoscópicos, centrífugas, balanzas analíticas y de precisión, estufas, incubadoras y cabinas de flujo laminar. Es nuestra familia más grande."
+    },
+    "cadena-frio": {
+      "slug": "refrigeradoras-de-medicamentos-y-vacunas",
+      "h1": "Cadena de frío",
+      "titulo": "Refrigeradoras de medicamentos y vacunas: precios en Perú",
+      "descripcion": "Refrigeradoras de medicamentos y vacunas, congeladores de laboratorio y conservadoras de banco de sangre, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Refrigeradoras y congeladores de uso médico, que no son lo mismo que una refrigeradora doméstica: mantienen la temperatura estable dentro del rango exigido, llevan registro y alarma de temperatura, y es lo que pide DIGEMID para conservar vacunas y medicamentos."
     }
   }
 }
