@@ -1810,5 +1810,24 @@
       "descripcion": "Refrigeradoras de medicamentos y vacunas, congeladores de laboratorio y conservadoras de banco de sangre, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
       "entrada": "Refrigeradoras y congeladores de uso médico, que no son lo mismo que una refrigeradora doméstica: mantienen la temperatura estable dentro del rango exigido, llevan registro y alarma de temperatura, y es lo que pide DIGEMID para conservar vacunas y medicamentos."
     }
+  },
+  "codigosEquipo": {
+    "_nota": "Código del equipo, tal como lo indicó el dueño. Sale en el bloque de datos técnicos de la ficha, con la etiqueta «Código» y junto a la capacidad en litros. NO se cita ninguna norma ni listado, no va en el texto corrido ni en la meta-descripción, y no se infiere para ningún otro equipo: solo salen los que estén escritos aquí.",
+    "biobase-bkm-za": {
+      "codigo": "D-212",
+      "capacidad": "18 L"
+    },
+    "biobase-bkm-zb": {
+      "codigo": "D-212",
+      "capacidad": "23 L"
+    },
+    "biobase-bkm-z45b": {
+      "codigo": "D-217",
+      "capacidad": "45 L"
+    },
+    "biobase-bkm-z60b": {
+      "codigo": "D-217",
+      "capacidad": "60 L"
+    }
   }
 }

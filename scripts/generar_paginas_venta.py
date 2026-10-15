@@ -466,7 +466,13 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
                         for g in f['secciones'])
         pie = '<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del fabricante.</p>' % e(f.get('fuente', 'fabricante'))
     else:
+        # «Código» y la capacidad salen de data/venta.json › codigosEquipo,
+        # escritos a mano equipo por equipo. No se infiere ninguno: si un
+        # equipo no está en esa lista, no lleva código. Sin citar norma ni
+        # listado, y solo aquí: ni en el texto ni en la meta-descripción.
+        cod = (CODIGOS_EQUIPO or {}).get(p['id']) or {}
         ident = [('Equipo', p['nom']), ('Marca', p.get('marca')), ('Modelo', p.get('modelo')),
+                 ('Capacidad', cod.get('capacidad')), ('Código', cod.get('codigo')),
                  ('Procedencia', p.get('origen')), ('Categoría', cat)]
         filas = '<tr class="g"><th colspan="2">Identificación</th></tr>' + ''.join(
             '<tr><th>%s</th><td>%s</td></tr>' % (k, e(v)) for k, v in ident if v)
@@ -504,6 +510,12 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     # cliente que ya se decidió por un equipo descubre que necesita otro.
     # Se usa la misma tarjeta de la tienda, para que se vean iguales.
     otros = ''.join(tarjeta_venta(o, base, fijas, locales, promos) for o in mismos[:6])
+    # Botón ESTÁTICO a la página de la familia. El de la tienda va a una
+    # ruta con almohadilla, que Google no sigue: sin este, la ficha no
+    # devolvía ningún enlace rastreable hacia arriba más que la miga.
+    lnd = (LANDINGS or {}).get(p.get('cat') or '')
+    fam_btn = ('<a class="btn fill" href="/venta/%s/">Ver todos los de %s</a> '
+               % (e(lnd['slug']), e((cat or 'esta familia').lower()))) if (lnd and lnd.get('slug')) else ''
     return f'''
     <button type="button" class="sb-atras" onclick="sbAtras()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -535,7 +547,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     <h2>Más en {e(cat)}</h2>
     <div class="vts">{otros}</div>
   </section>""" if otros else ''}
-  <p class="volver"><a class="btn" href="/#/venta/tienda">← Ver toda la tienda</a></p>'''
+  <p class="volver">{fam_btn}<a class="btn" href="/#/venta/tienda">← Ver toda la tienda</a></p>'''
 
 
 VIG_JS = '''<script>
@@ -557,16 +569,95 @@ VIG_JS = '''<script>
 </script>'''
 
 
+COLA_TITLE = ' | Precio Perú'
+LARGO_TITLE = 60
+LARGO_DESC = 155
+
+
+# Palabras que no pueden quedar al final de un título recortado: solas no
+# dicen nada y se leen como un error («… clase», «Desfibrilador con monitor y»).
+COLGANTES = {'de', 'del', 'la', 'el', 'los', 'las', 'un', 'una', 'con', 'sin',
+             'y', 'o', 'para', 'por', 'en', 'a', 'al', 'tipo', 'clase', 'más'}
+# Relleno que se tira PRIMERO cuando el título no entra: dice dónde se apoya
+# el equipo, no qué es. Antes de perder «clase B» o los litros, se pierde esto.
+RELLENO = ('de sobremesa', 'de mesa', 'de pedestal')
+
+
+def _recortar(txt, tope):
+    """Corta por palabras, nunca a mitad de una, y no deja colgando una
+    palabra que sola no significa nada. Sin puntos suspensivos: en un
+    título de Google quedan feos y gastan dos caracteres."""
+    txt = ' '.join(txt.split())
+    if len(txt) <= tope:
+        return txt
+    pal = txt.split()
+    while len(pal) > 1 and len(' '.join(pal)) > tope:
+        pal.pop()
+    # Y tampoco un número suelto: «Monitor multiparámetro de 15" de 8» es
+    # lo que queda de «… de 8 parámetros», y se lee peor que no decirlo.
+    while len(pal) > 1 and (pal[-1].lower().strip(',') in COLGANTES
+                            or pal[-1].strip(',').isdigit()):
+        pal.pop()
+    corto = ' '.join(pal)
+    return corto if len(corto) <= tope else corto[:tope].rstrip()
+
+
+def _nombre_corto(nom, hueco):
+    """El nombre del equipo dentro del hueco que queda.
+
+    Primero suelta el relleno («de mesa»), que es lo que menos aporta: así
+    «Autoclave de mesa 60 L clase B» entra entero como «Autoclave 60 L
+    clase B» en vez de quedar cortado en «Autoclave de mesa 60 L clase».
+    """
+    nom = ' '.join(nom.split())
+    for r in RELLENO:
+        if len(nom) <= hueco:
+            break
+        nom = ' '.join(nom.replace(r, ' ').split())
+    return _recortar(nom, hueco)
+
+
+def titulo_ficha(p):
+    """«<equipo> <marca> <modelo> | Precio Perú», máximo 60 caracteres.
+
+    Antes salían de 97 de media (máximo 136) y Google los cortaba a la
+    mitad. Lo que NO se recorta nunca es la marca y el modelo: las únicas
+    búsquedas de venta que traen visitas hoy son «mindray a7» y
+    «surtron 200», o sea marca y modelo. Si no entra todo, se acorta el
+    nombre del equipo por el final, que es la parte genérica.
+    """
+    mm = ' '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
+    hueco = LARGO_TITLE - len(COLA_TITLE) - (len(mm) + 1 if mm else 0)
+    nom = _nombre_corto(p['nom'], max(hueco, 12))
+    t = (nom + (' ' + mm if mm else '')) + COLA_TITLE
+    return t if len(t) <= LARGO_TITLE else _recortar(t, LARGO_TITLE)
+
+
+def descripcion_ficha(p):
+    """Una sola frase, con el precio adentro, máximo 155 caracteres.
+
+    Antes eran de 222 de media, repetían el nombre y el resumen, y 81 de
+    las 174 traían un espacio doble porque se concatenaba un resumen que
+    ya terminaba en punto. Google las cortaba igual.
+    """
+    nombre = ' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)
+    precio = (' a %s con IGV' % soles(p['precio'])) if p.get('precio') else ''
+    cola = '. Venta en Lima y provincias, con garantía y entrega a todo el país.'
+    base = nombre + precio
+    if len(base) + len(cola) > LARGO_DESC:
+        cola = '. Venta en Lima y provincias.'
+    if len(base) + len(cola) > LARGO_DESC:
+        base = _recortar(base, LARGO_DESC - len(cola))
+    return ' '.join((base + cola).split())
+
+
 def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, mismos):
     cat = cats.get(p.get('cat'), '')
     fts = fotos(p, base, fijas, locales)
     ruta = '/venta/%s/' % p['id']
     nombre = ' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)
-    nts = ('Código NTS %s' % p['clave']) if p.get('clave') else ''
-    title = '%s%s | Venta en Lima — Sinergia Biomédica' % (nombre, ' · ' + nts if nts else '')
-    descripcion = '%s %s%s Venta con ficha técnica, entrega en Lima y provincias y mantenimiento.' % (
-        nombre + '.', (p.get('resumen') or '').rstrip('.') + '. ' if p.get('resumen') else '',
-        ('%s (%s, NTS 113-MINSA).' % (nts, p['expediente'])) if nts and p.get('expediente') else (nts + '.' if nts else ''))
+    title = titulo_ficha(p)
+    descripcion = descripcion_ficha(p)
     cuerpo = producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, locales) + VIG_JS
     oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
               'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/PreOrder',
@@ -843,6 +934,7 @@ def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
                         cuerpo=cuerpo, jsonld=jsonld)
 
 
+CODIGOS_EQUIPO = {}        # lo llena main(): equipo → {codigo, capacidad}
 LANDINGS = {}              # lo llena main(): categoría → su página de aterrizaje
 TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promociones»
 
@@ -1264,6 +1356,8 @@ def main():
     if choques:
         sys.exit('La dirección de estas familias choca con la de un equipo: %s' % ', '.join(choques))
     LANDINGS.update(landings)
+    CODIGOS_EQUIPO.update({k: v for k, v in (repo.get('codigosEquipo') or {}).items()
+                           if not k.startswith('_')})
     cats_orden = [c['id'] for c in repo.get('categorias', [])]
     base = {p['id']: p for p in repo.get('productos', [])}
     fijas = {k: v for k, v in (repo.get('fotosFijas') or {}).items() if not k.startswith('_')}
