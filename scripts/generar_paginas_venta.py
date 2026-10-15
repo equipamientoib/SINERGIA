@@ -1094,6 +1094,26 @@ def mapa_portada(productos, cambios):
     gp.escribir('index.html', nuevo, cambios)
 
 
+def mapa_pie_portada(cambios):
+    """El mismo mapa del sitio, en el pie de la portada.
+
+    La portada es la página con más autoridad del sitio y hoy no tiene ni
+    un solo enlace estático: su menú va todo a rutas #/…, que Google no
+    sigue. Sin esto, /venta/ y sus 10 familias no tienen ningún camino de
+    entrada desde fuera de su propio barrio.
+
+    Se escribe entre marcas, igual que el resto de lo que la portada
+    recibe generado, para que no haya que mantenerlo a mano.
+    """
+    txt = open(gp.INDEX, encoding='utf-8').read()
+    ini, fin = '<!--MAPA-PIE-INICIO-->', '<!--MAPA-PIE-FIN-->'
+    if ini not in txt:
+        txt = txt.replace('<footer class="ent-pie">', ini + fin + '\n  <footer class="ent-pie">', 1)
+    nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
+                   lambda m: ini + gp.mapa_sitio() + fin, txt, flags=re.S)
+    gp.escribir('index.html', nuevo, cambios)
+
+
 def sitemap(paginas, cambios):
     """Agrega/actualiza las URL de /venta/ sin tocar las demás."""
     txt = open(gp.SITEMAP, encoding='utf-8').read() if os.path.exists(gp.SITEMAP) else ''
@@ -1313,6 +1333,7 @@ def main():
     gp.escribir('data/venta-vivo.json', json.dumps(copia, ensure_ascii=False, separators=(',', ':')) + '\n', cambios)
 
     mapa_portada(productos, cambios)
+    mapa_pie_portada(cambios)
     sitemap(paginas, cambios)
     vivos = {x['id']: x for x in orden}
     for pid, d in sorted(promos.items()):

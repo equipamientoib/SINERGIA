@@ -637,6 +637,23 @@
     .ent-top nav{font-size:13px}
   }
 
+/* ── Mapa del sitio en el pie de la portada ────────────────────────────
+   La portada no tenía ni un enlace estático: su menú va todo a rutas #/…,
+   que Google no sigue, así que /venta/ y sus familias quedaban sin ningún
+   camino de entrada. Mismo bloque que el de las páginas estáticas. */
+.mapa-pie{border-top:1px solid rgba(0,0,0,.08)}
+.mapa-pie .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:26px 40px;padding:34px 20px 30px;max-width:1180px;margin:0 auto}
+.mapa-pie div{display:flex;flex-direction:column;gap:7px;min-width:0}
+.mapa-pie b{font-family:var(--ff-d);font-size:15px;font-weight:600;margin-bottom:3px}
+.mapa-pie b a{color:var(--onix);text-decoration:none}
+.mapa-pie b a:hover{color:var(--cobre-d)}
+.mapa-pie a{font-size:13.5px;line-height:1.45;color:var(--gris);text-decoration:none}
+.mapa-pie a:hover{color:var(--cobre-d);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:560px){
+  .mapa-pie .wrap{padding:26px 16px 22px;gap:22px}
+}
+
 /* ===== css/17-venta.css ===== */
   /* =====================================================================
      VENTA (#/venta…): portada de venta, categorías y ficha de producto.

@@ -319,6 +319,7 @@ def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None)
   <nav class="migas" aria-label="Estás en">{migas_html}</nav>
 {cuerpo}
 </main>
+{mapa_sitio()}
 <footer class="pie"><div class="wrap">
   <div><b>Sinergia Biomédica</b><br>Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú</div>
   <div><a href="mailto:{e(cfg['email'])}">{e(cfg['email'])}</a><br>
@@ -642,6 +643,37 @@ def pagina_hub(hub, publicados, cfg, locales):
 
 
 # ─────────────────────────── escritura ───────────────────────────
+
+def mapa_sitio():
+    """Mapa del sitio para el pie: enlaces ESTÁTICOS, sin almohadilla.
+
+    Hasta ahora la portada no tenía ni un solo enlace estático (todo el menú
+    va a rutas #/…, que Google no sigue) y /alquiler/ no enlazaba a venta.
+    Resultado: el barrio de /venta/ quedaba aislado. Google conocía sus URL
+    por el sitemap pero nunca las rastreaba, que es exactamente lo que
+    Search Console llama «Discovered – currently not indexed»: 77 páginas
+    descubiertas y ninguna visitada.
+
+    Este bloque abre el camino desde las páginas que sí reciben visitas
+    (la portada y las de alquiler) hacia las 10 familias de venta y hacia
+    los 11 tipos de alquiler. Sale del catálogo, así que se mantiene solo.
+    """
+    venta = leer_json(os.path.join(ROOT, 'data', 'venta.json'))
+    cats = {c['id']: c['nombre'] for c in venta.get('categorias', [])}
+    orden = [c['id'] for c in venta.get('categorias', [])]
+    lands = {k: v for k, v in (venta.get('landings') or {}).items() if not k.startswith('_')}
+    fam = []
+    for cid in orden:
+        L = lands.get(cid)
+        if L and L.get('slug'):
+            fam.append('<a href="/venta/%s/">%s</a>' % (e(L['slug']), e(cats.get(cid, cid))))
+    tipos = leer_json(os.path.join(ROOT, 'data', 'seo-tipos.json')).get('tipos', [])
+    alq = ['<a href="/alquiler/%s/">%s</a>' % (e(t['slug']), e(t['nombre'])) for t in tipos]
+    return ('<nav class="mapa-pie" aria-label="Mapa del sitio"><div class="wrap">'
+            '<div><b><a href="/venta/">Venta de equipos médicos</a></b>%s</div>'
+            '<div><b><a href="/alquiler/">Alquiler de instrumentos</a></b>%s</div>'
+            '</div></nav>' % (''.join(fam), ''.join(alq)))
+
 
 def escribir(ruta_rel, contenido, cambios):
     ruta = os.path.join(ROOT, ruta_rel)
