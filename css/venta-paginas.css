@@ -242,3 +242,19 @@
 .vcat h2 a{color:inherit;text-decoration:none}
 .vcat h2 a i{font-style:normal;color:var(--cobre-d);font-size:.8em}
 .vcat h2 a:hover{color:var(--cobre-d)}
+
+/* ── Índice de familias (/venta/) ──────────────────────────────────────
+   Cada tarjeta es la puerta de una familia. Conserva el id de la
+   categoría, así los enlaces viejos del tipo /venta/#esterilizacion
+   siguen llevando al sitio correcto. */
+.fams{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.fam{display:flex;flex-direction:column;gap:6px;padding:20px 20px 18px;background:var(--blanco);
+  border:1px solid var(--linea);border-radius:14px;text-decoration:none;color:inherit;
+  scroll-margin-top:90px;transition:border-color .2s,transform .2s}
+.fam:hover{border-color:var(--cobre-d);transform:translateY(-2px)}
+.fam h2{font-family:var(--ff-d);font-size:19px;font-weight:600;color:var(--onix);margin:0}
+.fam p{margin:0;font-size:13.5px;line-height:1.55;color:var(--gris)}
+.fam-n{font-size:13px;font-weight:600;color:var(--grafito);margin-top:4px}
+.fam-d{font-size:13px;color:var(--cobre-d);font-weight:600;font-family:var(--ff-d)}
+.fam-ir{margin-top:8px;font-size:13px;font-weight:600;color:var(--cobre-d)}
+.fam-ir i{font-style:normal}

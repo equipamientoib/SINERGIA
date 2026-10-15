@@ -1746,6 +1746,69 @@
           "r": "Sí, y la armas tú mismo en segundos: marca los equipos que te interesan, pon las cantidades y te sale el documento con el detalle, el IGV y el total, listo para adjuntarlo a tu expediente. También puedes escribirnos por WhatsApp y te la mandamos."
         }
       ]
+    },
+    "monitoreo": {
+      "slug": "monitores-de-signos-vitales",
+      "h1": "Monitores de signos vitales",
+      "titulo": "Monitores de signos vitales: precios en Perú",
+      "descripcion": "Monitores multiparámetro, pulsioxímetros y monitores para UCI, con stock en Lima. Precios con IGV, código NTS para licitaciones, garantía de 12 meses y entrega en Lima y provincias.",
+      "entrada": "Monitores de cabecera, de transporte y de UCI, pulsioxímetros de mesa y de mano. Abajo está el cuadro con los modelos que tenemos y su precio con IGV. Lo que define el precio es el número de parámetros (ECG, SpO2, presión, temperatura, capnografía), el tamaño de la pantalla y si lleva impresora."
+    },
+    "reanimacion": {
+      "slug": "desfibriladores-y-dea",
+      "h1": "Desfibriladores y reanimación",
+      "titulo": "Desfibriladores y DEA: precios en Perú",
+      "descripcion": "Desfibriladores con monitor, DEA de acceso público y coches de paro, con stock en Lima. Precios con IGV, código NTS para licitaciones y entrega en Lima y provincias.",
+      "entrada": "Desfibriladores bifásicos con monitor para emergencia y UCI, desfibriladores externos automáticos (DEA) para ambulancias, colegios y empresas, y coches de paro equipados. El DEA es el de uso guiado por voz, pensado para que lo use personal no médico; el desfibrilador con monitor es el de uso hospitalario, con paletas y marcapaso."
+    },
+    "diagnostico": {
+      "slug": "equipos-de-diagnostico-clinico",
+      "h1": "Equipos de diagnóstico",
+      "titulo": "Electrocardiógrafos, tensiómetros y equipos de diagnóstico: precios en Perú",
+      "descripcion": "Electrocardiógrafos, espirómetros, MAPA, tensiómetros, estetoscopios y equipos de otorrino y oftalmología, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Es la familia más variada: desde un estetoscopio hasta un electrocardiógrafo de 12 canales o un oftalmoscopio indirecto. Abajo está el cuadro completo con los precios con IGV, ordenado de menor a mayor, para que ubiques rápido lo que buscas."
+    },
+    "neonatal": {
+      "slug": "incubadoras-y-equipos-neonatales",
+      "h1": "Neonatología y obstetricia",
+      "titulo": "Incubadoras, cunas de calor radiante y monitores fetales: precios en Perú",
+      "descripcion": "Incubadoras, cunas de calor radiante, monitores fetales y detectores de latidos, con stock en Lima. Precios con IGV, código NTS para licitaciones y entrega en Lima y provincias.",
+      "entrada": "Equipos para sala de partos, neonatología y control prenatal: incubadoras estándar y de transporte, cunas de calor radiante, monitores fetales de uno y dos bebés, y detectores de latidos de mano y de mesa."
+    },
+    "quirofano": {
+      "slug": "equipos-de-quirofano",
+      "h1": "Quirófano y aspiración",
+      "titulo": "Mesas de operaciones, lámparas quirúrgicas y electrobisturíes: precios en Perú",
+      "descripcion": "Mesas de operaciones, lámparas quirúrgicas, electrobisturíes, máquinas de anestesia y aspiradores de secreciones, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Todo lo que lleva una sala de operaciones: la mesa, la lámpara de techo o rodable, el electrobisturí, la máquina de anestesia y el aspirador. Si estás equipando un quirófano completo, arma la cotización con todo junto y te la mandamos en un solo documento."
+    },
+    "uci": {
+      "slug": "ventiladores-mecanicos-y-bombas-de-infusion",
+      "h1": "Ventilación e infusión",
+      "titulo": "Ventiladores mecánicos y bombas de infusión: precios en Perú",
+      "descripcion": "Ventiladores mecánicos de UCI y de transporte y bombas de infusión, con stock en Lima. Precios con IGV, código NTS para licitaciones y entrega en Lima y provincias.",
+      "entrada": "Ventiladores mecánicos para cuidados intensivos y para traslado, y bombas de infusión volumétricas. Son equipos de soporte vital: la instalación, la capacitación del personal y el mantenimiento después de la venta van incluidos en la entrega."
+    },
+    "imagenes": {
+      "slug": "ecografos-y-rayos-x",
+      "h1": "Imagenología",
+      "titulo": "Ecógrafos y equipos de rayos X: precios en Perú",
+      "descripcion": "Ecógrafos Doppler color portátiles y rodables y equipos de rayos X digitales, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Ecógrafos Doppler color, portátiles y rodables, con sus transductores, y equipos de rayos X digitales. Lo que marca la diferencia de precio es el número y el tipo de transductores que incluye y las aplicaciones que trae cargadas. Dinos para qué especialidad es y te decimos qué configuración te conviene."
+    },
+    "laboratorio": {
+      "slug": "equipos-de-laboratorio-clinico",
+      "h1": "Equipos de laboratorio",
+      "titulo": "Analizadores, microscopios y centrífugas de laboratorio: precios en Perú",
+      "descripcion": "Analizadores hematológicos y bioquímicos, microscopios, centrífugas, balanzas, incubadoras de cultivo y cabinas de flujo laminar, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Equipamiento para laboratorio clínico y de investigación: analizadores de hematología, bioquímica y coagulación, microscopios binoculares y estereoscópicos, centrífugas, balanzas analíticas y de precisión, estufas, incubadoras y cabinas de flujo laminar. Es nuestra familia más grande."
+    },
+    "cadena-frio": {
+      "slug": "refrigeradoras-de-medicamentos-y-vacunas",
+      "h1": "Cadena de frío",
+      "titulo": "Refrigeradoras de medicamentos y vacunas: precios en Perú",
+      "descripcion": "Refrigeradoras de medicamentos y vacunas, congeladores de laboratorio y conservadoras de banco de sangre, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
+      "entrada": "Refrigeradoras y congeladores de uso médico, que no son lo mismo que una refrigeradora doméstica: mantienen la temperatura estable dentro del rango exigido, llevan registro y alarma de temperatura, y es lo que pide DIGEMID para conservar vacunas y medicamentos."
     }
   }
 }

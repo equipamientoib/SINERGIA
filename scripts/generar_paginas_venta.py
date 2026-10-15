@@ -633,26 +633,36 @@ def precio_tarjeta(p, promos):
             % (soles(p['precio']), 'Precio especial'))
 
 
-def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
+def pagina_hub(productos, cats_orden, cats, catsx, cfg, promos, base, fijas, locales):
+    """/venta/ es el índice de las familias, no la lista de los 163 equipos.
+
+    Antes esta página los mostraba todos juntos, en secciones con ancla
+    (/venta/#esterilizacion). Un ancla no es una página: para Google todo
+    eso era UNA sola página que hablaba de estetoscopios, ecógrafos,
+    autoclaves y camas a la vez, así que no podía ganar ninguna búsqueda
+    concreta. Ahora cada familia tiene su página de verdad y esta es la
+    puerta que lleva a ellas. Las anclas viejas siguen funcionando: cada
+    tarjeta conserva el id de su familia.
+
+    Quien quiere buscar un equipo suelto tiene la tienda con buscador y
+    filtros, que no cambia.
+    """
     ruta = '/venta/'
-    secciones = []
+    tarjetas = []
     for cid in cats_orden:
         ps = [p for p in productos if p.get('cat') == cid]
-        if not ps:
+        L = (LANDINGS or {}).get(cid)
+        if not ps or not L:
             continue
-        tarjetas = ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in ps)
-        # Si la familia tiene su propia página, el título de la sección lleva
-        # a ella: es el enlace interno más visible hacia la página que quiere
-        # competir en Google por «autoclave de vapor precio».
-        lnd = (LANDINGS or {}).get(cid)
-        titulo = e(cats.get(cid, cid))
-        if lnd and lnd.get('slug'):
-            titulo = ('<a href="/venta/%s/">%s <i>→</i></a>' % (e(lnd['slug']), titulo))
-        secciones.append('<section class="vcat" id="%s"><h2>%s <small>%d</small></h2><div class="vts">%s</div></section>'
-                         % (e(cid), titulo, len(ps), tarjetas))
-    # Las promociones viven en su propia página (/promociones/), no aquí:
-    # la tienda se queda para buscar equipos. Lo único que queda es la
-    # ventana de bienvenida con uno de los remates.
+        precios = sorted(p['precio'] for p in ps if p.get('precio'))
+        desde = ('<span class="fam-d">desde %s</span>' % soles(precios[0])) if precios else ''
+        tarjetas.append(
+            '<a class="fam" id="%s" href="/venta/%s/">'
+            '<h2>%s</h2><p>%s</p>'
+            '<span class="fam-n">%d equipos</span>%s<span class="fam-ir">Ver precios <i>→</i></span></a>'
+            % (e(cid), e(L['slug']), e(cats.get(cid, cid)),
+               e(catsx.get(cid, '')), len(ps), desde))
+
     enof = [p for p in productos if promo(p)]
     franja_promo = ''
     rem = [p for p in enof if promo(p)['remate']]
@@ -668,13 +678,21 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
     <div class="eyebrow">Venta · Equipamiento biomédico · Lima y provincias</div>
     <h1>Venta de equipos médicos</h1>
     <p class="lead">{len(productos)} equipos con stock para hospitales, clínicas y obras de equipamiento: ficha técnica, código NTS y mantenimiento después de la venta.</p>
-    <p><a class="btn fill" href="/#/venta/tienda">Abrir la tienda con filtros →</a> <a class="btn" href="/venta/codigos-nts/">Buscar por código NTS</a></p>
+    <p><a class="btn fill" href="/#/venta/tienda">Buscar un equipo →</a> <a class="btn" href="/venta/codigos-nts/">Buscar por código NTS</a></p>
   </section>
   {franja_promo}
-  {''.join(secciones)}'''
-    jsonld = [{'@type': 'ItemList', 'name': 'Venta de equipos médicos',
-               'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
-                                    'url': SITIO + '/venta/%s/' % p['id']} for i, p in enumerate(productos)]}]
+  <section class="lp-s">
+    <h2>Qué vendemos</h2>
+    <div class="fams">{''.join(tarjetas)}</div>
+  </section>'''
+    jsonld = [{'@type': 'ItemList', 'name': 'Familias de equipos médicos',
+               'itemListElement': [{'@type': 'ListItem', 'position': i + 1,
+                                    'name': cats.get(c, c),
+                                    'url': SITIO + '/venta/%s/' % LANDINGS[c]['slug']}
+                                   for i, c in enumerate(
+                                       [c for c in cats_orden
+                                        if (LANDINGS or {}).get(c)
+                                        and any(p.get('cat') == c for p in productos)])]}]
     return ruta, pagina(cfg, ruta=ruta, title='Venta de equipos médicos en Lima y provincias | Sinergia Biomédica',
                         descripcion='Equipos médicos con stock: monitores, electrocardiógrafos, autoclaves, desfibriladores, '
                                     'ecógrafos y más, con ficha técnica y mantenimiento. Lima y provincias.',
@@ -705,37 +723,59 @@ def clase_de(p):
 
 
 def cuadro_precios(ps, promos):
-    """El cuadro comparable: capacidad, clase, precio y stock.
+    """Cuadro comparable de la familia: lo que la gente va a mirar primero.
 
-    Ordenado por capacidad de menor a mayor, que es como la gente decide:
-    primero mira si le alcanza el presupuesto para el tamaño que necesita.
+    Las columnas se ponen solas: capacidad y clase solo aparecen si los
+    equipos de esa familia las tienen en el nombre (los autoclaves sí, los
+    estetoscopios no). Una columna vacía en 33 filas es ruido.
     """
+    con_cap = any(capacidad_de(p) for p in ps)
+    con_cl = any(clase_de(p) for p in ps)
+    if con_cap:
+        orden = lambda x: (capacidad_de(x) or 10 ** 6, x.get('precio') or 10 ** 9)
+    else:
+        orden = lambda x: (x.get('precio') or 10 ** 9, x.get('nom') or '')
     filas = []
-    for p in sorted(ps, key=lambda x: (capacidad_de(x) or 10 ** 6, x.get('precio') or 10 ** 9)):
-        of = promo(p, promos)
-        cap = capacidad_de(p)
-        cl = clase_de(p)
+    for p in sorted(ps, key=orden):
+        cel = []
+        if con_cap:
+            cap = capacidad_de(p)
+            cel.append('<td>%s</td>' % (('%d L' % cap) if cap else '—'))
+        if con_cl:
+            cl = clase_de(p)
+            cel.append('<td>%s</td>' % (('Clase %s' % cl) if cl else '—'))
         precio = ('<b>%s</b>' % soles(p['precio'])) if p.get('precio') else 'Consultar'
-        if of:
+        if promo(p, promos):
             precio += ' <em class="lp-of">precio especial</em>'
         st = ('<span class="lp-si">En stock</span>' if (p.get('stock') or 0) > 0
               else '<span class="lp-no">A pedido</span>')
         filas.append(
-            '<tr><th scope="row"><a href="/venta/%s/">%s</a>'
-            '<small>%s</small></th><td>%s</td><td>%s</td><td class="lp-p">%s</td><td>%s</td></tr>'
+            '<tr><th scope="row"><a href="/venta/%s/">%s</a><small>%s</small></th>'
+            '%s<td class="lp-p">%s</td><td>%s</td></tr>'
             % (p['id'], e(p['nom']),
                e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
-               ('%d L' % cap) if cap else '—', ('Clase %s' % cl) if cl else '—', precio, st))
+               ''.join(cel), precio, st))
+    cab = ['<th scope="col">Equipo</th>']
+    if con_cap:
+        cab.append('<th scope="col">Capacidad</th>')
+    if con_cl:
+        cab.append('<th scope="col">Clase</th>')
+    cab.append('<th scope="col">Precio con IGV</th><th scope="col">Entrega</th>')
     return ('<div class="lp-tabla"><table>'
-            '<caption class="sr-only">Precios de autoclaves y esterilizadores</caption>'
-            '<thead><tr><th scope="col">Equipo</th><th scope="col">Capacidad</th>'
-            '<th scope="col">Clase</th><th scope="col">Precio con IGV</th>'
-            '<th scope="col">Entrega</th></tr></thead><tbody>%s</tbody></table></div>'
-            % ''.join(filas))
+            '<caption class="sr-only">Precios con IGV</caption>'
+            '<thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>'
+            % (''.join(cab), ''.join(filas)))
 
 
-def pagina_categoria(cid, L, ps, cats, cfg, promos):
-    """La página de una familia de equipos: cuadro de precios, guía y preguntas."""
+def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
+    """La página de una familia: tarjetas, cuadro de precios, guía y preguntas.
+
+    Las tarjetas son las mismas de la tienda, para que el cliente reconozca
+    dónde está. El cuadro de precios va debajo porque es lo que permite
+    comparar de un vistazo, y es lo que Google puede mostrar como respuesta.
+    La guía y las preguntas son opcionales: una familia sin texto propio
+    igual tiene su página, con sus equipos y sus precios.
+    """
     ruta = '/venta/%s/' % L['slug']
     precios = sorted(p['precio'] for p in ps if p.get('precio'))
     rango = {'min': soles(precios[0]) if precios else '',
@@ -747,37 +787,43 @@ def pagina_categoria(cid, L, ps, cats, cfg, promos):
     faq = L.get('faq') or []
     for f in faq:
         f['r_'] = f['r'].format(**rango)
-    bloque_faq = ''.join(
+    bloque_faq = ('<section class="lp-s"><h2>Preguntas frecuentes</h2>%s</section>' % ''.join(
         '<details class="lp-faq"><summary>%s</summary><p>%s</p></details>' % (e(f['q']), e(f['r_']))
-        for f in faq)
-    desde = ('<p class="lp-desde">Desde <b>%s</b> hasta <b>%s</b>, con IGV incluido.</p>'
-             % (rango['min'], rango['max'])) if precios else ''
-    title = '%s | Sinergia Biomédica' % L['titulo']
+        for f in faq)) if faq else ''
+    desde = ''
+    if len(precios) > 1:
+        desde = ('<p class="lp-desde">Desde <b>%s</b> hasta <b>%s</b>, con IGV incluido.</p>'
+                 % (rango['min'], rango['max']))
+    elif precios:
+        desde = '<p class="lp-desde"><b>%s</b>, con IGV incluido.</p>' % rango['min']
+    tarjetas = ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in ordenar(ps))
+    nts = [p for p in ps if p.get('clave')]
+    enlace_nts = (' <a class="btn" href="/venta/codigos-nts/">Buscar por código NTS</a>') if nts else ''
     cuerpo = f'''
   <section class="cabeza">
     <div class="eyebrow">Venta · {e(cats.get(cid, ''))} · Lima y provincias</div>
     <h1>{e(L['h1'])}</h1>
     <p class="lead">{L['entrada']}</p>
     {desde}
-    <p><a class="btn fill" href="/#/cotizar-venta">Armar mi cotización →</a>
-       <a class="btn" href="/venta/codigos-nts/">Buscar por código NTS</a></p>
+    <p><a class="btn fill" href="/#/cotizar-venta">Armar mi cotización →</a>{enlace_nts}</p>
   </section>
   <section class="lp-s">
-    <h2>Modelos y precios</h2>
+    <h2>{len(ps)} equipos</h2>
+    <div class="vts">{tarjetas}</div>
+  </section>
+  <section class="lp-s">
+    <h2>Cuadro de precios</h2>
     {cuadro_precios(ps, promos)}
     <p class="lp-nota">Precios con IGV, válidos con el stock del día. Toca un equipo para ver su
     ficha completa, sus características y el botón para agregarlo a tu cotización.</p>
   </section>
   {guia}
-  <section class="lp-s">
-    <h2>Preguntas frecuentes</h2>
-    {bloque_faq}
-  </section>
+  {bloque_faq}
   <section class="lp-cta">
     <h2>¿Te ayudamos a elegir?</h2>
-    <p>Dinos qué vas a esterilizar y cuántas veces al día, y te decimos qué capacidad te conviene.
-    Si es para una licitación, mándanos la ficha técnica del expediente y te devolvemos el cuadro de
-    cumplimiento.</p>
+    <p>Dinos para qué lo necesitas y te recomendamos el modelo que te conviene, sin compromiso. Si es
+    para una licitación, mándanos la ficha técnica del expediente y te devolvemos el cuadro de
+    cumplimiento punto por punto con el equipo que ofertamos.</p>
     <p><a class="btn fill" href="/#/cotizar-venta">Armar mi cotización →</a>
        <a class="btn" href="/#/contacto">Escríbenos</a></p>
   </section>'''
@@ -791,7 +837,8 @@ def pagina_categoria(cid, L, ps, cats, cfg, promos):
                        'mainEntity': [{'@type': 'Question', 'name': f['q'],
                                        'acceptedAnswer': {'@type': 'Answer', 'text': f['r_']}}
                                       for f in faq]})
-    return ruta, pagina(cfg, ruta=ruta, title=title, descripcion=L['descripcion'],
+    return ruta, pagina(cfg, ruta=ruta, title='%s | Sinergia Biomédica' % L['titulo'],
+                        descripcion=L['descripcion'],
                         migas=[('Inicio', '/'), ('Venta', '/venta/'), (L['h1'], ruta)],
                         cuerpo=cuerpo, jsonld=jsonld)
 
@@ -1173,9 +1220,30 @@ def main():
         sys.exit('No hay equipos en los datos: no se genera nada.')
     # Las familias con página propia se resuelven antes de generar nada: el
     # hub y las migas de cada ficha enlazan a ellas.
-    landings = {k: v for k, v in (repo.get('landings') or {}).items() if not k.startswith('_')}
-    LANDINGS.update(landings)
+    # Las familias con página propia se resuelven antes de generar nada: el
+    # índice y las migas de cada ficha enlazan a ellas. Una familia con
+    # equipos pero sin texto escrito igual tiene su página, con lo mínimo:
+    # así el índice nunca lleva a un enlace roto.
     cats = {c['id']: c['nombre'] for c in repo.get('categorias', [])}
+    catsx = {c['id']: c.get('ejemplos', '') for c in repo.get('categorias', [])}
+    landings = {k: dict(v) for k, v in (repo.get('landings') or {}).items()
+                if not k.startswith('_')}
+    for cid, nom in cats.items():
+        if not any(p.get('cat') == cid for p in productos):
+            continue
+        L = landings.setdefault(cid, {})
+        L.setdefault('slug', cid)
+        L.setdefault('h1', nom)
+        L.setdefault('titulo', '%s: precios en Perú' % nom)
+        L.setdefault('descripcion', '%s con stock en Lima. Precios con IGV y entrega en Lima y '
+                                    'provincias.' % (catsx.get(cid) or nom))
+        L.setdefault('entrada', catsx.get(cid) or nom)
+    # Una familia no puede llamarse como un equipo: las dos viven en
+    # /venta/<nombre>/ y la segunda pisaría a la primera.
+    choques = sorted({L['slug'] for L in landings.values()} & {p['id'] for p in productos})
+    if choques:
+        sys.exit('La dirección de estas familias choca con la de un equipo: %s' % ', '.join(choques))
+    LANDINGS.update(landings)
     cats_orden = [c['id'] for c in repo.get('categorias', [])]
     base = {p['id']: p for p in repo.get('productos', [])}
     fijas = {k: v for k, v in (repo.get('fotosFijas') or {}).items() if not k.startswith('_')}
@@ -1187,7 +1255,7 @@ def main():
 
     orden = ordenar(productos)
     cambios, paginas = [], []
-    ruta, doc = pagina_hub(orden, cats_orden, cats, cfg, base, fijas, locales, promos)
+    ruta, doc = pagina_hub(orden, cats_orden, cats, catsx, cfg, promos, base, fijas, locales)
     gp.escribir('venta/index.html', doc, cambios)
     paginas.append((ruta, 'venta/index.html'))
     ruta, doc = pagina_nts(orden, cfg)
@@ -1200,7 +1268,7 @@ def main():
         ps = [q for q in orden if q.get('cat') == cid]
         if not ps or not L.get('slug'):
             continue
-        ruta, doc = pagina_categoria(cid, L, ps, cats, cfg, promos)
+        ruta, doc = pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales)
         rel = 'venta/%s/index.html' % L['slug']
         gp.escribir(rel, doc, cambios)
         paginas.append((ruta, rel))
