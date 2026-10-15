@@ -585,7 +585,13 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
                # disponible para mostrar la ficha con foto y precio.
                'image': [SITIO + b if b.startswith('/') else b for _, b in fts][:3],
                'offers': oferta}]
-    migas = [('Inicio', '/'), ('Venta', '/venta/'), (cat or 'Equipos', '/venta/#' + (p.get('cat') or '')),
+    # Si la familia tiene página propia, la miga apunta ahí y no al ancla de
+    # la tienda: son 13 enlaces internos hacia la página que queremos que
+    # Google entienda como la principal de autoclaves.
+    lnd = (LANDINGS or {}).get(p.get('cat') or '')
+    destino_cat = ('/venta/%s/' % lnd['slug']) if (lnd and lnd.get('slug')) else \
+                  ('/venta/#' + (p.get('cat') or ''))
+    migas = [('Inicio', '/'), ('Venta', '/venta/'), (cat or 'Equipos', destino_cat),
              (p['nom'], ruta)]
     img = fts[0][0] if fts and fts[0][0].startswith('/') else None
     return ruta, pagina(cfg, ruta=ruta, title=title, descripcion=descripcion, migas=migas,
@@ -635,8 +641,15 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
         if not ps:
             continue
         tarjetas = ''.join(tarjeta_venta(p, base, fijas, locales, promos) for p in ps)
+        # Si la familia tiene su propia página, el título de la sección lleva
+        # a ella: es el enlace interno más visible hacia la página que quiere
+        # competir en Google por «autoclave de vapor precio».
+        lnd = (LANDINGS or {}).get(cid)
+        titulo = e(cats.get(cid, cid))
+        if lnd and lnd.get('slug'):
+            titulo = ('<a href="/venta/%s/">%s <i>→</i></a>' % (e(lnd['slug']), titulo))
         secciones.append('<section class="vcat" id="%s"><h2>%s <small>%d</small></h2><div class="vts">%s</div></section>'
-                         % (e(cid), e(cats.get(cid, cid)), len(ps), tarjetas))
+                         % (e(cid), titulo, len(ps), tarjetas))
     # Las promociones viven en su propia página (/promociones/), no aquí:
     # la tienda se queda para buscar equipos. Lo único que queda es la
     # ventana de bienvenida con uno de los remates.
@@ -668,6 +681,122 @@ def pagina_hub(productos, cats_orden, cats, cfg, base, fijas, locales, promos):
                         migas=[('Inicio', '/'), ('Venta', ruta)], cuerpo=cuerpo, jsonld=jsonld)
 
 
+# ── Páginas de aterrizaje por categoría ─────────────────────────────────
+# Una ficha de producto se llama «Autoclave de mesa 60 L clase B Biobase
+# BKM-Z60B»: perfecta para quien ya sabe qué modelo quiere, inútil para
+# quien escribe «autoclave de vapor precio» en Google, que es casi todo el
+# mundo. Esta página es la puerta de entrada de esa búsqueda: reúne la
+# familia entera, pone los precios en un cuadro comparable y explica cómo
+# elegir. El texto vive en data/venta.json › landings; aquí solo se arma.
+
+RX_CAPACIDAD = re.compile(r'(\d{1,4})\s*(?:l\b|lt\b|lts\b|litros?\b)', re.I)
+RX_CLASE = re.compile(r'clase\s+([bns])\b', re.I)
+
+
+def capacidad_de(p):
+    """Litros de la cámara, sacados del nombre («de 60 L», «de 430 litros»)."""
+    m = RX_CAPACIDAD.search(p.get('nom') or '')
+    return int(m.group(1)) if m else None
+
+
+def clase_de(p):
+    m = RX_CLASE.search(p.get('nom') or '')
+    return m.group(1).upper() if m else ''
+
+
+def cuadro_precios(ps, promos):
+    """El cuadro comparable: capacidad, clase, precio y stock.
+
+    Ordenado por capacidad de menor a mayor, que es como la gente decide:
+    primero mira si le alcanza el presupuesto para el tamaño que necesita.
+    """
+    filas = []
+    for p in sorted(ps, key=lambda x: (capacidad_de(x) or 10 ** 6, x.get('precio') or 10 ** 9)):
+        of = promo(p, promos)
+        cap = capacidad_de(p)
+        cl = clase_de(p)
+        precio = ('<b>%s</b>' % soles(p['precio'])) if p.get('precio') else 'Consultar'
+        if of:
+            precio += ' <em class="lp-of">precio especial</em>'
+        st = ('<span class="lp-si">En stock</span>' if (p.get('stock') or 0) > 0
+              else '<span class="lp-no">A pedido</span>')
+        filas.append(
+            '<tr><th scope="row"><a href="/venta/%s/">%s</a>'
+            '<small>%s</small></th><td>%s</td><td>%s</td><td class="lp-p">%s</td><td>%s</td></tr>'
+            % (p['id'], e(p['nom']),
+               e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
+               ('%d L' % cap) if cap else '—', ('Clase %s' % cl) if cl else '—', precio, st))
+    return ('<div class="lp-tabla"><table>'
+            '<caption class="sr-only">Precios de autoclaves y esterilizadores</caption>'
+            '<thead><tr><th scope="col">Equipo</th><th scope="col">Capacidad</th>'
+            '<th scope="col">Clase</th><th scope="col">Precio con IGV</th>'
+            '<th scope="col">Entrega</th></tr></thead><tbody>%s</tbody></table></div>'
+            % ''.join(filas))
+
+
+def pagina_categoria(cid, L, ps, cats, cfg, promos):
+    """La página de una familia de equipos: cuadro de precios, guía y preguntas."""
+    ruta = '/venta/%s/' % L['slug']
+    precios = sorted(p['precio'] for p in ps if p.get('precio'))
+    rango = {'min': soles(precios[0]) if precios else '',
+             'max': soles(precios[-1]) if precios else '',
+             'plazo': TERMINOS.get('plazoStock') or 'pocos días',
+             'garantia': str(TERMINOS.get('garantiaMeses') or 12)}
+    guia = ''.join('<section class="lp-g"><h2>%s</h2><p>%s</p></section>' % (e(g['h']), g['p'])
+                   for g in (L.get('guia') or []))
+    faq = L.get('faq') or []
+    for f in faq:
+        f['r_'] = f['r'].format(**rango)
+    bloque_faq = ''.join(
+        '<details class="lp-faq"><summary>%s</summary><p>%s</p></details>' % (e(f['q']), e(f['r_']))
+        for f in faq)
+    desde = ('<p class="lp-desde">Desde <b>%s</b> hasta <b>%s</b>, con IGV incluido.</p>'
+             % (rango['min'], rango['max'])) if precios else ''
+    title = '%s | Sinergia Biomédica' % L['titulo']
+    cuerpo = f'''
+  <section class="cabeza">
+    <div class="eyebrow">Venta · {e(cats.get(cid, ''))} · Lima y provincias</div>
+    <h1>{e(L['h1'])}</h1>
+    <p class="lead">{L['entrada']}</p>
+    {desde}
+    <p><a class="btn fill" href="/#/cotizar-venta">Armar mi cotización →</a>
+       <a class="btn" href="/venta/codigos-nts/">Buscar por código NTS</a></p>
+  </section>
+  <section class="lp-s">
+    <h2>Modelos y precios</h2>
+    {cuadro_precios(ps, promos)}
+    <p class="lp-nota">Precios con IGV, válidos con el stock del día. Toca un equipo para ver su
+    ficha completa, sus características y el botón para agregarlo a tu cotización.</p>
+  </section>
+  {guia}
+  <section class="lp-s">
+    <h2>Preguntas frecuentes</h2>
+    {bloque_faq}
+  </section>
+  <section class="lp-cta">
+    <h2>¿Te ayudamos a elegir?</h2>
+    <p>Dinos qué vas a esterilizar y cuántas veces al día, y te decimos qué capacidad te conviene.
+    Si es para una licitación, mándanos la ficha técnica del expediente y te devolvemos el cuadro de
+    cumplimiento.</p>
+    <p><a class="btn fill" href="/#/cotizar-venta">Armar mi cotización →</a>
+       <a class="btn" href="/#/contacto">Escríbenos</a></p>
+  </section>'''
+    jsonld = [
+        {'@type': 'ItemList', 'name': L['h1'],
+         'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': p['nom'],
+                              'url': SITIO + '/venta/%s/' % p['id']} for i, p in enumerate(ps)]},
+    ]
+    if faq:
+        jsonld.append({'@type': 'FAQPage',
+                       'mainEntity': [{'@type': 'Question', 'name': f['q'],
+                                       'acceptedAnswer': {'@type': 'Answer', 'text': f['r_']}}
+                                      for f in faq]})
+    return ruta, pagina(cfg, ruta=ruta, title=title, descripcion=L['descripcion'],
+                        migas=[('Inicio', '/'), ('Venta', '/venta/'), (L['h1'], ruta)],
+                        cuerpo=cuerpo, jsonld=jsonld)
+
+
+LANDINGS = {}              # lo llena main(): categoría → su página de aterrizaje
 TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promociones»
 
 
@@ -1042,6 +1171,10 @@ def main():
         print('Retirados a mano (noPublicar): %s' % ', '.join(sorted(fuera)))
     if not productos:
         sys.exit('No hay equipos en los datos: no se genera nada.')
+    # Las familias con página propia se resuelven antes de generar nada: el
+    # hub y las migas de cada ficha enlazan a ellas.
+    landings = {k: v for k, v in (repo.get('landings') or {}).items() if not k.startswith('_')}
+    LANDINGS.update(landings)
     cats = {c['id']: c['nombre'] for c in repo.get('categorias', [])}
     cats_orden = [c['id'] for c in repo.get('categorias', [])]
     base = {p['id']: p for p in repo.get('productos', [])}
@@ -1060,6 +1193,18 @@ def main():
     ruta, doc = pagina_nts(orden, cfg)
     gp.escribir('venta/codigos-nts/index.html', doc, cambios)
     paginas.append((ruta, 'venta/codigos-nts/index.html'))
+    # Una página de aterrizaje por cada familia con texto escrito
+    # (data/venta.json › landings). Sin texto no se genera: una página de
+    # categoría vacía no le sirve a nadie y Google la trata como relleno.
+    for cid, L in landings.items():
+        ps = [q for q in orden if q.get('cat') == cid]
+        if not ps or not L.get('slug'):
+            continue
+        ruta, doc = pagina_categoria(cid, L, ps, cats, cfg, promos)
+        rel = 'venta/%s/index.html' % L['slug']
+        gp.escribir(rel, doc, cambios)
+        paginas.append((ruta, rel))
+        print('Página de categoría: %s (%d equipos).' % (ruta, len(ps)))
     # Promociones: página propia, solo si hay algo que mostrar.
     TODOS_PUBLICADOS[:] = orden
     enof = [p for p in orden if promo(p)]
@@ -1080,8 +1225,12 @@ def main():
         gp.escribir('fichas/venta/%s/index.html' % p['id'],
                     ficha_a4_venta(p, cfg, base, fijas, locales), cambios)
 
-    # Equipos que ya no se publican (sin stock o despublicados): su página se borra.
-    vigentes = {p['id'] for p in productos} | {'codigos-nts'}
+    # Equipos que ya no se publican (sin stock o despublicados): su página se
+    # borra. Lo vigente sale de las páginas que esta corrida generó de verdad,
+    # no de una lista escrita a mano: así una página nueva de /venta/ (como la
+    # de una familia de equipos) no se borra sola por no estar apuntada aquí.
+    vigentes = {rel.split('/')[1] for _, rel in paginas
+                if rel.startswith('venta/') and rel.count('/') >= 2}
     carpeta = os.path.join(ROOT, 'venta')
     for d in sorted(os.listdir(carpeta)):
         if os.path.isdir(os.path.join(carpeta, d)) and d not in vigentes:
