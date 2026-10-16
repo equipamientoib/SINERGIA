@@ -1107,8 +1107,11 @@ def mapa_pie_portada(cambios):
     """
     txt = open(gp.INDEX, encoding='utf-8').read()
     ini, fin = '<!--MAPA-PIE-INICIO-->', '<!--MAPA-PIE-FIN-->'
+    # FUERA de #page-entrada: ese bloque es display:none hasta que corre el
+    # JS, asi que el mapa quedaba invisible para un rastreador que todavia
+    # no ha renderizado. Despues de </main> se ve siempre, con JS y sin el.
     if ini not in txt:
-        txt = txt.replace('<footer class="ent-pie">', ini + fin + '\n  <footer class="ent-pie">', 1)
+        txt = txt.replace('</main>', '</main>\n\n' + ini + fin, 1)
     nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
                    lambda m: ini + gp.mapa_sitio() + fin, txt, flags=re.S)
     gp.escribir('index.html', nuevo, cambios)
