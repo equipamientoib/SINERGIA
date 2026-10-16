@@ -842,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=170a6d3d';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=0a422479';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=170a6d3d';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=0a422479';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=170a6d3d','js/06-tablero.js?v=170a6d3d'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=0a422479','js/06-tablero.js?v=0a422479'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=170a6d3d'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=0a422479'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1797,10 +1797,12 @@ function ventaEnVivo(v){
    - stock visible: el 30 % del stock del proveedor, mínimo 1 y máximo 10;
    - código NTS (y su nombre oficial) si la hoja aún no lo tiene. */
 function vAjustar(p){
-  const q = Object.assign({}, p), sv = (VENTA && VENTA.stockVis) || {};
-  const n = Number(q.stock);
-  if(q.stock !== '' && q.stock != null && n > 0 && !q.propio)
-    q.stock = Math.min(sv.maximo || 10, Math.max(1, Math.floor(n * (sv.porcentaje || 30) / 100)));
+  const q = Object.assign({}, p);
+  /* El stock que viaja por dentro es el REAL. Antes aquí se recortaba al
+     30 % con tope 10, y ese número recortado era el que usaba el
+     cotizador para avisar «pedido especial»: un equipo con 13 unidades se
+     comportaba como si tuviera 3. El recorte se hace ahora solo al
+     MOSTRAR (vStock), que es donde importa no enseñar el inventario. */
   const fx = ((VENTA && VENTA.fijos) || {})[q.id] || {};   // marca/origen que la hoja no trae
   if(!q.marca && fx.marca) q.marca = fx.marca;
   if(!q.origen && fx.origen) q.origen = fx.origen;
@@ -1857,7 +1859,7 @@ function cargarVenta(){
                  locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  promos: Object.fromEntries(Object.entries(d.promociones||{}).filter(([k]) => k[0] !== '_')),
                  propios: ((d.equiposPropios||{}).equipos)||[],
-                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{},
+                 nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{},
                  codsEq: Object.fromEntries(Object.entries(d.codigosEquipo||{}).filter(([k]) => k[0] !== '_'))};
         VENTA.productos = vPropios(vAplicarPromos((d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})))));
         vMezclar(); return VENTA; });
@@ -1966,14 +1968,27 @@ function vMail(asunto){
 
 /* Precio publicado (proveedor + margen, calculado en la hoja) y stock. */
 const vSoles = n => 'S/ ' + Number(n).toLocaleString('es-PE', {maximumFractionDigits: 0});
-/* En la ficha (detalle=true) se muestra siempre la cantidad; en las tarjetas,
-   solo cuando quedan pocas unidades. */
+/* Lo que el público ve del stock.
+
+   La cantidad se muestra porque da credibilidad, pero NUNCA el número
+   real por encima de 3: de 4 para arriba dice «3+». La web es pública y
+   el stock equipo por equipo es la posición de inventario del negocio;
+   eso no se le regala a la competencia. El número real sigue entero en
+   la hoja y en el catálogo, que es lo que usan el cotizador y el portal.
+
+   Con 0 el equipo no desaparece: se queda su página diciendo que está
+   agotado, para no perder lo ganado en Google mientras vuelve el lote. */
+const V_STOCK_TOPE = 3;
+function vStockTxt(n){
+  if(n <= 0) return '';
+  if(n > V_STOCK_TOPE) return V_STOCK_TOPE + '+ unidades';
+  return n + (n === 1 ? ' unidad' : ' unidades');
+}
 function vStock(p, detalle){
   if(p.stock === undefined || p.stock === null || p.stock === '') return '';
   const n = Number(p.stock);
-  if(!(n > 0)) return '<span class="v-stock">A pedido</span>';
-  const cant = detalle || n <= 5 ? ' · ' + n + (n === 1 ? ' unidad' : (detalle ? ' unidades' : ' und.')) : '';
-  return `<span class="v-stock si">En stock${cant}</span>`;
+  if(!(n > 0)) return `<span class="v-stock v-agotado">Stock agotado${detalle ? ' · consultar plazo de nuevo lote' : ''}</span>`;
+  return `<span class="v-stock si">En stock · ${vStockTxt(n)}</span>`;
 }
 
 /* PROMOCIONES. El precio de oferta pasa a ser EL precio del equipo y el de
@@ -2087,8 +2102,9 @@ function vCard(p){
   const sub = [[p.marca, p.modelo].filter(Boolean).join(' · '),
                vCodTxt(p)].filter(Boolean).join(' · ');
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? ''
-    : (Number(p.stock) > 0 ? '<em class="vt-st">En stock</em>'
-                           : '<em class="vt-st vt-ped">A pedido</em>');
+    : (Number(p.stock) > 0
+        ? '<em class="vt-st">En stock · ' + vStockTxt(Number(p.stock)) + '</em>'
+        : '<em class="vt-st vt-ped">Stock agotado</em>');
   const precio = p.precio ? `<i>${vSoles(p.precio)}</i>`
                           : '<i class="vt-cons">Consultar precio</i>';
   const href = vPagina(p.id) || ('#/venta/p/' + p.id);
@@ -4184,7 +4200,10 @@ function vcSobraStock(p, q){
 }
 function vcAviso(p, q){
   const n = vcSobraStock(p, q);
-  return n ? `<span class="v-stock v-pedido">Pedido especial · ${n} en stock</span>` : '';
+  /* Se avisa con el tope público, no con el stock real: el aviso sale en
+     una página que cualquiera puede abrir. La cuenta de arriba sí usa el
+     número real, que es lo que importa para saber si sobra o no. */
+  return n ? `<span class="v-stock v-pedido">Pedido especial · ${vStockTxt(n)} en stock</span>` : '';
 }
 
 function vcFila(x){

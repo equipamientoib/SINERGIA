@@ -79,10 +79,11 @@ def ajustar(p, repo):
     """Stock visible (30 % del proveedor, mínimo 1, máximo 10) y código NTS
     con su nombre oficial si la hoja aún no lo tiene (data/venta.json)."""
     q = dict(p)
-    sv = repo.get('stockVisible') or {}
-    st = q.get('stock')
-    if isinstance(st, (int, float)) and st > 0 and not q.get('propio'):
-        q['stock'] = min(sv.get('maximo', 10), max(1, int(st * sv.get('porcentaje', 30) // 100)))
+    # El stock que viaja por dentro es el REAL. Antes aquí se recortaba al
+    # 30 % con tope 10, y ese número recortado era el que llegaba al
+    # cotizador y a todo lo demás: un equipo con 13 unidades se cotizaba
+    # como si tuviera 3. El recorte ahora se hace solo al MOSTRAR
+    # (stock_etiqueta), que es donde importa que no se vea el inventario.
     for k, v in ((repo.get('datosFijos') or {}).get(q['id']) or {}).items():
         if not q.get(k):
             q[k] = v
@@ -412,8 +413,9 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     # Precio con vigencia (14 días desde la última actualización con el proveedor)
     caja = ''
     stock = p.get('stock')
-    badge = ('<span class="st si">En stock · %d %s</span>' % (stock, 'unidad' if stock == 1 else 'unidades')
-             if isinstance(stock, (int, float)) and stock > 0 else '')
+    et = stock_etiqueta(p, detalle=True)
+    badge = ('<span class="st %s">%s</span>'
+             % ('si' if isinstance(stock, (int, float)) and stock > 0 else 'agotado', e(et))) if et else ''
     of = promo(p, promos)
     if p.get('precio'):
         nota = ('Incluye IGV · <span>Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización</span>'
@@ -661,7 +663,7 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
     descripcion = descripcion_ficha(p)
     cuerpo = producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, locales) + VIG_JS
     oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
-              'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/PreOrder',
+              'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/OutOfStock',
               'seller': {'@id': SITIO + '/#negocio'}}
     if p.get('precio'):
         oferta['price'] = str(int(round(p['precio'])))
@@ -839,8 +841,8 @@ def cuadro_precios(ps, promos):
         precio = ('<b>%s</b>' % soles(p['precio'])) if p.get('precio') else 'Consultar'
         if promo(p, promos):
             precio += ' <em class="lp-of">precio especial</em>'
-        st = ('<span class="lp-si">En stock</span>' if (p.get('stock') or 0) > 0
-              else '<span class="lp-no">A pedido</span>')
+        st = ('<span class="lp-si">En stock · %s</span>' % e(stock_txt(int(p['stock'])))
+              if (p.get('stock') or 0) > 0 else '<span class="lp-no">Stock agotado</span>')
         filas.append(
             '<tr><th scope="row"><a href="/venta/%s/">%s</a><small>%s</small></th>'
             '%s<td class="lp-p">%s</td><td>%s</td></tr>'
@@ -938,6 +940,39 @@ def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
 CODIGOS_EQUIPO = {}        # lo llena main(): equipo → {codigo, capacidad}
 
 
+STOCK_TOPE = 3
+
+
+def stock_txt(n):
+    """La cantidad como la ve el público: nunca el número real por encima
+    de 3. De 4 para arriba, «3+ unidades».
+
+    La cantidad se muestra porque da credibilidad, pero el stock equipo
+    por equipo es la posición de inventario del negocio y la web es
+    pública. El número real sigue entero en la hoja y en el catálogo, que
+    es lo que usan el cotizador y el portal.
+    """
+    if n <= 0:
+        return ''
+    if n > STOCK_TOPE:
+        return '%d+ unidades' % STOCK_TOPE
+    return '%d %s' % (n, 'unidad' if n == 1 else 'unidades')
+
+
+def stock_etiqueta(p, detalle=False):
+    """«En stock · 2 unidades», «En stock · 3+ unidades» o «Stock agotado».
+
+    Con 0 la página no desaparece: se queda diciendo que está agotado, para
+    no perder lo ganado en Google mientras vuelve el lote.
+    """
+    n = p.get('stock')
+    if not isinstance(n, (int, float)):
+        return ''
+    if n > 0:
+        return 'En stock · ' + stock_txt(int(n))
+    return 'Stock agotado' + (' · consultar plazo de nuevo lote' if detalle else '')
+
+
 def cod_de(p):
     """El código que se muestra, con el prefijo «Cod.».
 
@@ -984,8 +1019,7 @@ def pm_tarjeta(p, cfg, base, fijas, locales, promos):
     img = ('<img class="pm-foto" src="%s" alt="%s" loading="lazy" decoding="async">' % (fts[0][0], alt)) if fts \
         else '<span class="pm-foto pm-sinfoto">%s</span>' % gp.ICONO
     stock = p.get('stock')
-    chip = ('<span class="pm-st">En stock · %d %s</span>'
-            % (stock, 'unidad' if stock == 1 else 'unidades')) if isinstance(stock, (int, float)) and stock > 0 else ''
+    chip = ('<span class="pm-st">%s</span>' % e(stock_etiqueta(p))) if stock_etiqueta(p) else ''
     mm = ' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
     return ('<a class="pm-c sin-aviso" href="/venta/%s/">%s'
             '<span class="pm-d"><span class="pm-cat">Precio especial</span>'

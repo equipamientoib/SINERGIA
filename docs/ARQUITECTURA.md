@@ -61,8 +61,8 @@ había editado a mano.
 | `venta/**/index.html` | generado por `generar_paginas_venta.py` | sí |
 | `alquiler/**/index.html` | generado por `generar_paginas.py` | sí |
 | `sitemap.xml` | lo escriben los dos generadores | sí |
-| `css/app.css` | **generado entero**: `empaquetar_web.py` une los CSS sueltos | pendiente de decisión |
-| `js/app.js` | **generado entero**: une los JS sueltos, separados por `;` | pendiente de decisión |
+| `css/app.css` | **generado entero**: `empaquetar_web.py` une los CSS sueltos | sí |
+| `js/app.js` | **generado entero**: une los JS sueltos, separados por `;` | sí |
 | `index.html` | **FUENTE, escrito a mano** (la portada), con tres trozos generados entre marcas (`TIPOS-URL`, `VENTA-URL`, `MAPA-PIE`) y los sellos `?v=` | **no**, se perdería un cambio hecho a mano |
 | `data/**`, `scripts/**`, `css/*.css` sueltos, `js/*.js` sueltos | fuente | no |
 

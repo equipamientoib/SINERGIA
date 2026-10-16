@@ -395,7 +395,10 @@ function vcSobraStock(p, q){
 }
 function vcAviso(p, q){
   const n = vcSobraStock(p, q);
-  return n ? `<span class="v-stock v-pedido">Pedido especial · ${n} en stock</span>` : '';
+  /* Se avisa con el tope público, no con el stock real: el aviso sale en
+     una página que cualquiera puede abrir. La cuenta de arriba sí usa el
+     número real, que es lo que importa para saber si sobra o no. */
+  return n ? `<span class="v-stock v-pedido">Pedido especial · ${vStockTxt(n)} en stock</span>` : '';
 }
 
 function vcFila(x){

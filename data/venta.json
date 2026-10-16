@@ -1535,9 +1535,7 @@
     "edan-099004"
   ],
   "stockVisible": {
-    "_nota": "Stock que se muestra en la web: el 30 % del stock del proveedor, mínimo 1 y máximo 10 (si hay stock).",
-    "porcentaje": 30,
-    "maximo": 10
+    "_nota": "YA NO SE USA. Recortaba el stock al 30 % (minimo 1, maximo 10) antes de guardarlo, asi que el numero recortado era el que usaban tambien el cotizador y el resto de la web. Ahora el stock interno es el real y el recorte se hace solo al mostrarlo: hasta 3 se ve la cantidad exacta y de 4 en adelante «3+ unidades». Esta en scripts/generar_paginas_venta.py (stock_txt) y en js/12-venta.js (vStockTxt). Se deja esta nota para que nadie vuelva a activarlo sin saber que ya hay un tope."
   },
   "codigosNTS": {
     "boeco-076898": "D-280",
