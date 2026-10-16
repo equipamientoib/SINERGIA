@@ -224,3 +224,21 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 /* El botón verde flotante tapaba el botón principal de la ficha: en las
    páginas que ya tienen su propio WhatsApp a la vista, no se muestra. */
 body.wa-propio .wafab{display:none}
+
+/* ── Mapa del sitio en el pie ──────────────────────────────────────────
+   Enlaces estáticos (sin almohadilla) a las 10 familias de venta y a los
+   11 tipos de alquiler. Es el único camino que Google tiene desde las
+   páginas con visitas hacia el resto del catálogo: el menú de arriba va
+   a rutas #/…, que no sigue. */
+.mapa-pie{border-top:1px solid var(--linea);background:var(--blanco)}
+.mapa-pie .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:26px 40px;padding:34px 0 30px}
+.mapa-pie div{display:flex;flex-direction:column;gap:7px;min-width:0}
+.mapa-pie b{font-family:var(--ff-d);font-size:15px;font-weight:600;margin-bottom:3px}
+.mapa-pie b a{color:var(--onix);text-decoration:none}
+.mapa-pie b a:hover{color:var(--cobre-d)}
+.mapa-pie a{font-size:13.5px;line-height:1.45;color:var(--gris);text-decoration:none}
+.mapa-pie a:hover{color:var(--cobre-d);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:560px){
+  .mapa-pie .wrap{padding:26px 0 22px;gap:22px}
+}
