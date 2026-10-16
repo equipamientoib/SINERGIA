@@ -1705,11 +1705,11 @@
       "h1": "Autoclaves y esterilizadores",
       "titulo": "Autoclaves de vapor clase B en Perú: precios y modelos",
       "descripcion": "Autoclaves de vapor clase B de 18 a 430 litros, esterilizador de calor seco y lavador desinfector, con stock en Lima. Precios con IGV, código NTS para licitaciones, garantía de 12 meses y entrega en Lima y provincias.",
-      "entrada": "Vendemos autoclaves de vapor clase B, esterilizadores de calor seco y equipos de apoyo para la central de esterilización. Abajo está el cuadro con los modelos que tenemos, su capacidad y su precio con IGV, y después una guía corta para elegir sin equivocarse.",
+      "entrada": "Vendemos autoclaves de vapor clase B, esterilizadores de calor seco y equipos de apoyo para la central de esterilización. Aquí están los modelos que tenemos, con su capacidad y su precio con IGV, y después una guía corta para elegir sin equivocarse.",
       "guia": [
         {
           "h": "¿Clase B, clase S o clase N? Esta es la diferencia que importa",
-          "p": "La norma europea EN 13060 separa los autoclaves de mesa en tres clases según lo que son capaces de esterilizar.<br><br><b>Clase N</b> es la más básica: solo sirve para instrumental sólido y sin empaquetar. Si metes una bolsa o una manguera, el aire no sale y el vapor no llega adentro.<br><b>Clase S</b> esteriliza lo que el fabricante declare en su ficha, ni más ni menos: hay que leer la ficha de ese modelo en concreto.<br><b>Clase B</b> hace vacío fraccionado antes de inyectar el vapor, así que saca el aire de los lúmenes y de las telas. Es la única clase que esteriliza material poroso, instrumental hueco y cargas empaquetadas, que es el caso de casi cualquier consultorio, clínica o central.<br><br>En la práctica: si vas a esterilizar en bolsa, o tienes turbinas, cánulas, mangueras o campos de tela, necesitas clase B. Todos los autoclaves de vapor de este cuadro son clase B, salvo donde dice otra cosa."
+          "p": "La norma europea EN 13060 separa los autoclaves de mesa en tres clases según lo que son capaces de esterilizar.<br><br><b>Clase N</b> es la más básica: solo sirve para instrumental sólido y sin empaquetar. Si metes una bolsa o una manguera, el aire no sale y el vapor no llega adentro.<br><b>Clase S</b> esteriliza lo que el fabricante declare en su ficha, ni más ni menos: hay que leer la ficha de ese modelo en concreto.<br><b>Clase B</b> hace vacío fraccionado antes de inyectar el vapor, así que saca el aire de los lúmenes y de las telas. Es la única clase que esteriliza material poroso, instrumental hueco y cargas empaquetadas, que es el caso de casi cualquier consultorio, clínica o central.<br><br>En la práctica: si vas a esterilizar en bolsa, o tienes turbinas, cánulas, mangueras o campos de tela, necesitas clase B. Todos los autoclaves de vapor de esta página son clase B, salvo donde dice otra cosa."
         },
         {
           "h": "¿Qué capacidad necesito?",
@@ -1752,7 +1752,7 @@
       "h1": "Monitores de signos vitales",
       "titulo": "Monitores de signos vitales: precios en Perú",
       "descripcion": "Monitores multiparámetro, pulsioxímetros y monitores para UCI, con stock en Lima. Precios con IGV, código NTS para licitaciones, garantía de 12 meses y entrega en Lima y provincias.",
-      "entrada": "Monitores de cabecera, de transporte y de UCI, pulsioxímetros de mesa y de mano. Abajo está el cuadro con los modelos que tenemos y su precio con IGV. Lo que define el precio es el número de parámetros (ECG, SpO2, presión, temperatura, capnografía), el tamaño de la pantalla y si lleva impresora."
+      "entrada": "Monitores de cabecera, de transporte y de UCI, pulsioxímetros de mesa y de mano. Aquí están los modelos que tenemos, con su precio con IGV. Lo que define el precio es el número de parámetros (ECG, SpO2, presión, temperatura, capnografía), el tamaño de la pantalla y si lleva impresora."
     },
     "reanimacion": {
       "slug": "desfibriladores-y-dea",
@@ -1766,7 +1766,7 @@
       "h1": "Equipos de diagnóstico",
       "titulo": "Electrocardiógrafos, tensiómetros y equipos de diagnóstico: precios en Perú",
       "descripcion": "Electrocardiógrafos, espirómetros, MAPA, tensiómetros, estetoscopios y equipos de otorrino y oftalmología, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
-      "entrada": "Es la familia más variada: desde un estetoscopio hasta un electrocardiógrafo de 12 canales o un oftalmoscopio indirecto. Abajo está el cuadro completo con los precios con IGV, ordenado de menor a mayor, para que ubiques rápido lo que buscas."
+      "entrada": "Es la familia más variada: desde un estetoscopio hasta un electrocardiógrafo de 12 canales o un oftalmoscopio indirecto. Aquí están todos los equipos con su precio con IGV, para que ubiques rápido lo que buscas."
     },
     "neonatal": {
       "slug": "incubadoras-y-equipos-neonatales",
