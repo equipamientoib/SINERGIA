@@ -1718,10 +1718,6 @@
         {
           "h": "Vapor o calor seco",
           "p": "El <b>autoclave de vapor</b> es el estándar para instrumental quirúrgico, textiles y material empaquetado: esteriliza a 121 °C o 134 °C en ciclos de minutos.<br><br>El <b>esterilizador de calor seco</b> (estufa) trabaja a 160–180 °C durante una o dos horas y se usa para vidrio de laboratorio, polvos, aceites y grasas, es decir donde el vapor no entra o estropea el material. No reemplaza al autoclave para instrumental empaquetado.<br><br>Si vas a esterilizar material termosensible que no aguanta 121 °C, lo que corresponde es un equipo de baja temperatura (peróxido de hidrógeno), no un autoclave."
-        },
-        {
-          "h": "Si compras para el Estado: el código NTS",
-          "p": "En las licitaciones y compras del Estado, los esterilizadores se piden por su denominación de la NTS 113-MINSA, y la capacidad forma parte del código. Los que más salen son el <b>D-212</b> (20 litros), el <b>D-213</b> (30 litros), el <b>D-214</b> (40 litros), el <b>D-217</b> (50 litros), el <b>D-352</b> (30 litros vertical) y el <b>D-342</b> (100 litros); el <b>D-301</b> es el esterilizador por calor seco de 50 litros y el <b>D-218</b> el de baja temperatura por peróxido de hidrógeno de 70 litros.<br><br>Un equipo cumple el código si su capacidad es igual o mayor a la pedida y cumple el resto de las especificaciones. Si nos mandas la ficha técnica de tu expediente, te devolvemos el cuadro de cumplimiento punto por punto con el modelo que ofertamos."
         }
       ],
       "faq": [

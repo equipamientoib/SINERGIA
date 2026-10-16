@@ -96,7 +96,8 @@ function cargarVenta(){
                  locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  promos: Object.fromEntries(Object.entries(d.promociones||{}).filter(([k]) => k[0] !== '_')),
                  propios: ((d.equiposPropios||{}).equipos)||[],
-                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
+                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{},
+                 codsEq: Object.fromEntries(Object.entries(d.codigosEquipo||{}).filter(([k]) => k[0] !== '_'))};
         VENTA.productos = vPropios(vAplicarPromos((d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})))));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
@@ -105,6 +106,16 @@ function cargarVenta(){
   }
   return VENTA_CARGA;
 }
+
+/* El código del equipo, tal como se muestra: «Cod. D-212».
+
+   Sale de data/venta.json › codigosEquipo, escrito a mano equipo por
+   equipo, y si no está ahí, de la columna «clave» de la hoja. No se
+   inventa ninguno: el equipo que no tenga ni uno ni otro, no lleva
+   código. El prefijo «Cod.» se pone aquí, en un solo sitio, para que la
+   tarjeta, el mensaje de WhatsApp y la cotización digan lo mismo. */
+const vCod = p => String((((VENTA && VENTA.codsEq) || {})[p && p.id] || {}).codigo || (p && p.clave) || '').trim();
+const vCodTxt = p => { const c = vCod(p); return c ? 'Cod. ' + c : ''; };
 
 const vEsc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const vCat = id => (VENTA.categorias||[]).find(c => c.id === id);
@@ -139,7 +150,7 @@ function vBuscar(q){
   if(!t.length) return [];
   return VENTA.productos.filter(p => {
     const c = vCat(p.cat);
-    const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
+    const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,vCod(p),c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
     return t.every(w => txt.includes(w));
   });
 }
@@ -157,7 +168,7 @@ function vBuscarEn(q, destino){
 }
 function vBuscador(destino, ph){
   return `<label class="v-busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input type="search" placeholder="${ph||'Busca por equipo, marca, modelo o código NTS (ej. D-18)'}" oninput="vBuscarEn(this.value,'${destino}')" aria-label="Buscar equipos"></label>`;
+    <input type="search" placeholder="${ph||'Busca por equipo, marca, modelo o código (ej. D-18)'}" oninput="vBuscarEn(this.value,'${destino}')" aria-label="Buscar equipos"></label>`;
 }
 
 /* Cotizar una lista completa: el texto pegado va tal cual en el mensaje. */
@@ -287,7 +298,7 @@ function vNotaPrecio(larga){
    scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
    Si un equipo es nuevo y aún no tiene página, se abre la ficha interna. */
 function vMensajeWA(p){
-  const linea = [p.marca, p.modelo, p.clave ? 'Código NTS ' + p.clave : '',
+  const linea = [p.marca, p.modelo, vCodTxt(p),
                  p.precio ? vSoles(p.precio) : ''].filter(Boolean).join(' · ');
   const partes = ['Hola Sinergia Biomédica, quiero cotizar:', '', p.nom];
   if(linea) partes.push(linea);
@@ -303,7 +314,7 @@ function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/
 function vBotonAdd(p, clase, texto, extra){
   return `<button type="button" class="${clase}"${extra || ''} data-add="${vEsc(p.id)}"
     data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
-    data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
+    data-nts="${vEsc(vCod(p))}" data-precio="${Number(p.precio || 0)}"
     data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar a mi cotización'}</button>`;
 }
 
@@ -313,7 +324,7 @@ function vCard(p){
   /* Marca, modelo y código NTS en una sola línea: es lo que el comprador
      compara de un vistazo cuando revisa veinte equipos seguidos. */
   const sub = [[p.marca, p.modelo].filter(Boolean).join(' · '),
-               p.clave ? 'NTS ' + p.clave : ''].filter(Boolean).join(' · ');
+               vCodTxt(p)].filter(Boolean).join(' · ');
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? ''
     : (Number(p.stock) > 0 ? '<em class="vt-st">En stock</em>'
                            : '<em class="vt-st vt-ped">A pedido</em>');
@@ -387,7 +398,7 @@ function vPortada(){
       <h1>Equipamiento médico con <em>respaldo técnico</em>.</h1>
       <p class="lead">${n} equipos de marcas como Edan, Tuttnauer, KLS Martin y CU Medical para hospitales, clínicas y obras de equipamiento en Lima y provincias.</p>
       <div class="hero-props">
-        <span>Ficha técnica y código NTS</span>
+        <span>Ficha técnica y código</span>
         <span>Mantenimiento después de la venta</span>
       </div>
       <div class="hero-cta">
@@ -557,7 +568,7 @@ function vtFiltrados(){
     if(VT.stock && !(Number(p.stock) > 0)) return false;
     if(t.length){
       const c = vCat(p.cat);
-      const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
+      const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,vCod(p),c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
       if(!t.every(w => txt.includes(w))) return false;
     }
     return true;
@@ -638,7 +649,7 @@ function vProducto(id){
     ? (s.length===1 ? `<tr class="g"><th colspan="2">${vEsc(s[0])}</th></tr>` : `<tr><td>${vEsc(s[0])}</td><td>${vEsc(s[1])}</td></tr>`) : '').join('');
   const pest = [];
   if((p.caracteristicas||[]).length) pest.push(['Características', `<ul class="v-puntos">${p.caracteristicas.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul><p class="v-nota">Te enviamos la ficha técnica completa del fabricante junto con la cotización.</p>`]);
-  if(p.expediente||p.clave) pest.push(['Código NTS', `<table class="v-tabla">${p.clave?`<tr><td>Código NTS</td><td><b>${vEsc(p.clave)}</b> (NTS 113-MINSA)</td></tr>`:''}${p.expediente?`<tr><td>Nombre oficial</td><td><b>${vEsc(p.expediente)}</b></td></tr>`:''}<tr><td>Modelo ofertado</td><td>${vEsc([p.marca,p.modelo].filter(Boolean).join(' '))}</td></tr></table><p class="v-nota">Envíanos la ficha técnica de tu expediente y te devolvemos el cuadro de cumplimiento, punto por punto, con el modelo ofertado.</p>`]);
+  if(p.expediente||p.clave) pest.push(['Código', `<table class="v-tabla">${p.clave?`<tr><td>Código</td><td><b>${vEsc(p.clave)}</b></td></tr>`:''}${p.expediente?`<tr><td>Nombre oficial</td><td><b>${vEsc(p.expediente)}</b></td></tr>`:''}<tr><td>Modelo ofertado</td><td>${vEsc([p.marca,p.modelo].filter(Boolean).join(' '))}</td></tr></table><p class="v-nota">Envíanos la ficha técnica de tu expediente y te devolvemos el cuadro de cumplimiento, punto por punto, con el modelo ofertado.</p>`]);
   if(p.descripcion||p.resumen) pest.push(['Descripción', `<p>${vEsc(p.descripcion||p.resumen)}</p>${(p.usos||[]).length?`<ul class="v-puntos">${p.usos.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul>`:''}`]);
   if(specs) pest.push(['Especificaciones', `<table class="v-tabla">${specs}</table>`]);
   if((p.incluye||[]).length) pest.push(['Incluye', `<ul class="v-puntos">${p.incluye.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul>`]);
