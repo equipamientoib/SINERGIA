@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────────────────
+#  Archivos GENERADOS: en un merge se queda nuestra version y se vuelven
+#  a generar. Nunca se resuelven a mano.
+#
+#  POR QUE EXISTE ESTE ARCHIVO
+#  Estas paginas estan versionadas en el repositorio porque GitHub Pages
+#  sirve lo que hay en main tal cual. Ademas, dos robots las regeneran y
+#  las empujan a main todos los dias:
+#      .github/workflows/paginas-alquiler.yml   06:00 (hora de Lima)
+#      .github/workflows/paginas-venta.yml      06:20 (hora de Lima)
+#  Asi que cualquier rama que viva mas de un dia choca con ellos. El
+#  14/10 fueron 165 conflictos de golpe, todos en archivos que nadie
+#  habia editado a mano.
+#
+#  «merge=ours» NO significa «descarta lo de main»: significa que git no
+#  intenta mezclar linea por linea un archivo que no es la fuente. La
+#  fuente son los datos (data/) y los generadores (scripts/). Despues de
+#  un merge hay que REGENERAR, y ahi se recupera todo lo de los dos
+#  lados:
+#
+#      python3 scripts/generar_paginas.py
+#      python3 scripts/generar_paginas_venta.py --datos data/venta-vivo.json
+#      python3 scripts/empaquetar_web.py
+#
+#  Para que «merge=ours» funcione hay que declarar el driver una vez por
+#  copia del repositorio (git no lo trae de serie):
+#
+#      git config merge.ours.driver true
+#
+#  Sin eso, git avisa del conflicto igual que antes: no se pierde nada,
+#  solo no se ahorra el trabajo.
+#
+#  QUE NO ESTA AQUI, Y POR QUE
+#  index.html NO lleva merge=ours: es un archivo FUENTE, escrito a mano
+#  (la portada con sus dos tarjetas), con tres trozos generados entre
+#  marcas (TIPOS-URL, VENTA-URL, MAPA-PIE) y los sellos ?v=. Si llevara
+#  merge=ours, un cambio hecho a mano en main se perderia sin aviso.
+#  Mejor resolver ese conflicto a mano, que son dos lineas.
+#  js/app.js y css/app.css estan pendientes de decision del dueño.
+# ─────────────────────────────────────────────────────────────────────
+
+venta/**/index.html     merge=ours
+alquiler/**/index.html  merge=ours
+sitemap.xml             merge=ours
