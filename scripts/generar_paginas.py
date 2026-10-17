@@ -143,6 +143,26 @@ def leer_fichas():
     return out
 
 
+def filas_ficha(ficha):
+    """Las filas de la tabla de parámetros del fabricante, y su pie.
+
+    El formato del archivo es el mismo en los dos lados —
+    data/fichas/<id>.json para alquiler y data/fichas-venta/<id>.json
+    para venta—, así que la tabla se dibuja una sola vez. Antes estaba
+    copiada en los dos generadores: meter un campo nuevo obligaba a
+    tocar los dos y a acordarse de los dos.
+
+    Cada «sección» es un grupo (Tensión de red, Cámara, Alimentación…)
+    con sus filas de etiqueta y valor.
+    """
+    filas = ''.join('<tr class="g"><th colspan="2">%s</th></tr>' % e(g['titulo'])
+                    + ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
+                    for g in ficha.get('secciones') or [])
+    pie = ('<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del '
+           'fabricante.</p>' % e(ficha.get('fuente', 'fabricante')))
+    return filas, pie
+
+
 def fotos_de(eq, locales):
     urls = eq.get('fotos') or ([eq['photo']] if eq.get('photo') else [])
     out = []
@@ -425,15 +445,23 @@ def pagina_ficha_a4(f, eq, cfg, locales):
 '''
 
 
-def galeria(eq, locales, primera=False):
-    fotos = fotos_de(eq, locales)
-    alt = e(eq['nom'] + ' — ' + eq.get('marca', ''))
-    n = len(fotos)
-    if not fotos:
+def galeria_html(alt, ligeras, grandes, primera=False):
+    """La galería de fotos de una ficha, la misma en alquiler y en venta.
+
+    Cada lado busca sus fotos a su manera (alquiler las arma desde el
+    catálogo, venta las trae ya emparejadas del proveedor), pero el
+    HTML que sale es el mismo, así que se escribe una sola vez: antes
+    estaba copiado en los dos generadores y cualquier arreglo había que
+    hacerlo dos veces.
+
+    «ligeras» son las que se ven en la página y «grandes» las que se
+    abren al ampliar. Sin JavaScript se ve la primera; con él, flechas,
+    miniaturas y visor.
+    """
+    n = len(ligeras)
+    if not ligeras:
         return '<div class="gal una"><div class="gal-main sinfoto">%s</div></div>' % ICONO
-    # La foto ligera se ve en la ficha; la grande, al ampliar. Sin JavaScript
-    # se ve la primera; con él, flechas, miniaturas y visor (al final de la página).
-    grandes = [f.replace('-m.webp', '.webp') for f in fotos]
+    fotos = ligeras
     minis = ''.join('<button type="button" class="%s" data-i="%d" aria-label="Foto %d">'
                     '<img src="%s" alt="" loading="lazy" decoding="async" width="120" height="90"></button>'
                     % ('on' if k == 0 else '', k, k + 1, f) for k, f in enumerate(fotos)) if n > 1 else ''
@@ -447,6 +475,13 @@ def galeria(eq, locales, primera=False):
           {flechas}
         </div>
       </div>'''
+
+
+def galeria(eq, locales, primera=False):
+    """La galería de un instrumento de alquiler: sus fotos salen del catálogo."""
+    fotos = fotos_de(eq, locales)
+    return galeria_html(e(eq['nom'] + ' — ' + eq.get('marca', '')),
+                        fotos, [f.replace('-m.webp', '.webp') for f in fotos], primera)
 
 
 def producto(eq, t, cfg, locales, ficha=None, primera=False):
@@ -513,10 +548,7 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         desc += '<p class="nota-p"><b>Normas:</b> %s</p>' % normas
     # pestaña Parámetros: una tabla, grupos como subtítulos
     if ficha:
-        filas = ''.join('<tr class="g"><th colspan="2">%s</th></tr>' % e(g['titulo'])
-                        + ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
-                        for g in ficha['secciones'])
-        filas_pie = '<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del fabricante.</p>' % e(ficha.get('fuente', 'fabricante'))
+        filas, filas_pie = filas_ficha(ficha)
     else:
         filas = ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(k), e(str(v))) for k, v in specs.items())
         filas_pie = ''
@@ -687,6 +719,31 @@ def escribir(ruta_rel, contenido, cambios):
     return True
 
 
+def region_index(ini, fin, contenido, cambios, ancla=None, sep='\n'):
+    """Reemplaza un trozo marcado de index.html y lo vuelve a escribir.
+
+    index.html es un archivo FUENTE escrito a mano, con tres trozos que
+    se generan solos entre marcas: el mapa de tipos de alquiler, el de
+    equipos de venta y el mapa del pie. Los tres hacían lo mismo con su
+    propia copia del código, y una de esas copias llegó a inyectar el
+    mapa del pie dentro de un bloque oculto, donde no lo veía nadie.
+    Ahora el sitio donde se inserta se dice aquí, en un solo lugar.
+
+    Si las marcas no están y se da un «ancla» (otra marca o una etiqueta
+    del archivo), el bloque se crea justo después de ella. Sin ancla, se
+    avisa y no se toca nada: más vale no escribir que escribir mal.
+    """
+    txt = open(INDEX, encoding='utf-8').read()
+    if ini not in txt or fin not in txt:
+        if not ancla or ancla not in txt:
+            print('aviso: index.html no tiene los marcadores %s … %s' % (ini, fin))
+            return
+        txt = txt.replace(ancla, ancla + sep + ini + fin, 1)
+    nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
+                   lambda m: ini + contenido + fin, txt, flags=re.S)
+    escribir('index.html', nuevo, cambios)
+
+
 def fechas_previas():
     """lastmod de cada URL en el sitemap actual, para no moverlo sin motivo."""
     if not os.path.exists(SITEMAP):
@@ -715,11 +772,6 @@ def con_fotos_extra(equipos, extra):
 def mapa_portada(publicados, cambios, extra):
     """window.PAGINA_TIPO = {id_equipo: '/alquiler/<tipo>/#<id>'} en index.html:
     el catálogo lo usa para que el clic en un equipo abra su página."""
-    txt = open(INDEX, encoding='utf-8').read()
-    ini, fin = '<!--TIPOS-URL-INICIO-->', '<!--TIPOS-URL-FIN-->'
-    if ini not in txt or fin not in txt:
-        print('aviso: index.html no tiene los marcadores %s … %s' % (ini, fin))
-        return
     # Con un solo modelo se abre la página desde arriba (se ve el título);
     # con varios, se salta al modelo pulsado.
     mapa = {x['id']: '/alquiler/%s/%s' % (t['slug'], '#' + x['id'] if len(eqs) > 1 else '')
@@ -727,9 +779,7 @@ def mapa_portada(publicados, cambios, extra):
     js = '<script>window.PAGINA_TIPO=%s;window.FOTOS_EXTRA=%s;</script>' % (
         json.dumps(mapa, ensure_ascii=False, sort_keys=True),
         json.dumps(extra, ensure_ascii=False, sort_keys=True))
-    nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
-                   lambda m: ini + js + fin, txt, flags=re.S)
-    escribir('index.html', nuevo, cambios)
+    region_index('<!--TIPOS-URL-INICIO-->', '<!--TIPOS-URL-FIN-->', js, cambios)
 
 
 def main():
