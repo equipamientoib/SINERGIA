@@ -45,10 +45,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "$(git status --porcelain venta sitemap.xml index.html data/venta-vivo.json)" ]; then echo "Sin cambios."; exit 0; fi
+          # feed-google.xml y promociones/ se generan en cada corrida y hasta
+          # hoy NO se publicaban: el feed de Google Merchant se quedó parado
+          # el 15/10 y llegó a anunciar dos equipos dados de baja, con enlace
+          # a una página que ya no existe. Eso Google lo penaliza.
+          PUBLICA="venta sitemap.xml index.html data/venta-vivo.json feed-google.xml promociones"
+          if [ -z "$(git status --porcelain $PUBLICA)" ]; then echo "Sin cambios."; exit 0; fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A venta sitemap.xml index.html data/venta-vivo.json
+          git add -A $PUBLICA
           git commit -m "Paginas de venta al dia con la hoja"
           git pull --rebase origin "${GITHUB_REF_NAME}" || true
           git push

@@ -862,9 +862,19 @@ def main():
         loc = SITIO + ruta
         fecha = hoy if (rel in cambios or loc not in previas) else previas[loc]
         filas.append('  <url><loc>%s</loc><lastmod>%s</lastmod></url>' % (loc, fecha))
-    # Las páginas de venta (/venta/…) las pone scripts/generar_paginas_venta.py: se conservan.
+    # Del sitemap anterior se conserva TODO lo que no escribe este generador:
+    # las páginas de venta y /promociones/, que las pone
+    # scripts/generar_paginas_venta.py. Antes se conservaba solo lo que
+    # llevara «/venta/» en la dirección, así que /promociones/ se borraba a
+    # las 06:00 y volvía a las 06:20: veinte minutos al día fuera del
+    # sitemap, y si Google pasaba justo en esa ventana la veía desaparecida.
+    # Cada generador poda lo suyo; lo ajeno no se toca.
     previo = open(SITEMAP, encoding='utf-8').read() if os.path.exists(SITEMAP) else ''
-    filas += [u for u in re.findall(r'  <url>.*?</url>', previo) if '/venta/' in u]
+    mias = {SITIO + ruta for ruta, _ in urls}
+    for u in re.findall(r'  <url>.*?</url>', previo):
+        loc = re.search(r'<loc>([^<]+)</loc>', u)
+        if loc and loc.group(1) not in mias:
+            filas.append(u)
     escribir('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n'
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
              + '\n'.join(filas) + '\n</urlset>\n', cambios)
