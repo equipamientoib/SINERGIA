@@ -237,11 +237,6 @@ except Exception:
                 'incluye': 'Manual de usuario, certificado de garantía y capacitación de uso.'}
 
 
-# Mientras las fichas técnicas no estén completas, la página no las
-# ofrece. Cambiar a True y volver a generar para publicarlas.
-MOSTRAR_FICHA_PDF = False
-
-
 def condiciones(p):
     """Garantía, entrega, pago y qué incluye, como una pestaña más.
 
@@ -418,12 +413,16 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
           <small class="pc-nota">{nota}</small></div>'''
     elif badge:
         caja = '<div class="precio"><div class="pc-fila"><b class="pc-monto consulta">Consultar precio</b>%s</div></div>' % badge
-    # Ficha técnica: todavía no se ofrece. El PDF se sigue generando, pero
-    # le falta información del fabricante y publicarlo a medias resta más
-    # de lo que suma. Poner MOSTRAR_FICHA_PDF = True cuando esté completa.
+    # Ficha técnica en PDF: se ofrece EQUIPO POR EQUIPO, solo si ese equipo
+    # tiene cargados los parámetros del fabricante (data/fichas-venta/<id>.json).
+    # Antes era un interruptor global, y estaba apagado con razón: sin
+    # parámetros, la hoja repetía lo que el cliente ya había visto en la
+    # página y descargarla no le aportaba nada. Así, el día que entre el
+    # catálogo de otro equipo, su botón aparece solo, sin tocar código.
+    f = ficha_venta(p['id'])
     pdf = pdf_venta(p['id'])
     ruta_pdf = os.path.join(ROOT, pdf.lstrip('/'))
-    if MOSTRAR_FICHA_PDF and os.path.exists(ruta_pdf):
+    if f and os.path.exists(ruta_pdf):
         kb = max(1, round(os.path.getsize(ruta_pdf) / 1024))
         doc = f'''<div class="doc">
           <span class="doc-ico" aria-hidden="true">PDF</span>
@@ -431,11 +430,6 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
           <button type="button" class="btn doc-ver" data-ver="{pdf}" data-pdf="{pdf}" data-titulo="Ficha técnica — {e(p['nom'])}">Ver</button>
           <a class="btn fill doc-dl" href="{pdf}" download>Descargar</a>
         </div>'''
-    elif MOSTRAR_FICHA_PDF:
-        wa_f = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(
-            'Hola Sinergia Biomédica, me envían la ficha técnica de: %s %s %s' % (p['nom'], p.get('marca', ''), p.get('modelo', ''))))
-        doc = f'''<p class="doc-linea"><span class="doc-mini" aria-hidden="true">PDF</span>
-          Ficha técnica en preparación · <a href="{wa_f}" target="_blank" rel="noopener">pídela por WhatsApp</a></p>'''
     else:
         doc = ''
 
@@ -446,20 +440,29 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
         desc += '<p class="nota-p"><b>Se usa en:</b></p><ul>%s</ul>' % areas
     desc += ('<p class="nota-p">Incluye asesoría para elegir el modelo, entrega en Lima y provincias '
              'y mantenimiento después de la venta.</p>')
-    f = ficha_venta(p['id'])
+    # La identificación va SIEMPRE, con o sin parámetros del fabricante.
+    # Antes, el equipo que tenía ficha del fabricante perdía este bloque
+    # entero y se llevaba con él el código, que es justo el dato que busca
+    # el comprador del Estado. Ahora: identificación arriba, parámetros del
+    # fabricante debajo.
+    #
+    # «Código» y la capacidad salen de data/venta.json › codigosEquipo,
+    # escritos a mano equipo por equipo. No se infiere ninguno: si un
+    # equipo no está en esa lista, no lleva código. Sin citar norma ni
+    # listado, y solo aquí: ni en el texto ni en la meta-descripción.
+    ce = (CODIGOS_EQUIPO or {}).get(p['id']) or {}
+    ident = [('Equipo', p['nom']), ('Marca', p.get('marca')), ('Modelo', p.get('modelo')),
+             ('Capacidad', ce.get('capacidad')), ('Código', cod_de(p)),
+             ('Procedencia', p.get('origen')), ('Categoría', cat)]
+    filas = '<tr class="g"><th colspan="2">Identificación</th></tr>' + ''.join(
+        '<tr><th>%s</th><td>%s</td></tr>' % (k, e(v)) for k, v in ident if v)
     if f:
-        filas, pie = gp.filas_ficha(f)
+        # Con los parámetros del fabricante no se repiten las cuatro o cinco
+        # características del catálogo: las mismas («45 litros», «220 V»)
+        # saldrían otra vez dos filas más abajo, y con menos detalle.
+        mas, pie = gp.filas_ficha(f)
+        filas += mas
     else:
-        # «Código» y la capacidad salen de data/venta.json › codigosEquipo,
-        # escritos a mano equipo por equipo. No se infiere ninguno: si un
-        # equipo no está en esa lista, no lleva código. Sin citar norma ni
-        # listado, y solo aquí: ni en el texto ni en la meta-descripción.
-        ce = (CODIGOS_EQUIPO or {}).get(p['id']) or {}
-        ident = [('Equipo', p['nom']), ('Marca', p.get('marca')), ('Modelo', p.get('modelo')),
-                 ('Capacidad', ce.get('capacidad')), ('Código', cod_de(p)),
-                 ('Procedencia', p.get('origen')), ('Categoría', cat)]
-        filas = '<tr class="g"><th colspan="2">Identificación</th></tr>' + ''.join(
-            '<tr><th>%s</th><td>%s</td></tr>' % (k, e(v)) for k, v in ident if v)
         car = p.get('caracteristicas') or []
         if car:
             filas += '<tr class="g"><th colspan="2">Características principales</th></tr>' + ''.join(
@@ -981,7 +984,23 @@ def ficha_a4_venta(p, cfg, base, fijas, locales):
     cars = ''.join('<tr><th>%s</th><td></td></tr>' % e(c) for c in (p.get('caracteristicas') or []))
     areas = ''.join('<li>%s</li>' % e(a) for a in (p.get('areas') or []))
     grupos = '<div class="g"><h4>Identificación</h4><table>%s</table></div>' % tabla if tabla else ''
-    if p.get('caracteristicas'):
+    # Con parámetros del fabricante cargados, la hoja los lleva: es lo que
+    # convierte este PDF en un documento que vale la pena descargar. Sin
+    # ellos, la hoja se queda con las características del catálogo.
+    fch = ficha_venta(p['id'])
+    fuente_pie = ('<br>Fuente: ' + e(fch.get('fuente', 'fabricante'))
+                  + '. Especificaciones sujetas a cambios del fabricante.') if fch else ''
+    if fch:
+        grupos += ''.join(
+            '<div class="g"><h4>%s</h4><table>%s</table></div>'
+            % (e(g['titulo']), ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b))
+                                       for a, b in g['filas']))
+            for g in fch.get('secciones') or [])
+        inc = fch.get('incluye') or []
+        if inc:
+            grupos += ('<div class="g"><h4>Accesorios estándar</h4><table>%s</table></div>'
+                       % ''.join('<tr><td colspan="2">%s</td></tr>' % e(x) for x in inc))
+    elif p.get('caracteristicas'):
         grupos += ('<div class="g"><h4>Características</h4><table>%s</table></div>'
                    % ''.join('<tr><td colspan="2">%s</td></tr>' % e(c) for c in p['caracteristicas']))
     return f'''<!DOCTYPE html>
@@ -1036,7 +1055,7 @@ def ficha_a4_venta(p, cfg, base, fijas, locales):
   {f'<div class="incluye"><b>Se usa en</b><ul>{areas}</ul></div>' if areas else ''}
   <footer>
     <div><b>Sinergia Biomédica</b> · Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú · {e(cfg['email'])} · {e(cfg['telefono'])}</div>
-    <div style="text-align:right">sinergiabiomedica.pe<br>Precio y disponibilidad: consultar</div>
+    <div style="text-align:right">sinergiabiomedica.pe<br>Precio y disponibilidad: consultar{fuente_pie}</div>
   </footer>
 </div>
 <button class="boton" onclick="print()">Guardar como PDF</button>

@@ -1,0 +1,169 @@
+{
+ "_nota": "Ficha técnica del fabricante. Mismo formato que data/fichas/ (alquiler): scripts/generar_paginas_venta.py la muestra en la pestaña «Parámetros técnicos» de la página del equipo, debajo de la identificación, y arma con ella la hoja A4 de la que sale el PDF. Si este archivo no existe, la página no muestra parámetros ni ofrece el PDF: no hay que tocar código para cargar un equipo nuevo, basta con dejar aquí su archivo. «revisar» es lo que Sinergia debe confirmar con el fabricante.",
+ "id": "biobase-bkm-z45b",
+ "titulo": "Autoclave de mesa 45 L clase B Biobase BKM-Z45B",
+ "resumen": "Autoclave de vapor clase B de 45 L con prevacío, generador de vapor incorporado y puerta automática.",
+ "fuente": "catálogo BIOBASE «Serie Class B», páginas 09-10 (versión en español)",
+ "secciones": [
+  {
+   "titulo": "Cámara y ciclo",
+   "filas": [
+    [
+     "Capacidad",
+     "45 L"
+    ],
+    [
+     "Material de la cámara",
+     "S30408"
+    ],
+    [
+     "Tamaño de la cámara",
+     "φ 316 × 621 mm"
+    ],
+    [
+     "Rack",
+     "1 rack con 3 bandejas"
+    ],
+    [
+     "Temperatura de trabajo",
+     "105 a 134 °C"
+    ],
+    [
+     "Exactitud de temperatura",
+     "0,1 °C"
+    ],
+    [
+     "Temperatura máxima de diseño",
+     "150 °C"
+    ],
+    [
+     "Presión de trabajo",
+     "0,23 MPa"
+    ],
+    [
+     "Presión de diseño",
+     "-0,1 / 0,3 MPa"
+    ],
+    [
+     "Tiempo de esterilización",
+     "Configurable de 1 a 99 minutos"
+    ],
+    [
+     "Tiempo de secado",
+     "Configurable de 1 a 99 minutos"
+    ]
+   ]
+  },
+  {
+   "titulo": "Vacío, agua y filtros",
+   "filas": [
+    [
+     "Sistema de vacío",
+     "Vacío de alta eficiencia, vacío extremo superior a -90 kPa. Bomba de agua de alta presión combinada con eyector, principio de Venturi"
+    ],
+    [
+     "Tanque de agua",
+     "Acero inoxidable incorporado, con ciclo interno de vapor y agua"
+    ],
+    [
+     "Capacidad del tanque",
+     "14 L"
+    ],
+    [
+     "Filtros de agua",
+     "Del tanque y de la cámara, de desmontaje rápido"
+    ],
+    [
+     "Filtro de aire",
+     "0,22 μm, eficiencia de filtración superior al 99,5 %"
+    ]
+   ]
+  },
+  {
+   "titulo": "Mando, programas y registro",
+   "filas": [
+    [
+     "Puerta",
+     "Automática"
+    ],
+    [
+     "Pantalla",
+     "Táctil LCD de 5 pulgadas"
+    ],
+    [
+     "Programas",
+     "Instrumental sin empaque, instrumental empacado, caucho, apósitos, líquidos, personalización de líquidos, personalización de sólidos, esterilización de medios, programa reforzado, prueba B&D, prueba de vacío y disolución de medios"
+    ],
+    [
+     "Automatismo",
+     "Calentamiento, esterilización, evacuación y secado totalmente automáticos"
+    ],
+    [
+     "Calentamiento de la cámara",
+     "Resistencia de película"
+    ],
+    [
+     "Registro de ciclos",
+     "Impresora incorporada de serie y puerto USB de serie"
+    ],
+    [
+     "Sensor de temperatura móvil",
+     "Sonda que mide la temperatura interna del líquido"
+    ],
+    [
+     "Protecciones",
+     "Sobretemperatura automática, control y protección múltiple del evaporador, enclavamiento de seguridad de la puerta y doble protección contra sobrepresión"
+    ]
+   ]
+  },
+  {
+   "titulo": "Instalación",
+   "filas": [
+    [
+     "Alimentación",
+     "AC 220 V, 50/60 Hz (estándar); conexión por interruptor termomagnético"
+    ],
+    [
+     "Consumo",
+     "5,8 kW"
+    ],
+    [
+     "Altitud de operación",
+     "Hasta 2000 m s. n. m.; versión para 2000 a 3000 m bajo pedido"
+    ]
+   ]
+  },
+  {
+   "titulo": "Medidas y peso",
+   "filas": [
+    [
+     "Dimensiones externas (an × prof × al)",
+     "610 × 1020 × 610 mm"
+    ],
+    [
+     "Peso neto",
+     "128 kg"
+    ],
+    [
+     "Dimensiones de embalaje (an × prof × al)",
+     "750 × 1200 × 880 mm"
+    ],
+    [
+     "Peso bruto",
+     "165 kg"
+    ]
+   ]
+  }
+ ],
+ "incluye": [
+  "Bandeja de acero inoxidable",
+  "USB",
+  "Impresora",
+  "Sensor móvil"
+ ],
+ "revisar": [
+  "El catálogo da «1~99 min» como RANGO CONFIGURABLE de esterilización y de secado, no como duración de ciclo. No se publica ninguna duración real por programa porque el catálogo no la trae.",
+  "Confirmar con el fabricante la duración real de cada programa, para poder publicarla.",
+  "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (105 a 134 °C), como el resto de las fichas del sitio. Los números son los del catálogo."
+ ]
+}
