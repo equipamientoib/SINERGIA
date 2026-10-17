@@ -497,6 +497,10 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     # Botón ESTÁTICO a la página de la familia. El de la tienda va a una
     # ruta con almohadilla, que Google no sigue: sin este, la ficha no
     # devolvía ningún enlace rastreable hacia arriba más que la miga.
+    # El texto largo, si este equipo lo tiene. Sin él no se deja ni una
+    # línea en blanco: las 159 páginas sin texto salen byte por byte iguales.
+    largo = texto_ficha(p)[0]
+    txt_largo = ('\n    ' + largo) if largo else ''
     lnd = (LANDINGS or {}).get(p.get('cat') or '')
     fam_btn = ('<a class="btn fill" href="/venta/%s/">Ver todos los de %s</a> '
                % (e(lnd['slug']), e((cat or 'esta familia').lower()))) if (lnd and lnd.get('slug')) else ''
@@ -525,7 +529,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
       <div class="tabs" role="tablist">{tabs}</div>
       {panels}
     </div>
-    {barra_movil(p, wa, fts[0][0] if fts else '')}
+    {barra_movil(p, wa, fts[0][0] if fts else '')}{txt_largo}
     {nav}
     {f"""<section class="otros">
     <h2>Más en {e(cat)}</h2>
@@ -660,6 +664,15 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
                # disponible para mostrar la ficha con foto y precio.
                'image': [SITIO + b if b.startswith('/') else b for _, b in fts][:3],
                'offers': oferta}]
+    # Las preguntas de la ficha, para que Google pueda mostrarlas debajo
+    # del resultado. Son las mismas que ve el cliente en la página: si no
+    # estuvieran visibles no se podrían publicar así.
+    faq = texto_ficha(p)[1]
+    if faq:
+        jsonld.append({'@type': 'FAQPage',
+                       'mainEntity': [{'@type': 'Question', 'name': q,
+                                       'acceptedAnswer': {'@type': 'Answer', 'text': r}}
+                                      for q, r in faq]})
     # Si la familia tiene página propia, la miga apunta ahí y no al ancla de
     # la tienda: son 13 enlaces internos hacia la página que queremos que
     # Google entienda como la principal de autoclaves.
@@ -920,6 +933,48 @@ def cod_de(p):
 def cod_texto(p):
     c = cod_de(p)
     return ('Cod. ' + c) if c else ''
+TEXTOS = {}                # lo llena main(): equipo → {guia, faq} de data/venta.json
+
+
+def datos_texto(p):
+    """Los huecos entre llaves que puede usar el texto de una ficha.
+
+    Se rellenan al generar la página, no se escriben a mano en los datos:
+    así el precio del texto no se queda viejo cuando cambia el de la hoja,
+    que es exactamente lo que pasaría con un número escrito a mano.
+    """
+    ce = (CODIGOS_EQUIPO or {}).get(p['id']) or {}
+    return {'precio': soles(p['precio']) if p.get('precio') else 'consultar',
+            'plazo': TERMINOS.get('plazoStock') or 'pocos días',
+            'garantia': str(TERMINOS.get('garantiaMeses') or 12),
+            'pago': TERMINOS.get('pago') or '',
+            'codigo': cod_de(p) or '',
+            'capacidad': ce.get('capacidad') or ''}
+
+
+def texto_ficha(p):
+    """El texto largo de la ficha: guía y preguntas frecuentes.
+
+    Va debajo de las pestañas, con el mismo aspecto que la guía de las
+    páginas de familia, para que el cliente reconozca dónde está. Arriba
+    no cambia nada: foto, precio y botones se quedan igual.
+
+    Devuelve el HTML y la lista de preguntas, que el llamador necesita
+    aparte para publicarlas como datos estructurados.
+    """
+    T = (TEXTOS or {}).get(p['id']) or {}
+    if not T:
+        return '', []
+    d = datos_texto(p)
+    guia = ''.join('<section class="lp-g"><h2>%s</h2><p>%s</p></section>'
+                   % (e(g['h']), g['p'].format(**d)) for g in T.get('guia') or [])
+    faq = [(f['q'], f['r'].format(**d)) for f in T.get('faq') or []]
+    bloque = ('<section class="lp-s"><h2>Preguntas frecuentes</h2>%s</section>' % ''.join(
+        '<details class="lp-faq"><summary>%s</summary><p>%s</p></details>' % (e(q), r)
+        for q, r in faq)) if faq else ''
+    return '<div class="ficha-texto">%s%s</div>' % (guia, bloque), faq
+
+
 LANDINGS = {}              # lo llena main(): categoría → su página de aterrizaje
 TODOS_PUBLICADOS = []      # lo llena main(), para el texto de «no hay promociones»
 
@@ -1336,6 +1391,8 @@ def main():
     LANDINGS.update(landings)
     CODIGOS_EQUIPO.update({k: v for k, v in (repo.get('codigosEquipo') or {}).items()
                            if not k.startswith('_')})
+    TEXTOS.update({k: v for k, v in (repo.get('textosFicha') or {}).items()
+                   if not k.startswith('_')})
     cats_orden = [c['id'] for c in repo.get('categorias', [])]
     base = {p['id']: p for p in repo.get('productos', [])}
     fijas = {k: v for k, v in (repo.get('fotosFijas') or {}).items() if not k.startswith('_')}
