@@ -163,6 +163,48 @@ def filas_ficha(ficha):
     return filas, pie
 
 
+MESES_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+            'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+
+
+def vigencia_calibracion(eq):
+    """«Calibración vigente hasta agosto 2027», o nada.
+
+    SOLO el mes y el año: el cliente ve que la trazabilidad está al día y
+    nadie sabe la fecha exacta en que toca renovar. No sale el día, ni la
+    fecha de emisión, ni el laboratorio que la emitió, ni el documento:
+    el certificado lleva el número de serie del patrón y el número de
+    certificado del laboratorio, y eso no se publica.
+
+    Si la fecha ya pasó NO se muestra nada: ni la fecha, ni «vencido», ni
+    aviso alguno. La web no le anuncia a un cliente que un patrón está
+    fuera de vigencia antes de que la empresa lo renueve; simplemente
+    desaparece la línea hasta que la hoja traiga la fecha nueva.
+
+    Las páginas se regeneran todos los días, así que la línea se apaga
+    sola el día que la fecha queda atrás.
+    """
+    cf = str(eq.get('cal_fin') or '').strip()
+    if not cf:
+        return ''
+    try:
+        partes = [int(x) for x in cf.replace('-', '/').split('/')]
+        if len(partes) != 3:
+            return ''
+        if partes[0] > 31:               # 2027/08/31
+            a, m, d = partes
+        else:                            # 31/08/2027, que es como llega
+            d, m, a = partes
+            if a < 100:                  # por si llega 27 en vez de 2027
+                a += 2000
+        fin = datetime.date(a, m, d)
+    except Exception:
+        return ''
+    if fin < datetime.date.today():
+        return ''
+    return 'Calibración vigente hasta %s %d' % (MESES_ES[m - 1], a)
+
+
 def fotos_de(eq, locales):
     urls = eq.get('fotos') or ([eq['photo']] if eq.get('photo') else [])
     out = []
@@ -514,9 +556,17 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
           <button type="button" class="btn doc-ver" data-ver="/fichas/{e(eq['id'])}/" data-pdf="{pdf}" data-titulo="Ficha técnica — {e(eq['nom'])}">Ver</button>
           <a class="btn fill doc-dl" href="{pdf}" download>Descargar</a>
         </div>'''
+    # EL CERTIFICADO DE CALIBRACIÓN NO SE PUBLICA. La hoja tiene las
+    # columnas cal_pdf y cal_dl y aquí se pintaba un enlace al documento en
+    # Drive. Son certificados a nombre de la empresa, con el número de serie
+    # de cada patrón y el número de certificado del laboratorio que lo
+    # emitió: publicarlos le enseña a la competencia qué patrones hay, quién
+    # los calibra y cuándo vencen. El dato se queda en la hoja para uso
+    # interno. No volver a pintarlo, ni el enlace ni las fechas.
     enl = []
-    if eq.get('cal_pdf'):
-        enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración</a>' % e(eq['cal_pdf']))
+    vig = vigencia_calibracion(eq)
+    if vig:
+        enl.append(e(vig))
     if eq.get('ficha'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
     precio = ''

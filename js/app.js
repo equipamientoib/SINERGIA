@@ -700,12 +700,30 @@ function renderEquipo(id){
     :(VER_PRECIOS
       ?`<div class="dbtns"><button class="btn btn-fill btn-lg" onclick="go('#/cotizar/'+'${e.id}')">Calcular mi alquiler</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
       :`<div class="dbtns"><a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a></div>`);
-  /* Bloque de calibración: fechas y certificado (hoja Equipos, columnas cal_*). */
-  const calHTML=(e.cal_fin||e.cal_pdf)?`<div class="spec"><div class="sh">Certificado de calibración</div>`
-    +(e.cal_ini?`<div class="row"><span class="l">Emitido</span><span class="v">${e.cal_ini}</span></div>`:'')
-    +(e.cal_fin?`<div class="row"><span class="l">Vigente hasta</span><span class="v">${e.cal_fin}</span></div>`:'')
-    +(e.cal_pdf?`<div class="row"><span class="l">Documento</span><span class="v"><a href="${e.cal_pdf}" target="_blank" rel="noopener">Ver certificado</a></span></div>`:'')
-    +`</div>`:'';
+  /* Calibración: SOLO «vigente hasta <mes> <año>».
+     El documento NO se publica: el certificado lleva el número de serie
+     del patrón y el número de certificado del laboratorio emisor, y eso le
+     enseñaría a la competencia qué patrones hay y quién los calibra. Nunca
+     volver a pintar aquí el enlace a Drive (cal_pdf / cal_dl), ni la fecha
+     de emisión (cal_ini), ni el laboratorio.
+     Solo mes y año: el cliente ve la trazabilidad al día y nadie sabe la
+     fecha exacta. Si ya pasó NO se muestra nada, ni «vencido» ni aviso
+     alguno: la línea desaparece hasta que la hoja traiga la fecha nueva. */
+  const calHTML=(function(){
+    const MESES=['enero','febrero','marzo','abril','mayo','junio','julio',
+                 'agosto','septiembre','octubre','noviembre','diciembre'];
+    const cf=String(e.cal_fin||'').trim(); if(!cf) return '';
+    const p=cf.replace(/-/g,'/').split('/').map(Number);
+    if(p.length!==3||p.some(isNaN)) return '';
+    let d,m,a;
+    if(p[0]>31){ a=p[0]; m=p[1]; d=p[2]; } else { d=p[0]; m=p[1]; a=p[2]; if(a<100) a+=2000; }
+    const fin=new Date(a,m-1,d);
+    if(fin.getFullYear()!==a||fin.getMonth()!==m-1||fin.getDate()!==d) return '';
+    const hoy=new Date(); hoy.setHours(0,0,0,0);
+    if(fin<hoy) return '';
+    return `<div class="spec"><div class="row"><span class="l">Calibración vigente hasta</span>`
+      +`<span class="v">${MESES[m-1]} ${a}</span></div></div>`;
+  })();
   const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div>${tieneMedio(e.dia)?`<div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div>`:''}<div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
@@ -842,17 +860,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=0a422479';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=94d27de3';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=0a422479';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=94d27de3';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=0a422479','js/06-tablero.js?v=0a422479'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=94d27de3','js/06-tablero.js?v=94d27de3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=0a422479'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=94d27de3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */

@@ -269,10 +269,11 @@ function equipos_(ss) {
     var fp = pdf_(r.ficha_pdf);
     e.ficha = fp.ver; e.ficha_dl = fp.descargar;
 
-    e.cal_ini = fecha_(r.cal_inicio);
+    /* Solo la VIGENCIA. El certificado no se publica: lleva el número de
+       serie del patrón y el número de certificado del laboratorio que lo
+       emitió. La web muestra «Calibración vigente hasta <mes> <año>» y
+       nada más. No volver a mandar cal_pdf, cal_dl ni cal_ini. */
     e.cal_fin = fecha_(r.cal_fin);
-    var cal = pdf_(r.cal_certificado);
-    e.cal_pdf = cal.ver; e.cal_dl = cal.descargar;
 
     e.desc = s_(r.descripcion);
     try { e.specs = JSON.parse(s_(r.specs_json) || '{}'); } catch (err) { e.specs = {}; }
