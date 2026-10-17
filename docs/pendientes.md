@@ -1,7 +1,28 @@
 # Pendientes
 
 Lista viva de lo que falta. Se va tachando de arriba abajo, de uno en uno.
-Última revisión: 5 de octubre de 2026.
+Última revisión: 17 de octubre de 2026.
+
+## Arreglos chicos anotados el 17/10/2026
+
+Ninguno es urgente. Los tres salieron de trabajar en los PR #135 y #136.
+
+- [ ] **El robot de venta no publica el feed de Google.** Su `git add` lleva
+  `venta sitemap.xml index.html data/venta-vivo.json` y deja fuera
+  `feed-google.xml`, `promociones/index.html` y las hojas A4 de
+  `fichas/venta/`. Por eso el feed anunciaba dos equipos dados de baja, con
+  enlace a una página que ya no existe. Arreglo: añadirlos al `git add` del
+  robot (`.github/workflows/paginas-venta.yml`).
+- [ ] **`/promociones/` desaparece del sitemap 20 minutos al día.**
+  `generar_paginas.py` reescribe el sitemap y del anterior solo conserva las
+  URL que llevan `/venta/`, así que a las 06:00 la borra y a las 06:20 el
+  generador de venta la vuelve a poner. Arreglo: una línea en
+  `scripts/generar_paginas.py` (la de `filas += [u for u in …]`).
+- [ ] **La segunda página de los PDF imprime el gris del fondo.** Solo
+  afecta a los PDF que pasan de una página (hoy, los dos Biobase con
+  parámetros). El arreglo son tres palabras de CSS en la plantilla A4, pero
+  esa plantilla la comparten las 164 hojas y regenera más de 150 PDF: hacerlo
+  en un PR de limpieza, solo, y revisando qué archivos salen modificados.
 
 ## Ahora
 
