@@ -44,6 +44,9 @@
 #  marcas (TIPOS-URL, VENTA-URL, MAPA-PIE) y los sellos ?v=. Si llevara
 #  merge=ours, un cambio hecho a mano en main se perderia sin aviso.
 #  Mejor resolver ese conflicto a mano, que son dos lineas.
+#  data/venta-vivo.json tampoco: es la foto de la hoja de Google, o sea
+#  un DATO, no una pagina generada. Con merge=ours se quedaria la foto
+#  vieja y las paginas se regenerarian con datos atrasados.
 #  js/app.js y css/app.css SI llevan merge=ours: empaquetar_web.py los
 #  escribe completos en cada corrida (une los sueltos de css/ y js/), asi
 #  que no hay nada propio que perder en ellos.
@@ -51,6 +54,8 @@
 
 venta/**/index.html     merge=ours
 alquiler/**/index.html  merge=ours
+promociones/index.html  merge=ours
 sitemap.xml             merge=ours
+feed-google.xml         merge=ours
 css/app.css             merge=ours
 js/app.js               merge=ours
