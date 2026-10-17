@@ -30,6 +30,14 @@
 #  Sin eso, git avisa del conflicto igual que antes: no se pierde nada,
 #  solo no se ahorra el trabajo.
 #
+#  OJO: ese driver se declara en la CONFIGURACION LOCAL de cada copia,
+#  no dentro del repositorio, asi que el boton «Merge pull request» de
+#  GitHub no puede ejecutarlo. GitHub seguira pintando el PR en rojo
+#  cuando los robots hayan tocado los mismos archivos generados. Lo que
+#  cambia es el arreglo: se resuelve aqui, en una copia con el driver
+#  puesto, con un merge y una regeneracion, en vez de 165 archivos a
+#  mano. GitLab y Bitbucket documentan la misma limitacion.
+#
 #  QUE NO ESTA AQUI, Y POR QUE
 #  index.html NO lleva merge=ours: es un archivo FUENTE, escrito a mano
 #  (la portada con sus dos tarjetas), con tres trozos generados entre
