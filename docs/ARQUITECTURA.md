@@ -45,10 +45,18 @@ GitHub Pages sirve lo que hay en `main` tal cual, así que el HTML generado
 está versionado. Además, dos robots lo regeneran y lo empujan a `main`
 todos los días:
 
-| Robot | Hora (Lima) | Qué toca |
+| Robot | Hora (Lima) | Qué PUBLICA (lo que entra en su commit) |
 |---|---|---|
-| `.github/workflows/paginas-alquiler.yml` | 06:00 | `alquiler/**`, `sitemap.xml` |
-| `.github/workflows/paginas-venta.yml` | 06:20 | `venta/**`, `sitemap.xml`, `index.html`, `feed-google.xml` |
+| `.github/workflows/paginas-alquiler.yml` | 06:00 | `alquiler/`, `sitemap.xml` |
+| `.github/workflows/paginas-venta.yml` | 06:20 | `venta/`, `sitemap.xml`, `index.html`, `data/venta-vivo.json` |
+
+**Los dos generan más de lo que publican.** `feed-google.xml`,
+`promociones/index.html` y las hojas A4 de `fichas/venta/` se vuelven a
+escribir en cada corrida pero **no entran en el `git add` del robot**, así
+que no se publican solos. Consecuencia real, vista el 17/10/2026: el feed
+de Google Merchant seguía anunciando dos equipos dados de baja, con enlace
+a una página que ya no existía. Si se da de baja un equipo, hay que
+regenerar y publicar el feed a mano, o arreglar el `git add` del robot.
 
 Por eso **cualquier rama que viva más de un día choca con ellos**. El
 14/10/2026 fueron 165 conflictos de una vez, todos en archivos que nadie
@@ -77,12 +85,69 @@ git merge origin/main                 # o rebase
 git checkout --theirs -- $(git diff --name-only --diff-filter=U)
 git add -- $(git diff --name-only --diff-filter=U)
 
-python3 scripts/generar_paginas.py
+# OJO con el de alquiler: ver el aviso de abajo antes de correrlo.
+python3 scripts/generar_paginas.py --datos /tmp/vivo.json
 python3 scripts/generar_paginas_venta.py --datos data/venta-vivo.json
 python3 scripts/empaquetar_web.py
 
 git add -A && git commit
 ```
+
+#### AVISO: el generador de alquiler, sin `--datos`, retrocede la hoja
+
+`generar_paginas.py` sin `--datos` lee `data/catalogo.json`, que es una
+**copia vieja** del catálogo y **no tiene las columnas que se llenan en la
+hoja**, como `cal_pdf` (el certificado de calibración). El robot, en cambio,
+corre siempre con el catálogo EN VIVO y nunca publica `data/catalogo.json`.
+
+Resultado: regenerar en local con la copia del repositorio **borra de las
+páginas lo que el robot acaba de publicar desde la hoja**. Pasó el
+17/10/2026 con los certificados de calibración de siete instrumentos.
+
+Para regenerar alquiler de verdad, hay que traer el catálogo en vivo, igual
+que el robot:
+
+```bash
+URL=$(grep -oE 'https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec' js/00-config.js | head -1)
+curl -sSL --max-time 90 -o /tmp/vivo.json "$URL"
+python3 scripts/generar_paginas.py --datos /tmp/vivo.json
+```
+
+Y después comparar contra `main`: si cambia alguna página de alquiler que
+no se estaba tocando, algo se perdió.
+
+```bash
+git diff --name-only origin/main -- alquiler/
+```
+
+### Los PDF de las fichas técnicas: revisar SIEMPRE qué sale modificado
+
+`scripts/generar_pdf_fichas.js` convierte cada hoja A4 (`fichas/<id>/` y
+`fichas/venta/<id>/`) en su PDF. Compara los bytes antes de escribir y se
+salta el archivo si son idénticos, pero **eso no basta**:
+
+> **Un PDF puede salir distinto aunque su contenido no haya cambiado ni una
+> letra.** Basta con que el navegador que lo genera sea de otra versión:
+> cambian el subconjunto de fuentes incrustado y el orden interno de los
+> objetos, y los bytes ya no coinciden. El 17/10/2026 una corrida reescribió
+> **98 PDF** cuyo contenido era el mismo; solo dos habían cambiado de verdad.
+
+Por eso, **antes de hacer commit después de correr ese script**:
+
+```bash
+git status --short fichas/            # ¿qué salió modificado?
+```
+
+Si aparecen archivos de equipos que no se tocaron, hay que devolverlos:
+
+```bash
+git status --porcelain fichas/ | awk '$1=="M" && $2 ~ /\.pdf$/ {print $2}' \
+  | grep -v <el id que sí cambió> | xargs -r git checkout --
+git status --porcelain fichas/ | awk '$1=="??"{print $2}' | xargs -r rm -f
+```
+
+Cada PDF pesa unos 180 KB: publicar 150 sin motivo son 27 MB de basura en
+el historial del repositorio, que ya no se pueden quitar.
 
 ### Una vez por copia del repositorio
 
