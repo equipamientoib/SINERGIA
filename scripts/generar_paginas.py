@@ -514,9 +514,14 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
           <button type="button" class="btn doc-ver" data-ver="/fichas/{e(eq['id'])}/" data-pdf="{pdf}" data-titulo="Ficha técnica — {e(eq['nom'])}">Ver</button>
           <a class="btn fill doc-dl" href="{pdf}" download>Descargar</a>
         </div>'''
+    # EL CERTIFICADO DE CALIBRACIÓN NO SE PUBLICA. La hoja tiene las
+    # columnas cal_pdf y cal_dl y aquí se pintaba un enlace al documento en
+    # Drive. Son certificados a nombre de la empresa, con el número de serie
+    # de cada patrón y el número de certificado del laboratorio que lo
+    # emitió: publicarlos le enseña a la competencia qué patrones hay, quién
+    # los calibra y cuándo vencen. El dato se queda en la hoja para uso
+    # interno. No volver a pintarlo, ni el enlace ni las fechas.
     enl = []
-    if eq.get('cal_pdf'):
-        enl.append('<a href="%s" target="_blank" rel="noopener">Certificado de calibración</a>' % e(eq['cal_pdf']))
     if eq.get('ficha'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
     precio = ''

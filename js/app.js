@@ -700,12 +700,14 @@ function renderEquipo(id){
     :(VER_PRECIOS
       ?`<div class="dbtns"><button class="btn btn-fill btn-lg" onclick="go('#/cotizar/'+'${e.id}')">Calcular mi alquiler</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
       :`<div class="dbtns"><a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a></div>`);
-  /* Bloque de calibración: fechas y certificado (hoja Equipos, columnas cal_*). */
-  const calHTML=(e.cal_fin||e.cal_pdf)?`<div class="spec"><div class="sh">Certificado de calibración</div>`
-    +(e.cal_ini?`<div class="row"><span class="l">Emitido</span><span class="v">${e.cal_ini}</span></div>`:'')
-    +(e.cal_fin?`<div class="row"><span class="l">Vigente hasta</span><span class="v">${e.cal_fin}</span></div>`:'')
-    +(e.cal_pdf?`<div class="row"><span class="l">Documento</span><span class="v"><a href="${e.cal_pdf}" target="_blank" rel="noopener">Ver certificado</a></span></div>`:'')
-    +`</div>`:'';
+  /* EL CERTIFICADO DE CALIBRACIÓN NO SE PUBLICA. Aquí se pintaba un bloque
+     con la fecha de emisión, la de vencimiento y un enlace al documento en
+     Drive (hoja Equipos, columnas cal_*). Son certificados a nombre de la
+     empresa, con el número de serie de cada patrón y el número de
+     certificado del laboratorio emisor: publicarlos le enseña a la
+     competencia qué patrones hay, quién los calibra y cuándo vencen.
+     Los datos se quedan en la hoja para uso interno. No reponer. */
+  const calHTML='';
   const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div>${tieneMedio(e.dia)?`<div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div>`:''}<div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
@@ -842,17 +844,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=0a422479';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=f5478c3d';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=0a422479';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=f5478c3d';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=0a422479','js/06-tablero.js?v=0a422479'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=f5478c3d','js/06-tablero.js?v=f5478c3d'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=0a422479'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=f5478c3d'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
