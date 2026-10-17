@@ -9,10 +9,6 @@
    "titulo": "Cámara y ciclo",
    "filas": [
     [
-     "Capacidad",
-     "45 L"
-    ],
-    [
      "Material de la cámara",
      "S30408"
     ],
@@ -164,6 +160,7 @@
  "revisar": [
   "El catálogo da «1~99 min» como RANGO CONFIGURABLE de esterilización y de secado, no como duración de ciclo. No se publica ninguna duración real por programa porque el catálogo no la trae.",
   "Confirmar con el fabricante la duración real de cada programa, para poder publicarla.",
-  "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (105 a 134 °C), como el resto de las fichas del sitio. Los números son los del catálogo."
+  "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (105 a 134 °C), como el resto de las fichas del sitio. Los números son los del catálogo.",
+  "La capacidad va solo en «Identificación», al lado del código, que es donde la busca el comprador. Antes salía también en «Cámara y ciclo», repetida tres filas más abajo."
  ]
 }

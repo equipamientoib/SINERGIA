@@ -9,10 +9,6 @@
    "titulo": "Cámara y ciclo",
    "filas": [
     [
-     "Capacidad",
-     "60 L"
-    ],
-    [
      "Material de la cámara",
      "S30408"
     ],
@@ -165,6 +161,7 @@
   "El catálogo da «1~99 min» como RANGO CONFIGURABLE de esterilización y de secado, no como duración de ciclo. No se publica ninguna duración real por programa porque el catálogo no la trae.",
   "Confirmar con el fabricante la duración real de cada programa, para poder publicarla.",
   "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (105 a 134 °C), como el resto de las fichas del sitio. Los números son los del catálogo.",
-  "El catálogo da el BKM-Z60B como «igual al Z45B salvo» capacidad, pantalla, cámara, consumo, medidas y pesos. El resto de los valores (presiones, temperaturas, tanque, material, rack, alimentación y altitud) se toman del Z45B: confirmar en las páginas 09-10 si alguno difiere."
+  "El catálogo da el BKM-Z60B como «igual al Z45B salvo» capacidad, pantalla, cámara, consumo, medidas y pesos. El resto de los valores (presiones, temperaturas, tanque, material, rack, alimentación y altitud) se toman del Z45B: confirmar en las páginas 09-10 si alguno difiere.",
+  "La capacidad va solo en «Identificación», al lado del código, que es donde la busca el comprador. Antes salía también en «Cámara y ciclo», repetida tres filas más abajo."
  ]
 }
