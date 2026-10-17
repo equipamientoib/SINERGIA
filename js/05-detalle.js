@@ -19,14 +19,30 @@ function renderEquipo(id){
     :(VER_PRECIOS
       ?`<div class="dbtns"><button class="btn btn-fill btn-lg" onclick="go('#/cotizar/'+'${e.id}')">Calcular mi alquiler</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
       :`<div class="dbtns"><a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a></div>`);
-  /* EL CERTIFICADO DE CALIBRACIÓN NO SE PUBLICA. Aquí se pintaba un bloque
-     con la fecha de emisión, la de vencimiento y un enlace al documento en
-     Drive (hoja Equipos, columnas cal_*). Son certificados a nombre de la
-     empresa, con el número de serie de cada patrón y el número de
-     certificado del laboratorio emisor: publicarlos le enseña a la
-     competencia qué patrones hay, quién los calibra y cuándo vencen.
-     Los datos se quedan en la hoja para uso interno. No reponer. */
-  const calHTML='';
+  /* Calibración: SOLO «vigente hasta <mes> <año>».
+     El documento NO se publica: el certificado lleva el número de serie
+     del patrón y el número de certificado del laboratorio emisor, y eso le
+     enseñaría a la competencia qué patrones hay y quién los calibra. Nunca
+     volver a pintar aquí el enlace a Drive (cal_pdf / cal_dl), ni la fecha
+     de emisión (cal_ini), ni el laboratorio.
+     Solo mes y año: el cliente ve la trazabilidad al día y nadie sabe la
+     fecha exacta. Si ya pasó NO se muestra nada, ni «vencido» ni aviso
+     alguno: la línea desaparece hasta que la hoja traiga la fecha nueva. */
+  const calHTML=(function(){
+    const MESES=['enero','febrero','marzo','abril','mayo','junio','julio',
+                 'agosto','septiembre','octubre','noviembre','diciembre'];
+    const cf=String(e.cal_fin||'').trim(); if(!cf) return '';
+    const p=cf.replace(/-/g,'/').split('/').map(Number);
+    if(p.length!==3||p.some(isNaN)) return '';
+    let d,m,a;
+    if(p[0]>31){ a=p[0]; m=p[1]; d=p[2]; } else { d=p[0]; m=p[1]; a=p[2]; if(a<100) a+=2000; }
+    const fin=new Date(a,m-1,d);
+    if(fin.getFullYear()!==a||fin.getMonth()!==m-1||fin.getDate()!==d) return '';
+    const hoy=new Date(); hoy.setHours(0,0,0,0);
+    if(fin<hoy) return '';
+    return `<div class="spec"><div class="row"><span class="l">Calibración vigente hasta</span>`
+      +`<span class="v">${MESES[m-1]} ${a}</span></div></div>`;
+  })();
   const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div>${tieneMedio(e.dia)?`<div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div>`:''}<div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
