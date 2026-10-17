@@ -731,7 +731,7 @@ function cotHTML(d, formal){
       <td class="c">${i + 1}</td>
       <td><b>${cotEsc(inf.nom.toUpperCase())}</b>
         ${inf.foto ? `<img class="mini" src="${cotEsc(inf.foto)}" alt="">` : ''}
-        <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Código NTS ' + cotEsc(inf.nts) + ' (NTS 113-MINSA)' : ''}
+        <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Cod. ' + cotEsc(inf.nts) : ''}
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;

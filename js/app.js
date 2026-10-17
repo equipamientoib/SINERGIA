@@ -842,17 +842,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=9c11b54d';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=0a422479';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=9c11b54d';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=0a422479';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=9c11b54d','js/06-tablero.js?v=9c11b54d'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=0a422479','js/06-tablero.js?v=0a422479'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=9c11b54d'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=0a422479'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -1797,10 +1797,12 @@ function ventaEnVivo(v){
    - stock visible: el 30 % del stock del proveedor, mínimo 1 y máximo 10;
    - código NTS (y su nombre oficial) si la hoja aún no lo tiene. */
 function vAjustar(p){
-  const q = Object.assign({}, p), sv = (VENTA && VENTA.stockVis) || {};
-  const n = Number(q.stock);
-  if(q.stock !== '' && q.stock != null && n > 0 && !q.propio)
-    q.stock = Math.min(sv.maximo || 10, Math.max(1, Math.floor(n * (sv.porcentaje || 30) / 100)));
+  const q = Object.assign({}, p);
+  /* El stock que viaja por dentro es el REAL. Antes aquí se recortaba al
+     30 % con tope 10, y ese número recortado era el que usaba el
+     cotizador para avisar «pedido especial»: un equipo con 13 unidades se
+     comportaba como si tuviera 3. El recorte se hace ahora solo al
+     MOSTRAR (vStock), que es donde importa no enseñar el inventario. */
   const fx = ((VENTA && VENTA.fijos) || {})[q.id] || {};   // marca/origen que la hoja no trae
   if(!q.marca && fx.marca) q.marca = fx.marca;
   if(!q.origen && fx.origen) q.origen = fx.origen;
@@ -1857,7 +1859,8 @@ function cargarVenta(){
                  locales: (d.fotosLocales||[]).reduce((o,id) => (o[id] = 1, o), {}),
                  promos: Object.fromEntries(Object.entries(d.promociones||{}).filter(([k]) => k[0] !== '_')),
                  propios: ((d.equiposPropios||{}).equipos)||[],
-                 stockVis: d.stockVisible||{}, nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{}};
+                 nts: d.codigosNTS||{}, ntsNom: d.nombresNTS||{}, fijos: d.datosFijos||{},
+                 codsEq: Object.fromEntries(Object.entries(d.codigosEquipo||{}).filter(([k]) => k[0] !== '_'))};
         VENTA.productos = vPropios(vAplicarPromos((d.productos||[]).filter(p => p && p.id && p.nom && !vBloqueado(p.id)).map(p => vAjustar(p.fotos || !p.fotosSitio ? p : Object.assign({}, p, {fotos: p.fotosSitio})))));
         vMezclar(); return VENTA; });
     /* Precios y stock en vivo desde el Apps Script de venta (si está configurado). */
@@ -1866,6 +1869,16 @@ function cargarVenta(){
   }
   return VENTA_CARGA;
 }
+
+/* El código del equipo, tal como se muestra: «Cod. D-212».
+
+   Sale de data/venta.json › codigosEquipo, escrito a mano equipo por
+   equipo, y si no está ahí, de la columna «clave» de la hoja. No se
+   inventa ninguno: el equipo que no tenga ni uno ni otro, no lleva
+   código. El prefijo «Cod.» se pone aquí, en un solo sitio, para que la
+   tarjeta, el mensaje de WhatsApp y la cotización digan lo mismo. */
+const vCod = p => String((((VENTA && VENTA.codsEq) || {})[p && p.id] || {}).codigo || (p && p.clave) || '').trim();
+const vCodTxt = p => { const c = vCod(p); return c ? 'Cod. ' + c : ''; };
 
 const vEsc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const vCat = id => (VENTA.categorias||[]).find(c => c.id === id);
@@ -1900,7 +1913,7 @@ function vBuscar(q){
   if(!t.length) return [];
   return VENTA.productos.filter(p => {
     const c = vCat(p.cat);
-    const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
+    const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,vCod(p),c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
     return t.every(w => txt.includes(w));
   });
 }
@@ -1918,7 +1931,7 @@ function vBuscarEn(q, destino){
 }
 function vBuscador(destino, ph){
   return `<label class="v-busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input type="search" placeholder="${ph||'Busca por equipo, marca, modelo o código NTS (ej. D-18)'}" oninput="vBuscarEn(this.value,'${destino}')" aria-label="Buscar equipos"></label>`;
+    <input type="search" placeholder="${ph||'Busca por equipo, marca, modelo o código (ej. D-18)'}" oninput="vBuscarEn(this.value,'${destino}')" aria-label="Buscar equipos"></label>`;
 }
 
 /* Cotizar una lista completa: el texto pegado va tal cual en el mensaje. */
@@ -1955,14 +1968,27 @@ function vMail(asunto){
 
 /* Precio publicado (proveedor + margen, calculado en la hoja) y stock. */
 const vSoles = n => 'S/ ' + Number(n).toLocaleString('es-PE', {maximumFractionDigits: 0});
-/* En la ficha (detalle=true) se muestra siempre la cantidad; en las tarjetas,
-   solo cuando quedan pocas unidades. */
+/* Lo que el público ve del stock.
+
+   La cantidad se muestra porque da credibilidad, pero NUNCA el número
+   real por encima de 3: de 4 para arriba dice «3+». La web es pública y
+   el stock equipo por equipo es la posición de inventario del negocio;
+   eso no se le regala a la competencia. El número real sigue entero en
+   la hoja y en el catálogo, que es lo que usan el cotizador y el portal.
+
+   Con 0 el equipo no desaparece: se queda su página diciendo que está
+   agotado, para no perder lo ganado en Google mientras vuelve el lote. */
+const V_STOCK_TOPE = 3;
+function vStockTxt(n){
+  if(n <= 0) return '';
+  if(n > V_STOCK_TOPE) return V_STOCK_TOPE + '+ unidades';
+  return n + (n === 1 ? ' unidad' : ' unidades');
+}
 function vStock(p, detalle){
   if(p.stock === undefined || p.stock === null || p.stock === '') return '';
   const n = Number(p.stock);
-  if(!(n > 0)) return '<span class="v-stock">A pedido</span>';
-  const cant = detalle || n <= 5 ? ' · ' + n + (n === 1 ? ' unidad' : (detalle ? ' unidades' : ' und.')) : '';
-  return `<span class="v-stock si">En stock${cant}</span>`;
+  if(!(n > 0)) return `<span class="v-stock v-agotado">Stock agotado${detalle ? ' · consultar plazo de nuevo lote' : ''}</span>`;
+  return `<span class="v-stock si">En stock · ${vStockTxt(n)}</span>`;
 }
 
 /* PROMOCIONES. El precio de oferta pasa a ser EL precio del equipo y el de
@@ -2048,7 +2074,7 @@ function vNotaPrecio(larga){
    scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
    Si un equipo es nuevo y aún no tiene página, se abre la ficha interna. */
 function vMensajeWA(p){
-  const linea = [p.marca, p.modelo, p.clave ? 'Código NTS ' + p.clave : '',
+  const linea = [p.marca, p.modelo, vCodTxt(p),
                  p.precio ? vSoles(p.precio) : ''].filter(Boolean).join(' · ');
   const partes = ['Hola Sinergia Biomédica, quiero cotizar:', '', p.nom];
   if(linea) partes.push(linea);
@@ -2064,7 +2090,7 @@ function vAbrir(id){ const u = vPagina(id); if(u) location.href = u; else go('#/
 function vBotonAdd(p, clase, texto, extra){
   return `<button type="button" class="${clase}"${extra || ''} data-add="${vEsc(p.id)}"
     data-nom="${vEsc(p.nom)}" data-mm="${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}"
-    data-nts="${vEsc(p.clave || '')}" data-precio="${Number(p.precio || 0)}"
+    data-nts="${vEsc(vCod(p))}" data-precio="${Number(p.precio || 0)}"
     data-foto="${vEsc(vFoto(p, 0, true) || '')}">${texto || 'Agregar a mi cotización'}</button>`;
 }
 
@@ -2074,10 +2100,11 @@ function vCard(p){
   /* Marca, modelo y código NTS en una sola línea: es lo que el comprador
      compara de un vistazo cuando revisa veinte equipos seguidos. */
   const sub = [[p.marca, p.modelo].filter(Boolean).join(' · '),
-               p.clave ? 'NTS ' + p.clave : ''].filter(Boolean).join(' · ');
+               vCodTxt(p)].filter(Boolean).join(' · ');
   const st = (p.stock === undefined || p.stock === null || p.stock === '') ? ''
-    : (Number(p.stock) > 0 ? '<em class="vt-st">En stock</em>'
-                           : '<em class="vt-st vt-ped">A pedido</em>');
+    : (Number(p.stock) > 0
+        ? '<em class="vt-st">En stock · ' + vStockTxt(Number(p.stock)) + '</em>'
+        : '<em class="vt-st vt-ped">Stock agotado</em>');
   const precio = p.precio ? `<i>${vSoles(p.precio)}</i>`
                           : '<i class="vt-cons">Consultar precio</i>';
   const href = vPagina(p.id) || ('#/venta/p/' + p.id);
@@ -2148,7 +2175,7 @@ function vPortada(){
       <h1>Equipamiento médico con <em>respaldo técnico</em>.</h1>
       <p class="lead">${n} equipos de marcas como Edan, Tuttnauer, KLS Martin y CU Medical para hospitales, clínicas y obras de equipamiento en Lima y provincias.</p>
       <div class="hero-props">
-        <span>Ficha técnica y código NTS</span>
+        <span>Ficha técnica y código</span>
         <span>Mantenimiento después de la venta</span>
       </div>
       <div class="hero-cta">
@@ -2318,7 +2345,7 @@ function vtFiltrados(){
     if(VT.stock && !(Number(p.stock) > 0)) return false;
     if(t.length){
       const c = vCat(p.cat);
-      const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
+      const txt = vNorm([p.nom,p.marca,p.modelo,p.expediente,p.clave,vCod(p),c&&c.nombre,(p.areas||[]).join(' '),(p.caracteristicas||[]).join(' ')].join(' '));
       if(!t.every(w => txt.includes(w))) return false;
     }
     return true;
@@ -2399,7 +2426,7 @@ function vProducto(id){
     ? (s.length===1 ? `<tr class="g"><th colspan="2">${vEsc(s[0])}</th></tr>` : `<tr><td>${vEsc(s[0])}</td><td>${vEsc(s[1])}</td></tr>`) : '').join('');
   const pest = [];
   if((p.caracteristicas||[]).length) pest.push(['Características', `<ul class="v-puntos">${p.caracteristicas.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul><p class="v-nota">Te enviamos la ficha técnica completa del fabricante junto con la cotización.</p>`]);
-  if(p.expediente||p.clave) pest.push(['Código NTS', `<table class="v-tabla">${p.clave?`<tr><td>Código NTS</td><td><b>${vEsc(p.clave)}</b> (NTS 113-MINSA)</td></tr>`:''}${p.expediente?`<tr><td>Nombre oficial</td><td><b>${vEsc(p.expediente)}</b></td></tr>`:''}<tr><td>Modelo ofertado</td><td>${vEsc([p.marca,p.modelo].filter(Boolean).join(' '))}</td></tr></table><p class="v-nota">Envíanos la ficha técnica de tu expediente y te devolvemos el cuadro de cumplimiento, punto por punto, con el modelo ofertado.</p>`]);
+  if(p.expediente||p.clave) pest.push(['Código', `<table class="v-tabla">${p.clave?`<tr><td>Código</td><td><b>${vEsc(p.clave)}</b></td></tr>`:''}${p.expediente?`<tr><td>Nombre oficial</td><td><b>${vEsc(p.expediente)}</b></td></tr>`:''}<tr><td>Modelo ofertado</td><td>${vEsc([p.marca,p.modelo].filter(Boolean).join(' '))}</td></tr></table><p class="v-nota">Envíanos la ficha técnica de tu expediente y te devolvemos el cuadro de cumplimiento, punto por punto, con el modelo ofertado.</p>`]);
   if(p.descripcion||p.resumen) pest.push(['Descripción', `<p>${vEsc(p.descripcion||p.resumen)}</p>${(p.usos||[]).length?`<ul class="v-puntos">${p.usos.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul>`:''}`]);
   if(specs) pest.push(['Especificaciones', `<table class="v-tabla">${specs}</table>`]);
   if((p.incluye||[]).length) pest.push(['Incluye', `<ul class="v-puntos">${p.incluye.map(u=>`<li>${vEsc(u)}</li>`).join('')}</ul>`]);
@@ -3231,7 +3258,7 @@ function cotHTML(d, formal){
       <td class="c">${i + 1}</td>
       <td><b>${cotEsc(inf.nom.toUpperCase())}</b>
         ${inf.foto ? `<img class="mini" src="${cotEsc(inf.foto)}" alt="">` : ''}
-        <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Código NTS ' + cotEsc(inf.nts) + ' (NTS 113-MINSA)' : ''}
+        <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Cod. ' + cotEsc(inf.nts) : ''}
         <br>Equipo nuevo, con garantía del fabricante.</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
@@ -3916,7 +3943,7 @@ function vcAgregar(id, cuantos){
   const p = vcProducto(id);
   if(window.SBCarrito) SBCarrito.agregar(id, p ? {
     nom: p.nom, mm: [p.marca, p.modelo].filter(Boolean).join(' '),
-    nts: p.clave || '', precio: Number(p.precio || 0), foto: vFoto(p, 0, true) || ''
+    nts: vCod(p), precio: Number(p.precio || 0), foto: vFoto(p, 0, true) || ''
   } : null, cuantos || 1);
   vcPintarTodo();
 }
@@ -4173,7 +4200,10 @@ function vcSobraStock(p, q){
 }
 function vcAviso(p, q){
   const n = vcSobraStock(p, q);
-  return n ? `<span class="v-stock v-pedido">Pedido especial · ${n} en stock</span>` : '';
+  /* Se avisa con el tope público, no con el stock real: el aviso sale en
+     una página que cualquiera puede abrir. La cuenta de arriba sí usa el
+     número real, que es lo que importa para saber si sobra o no. */
+  return n ? `<span class="v-stock v-pedido">Pedido especial · ${vStockTxt(n)} en stock</span>` : '';
 }
 
 function vcFila(x){
@@ -4182,7 +4212,7 @@ function vcFila(x){
     ${foto ? `<img class="vc-f" src="${vEsc(foto)}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
-      <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
+      <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${vCodTxt(p) ? ' · ' + vEsc(vCodTxt(p)) : ''}</small>
       ${vcAviso(p, x.q) || (p.stock != null ? vStock(p) : '')}
     </div>
     <div class="vc-q">
@@ -4227,7 +4257,7 @@ function vcDoc(c, d){
       i: x.p.id, q: x.q, pu: x.precio, t: x.total,
       n: x.p.nom,
       m: [x.p.marca, x.p.modelo].filter(Boolean).join(' · '),
-      nts: x.p.clave || ''
+      nts: vCod(x.p)
     })),
     /* El servicio fuera de Lima, con sus partidas separadas: el documento
        lo imprime como filas propias del cuadro, igual que el alquiler. */
@@ -4254,7 +4284,7 @@ function vcInfoDe(e){
   return {
     nom: p ? p.nom : (e.n || e.i || 'Equipo'),
     mm: p ? [p.marca, p.modelo].filter(Boolean).join(' · ') : (e.m || ''),
-    nts: p ? (p.clave || '') : (e.nts || ''),
+    nts: p ? vCod(p) : (e.nts || ''),
     foto: e.f || foto
   };
 }

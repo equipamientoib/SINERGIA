@@ -1535,9 +1535,7 @@
     "edan-099004"
   ],
   "stockVisible": {
-    "_nota": "Stock que se muestra en la web: el 30 % del stock del proveedor, mínimo 1 y máximo 10 (si hay stock).",
-    "porcentaje": 30,
-    "maximo": 10
+    "_nota": "YA NO SE USA. Recortaba el stock al 30 % (minimo 1, maximo 10) antes de guardarlo, asi que el numero recortado era el que usaban tambien el cotizador y el resto de la web. Ahora el stock interno es el real y el recorte se hace solo al mostrarlo: hasta 3 se ve la cantidad exacta y de 4 en adelante «3+ unidades». Esta en scripts/generar_paginas_venta.py (stock_txt) y en js/12-venta.js (vStockTxt). Se deja esta nota para que nadie vuelva a activarlo sin saber que ya hay un tope."
   },
   "codigosNTS": {
     "boeco-076898": "D-280",
@@ -1720,8 +1718,8 @@
           "p": "El <b>autoclave de vapor</b> es el estándar para instrumental quirúrgico, textiles y material empaquetado: esteriliza a 121 °C o 134 °C en ciclos de minutos.<br><br>El <b>esterilizador de calor seco</b> (estufa) trabaja a 160–180 °C durante una o dos horas y se usa para vidrio de laboratorio, polvos, aceites y grasas, es decir donde el vapor no entra o estropea el material. No reemplaza al autoclave para instrumental empaquetado.<br><br>Si vas a esterilizar material termosensible que no aguanta 121 °C, lo que corresponde es un equipo de baja temperatura (peróxido de hidrógeno), no un autoclave."
         },
         {
-          "h": "Si compras para el Estado: el código NTS",
-          "p": "En las licitaciones y compras del Estado, los esterilizadores se piden por su denominación de la NTS 113-MINSA, y la capacidad forma parte del código. Los que más salen son el <b>D-212</b> (20 litros), el <b>D-213</b> (30 litros), el <b>D-214</b> (40 litros), el <b>D-217</b> (50 litros), el <b>D-352</b> (30 litros vertical) y el <b>D-342</b> (100 litros); el <b>D-301</b> es el esterilizador por calor seco de 50 litros y el <b>D-218</b> el de baja temperatura por peróxido de hidrógeno de 70 litros.<br><br>Un equipo cumple el código si su capacidad es igual o mayor a la pedida y cumple el resto de las especificaciones. Si nos mandas la ficha técnica de tu expediente, te devolvemos el cuadro de cumplimiento punto por punto con el modelo que ofertamos."
+          "h": "Cómo se compra un esterilizador en el Estado",
+          "p": "Si el equipo es para un establecimiento público, lo más probable es que el expediente no pida «un autoclave de 45 litros»: pida un <b>código</b>. Entender eso ahorra mucho tiempo.<br><br>El Ministerio de Salud mantiene un listado de denominaciones de equipamiento, la <b>NTS N°113-MINSA/DGIEM-V.01</b>, donde cada tipo de equipo tiene su código, del estilo <i>D-212</i> o <i>D-217</i>. Ese código es una <b>partida del programa médico arquitectónico</b>: identifica qué equipo va en qué ambiente, igual que una partida de obra identifica un muro o una puerta. Por eso el comprador del Estado busca por código y no por marca: está armando un ambiente, no eligiendo un modelo.<br><br>Lo que mucha gente confunde: <b>la denominación no fija la capacidad mínima que debe tener tu equipo</b>. Eso lo fija la <b>EETT</b> —las especificaciones técnicas— de cada expediente, y cada entidad la redacta con su propio criterio. Dos hospitales pueden pedir la misma denominación y exigir cosas distintas. Por eso nunca verás aquí que un equipo nuestro «cumple» un código: el cumplimiento se determina contra la EETT de tu expediente, punto por punto, no contra el listado.<br><br>En nuestras fichas el código va como un dato más, junto a la marca, el modelo y la capacidad real en litros, para que lo ubiques rápido. <b>Mándanos la ficha técnica de tu expediente y te devolvemos el cuadro de cumplimiento</b>, línea por línea, con el modelo que ofertamos y lo que sí y lo que no cubre."
         }
       ],
       "faq": [
@@ -1809,6 +1807,25 @@
       "titulo": "Refrigeradoras de medicamentos y vacunas: precios en Perú",
       "descripcion": "Refrigeradoras de medicamentos y vacunas, congeladores de laboratorio y conservadoras de banco de sangre, con stock en Lima. Precios con IGV y entrega en Lima y provincias.",
       "entrada": "Refrigeradoras y congeladores de uso médico, que no son lo mismo que una refrigeradora doméstica: mantienen la temperatura estable dentro del rango exigido, llevan registro y alarma de temperatura, y es lo que pide DIGEMID para conservar vacunas y medicamentos."
+    }
+  },
+  "codigosEquipo": {
+    "_nota": "Código del equipo, tal como lo indicó el dueño. Sale en el bloque de datos técnicos de la ficha, con la etiqueta «Código» y junto a la capacidad en litros. NO se cita ninguna norma ni listado, no va en el texto corrido ni en la meta-descripción, y no se infiere para ningún otro equipo: solo salen los que estén escritos aquí.",
+    "biobase-bkm-za": {
+      "codigo": "D-212",
+      "capacidad": "18 L"
+    },
+    "biobase-bkm-zb": {
+      "codigo": "D-212",
+      "capacidad": "23 L"
+    },
+    "biobase-bkm-z45b": {
+      "codigo": "D-217",
+      "capacidad": "45 L"
+    },
+    "biobase-bkm-z60b": {
+      "codigo": "D-217",
+      "capacidad": "60 L"
     }
   }
 }

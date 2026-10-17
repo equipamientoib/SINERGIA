@@ -138,7 +138,7 @@ function vcAgregar(id, cuantos){
   const p = vcProducto(id);
   if(window.SBCarrito) SBCarrito.agregar(id, p ? {
     nom: p.nom, mm: [p.marca, p.modelo].filter(Boolean).join(' '),
-    nts: p.clave || '', precio: Number(p.precio || 0), foto: vFoto(p, 0, true) || ''
+    nts: vCod(p), precio: Number(p.precio || 0), foto: vFoto(p, 0, true) || ''
   } : null, cuantos || 1);
   vcPintarTodo();
 }
@@ -395,7 +395,10 @@ function vcSobraStock(p, q){
 }
 function vcAviso(p, q){
   const n = vcSobraStock(p, q);
-  return n ? `<span class="v-stock v-pedido">Pedido especial · ${n} en stock</span>` : '';
+  /* Se avisa con el tope público, no con el stock real: el aviso sale en
+     una página que cualquiera puede abrir. La cuenta de arriba sí usa el
+     número real, que es lo que importa para saber si sobra o no. */
+  return n ? `<span class="v-stock v-pedido">Pedido especial · ${vStockTxt(n)} en stock</span>` : '';
 }
 
 function vcFila(x){
@@ -404,7 +407,7 @@ function vcFila(x){
     ${foto ? `<img class="vc-f" src="${vEsc(foto)}" alt="" loading="lazy" decoding="async">` : '<span class="vc-f sin"></span>'}
     <div class="vc-n">
       <b>${vEsc(p.nom)}</b>
-      <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${p.clave ? ' · NTS ' + vEsc(p.clave) : ''}</small>
+      <small>${vEsc([p.marca, p.modelo].filter(Boolean).join(' '))}${vCodTxt(p) ? ' · ' + vEsc(vCodTxt(p)) : ''}</small>
       ${vcAviso(p, x.q) || (p.stock != null ? vStock(p) : '')}
     </div>
     <div class="vc-q">
@@ -449,7 +452,7 @@ function vcDoc(c, d){
       i: x.p.id, q: x.q, pu: x.precio, t: x.total,
       n: x.p.nom,
       m: [x.p.marca, x.p.modelo].filter(Boolean).join(' · '),
-      nts: x.p.clave || ''
+      nts: vCod(x.p)
     })),
     /* El servicio fuera de Lima, con sus partidas separadas: el documento
        lo imprime como filas propias del cuadro, igual que el alquiler. */
@@ -476,7 +479,7 @@ function vcInfoDe(e){
   return {
     nom: p ? p.nom : (e.n || e.i || 'Equipo'),
     mm: p ? [p.marca, p.modelo].filter(Boolean).join(' · ') : (e.m || ''),
-    nts: p ? (p.clave || '') : (e.nts || ''),
+    nts: p ? vCod(p) : (e.nts || ''),
     foto: e.f || foto
   };
 }

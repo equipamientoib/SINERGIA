@@ -244,3 +244,6 @@
 .fam-d{font-size:13px;color:var(--cobre-d);font-weight:600;font-family:var(--ff-d)}
 .fam-ir{margin-top:8px;font-size:13px;font-weight:600;color:var(--cobre-d)}
 .fam-ir i{font-style:normal}
+
+/* Agotado en la ficha estática: mismo criterio que en la tienda. */
+.st.agotado{color:#8c3a3a;background:#fbefef;border-color:#edd3d3}

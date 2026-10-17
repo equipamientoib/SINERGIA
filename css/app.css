@@ -883,6 +883,11 @@
   .v-marcas .names span{white-space:nowrap}
   @media(max-width:880px){ .v-marcas .names{flex-wrap:wrap;justify-content:center;gap:8px 18px} }
 
+  /* Agotado: la página no desaparece, se queda avisando. En rojo apagado,
+     que informa sin alarmar: el equipo vuelve cuando llega el lote. */
+  .v-stock.v-agotado{color:#8c3a3a;background:#fbefef;border-color:#edd3d3}
+  .v-stock.v-agotado::before{background:#c25c5c}
+
 /* ===== css/18-cotizador.css ===== */
 /* =====================================================================
    18-cotizador.css — Página «Arma tu alquiler» (#/cotizar)

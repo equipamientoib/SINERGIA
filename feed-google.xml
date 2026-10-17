@@ -3,11 +3,11 @@
 <channel>
   <title>Sinergia Biomédica — equipos biomédicos</title>
   <link>https://sinergiabiomedica.pe</link>
-  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-16.</description>
+  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-17.</description>
   <item>
     <g:id>edan-h100b</g:id>
     <title>Pulsioxímetro de mano Edan H100B</title>
-    <description>Pulsioxímetro portátil para triaje, atención extramural y visitas domiciliarias. SpO2 y frecuencia de pulso Pantalla monocromática Versión con baterías alcalinas o recargables Código NTS D-334.</description>
+    <description>Pulsioxímetro portátil para triaje, atención extramural y visitas domiciliarias. SpO2 y frecuencia de pulso Pantalla monocromática Versión con baterías alcalinas o recargables Cod. D-334.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-h100b/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h100b.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -22,7 +22,7 @@
   <item>
     <g:id>edan-h100b-2</g:id>
     <title>Pulsioxímetro de mano recargable Edan H100B</title>
-    <description>Pulsioxímetro portátil con batería recargable para triaje y visitas. SpO2 y pulso Batería recargable Código NTS D-334.</description>
+    <description>Pulsioxímetro portátil con batería recargable para triaje y visitas. SpO2 y pulso Batería recargable Cod. D-334.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-h100b-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h100b-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -37,7 +37,7 @@
   <item>
     <g:id>riester-econom</g:id>
     <title>Set de diagnóstico (otoscopio y oftalmoscopio) Riester Econom</title>
-    <description>Set básico de diagnóstico con estuche rígido. Otoscopio y oftalmoscopio 2.7 V Estuche rígido Código NTS D-131.</description>
+    <description>Set básico de diagnóstico con estuche rígido. Otoscopio y oftalmoscopio 2.7 V Estuche rígido Cod. D-131.</description>
     <link>https://sinergiabiomedica.pe/venta/riester-econom/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-econom.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -52,7 +52,7 @@
   <item>
     <g:id>heine-gamma-g5</g:id>
     <title>Tensiómetro aneroide de mano Heine Gamma G5</title>
-    <description>Tensiómetro aneroide de un tubo para consulta. Brazalete adulto con velcro 1 tubo Código NTS D-133.</description>
+    <description>Tensiómetro aneroide de un tubo para consulta. Brazalete adulto con velcro 1 tubo Cod. D-133.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-g5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-g5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -67,7 +67,7 @@
   <item>
     <g:id>riester-big-ben-3</g:id>
     <title>Tensiómetro aneroide de pared Riester Big Ben</title>
-    <description>Tensiómetro de pared con esfera grande para consultorios. Brazalete adulto con velcro Montaje en pared Código NTS D-133.</description>
+    <description>Tensiómetro de pared con esfera grande para consultorios. Brazalete adulto con velcro Montaje en pared Cod. D-133.</description>
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben-3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben-3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -82,7 +82,7 @@
   <item>
     <g:id>riester-big-ben-2</g:id>
     <title>Tensiómetro aneroide de mesa Riester Big Ben</title>
-    <description>Tensiómetro de mesa con esfera grande cuadrada. Brazalete adulto con velcro Esfera grande Código NTS D-133.</description>
+    <description>Tensiómetro de mesa con esfera grande cuadrada. Brazalete adulto con velcro Esfera grande Cod. D-133.</description>
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -97,7 +97,7 @@
   <item>
     <g:id>heine-gamma-xxl-lf-w</g:id>
     <title>Tensiómetro aneroide de pared Heine Gamma XXL LF-W</title>
-    <description>Tensiómetro de pared de esfera grande. Brazalete adulto con velcro Montaje en pared Código NTS D-133.</description>
+    <description>Tensiómetro de pared de esfera grande. Brazalete adulto con velcro Montaje en pared Cod. D-133.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-xxl-lf-w/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-xxl-lf-w.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -112,7 +112,7 @@
   <item>
     <g:id>riester-big-ben</g:id>
     <title>Tensiómetro aneroide rodable pediátrico Riester Big Ben</title>
-    <description>Tensiómetro de pedestal con brazalete pediátrico. Brazalete pediátrico Base rodable Código NTS D-136.</description>
+    <description>Tensiómetro de pedestal con brazalete pediátrico. Brazalete pediátrico Base rodable Cod. D-136.</description>
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -142,7 +142,7 @@
   <item>
     <g:id>edan-sd3-plus</g:id>
     <title>Detector de latidos fetales portátil Edan SD-3 Plus</title>
-    <description>Doppler fetal de bolsillo para control prenatal. Sonda de 2,0 MHz Batería recargable Código NTS D-97.</description>
+    <description>Doppler fetal de bolsillo para control prenatal. Sonda de 2,0 MHz Batería recargable Cod. D-97.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-sd3-plus/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd3-plus.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -157,7 +157,7 @@
   <item>
     <g:id>edan-sonotrax-ii-pro</g:id>
     <title>Detector de latidos fetales portátil Edan Sonotrax II Pro</title>
-    <description>Doppler fetal de bolsillo con batería recargable. Sonda de 2.0 MHz Batería recargable Código NTS D-97.</description>
+    <description>Doppler fetal de bolsillo con batería recargable. Sonda de 2.0 MHz Batería recargable Cod. D-97.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-sonotrax-ii-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sonotrax-ii-pro.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -232,7 +232,7 @@
   <item>
     <g:id>edan-099004</g:id>
     <title>Monitor de signos vitales de 12&quot; Slim Edan X12</title>
-    <description>Monitor multiparámetro delgado, sin impresora. Pantalla de 12&quot; 5 parámetros Código NTS D-18.</description>
+    <description>Monitor multiparámetro delgado, sin impresora. Pantalla de 12&quot; 5 parámetros Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-099004/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099004.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -247,7 +247,7 @@
   <item>
     <g:id>edan-092796</g:id>
     <title>Monitor de signos vitales de 8&quot; Slim Edan X8</title>
-    <description>Monitor multiparámetro compacto con impresora. Pantalla táctil de 8&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro compacto con impresora. Pantalla táctil de 8&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-092796/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092796.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -262,7 +262,7 @@
   <item>
     <g:id>edan-092797</g:id>
     <title>Monitor de signos vitales de 10&quot; Slim Edan X10</title>
-    <description>Monitor multiparámetro táctil compacto con impresora. Pantalla táctil de 10&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro táctil compacto con impresora. Pantalla táctil de 10&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-092797/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092797.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -292,7 +292,7 @@
   <item>
     <g:id>edan-elite-v5</g:id>
     <title>Monitor modular de 12&quot; Edan Elite V5</title>
-    <description>Monitor modular táctil configurable según los módulos que necesites. Pantalla táctil de 12&quot; Modular 2 baterías Código NTS D-18.</description>
+    <description>Monitor modular táctil configurable según los módulos que necesites. Pantalla táctil de 12&quot; Modular 2 baterías Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -337,7 +337,7 @@
   <item>
     <g:id>cu-medical-cu-sp1-auto</g:id>
     <title>Desfibrilador externo automático (DEA) básico CU Medical CU-SP1 Auto</title>
-    <description>DEA totalmente automático de acceso público, con parches y batería. Totalmente automático Guía por voz Parches y batería incluidos Código NTS D-373.</description>
+    <description>DEA totalmente automático de acceso público, con parches y batería. Totalmente automático Guía por voz Parches y batería incluidos Cod. D-373.</description>
     <link>https://sinergiabiomedica.pe/venta/cu-medical-cu-sp1-auto/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-cu-sp1-auto.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -352,7 +352,7 @@
   <item>
     <g:id>edan-m3a</g:id>
     <title>Pulsioxímetro de sobremesa con pantalla de 3.5&quot; Edan M3A</title>
-    <description>Pulsioxímetro de mesa con batería de litio. Pantalla a color de 3.5&quot; SpO2 y pulso Batería de litio Código NTS D-17.</description>
+    <description>Pulsioxímetro de mesa con batería de litio. Pantalla a color de 3.5&quot; SpO2 y pulso Batería de litio Cod. D-17.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-m3a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -367,7 +367,7 @@
   <item>
     <g:id>edan-m3</g:id>
     <title>Pulsioxímetro de sobremesa Edan M3</title>
-    <description>Pulsioxímetro de mesa con batería para hospitalización, emergencia y consulta. Pantalla a color de 5,6 pulgadas SpO2 y frecuencia de pulso Batería de litio Código NTS D-17.</description>
+    <description>Pulsioxímetro de mesa con batería para hospitalización, emergencia y consulta. Pantalla a color de 5,6 pulgadas SpO2 y frecuencia de pulso Batería de litio Cod. D-17.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-m3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -382,7 +382,7 @@
   <item>
     <g:id>ca-mi-new-askir-230-12v-br</g:id>
     <title>Aspirador portátil con batería 16 L/min CA-MI New Askir 230 12V BR</title>
-    <description>Aspirador de secreciones con batería y corriente para atención domiciliaria y traslado. 16 L/min Frasco de 1 L Batería y corriente Código NTS D-86.</description>
+    <description>Aspirador de secreciones con batería y corriente para atención domiciliaria y traslado. 16 L/min Frasco de 1 L Batería y corriente Cod. D-86.</description>
     <link>https://sinergiabiomedica.pe/venta/ca-mi-new-askir-230-12v-br/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-new-askir-230-12v-br.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -397,7 +397,7 @@
   <item>
     <g:id>ca-mi-askir-36-br</g:id>
     <title>Aspirador portátil con batería 36 L/min CA-MI Askir 36 BR</title>
-    <description>Aspirador de secreciones de mayor caudal con batería recargable. 36 L/min Frasco de 1 L Batería y corriente Código NTS D-86.</description>
+    <description>Aspirador de secreciones de mayor caudal con batería recargable. 36 L/min Frasco de 1 L Batería y corriente Cod. D-86.</description>
     <link>https://sinergiabiomedica.pe/venta/ca-mi-askir-36-br/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-askir-36-br.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -442,7 +442,7 @@
   <item>
     <g:id>gemmy-010542</g:id>
     <title>Centrífuga de microhematocrito Gemmy KHT-410E</title>
-    <description>Centrífuga para microhematocrito con rotor de capilares. 24 capilares 12 000 rpm Código NTS D-269.</description>
+    <description>Centrífuga para microhematocrito con rotor de capilares. 24 capilares 12 000 rpm Cod. D-269.</description>
     <link>https://sinergiabiomedica.pe/venta/gemmy-010542/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-010542.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -457,7 +457,7 @@
   <item>
     <g:id>heine-mini-3000-led</g:id>
     <title>Set de diagnóstico LED de bolsillo Heine mini 3000 LED</title>
-    <description>Set compacto de otoscopio y oftalmoscopio para consulta. Otoscopio y oftalmoscopio 2 mangos a pilas Estuche Código NTS D-131.</description>
+    <description>Set compacto de otoscopio y oftalmoscopio para consulta. Otoscopio y oftalmoscopio 2 mangos a pilas Estuche Cod. D-131.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-mini-3000-led/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-mini-3000-led.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -517,7 +517,7 @@
   <item>
     <g:id>heine-beta-200-beta-100</g:id>
     <title>Set oftalmoscopio y otoscopio recargable Heine BETA 200 / BETA 100</title>
-    <description>Set de diagnóstico con oftalmoscopio y otoscopio de alta gama. Oftalmoscopio y otoscopio Mango BETA 4 USB recargable de 3.5 V Código NTS D-131.</description>
+    <description>Set de diagnóstico con oftalmoscopio y otoscopio de alta gama. Oftalmoscopio y otoscopio Mango BETA 4 USB recargable de 3.5 V Cod. D-131.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-beta-100/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-beta-100.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -547,7 +547,7 @@
   <item>
     <g:id>edan-se301</g:id>
     <title>Electrocardiógrafo de 3 canales Edan SE-301</title>
-    <description>Electrocardiógrafo interpretativo para consulta, emergencia y hospitalización. 3 canales Pantalla táctil a color de 5 pulgadas Interpretación automática Papel de 80 mm, puerto USB Código NTS D-1.</description>
+    <description>Electrocardiógrafo interpretativo para consulta, emergencia y hospitalización. 3 canales Pantalla táctil a color de 5 pulgadas Interpretación automática Papel de 80 mm, puerto USB Cod. D-1.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-se301/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-se301-real.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -562,7 +562,7 @@
   <item>
     <g:id>edan-094577</g:id>
     <title>Electrocardiógrafo de 6 canales Edan SE-601B</title>
-    <description>Electrocardiógrafo interpretativo para consulta y emergencia. 6 canales Pantalla de 5.7&quot; Papel de 110 mm, USB Código NTS D-1.</description>
+    <description>Electrocardiógrafo interpretativo para consulta y emergencia. 6 canales Pantalla de 5.7&quot; Papel de 110 mm, USB Cod. D-1.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-094577/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-094577.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -577,7 +577,7 @@
   <item>
     <g:id>heine-gamma-xxl-lf-s</g:id>
     <title>Tensiómetro aneroide rodable Heine Gamma XXL LF-S</title>
-    <description>Tensiómetro de pedestal con ruedas para consultorios y hospitalización. Brazalete adulto con velcro Base rodable Código NTS D-135.</description>
+    <description>Tensiómetro de pedestal con ruedas para consultorios y hospitalización. Brazalete adulto con velcro Base rodable Cod. D-135.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-xxl-lf-s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-xxl-lf-s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -592,7 +592,7 @@
   <item>
     <g:id>edan-sd5</g:id>
     <title>Detector de latidos fetales de sobremesa Edan SD-5</title>
-    <description>Doppler fetal de mesa para consultorios de obstetricia. Sonda de 2,0 MHz alámbrica Versión SD-6 con sonda inalámbrica Código NTS D-96.</description>
+    <description>Doppler fetal de mesa para consultorios de obstetricia. Sonda de 2,0 MHz alámbrica Versión SD-6 con sonda inalámbrica Cod. D-96.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-sd5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -607,7 +607,7 @@
   <item>
     <g:id>edan-sd-6</g:id>
     <title>Detector de latidos fetales con sonda inalámbrica Edan SD-6</title>
-    <description>Doppler fetal de mesa con transductor inalámbrico Bluetooth. Sonda de 2.0 MHz inalámbrica Código NTS D-96.</description>
+    <description>Doppler fetal de mesa con transductor inalámbrico Bluetooth. Sonda de 2.0 MHz inalámbrica Cod. D-96.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-sd-6/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd-6.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -682,7 +682,7 @@
   <item>
     <g:id>heine-084117</g:id>
     <title>Lámpara de examen LED rodable Heine EL3 LED</title>
-    <description>Lámpara de exploración LED con trípode rodable para consultorio. Iluminación LED Trípode rodable Código NTS D-28.</description>
+    <description>Lámpara de exploración LED con trípode rodable para consultorio. Iluminación LED Trípode rodable Cod. D-28.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-084117/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-084117.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -697,7 +697,7 @@
   <item>
     <g:id>optika-b-382pli-alc</g:id>
     <title>Microscopio binocular plan con LED Optika B-382PLi-ALC</title>
-    <description>Microscopio de laboratorio con óptica corregida al infinito. 1000X Objetivos plan Iluminación LED Código NTS D-60.</description>
+    <description>Microscopio de laboratorio con óptica corregida al infinito. 1000X Objetivos plan Iluminación LED Cod. D-60.</description>
     <link>https://sinergiabiomedica.pe/venta/optika-b-382pli-alc/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-382pli-alc.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -712,7 +712,7 @@
   <item>
     <g:id>optika-b-290tb</g:id>
     <title>Microscopio digital con tablet Optika B-290TB</title>
-    <description>Microscopio binocular con cámara y tablet integrados para documentar imágenes. 1000X Cámara de 3.1 MP Tablet incluida Código NTS D-60.</description>
+    <description>Microscopio binocular con cámara y tablet integrados para documentar imágenes. 1000X Cámara de 3.1 MP Tablet incluida Cod. D-60.</description>
     <link>https://sinergiabiomedica.pe/venta/optika-b-290tb/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-290tb.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -727,7 +727,7 @@
   <item>
     <g:id>edan-100807</g:id>
     <title>Monitor de signos vitales de 13.6&quot; preconfigurado Edan iX12</title>
-    <description>Monitor multiparámetro táctil con impresora para UCI y emergencia. Pantalla táctil de 13.6&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro táctil con impresora para UCI y emergencia. Pantalla táctil de 13.6&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-100807/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100807.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -742,7 +742,7 @@
   <item>
     <g:id>edan-elite-v6</g:id>
     <title>Monitor modular de 15&quot; Edan Elite V6</title>
-    <description>Monitor modular táctil de pantalla grande para cuidados críticos. Pantalla táctil de 15&quot; Modular 2 baterías Código NTS D-18.</description>
+    <description>Monitor modular táctil de pantalla grande para cuidados críticos. Pantalla táctil de 15&quot; Modular 2 baterías Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v6/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v6.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -757,7 +757,7 @@
   <item>
     <g:id>monitoreo-cx10</g:id>
     <title>Monitor de signos vitales de 10&quot; con impresora Edan CX10</title>
-    <description>Monitor multiparámetro táctil compacto para hospitalización y emergencia. Pantalla táctil de 10&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro táctil compacto para hospitalización y emergencia. Pantalla táctil de 10&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx10/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx10.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -772,7 +772,7 @@
   <item>
     <g:id>monitoreo-cx12</g:id>
     <title>Monitor de signos vitales de 12&quot; con impresora Edan CX12</title>
-    <description>Monitor multiparámetro táctil para emergencia y hospitalización. Pantalla táctil de 12&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro táctil para emergencia y hospitalización. Pantalla táctil de 12&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx12/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx12.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -787,7 +787,7 @@
   <item>
     <g:id>edan-elite-v8</g:id>
     <title>Monitor modular de 17&quot; Edan Elite V8</title>
-    <description>Monitor modular de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular 2 baterías Código NTS D-18.</description>
+    <description>Monitor modular de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular 2 baterías Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v8/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v8.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -802,7 +802,7 @@
   <item>
     <g:id>monitoreo-cx15</g:id>
     <title>Monitor de signos vitales de 15&quot; con impresora Edan CX15</title>
-    <description>Monitor multiparámetro táctil de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro táctil de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx15/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx15.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -817,7 +817,7 @@
   <item>
     <g:id>edan-100806</g:id>
     <title>Monitor de signos vitales de 10&quot; preconfigurado Edan iX10</title>
-    <description>Monitor multiparámetro táctil con impresora para hospitalización. Pantalla táctil de 10&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro táctil con impresora para hospitalización. Pantalla táctil de 10&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-100806/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100806.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -832,7 +832,7 @@
   <item>
     <g:id>edan-100808</g:id>
     <title>Monitor de signos vitales de 15&quot; preconfigurado Edan iX15</title>
-    <description>Monitor multiparámetro táctil con impresora de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor multiparámetro táctil con impresora de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-100808/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100808.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -847,7 +847,7 @@
   <item>
     <g:id>edan-095443</g:id>
     <title>Monitor multiparámetro de 12&quot; de 7 parámetros Edan X12</title>
-    <description>Monitor táctil de diseño delgado con 7 parámetros. Pantalla táctil de 12&quot; 7 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor táctil de diseño delgado con 7 parámetros. Pantalla táctil de 12&quot; 7 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-095443/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-095443.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -862,7 +862,7 @@
   <item>
     <g:id>edan-iv12</g:id>
     <title>Monitor modular de 12&quot; (módulos aparte) Edan iV12</title>
-    <description>Monitor modular táctil que se configura con los módulos de parámetros que necesites. Pantalla táctil de 12&quot; Modular Código NTS D-18.</description>
+    <description>Monitor modular táctil que se configura con los módulos de parámetros que necesites. Pantalla táctil de 12&quot; Modular Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-iv12/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv12.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -892,7 +892,7 @@
   <item>
     <g:id>meling-biomedi-100408</g:id>
     <title>Refrigeradora de medicamentos de 130 L Meling YC-130L</title>
-    <description>Refrigeradora para farmacia y vacunas de +2 a +8 °C. 130 L +2 a +8 °C Código NTS D-288.</description>
+    <description>Refrigeradora para farmacia y vacunas de +2 a +8 °C. 130 L +2 a +8 °C Cod. D-288.</description>
     <link>https://sinergiabiomedica.pe/venta/meling-biomedi-100408/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-biomedi-100408.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -907,7 +907,7 @@
   <item>
     <g:id>cu-medical-dea</g:id>
     <title>Desfibrilador externo automático (DEA) CU Medical Serie i-PAD</title>
-    <description>DEA de acceso público para centros de salud, empresas, colegios y ambulancias. Uso automático con guía por voz Versión con pantalla y batería recargable Parches desechables adulto y pediátrico Código NTS D-373.</description>
+    <description>DEA de acceso público para centros de salud, empresas, colegios y ambulancias. Uso automático con guía por voz Versión con pantalla y batería recargable Parches desechables adulto y pediátrico Cod. D-373.</description>
     <link>https://sinergiabiomedica.pe/venta/cu-medical-dea/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-dea.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -922,7 +922,7 @@
   <item>
     <g:id>edan-f3</g:id>
     <title>Monitor fetal gemelar Edan F3</title>
-    <description>Monitor fetal de sobremesa para control prenatal y sala de partos. Pantalla a color de 5,6 pulgadas Monitoreo de gemelos Con batería Versión con presión intrauterina Código NTS D-16.</description>
+    <description>Monitor fetal de sobremesa para control prenatal y sala de partos. Pantalla a color de 5,6 pulgadas Monitoreo de gemelos Con batería Versión con presión intrauterina Cod. D-16.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-f3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -937,7 +937,7 @@
   <item>
     <g:id>edan-f9</g:id>
     <title>Monitor fetal-materno de 12 pulgadas Edan F9</title>
-    <description>Monitor fetal gemelar con parámetros maternos para centros obstétricos. Pantalla a color de 12 pulgadas Monitoreo de gemelos Opción con ECG, PNI, SpO2 y temperatura materna Código NTS D-15.</description>
+    <description>Monitor fetal gemelar con parámetros maternos para centros obstétricos. Pantalla a color de 12 pulgadas Monitoreo de gemelos Opción con ECG, PNI, SpO2 y temperatura materna Cod. D-15.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-f9/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f9.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -952,7 +952,7 @@
   <item>
     <g:id>cami-new-hospivac-350</g:id>
     <title>Aspirador de secreciones rodable 60 L/min CA-MI New Hospivac 350 Full5</title>
-    <description>Aspirador rodable con pedal e intercambiador para quirófano, emergencia y UCI. 60 L/min 2 frascos de 5 L Pedal e intercambiador Código NTS D-88.</description>
+    <description>Aspirador rodable con pedal e intercambiador para quirófano, emergencia y UCI. 60 L/min 2 frascos de 5 L Pedal e intercambiador Cod. D-88.</description>
     <link>https://sinergiabiomedica.pe/venta/cami-new-hospivac-350/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cami-new-hospivac-350.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -967,7 +967,7 @@
   <item>
     <g:id>cami-094407</g:id>
     <title>Aspirador rodable de alto flujo 90 L/min CA-MI New Hospivac 400 Full2</title>
-    <description>Aspirador quirúrgico rodable de alto flujo con pedal e intercambiador. 90 L/min 2 frascos de 2 L Pedal e intercambiador Código NTS D-88.</description>
+    <description>Aspirador quirúrgico rodable de alto flujo con pedal e intercambiador. 90 L/min 2 frascos de 2 L Pedal e intercambiador Cod. D-88.</description>
     <link>https://sinergiabiomedica.pe/venta/cami-094407/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cami-094407.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -982,7 +982,7 @@
   <item>
     <g:id>gemmy-076299</g:id>
     <title>Centrífuga universal automática de 24 tubos Gemmy PLC-024</title>
-    <description>Centrífuga automática de alta capacidad para laboratorios con mucha demanda. 24 tubos de 15 ml 3500 rpm Código NTS D-268.</description>
+    <description>Centrífuga automática de alta capacidad para laboratorios con mucha demanda. 24 tubos de 15 ml 3500 rpm Cod. D-268.</description>
     <link>https://sinergiabiomedica.pe/venta/gemmy-076299/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-076299.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1042,7 +1042,7 @@
   <item>
     <g:id>mindray-ba88a</g:id>
     <title>Analizador bioquímico semiautomático Mindray BA-88A</title>
-    <description>Analizador de química clínica semiautomático para laboratorios pequeños y medianos. Semiautomático Código NTS D-245.</description>
+    <description>Analizador de química clínica semiautomático para laboratorios pequeños y medianos. Semiautomático Cod. D-245.</description>
     <link>https://sinergiabiomedica.pe/venta/mindray-ba88a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-ba88a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1057,7 +1057,7 @@
   <item>
     <g:id>heine-beta-200-led-4</g:id>
     <title>Set otoscopio y oftalmoscopio LED a pilas Heine BETA 200 LED</title>
-    <description>Set de diagnóstico LED con otoscopio de fibra óptica y oftalmoscopio. Otoscopio y oftalmoscopio LED Mango a pilas de 2.5 V Código NTS D-131.</description>
+    <description>Set de diagnóstico LED con otoscopio de fibra óptica y oftalmoscopio. Otoscopio y oftalmoscopio LED Mango a pilas de 2.5 V Cod. D-131.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-4/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-4.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1087,7 +1087,7 @@
   <item>
     <g:id>heine-beta-200-2</g:id>
     <title>Set otoscopio y oftalmoscopio LED recargable Heine BETA 200</title>
-    <description>Set de diagnóstico con mango recargable por cable USB. Otoscopio y oftalmoscopio LED Mango recargable USB de 3.5 V Código NTS D-131.</description>
+    <description>Set de diagnóstico con mango recargable por cable USB. Otoscopio y oftalmoscopio LED Mango recargable USB de 3.5 V Cod. D-131.</description>
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1102,7 +1102,7 @@
   <item>
     <g:id>edan-096982</g:id>
     <title>Electrocardiógrafo de 6 canales con pantalla táctil Edan SE-601C</title>
-    <description>Electrocardiógrafo táctil con interpretación Glasgow. 6 canales Pantalla táctil de 5.7&quot; Interpretación Glasgow Código NTS D-1.</description>
+    <description>Electrocardiógrafo táctil con interpretación Glasgow. 6 canales Pantalla táctil de 5.7&quot; Interpretación Glasgow Cod. D-1.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-096982/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-096982.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1117,7 +1117,7 @@
   <item>
     <g:id>edan-099606</g:id>
     <title>Electrocardiógrafo de 12 canales Edan SE-1201</title>
-    <description>Electrocardiógrafo interpretativo con algoritmo Glasgow. 12 canales Pantalla táctil de 7&quot; Interpretación Glasgow Código NTS D-1.</description>
+    <description>Electrocardiógrafo interpretativo con algoritmo Glasgow. 12 canales Pantalla táctil de 7&quot; Interpretación Glasgow Cod. D-1.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-099606/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099606.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1177,7 +1177,7 @@
   <item>
     <g:id>biobase-bkm-za</g:id>
     <title>Autoclave de mesa 18 L clase B Biobase BKM-ZA</title>
-    <description>Autoclave de vapor clase B de 18 litros para consultorios y odontología. 18 litros Clase B con prevacío Impresora incorporada 220 V</description>
+    <description>Autoclave de vapor clase B de 18 litros para consultorios y odontología. 18 litros Clase B con prevacío Impresora incorporada 220 V Cod. D-212.</description>
     <link>https://sinergiabiomedica.pe/venta/biobase-bkm-za/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-za.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1237,7 +1237,7 @@
   <item>
     <g:id>boeco-076898</g:id>
     <title>Balanza analítica 220 g Boeco BAS 31 Plus</title>
-    <description>Balanza analítica de alta precisión para laboratorio. Capacidad 220 g Precisión 0.0001 g Código NTS D-280.</description>
+    <description>Balanza analítica de alta precisión para laboratorio. Capacidad 220 g Precisión 0.0001 g Cod. D-280.</description>
     <link>https://sinergiabiomedica.pe/venta/boeco-076898/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-076898.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1252,7 +1252,7 @@
   <item>
     <g:id>biobase-bkm-zb</g:id>
     <title>Autoclave de mesa 23 L clase B Biobase BKM-ZB</title>
-    <description>Autoclave de vapor clase B de 23 litros para consultorios, odontología y centros de salud. 23 litros Clase B con prevacío Impresora incorporada Puerto USB 220 V</description>
+    <description>Autoclave de vapor clase B de 23 litros para consultorios, odontología y centros de salud. 23 litros Clase B con prevacío Impresora incorporada Puerto USB 220 V Cod. D-212.</description>
     <link>https://sinergiabiomedica.pe/venta/biobase-bkm-zb/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-zb.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1297,7 +1297,7 @@
   <item>
     <g:id>keewell-ft2800</g:id>
     <title>Calentador de sangre y fluidos Keewell FT2800</title>
-    <description>Calentador de sangre e infusiones para prevenir la hipotermia del paciente. Para sangre y soluciones Control de temperatura Código NTS D-91.</description>
+    <description>Calentador de sangre e infusiones para prevenir la hipotermia del paciente. Para sangre y soluciones Control de temperatura Cod. D-91.</description>
     <link>https://sinergiabiomedica.pe/venta/keewell-ft2800/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-keewell-ft2800.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1312,7 +1312,7 @@
   <item>
     <g:id>tuttnauer-t-top-11</g:id>
     <title>Autoclave de mesa de 25 litros clase B Tuttnauer T-Top 11 P</title>
-    <description>Autoclave de vapor clase B para consultorios, odontología y centros de salud. 25 litros Clase B Impresora incorporada Código NTS D-212.</description>
+    <description>Autoclave de vapor clase B para consultorios, odontología y centros de salud. 25 litros Clase B Impresora incorporada Cod. D-212.</description>
     <link>https://sinergiabiomedica.pe/venta/tuttnauer-t-top-11/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-t-top-11.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1357,7 +1357,7 @@
   <item>
     <g:id>edan-iv15</g:id>
     <title>Monitor modular de 15&quot; (módulos aparte) Edan iV15</title>
-    <description>Monitor modular táctil de pantalla grande para cuidados críticos. Pantalla táctil de 15&quot; Modular Código NTS D-18.</description>
+    <description>Monitor modular táctil de pantalla grande para cuidados críticos. Pantalla táctil de 15&quot; Modular Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-iv15/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv15.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1372,7 +1372,7 @@
   <item>
     <g:id>edan-086825</g:id>
     <title>Monitor multiparámetro de 12&quot; con presión invasiva Edan iM70</title>
-    <description>Monitor de cabecera con 6 parámetros incluida presión invasiva. Pantalla táctil de 12&quot; 6 parámetros con PI Impresora Código NTS D-18.</description>
+    <description>Monitor de cabecera con 6 parámetros incluida presión invasiva. Pantalla táctil de 12&quot; 6 parámetros con PI Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-086825/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-086825.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1387,7 +1387,7 @@
   <item>
     <g:id>edan-iv17</g:id>
     <title>Monitor modular de 17&quot; (módulos aparte) Edan iV17</title>
-    <description>Monitor modular táctil de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular Código NTS D-18.</description>
+    <description>Monitor modular táctil de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-iv17/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv17.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1402,7 +1402,7 @@
   <item>
     <g:id>edan-092463</g:id>
     <title>Monitor multiparámetro de 15&quot; de 8 parámetros Edan iM80</title>
-    <description>Monitor de cabecera avanzado para cuidados críticos. Pantalla de 15&quot; 8 parámetros Impresora Código NTS D-18.</description>
+    <description>Monitor de cabecera avanzado para cuidados críticos. Pantalla de 15&quot; 8 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-092463/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092463.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1417,7 +1417,7 @@
   <item>
     <g:id>kls-martin-095440</g:id>
     <title>Lámpara quirúrgica LED de techo 100 000 lux KLS Martin marLED E3</title>
-    <description>Lámpara LED de techo para salas de procedimientos. 100 000 lux Montaje en techo Código NTS D-33.</description>
+    <description>Lámpara LED de techo para salas de procedimientos. 100 000 lux Montaje en techo Cod. D-33.</description>
     <link>https://sinergiabiomedica.pe/venta/kls-martin-095440/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-095440.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1432,7 +1432,7 @@
   <item>
     <g:id>mindray-hyled-200m</g:id>
     <title>Lámpara de procedimientos rodable LED Mindray HyLED 200M</title>
-    <description>Lámpara LED móvil para tópicos y consulta externa. LED Base rodable Código NTS D-34.</description>
+    <description>Lámpara LED móvil para tópicos y consulta externa. LED Base rodable Cod. D-34.</description>
     <link>https://sinergiabiomedica.pe/venta/mindray-hyled-200m/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-hyled-200m.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1522,7 +1522,7 @@
   <item>
     <g:id>cu-medical-hd1</g:id>
     <title>Desfibrilador con monitor y paletas externas CU Medical CU-HD1</title>
-    <description>Desfibrilador bifásico con monitor a color para emergencia, UCI y sala de operaciones. Energía hasta 360 J Paletas externas reutilizables Marcapaso transcutáneo Opción con SpO2 y presión no invasiva Código NTS D-447.</description>
+    <description>Desfibrilador bifásico con monitor a color para emergencia, UCI y sala de operaciones. Energía hasta 360 J Paletas externas reutilizables Marcapaso transcutáneo Opción con SpO2 y presión no invasiva Cod. D-447.</description>
     <link>https://sinergiabiomedica.pe/venta/cu-medical-hd1/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-hd1.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1537,7 +1537,7 @@
   <item>
     <g:id>cu-medical-096614</g:id>
     <title>Desfibrilador monitor con SpO2 y presión no invasiva CU Medical Life Gain CU-HD1</title>
-    <description>Desfibrilador bifásico con marcapaso y parámetros de monitoreo. 360 J Paletas reutilizables Marcapaso, SpO2 y PNI Código NTS D-447.</description>
+    <description>Desfibrilador bifásico con marcapaso y parámetros de monitoreo. 360 J Paletas reutilizables Marcapaso, SpO2 y PNI Cod. D-447.</description>
     <link>https://sinergiabiomedica.pe/venta/cu-medical-096614/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-096614.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1552,7 +1552,7 @@
   <item>
     <g:id>edan-f9-express</g:id>
     <title>Monitor fetal-materno de 12&quot; Edan F9 Express</title>
-    <description>Monitor fetal gemelar con parámetros maternos completos. Pantalla de 12&quot; Gemelar ECG, PNI, SpO2 y temperatura materna Código NTS D-15.</description>
+    <description>Monitor fetal gemelar con parámetros maternos completos. Pantalla de 12&quot; Gemelar ECG, PNI, SpO2 y temperatura materna Cod. D-15.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-f9-express/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f9-express.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1567,7 +1567,7 @@
   <item>
     <g:id>edan-f15</g:id>
     <title>Monitor fetal-materno de 15&quot; Edan F15</title>
-    <description>Monitor fetal gemelar de pantalla grande con parámetros maternos. Pantalla de 15&quot; Gemelar ECG, PNI, SpO2 y temperatura materna Código NTS D-16.</description>
+    <description>Monitor fetal gemelar de pantalla grande con parámetros maternos. Pantalla de 15&quot; Gemelar ECG, PNI, SpO2 y temperatura materna Cod. D-16.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-f15/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f15.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1612,7 +1612,7 @@
   <item>
     <g:id>hettich-haematokrit-200</g:id>
     <title>Centrífuga de microhematocrito Hettich Haematokrit 200</title>
-    <description>Centrífuga de microhematocrito de alta calidad alemana. Rotor de 24 capilares Código NTS D-269.</description>
+    <description>Centrífuga de microhematocrito de alta calidad alemana. Rotor de 24 capilares Cod. D-269.</description>
     <link>https://sinergiabiomedica.pe/venta/hettich-haematokrit-200/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hettich-haematokrit-200.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1627,7 +1627,7 @@
   <item>
     <g:id>cardioline-touchecg-tab7</g:id>
     <title>Electrocardiógrafo con tablet Cardioline TouchECG Tab7</title>
-    <description>ECG de 12 derivaciones en tablet Android para consulta y atención móvil. Tablet Android Unidad de adquisición HD+ Código NTS D-1.</description>
+    <description>ECG de 12 derivaciones en tablet Android para consulta y atención móvil. Tablet Android Unidad de adquisición HD+ Cod. D-1.</description>
     <link>https://sinergiabiomedica.pe/venta/cardioline-touchecg-tab7/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-cardioline-touchecg-tab7.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1642,7 +1642,7 @@
   <item>
     <g:id>edan-h30-pro</g:id>
     <title>Analizador hematológico de 3 diferenciales Edan H30 Pro</title>
-    <description>Analizador automático de hemograma para laboratorios de centros de salud y clínicas. 3 diferenciales Pantalla táctil de 10,4 pulgadas Versiones de 5 diferenciales: H60 y H80S Código NTS D-448.</description>
+    <description>Analizador automático de hemograma para laboratorios de centros de salud y clínicas. 3 diferenciales Pantalla táctil de 10,4 pulgadas Versiones de 5 diferenciales: H60 y H80S Cod. D-448.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-h30-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h30-pro.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1657,7 +1657,7 @@
   <item>
     <g:id>mindray-bc-30s</g:id>
     <title>Analizador hematológico de 3 diferenciales Mindray BC-30S</title>
-    <description>Contador hematológico automatizado de 3 poblaciones para laboratorios y centros de salud. 3 diferenciales Totalmente automático Código NTS D-448.</description>
+    <description>Contador hematológico automatizado de 3 poblaciones para laboratorios y centros de salud. 3 diferenciales Totalmente automático Cod. D-448.</description>
     <link>https://sinergiabiomedica.pe/venta/mindray-bc-30s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-bc-30s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1672,7 +1672,7 @@
   <item>
     <g:id>edan-093683</g:id>
     <title>Analizador hematológico de 3 diferenciales Edan H30</title>
-    <description>Contador hematológico de 3 poblaciones para laboratorio clínico. 3 diferenciales Uso de rutina Código NTS D-448.</description>
+    <description>Contador hematológico de 3 poblaciones para laboratorio clínico. 3 diferenciales Uso de rutina Cod. D-448.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-093683/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-093683.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1792,7 +1792,7 @@
   <item>
     <g:id>biobase-bkm-z45b</g:id>
     <title>Autoclave de mesa 45 L clase B Biobase BKM-Z45B</title>
-    <description>Autoclave de vapor clase B de 45 litros para centrales de esterilización y clínicas. 45 litros Clase B con prevacío Generador de vapor Pantalla digital y manómetros 220 V</description>
+    <description>Autoclave de vapor clase B de 45 litros para centrales de esterilización y clínicas. 45 litros Clase B con prevacío Generador de vapor Pantalla digital y manómetros 220 V Cod. D-217.</description>
     <link>https://sinergiabiomedica.pe/venta/biobase-bkm-z45b/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-z45b.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1807,7 +1807,7 @@
   <item>
     <g:id>biobase-bkm-z60b</g:id>
     <title>Autoclave de mesa 60 L clase B Biobase BKM-Z60B</title>
-    <description>Autoclave de vapor clase B de 60 litros para centrales de esterilización y clínicas. 60 litros Clase B con prevacío Generador de vapor Pantalla digital y manómetros 220 V</description>
+    <description>Autoclave de vapor clase B de 60 litros para centrales de esterilización y clínicas. 60 litros Clase B con prevacío Generador de vapor Pantalla digital y manómetros 220 V Cod. D-217.</description>
     <link>https://sinergiabiomedica.pe/venta/biobase-bkm-z60b/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bkm-z60b.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -1852,7 +1852,7 @@
   <item>
     <g:id>baix-48l</g:id>
     <title>Autoclave de mesa de 48 litros clase B Baix 48 L clase B</title>
-    <description>Autoclave de vapor clase B de mayor capacidad para centrales de esterilización. 48 litros Clase B con bomba de vacío Generador de vapor 220 V / 60 Hz Código NTS D-217.</description>
+    <description>Autoclave de vapor clase B de mayor capacidad para centrales de esterilización. 48 litros Clase B con bomba de vacío Generador de vapor 220 V / 60 Hz Cod. D-217.</description>
     <link>https://sinergiabiomedica.pe/venta/baix-48l/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/baix-48l.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -2017,7 +2017,7 @@
   <item>
     <g:id>edan-h60</g:id>
     <title>Analizador hematológico de 5 diferenciales Edan H60</title>
-    <description>Hematología completa de 5 diferenciales para laboratorios de mediana demanda. 5 diferenciales Pantalla táctil de 12&quot; Código NTS D-448.</description>
+    <description>Hematología completa de 5 diferenciales para laboratorios de mediana demanda. 5 diferenciales Pantalla táctil de 12&quot; Cod. D-448.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-h60/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h60.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -2032,7 +2032,7 @@
   <item>
     <g:id>laboratorio-h60s</g:id>
     <title>Analizador hematológico de 5 diferenciales con autocargador Edan H60S</title>
-    <description>Hematología de 5 diferenciales con autocargador de muestras. 5 diferenciales Pantalla táctil de 12&quot; Autocargador Código NTS D-448.</description>
+    <description>Hematología de 5 diferenciales con autocargador de muestras. 5 diferenciales Pantalla táctil de 12&quot; Autocargador Cod. D-448.</description>
     <link>https://sinergiabiomedica.pe/venta/laboratorio-h60s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-h60s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -2047,7 +2047,7 @@
   <item>
     <g:id>edan-h80s</g:id>
     <title>Analizador hematológico de 5 diferenciales con automuestreador Edan H80S</title>
-    <description>Hematología de 5 diferenciales con carga automática para alto volumen. 5 diferenciales Pantalla táctil de 12.1&quot; Automuestreador Código NTS D-448.</description>
+    <description>Hematología de 5 diferenciales con carga automática para alto volumen. 5 diferenciales Pantalla táctil de 12.1&quot; Automuestreador Cod. D-448.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-h80s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h80s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -2077,7 +2077,7 @@
   <item>
     <g:id>esterilizacion-tiva2-h</g:id>
     <title>Lavador desinfector de 65 L Tuttnauer TIVA2-H</title>
-    <description>Lavadora desinfectadora de instrumental para centrales de esterilización. 65 L 1 puerta Alta velocidad Código NTS E-208.</description>
+    <description>Lavadora desinfectadora de instrumental para centrales de esterilización. 65 L 1 puerta Alta velocidad Cod. E-208.</description>
     <link>https://sinergiabiomedica.pe/venta/esterilizacion-tiva2-h/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-esterilizacion-tiva2-h.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -2092,7 +2092,7 @@
   <item>
     <g:id>laboratorio-bc-60</g:id>
     <title>Analizador automático de hemocultivos Autobio BC 60</title>
-    <description>Sistema automatizado para la detección de hemocultivos positivos. Capacidad de 60 frascos Lectura automática continua Código NTS D-368.</description>
+    <description>Sistema automatizado para la detección de hemocultivos positivos. Capacidad de 60 frascos Lectura automática continua Cod. D-368.</description>
     <link>https://sinergiabiomedica.pe/venta/laboratorio-bc-60/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-bc-60.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
@@ -2182,7 +2182,7 @@
   <item>
     <g:id>perlove-099414</g:id>
     <title>Rayos X digital con 2 detectores y mesa flotante Perlove PLD6500E</title>
-    <description>Sistema de radiología digital directa con dos detectores planos. 65 kW 2 detectores de 17x17&quot; Mesa flotante Código NTS D-20.</description>
+    <description>Sistema de radiología digital directa con dos detectores planos. 65 kW 2 detectores de 17x17&quot; Mesa flotante Cod. D-20.</description>
     <link>https://sinergiabiomedica.pe/venta/perlove-099414/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/perlove-rx-digital.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
