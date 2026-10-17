@@ -234,6 +234,42 @@ ${SITE.nav.filter(n=>n.r!=='#/').map(n=>`        <a onclick="go('${n.r}')">${n.p
 renderHeader();
 renderFooter();
 
+/* ── Vigencia de la calibración ───────────────────────────────────────
+   «Calibración vigente hasta agosto 2027», o cadena vacía.
+
+   Vive AQUÍ, en un solo sitio, porque lo pintan la tarjeta del catálogo
+   (03-catalogo.js) y la ficha del equipo (05-detalle.js). Estaba escrito
+   dos veces con formatos distintos: la ficha decía «agosto 2027» y la
+   tarjeta soltaba la fecha entera, «31/08/2027», que es justo el dato
+   que no se publica.
+
+   SOLO mes y año: el cliente ve que la trazabilidad está al día y nadie
+   sabe la fecha exacta en que toca renovar. El certificado NO se
+   publica: lleva el número de serie del patrón y el número de
+   certificado del laboratorio. Nunca pintar aquí el día, la fecha de
+   emisión, el laboratorio ni el enlace al documento.
+
+   Si la fecha ya pasó devuelve vacío: ni fecha, ni «vencido», ni aviso.
+   La web no le anuncia a un cliente que un patrón está fuera de
+   vigencia antes de que la empresa lo renueve. */
+const SB_MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+                  'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+function sbCalVigente(calFin){
+  const cf = String(calFin || '').trim();
+  if(!cf) return '';
+  const p = cf.replace(/-/g, '/').split('/').map(Number);
+  if(p.length !== 3 || p.some(isNaN)) return '';
+  let d, m, a;
+  if(p[0] > 31){ a = p[0]; m = p[1]; d = p[2]; }      // 2027/08/31
+  else { d = p[0]; m = p[1]; a = p[2]; if(a < 100) a += 2000; }   // 31/08/2027
+  const fin = new Date(a, m - 1, d);
+  if(fin.getFullYear() !== a || fin.getMonth() !== m - 1 || fin.getDate() !== d) return '';
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  if(fin < hoy) return '';
+  return 'Calibración vigente hasta ' + SB_MESES[m - 1] + ' ' + a;
+}
+
 ;
 /* ===== js/02-datos.js ===== */
 /* =====================================================================
@@ -608,7 +644,7 @@ function cardEq(e){
         <div class="cat">${e.cat}</div>
         <h3><a href="${urlEquipo(e.id)}">${e.nom}</a></h3>
         <div class="marca">${e.marca}</div>
-      ${e.cal_fin?`<div class="calchip" style="margin-top:7px;display:inline-block;font-family:var(--ff-d);font-size:10px;letter-spacing:.6px;padding:3px 8px;border-radius:5px;background:rgba(46,139,107,.10);color:var(--ok);border:1px solid rgba(46,139,107,.25)">CALIBRACIÓN VIGENTE HASTA ${e.cal_fin}</div>`:''}
+      ${(()=>{const v=sbCalVigente(e.cal_fin); return v?`<div class="calchip" title="${v}">CALIBRACIÓN VIGENTE</div>`:'';})()}
         <div class="desc">${e.desc}</div>
         ${foot}
       </div></div>`;
@@ -700,30 +736,13 @@ function renderEquipo(id){
     :(VER_PRECIOS
       ?`<div class="dbtns"><button class="btn btn-fill btn-lg" onclick="go('#/cotizar/'+'${e.id}')">Calcular mi alquiler</button><a class="btn btn-lg" onclick="go('#/contacto')">Consultar</a></div>`
       :`<div class="dbtns"><a class="btn btn-fill btn-lg" onclick="go('#/contacto')">Solicitar cotización</a></div>`);
-  /* Calibración: SOLO «vigente hasta <mes> <año>».
-     El documento NO se publica: el certificado lleva el número de serie
-     del patrón y el número de certificado del laboratorio emisor, y eso le
-     enseñaría a la competencia qué patrones hay y quién los calibra. Nunca
-     volver a pintar aquí el enlace a Drive (cal_pdf / cal_dl), ni la fecha
-     de emisión (cal_ini), ni el laboratorio.
-     Solo mes y año: el cliente ve la trazabilidad al día y nadie sabe la
-     fecha exacta. Si ya pasó NO se muestra nada, ni «vencido» ni aviso
-     alguno: la línea desaparece hasta que la hoja traiga la fecha nueva. */
-  const calHTML=(function(){
-    const MESES=['enero','febrero','marzo','abril','mayo','junio','julio',
-                 'agosto','septiembre','octubre','noviembre','diciembre'];
-    const cf=String(e.cal_fin||'').trim(); if(!cf) return '';
-    const p=cf.replace(/-/g,'/').split('/').map(Number);
-    if(p.length!==3||p.some(isNaN)) return '';
-    let d,m,a;
-    if(p[0]>31){ a=p[0]; m=p[1]; d=p[2]; } else { d=p[0]; m=p[1]; a=p[2]; if(a<100) a+=2000; }
-    const fin=new Date(a,m-1,d);
-    if(fin.getFullYear()!==a||fin.getMonth()!==m-1||fin.getDate()!==d) return '';
-    const hoy=new Date(); hoy.setHours(0,0,0,0);
-    if(fin<hoy) return '';
-    return `<div class="spec"><div class="row"><span class="l">Calibración vigente hasta</span>`
-      +`<span class="v">${MESES[m-1]} ${a}</span></div></div>`;
-  })();
+  /* Calibración: la etiqueta sube junto al precio, igual que en la
+     página del instrumento. El documento NO se publica y el día tampoco:
+     solo «vigente», con el mes y el año al lado. Ver sbCalVigente() en
+     01-componentes.js, que es donde vive la regla. */
+  const calVig = sbCalVigente(e.cal_fin);
+  const sello = calVig ? `<p class="cal-ok"><span aria-hidden="true">✓</span>Calibración vigente hasta `
+    + `<b>${calVig.replace('Calibración vigente hasta ', '')}</b></p>` : '';
   const tarifasHTML=(isA||!VER_PRECIOS)?'':`<div class="spec"><div class="sh">Tarifas de alquiler</div>${tieneMedio(e.dia)?`<div class="row"><span class="l">Medio día (4 h)</span><span class="v">S/ ${fmt(precioMedio(e.dia))}</span></div>`:''}<div class="row"><span class="l">Día</span><span class="v">S/ ${fmt(e.dia)}</span></div><div class="row"><span class="l">Semana</span><span class="v">S/ ${fmt(e.sem)}</span></div><div class="row"><span class="l">Mes</span><span class="v">S/ ${fmt(e.mes)}</span></div></div>`;
   body.innerHTML=`
     <div class="crumb"><a onclick="go('#/catalogo')">Catálogo</a> &nbsp;/&nbsp; ${e.nom}</div>
@@ -739,12 +758,13 @@ function renderEquipo(id){
         <h1>${e.nom}</h1>
         <div class="dmarca">${e.marca}</div>
         ${priceHTML}
+        ${sello}
         ${(isA||!VER_PRECIOS)?'':`<div class="pmodbig">Modalidades (IGV incluido): ${tieneMedio(e.dia)?`&nbsp;medio día S/ ${fmt(precioMedio(e.dia))} &nbsp;·&nbsp;`:''} día S/ ${fmt(e.dia)}</div><div class="modnote">${tieneMedio(e.dia)?`Medio día es un turno de 4 h (${HORARIO_MANANA} o ${HORARIO_TARDE}) y el día completo son los dos turnos.`:`Este instrumento se alquila desde un día completo (${HORARIO_MANANA} y ${HORARIO_TARDE}).`} ${soloEquipo(e.id) ? `Lo recoges en nuestra oficina: sin instrumentista, con DNI y S/ ${fmt(garantiaDe(e.id))} de garantía que se te devuelve.` : 'Va con nuestro instrumentista, que se cobra aparte.'}</div>`}
         <div class="ddesc">${e.desc}</div>
         ${btnsHTML}
         ${e.ficha?`<a class="btn-ficha" href="${e.ficha}" target="_blank" rel="noopener">Ver ficha técnica (PDF)</a>`:`<div class="ficha-soon">Ficha técnica (PDF) · próximamente</div>`}
         <div class="dnote">${isA?'Complementaria: no se alquila sola. Va sin costo con cualquier equipo que lleve instrumentista.':'Se entrega con su certificado de calibración vigente.'}</div>
-        ${calHTML}${tarifasHTML}${specRows?`<div class="spec"><div class="sh">Ficha técnica</div>${specRows}</div>`:''}
+        ${tarifasHTML}${specRows?`<div class="spec"><div class="sh">Ficha técnica</div>${specRows}</div>`:''}
       </div>
     </div>`;
   window._galItems=items;
@@ -860,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=94d27de3';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=9188a348';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=94d27de3';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=9188a348';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=94d27de3','js/06-tablero.js?v=94d27de3'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=9188a348','js/06-tablero.js?v=9188a348'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=94d27de3'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=9188a348'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */

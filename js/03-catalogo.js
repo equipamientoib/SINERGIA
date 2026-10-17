@@ -99,7 +99,7 @@ function cardEq(e){
         <div class="cat">${e.cat}</div>
         <h3><a href="${urlEquipo(e.id)}">${e.nom}</a></h3>
         <div class="marca">${e.marca}</div>
-      ${e.cal_fin?`<div class="calchip" style="margin-top:7px;display:inline-block;font-family:var(--ff-d);font-size:10px;letter-spacing:.6px;padding:3px 8px;border-radius:5px;background:rgba(46,139,107,.10);color:var(--ok);border:1px solid rgba(46,139,107,.25)">CALIBRACIÓN VIGENTE HASTA ${e.cal_fin}</div>`:''}
+      ${(()=>{const v=sbCalVigente(e.cal_fin); return v?`<div class="calchip" title="${v}">CALIBRACIÓN VIGENTE</div>`:'';})()}
         <div class="desc">${e.desc}</div>
         ${foot}
       </div></div>`;
