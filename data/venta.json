@@ -1827,5 +1827,232 @@
       "codigo": "D-217",
       "capacidad": "60 L"
     }
+  },
+  "textosFicha": {
+    "_nota": "Texto largo de la página de un equipo: va DEBAJO de las pestañas, con el mismo aspecto que la guía de las páginas de familia. «guia» son las secciones con título (h2) y «faq» las preguntas plegables, que además se publican como datos estructurados para Google. Los huecos entre llaves los rellena el generador al escribir la página, para que no se queden viejos: {precio}, {plazo}, {garantia}, {pago}, {codigo} y {capacidad}. Reglas que valen para todas: no se inventa ningún dato técnico; lo que no esté en los datos del repositorio no se escribe. La GUÍA de la familia explica el sistema de códigos; la ficha solo muestra el código como dato. La sección «Los parámetros completos del fabricante» solo va en los equipos SIN archivo en data/fichas-venta/: el día que entre el catálogo del ZA o el ZB, hay que quitarles esa sección.",
+    "biobase-bkm-za": {
+      "guia": [
+        {
+          "h": "Para qué sirve este autoclave",
+          "p": "El BKM-ZA esteriliza con vapor de agua a presión. Es de mesa, de 18 litros, la medida de un consultorio: dental, de podología, de medicina estética o de curaciones, donde entran una o dos bandejas de instrumental por ciclo.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces en el mismo turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso. Es la cuenta que conviene hacer antes de elegir, y la hacemos contigo sin compromiso."
+        },
+        {
+          "h": "Qué significa que sea clase B",
+          "p": "La norma europea EN 13060 separa los autoclaves de mesa en tres clases, según lo que son capaces de esterilizar. No es una etiqueta comercial: es lo que define si el equipo te sirve para lo que haces.<br><br>Un autoclave <b>clase N</b> solo esteriliza instrumental sólido y sin empaquetar. Si metes una bolsa o una manguera, el aire que queda dentro no sale y el vapor no llega al interior. Un <b>clase S</b> esteriliza lo que el fabricante declare en su ficha, ni más ni menos, así que hay que leer la ficha de ese modelo en concreto.<br><br>El <b>clase B</b> hace vacío antes de inyectar el vapor, y por eso saca el aire de los lúmenes y de las telas. Es la única clase que esteriliza material poroso, instrumental hueco y cargas empaquetadas. En la práctica: si esterilizas en bolsa, o tienes turbinas, cánulas, mangueras o campos de tela, necesitas clase B. Este equipo lo es, con prevacío."
+        },
+        {
+          "h": "Qué trae el equipo",
+          "p": "<b>Cámara de 18 litros</b> y ciclo de vapor clase B con prevacío.<br><b>Impresora incorporada</b>, para dejar impreso el resultado de cada ciclo.<br><b>Alimentación a 220 V</b>, la red común en el Perú."
+        },
+        {
+          "h": "Los parámetros completos del fabricante",
+          "p": "Los tiempos de cada programa, las temperaturas, las medidas de la cámara y los consumos salen de la ficha técnica del fabricante: <b>te la mandamos junto con la cotización</b>, o antes si nos la pides por WhatsApp. Preferimos entregarte el documento del fabricante a resumirlo aquí a medias, porque es el dato con el que después se arma una especificación técnica o se compara contra otra oferta."
+        },
+        {
+          "h": "Dónde se usa",
+          "p": "Está pensado para <b>consulta externa</b> y <b>odontología</b>. Por capacidad, 18 litros es la medida que suele corresponder a un consultorio dental, de podología, de medicina estética o de curaciones."
+        },
+        {
+          "h": "Entrega, garantía y forma de pago",
+          "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
+        },
+        {
+          "h": "Si compras para el Estado",
+          "p": "Este equipo lleva el <b>Cod. {codigo}</b>, con capacidad de <b>{capacidad}</b>. Si nos mandas la especificación técnica de tu expediente, te devolvemos el cuadro de cumplimiento punto por punto con este modelo."
+        }
+      ],
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta el autoclave Biobase BKM-ZA en Perú?",
+          "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
+        },
+        {
+          "q": "¿Sirve para esterilizar instrumental empaquetado y mangueras?",
+          "r": "Sí. Es clase B con prevacío, que es la clase que saca el aire de las bolsas, de los lúmenes y de las telas. Un clase N o un clase S no te garantizan eso."
+        },
+        {
+          "q": "¿En cuánto tiempo lo entregan y llega a provincias?",
+          "r": "De {plazo}, porque es stock nuestro. Entregamos en Lima y en todo el país; el envío a provincias se coordina al emitir la cotización."
+        },
+        {
+          "q": "¿Qué garantía tiene y qué pasa después?",
+          "r": "{garantia} meses de garantía. Terminada la garantía seguimos haciendo el mantenimiento del equipo."
+        },
+        {
+          "q": "¿Entra en una cotización para una licitación?",
+          "r": "Sí. Emitimos cotización formal con los datos de tu expediente, y si nos mandas la especificación técnica te devolvemos el cuadro de cumplimiento punto por punto."
+        }
+      ]
+    },
+    "biobase-bkm-zb": {
+      "guia": [
+        {
+          "h": "Para qué sirve este autoclave",
+          "p": "El BKM-ZB esteriliza con vapor de agua a presión. Es de mesa, de 23 litros: el escalón siguiente al de 18, para el consultorio que llena la cámara todos los días o que esteriliza cargas empaquetadas de forma seguida.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces en el mismo turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso. Es la cuenta que conviene hacer antes de elegir, y la hacemos contigo sin compromiso."
+        },
+        {
+          "h": "Qué significa que sea clase B",
+          "p": "La norma europea EN 13060 separa los autoclaves de mesa en tres clases, según lo que son capaces de esterilizar. No es una etiqueta comercial: es lo que define si el equipo te sirve para lo que haces.<br><br>Un autoclave <b>clase N</b> solo esteriliza instrumental sólido y sin empaquetar. Si metes una bolsa o una manguera, el aire que queda dentro no sale y el vapor no llega al interior. Un <b>clase S</b> esteriliza lo que el fabricante declare en su ficha, ni más ni menos, así que hay que leer la ficha de ese modelo en concreto.<br><br>El <b>clase B</b> hace vacío antes de inyectar el vapor, y por eso saca el aire de los lúmenes y de las telas. Es la única clase que esteriliza material poroso, instrumental hueco y cargas empaquetadas. En la práctica: si esterilizas en bolsa, o tienes turbinas, cánulas, mangueras o campos de tela, necesitas clase B. Este equipo lo es, con prevacío."
+        },
+        {
+          "h": "Qué trae el equipo",
+          "p": "<b>Cámara de 23 litros</b> y ciclo de vapor clase B con prevacío.<br><b>Impresora incorporada</b>, para dejar impreso el resultado de cada ciclo.<br><b>Puerto USB</b>.<br><b>Alimentación a 220 V</b>, la red común en el Perú."
+        },
+        {
+          "h": "Los parámetros completos del fabricante",
+          "p": "Los tiempos de cada programa, las temperaturas, las medidas de la cámara y los consumos salen de la ficha técnica del fabricante: <b>te la mandamos junto con la cotización</b>, o antes si nos la pides por WhatsApp. Preferimos entregarte el documento del fabricante a resumirlo aquí a medias, porque es el dato con el que después se arma una especificación técnica o se compara contra otra oferta."
+        },
+        {
+          "h": "Dónde se usa",
+          "p": "Está pensado para <b>consulta externa</b> y <b>odontología</b>. Por capacidad, 23 litros es la medida que suele corresponder a un consultorio dental de varios sillones, a un tópico o a un centro médico con sala de procedimientos."
+        },
+        {
+          "h": "Entrega, garantía y forma de pago",
+          "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
+        },
+        {
+          "h": "Si compras para el Estado",
+          "p": "Este equipo lleva el <b>Cod. {codigo}</b>, con capacidad de <b>{capacidad}</b>. Si nos mandas la especificación técnica de tu expediente, te devolvemos el cuadro de cumplimiento punto por punto con este modelo."
+        }
+      ],
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta el autoclave Biobase BKM-ZB en Perú?",
+          "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
+        },
+        {
+          "q": "¿Sirve para esterilizar instrumental empaquetado y mangueras?",
+          "r": "Sí. Es clase B con prevacío, que es la clase que saca el aire de las bolsas, de los lúmenes y de las telas. Un clase N o un clase S no te garantizan eso."
+        },
+        {
+          "q": "¿En cuánto tiempo lo entregan y llega a provincias?",
+          "r": "De {plazo}, porque es stock nuestro. Entregamos en Lima y en todo el país; el envío a provincias se coordina al emitir la cotización."
+        },
+        {
+          "q": "¿Qué garantía tiene y qué pasa después?",
+          "r": "{garantia} meses de garantía. Terminada la garantía seguimos haciendo el mantenimiento del equipo."
+        },
+        {
+          "q": "¿Entra en una cotización para una licitación?",
+          "r": "Sí. Emitimos cotización formal con los datos de tu expediente, y si nos mandas la especificación técnica te devolvemos el cuadro de cumplimiento punto por punto."
+        }
+      ]
+    },
+    "biobase-bkm-z45b": {
+      "guia": [
+        {
+          "h": "Para qué sirve este autoclave",
+          "p": "El BKM-Z45B esteriliza con vapor de agua a presión. Es de mesa, de 45 litros, y cubre el salto entre el equipo de consultorio y la autoclave grande de central: una clínica, un centro odontológico de varios sillones o una central de esterilización chica.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces por turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso."
+        },
+        {
+          "h": "Qué significa que sea clase B",
+          "p": "La norma europea EN 13060 separa los autoclaves de mesa en tres clases, según lo que son capaces de esterilizar. No es una etiqueta comercial: es lo que define si el equipo te sirve para lo que haces.<br><br>Un autoclave <b>clase N</b> solo esteriliza instrumental sólido y sin empaquetar. Si metes una bolsa o una manguera, el aire que queda dentro no sale y el vapor no llega al interior. Un <b>clase S</b> esteriliza lo que el fabricante declare en su ficha, ni más ni menos, así que hay que leer la ficha de ese modelo en concreto.<br><br>El <b>clase B</b> hace vacío antes de inyectar el vapor, y por eso saca el aire de los lúmenes y de las telas. Es la única clase que esteriliza material poroso, instrumental hueco y cargas empaquetadas. En la práctica: si esterilizas en bolsa, o tienes turbinas, cánulas, mangueras o campos de tela, necesitas clase B. Este equipo lo es, con prevacío."
+        },
+        {
+          "h": "Qué trae el equipo",
+          "p": "<b>Cámara de 45 litros</b> en acero S30408, con rack de 3 bandejas.<br><b>Puerta automática</b> y <b>pantalla táctil LCD de 5 pulgadas</b>.<br><b>Generador de vapor</b>: el equipo produce su propio vapor.<br><b>Vacío de alta eficiencia</b>, con bomba de agua de alta presión y eyector.<br><b>Tanque de agua de 14 litros</b> en acero inoxidable, con filtros de desmontaje rápido y filtro de aire de 0,22 μm.<br><b>Impresora y puerto USB de serie</b>, y sonda móvil que mide la temperatura dentro del líquido.<br><b>Alimentación a 220 V</b>, la red común en el Perú.<br><br>La tabla completa, con presiones, temperaturas, medidas y pesos, está en la pestaña «Parámetros técnicos» de esta misma página, y también en la ficha técnica en PDF que puedes descargar arriba."
+        },
+        {
+          "h": "Si lo vas a instalar en altura",
+          "p": "El equipo estándar opera <b>hasta 2000 m sobre el nivel del mar</b>, que cubre Lima, la costa y buena parte de la sierra baja. Por encima de esa altura el fabricante hace una <b>versión de altura</b>, que se solicita al pedirlo: dinos la ciudad donde va a trabajar y lo verificamos antes de cotizar."
+        },
+        {
+          "h": "Dónde se usa",
+          "p": "Está pensado para <b>central de esterilización</b> y <b>centro quirúrgico</b>. Por capacidad, 45 litros es también la medida que suele corresponder a una clínica, a un centro odontológico de varios sillones y a una central de esterilización chica."
+        },
+        {
+          "h": "Entrega, garantía y forma de pago",
+          "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
+        },
+        {
+          "h": "Si compras para el Estado",
+          "p": "Este equipo lleva el <b>Cod. {codigo}</b>, con capacidad de <b>{capacidad}</b>. Si nos mandas la especificación técnica de tu expediente, te devolvemos el cuadro de cumplimiento punto por punto con este modelo."
+        }
+      ],
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta el autoclave Biobase BKM-Z45B en Perú?",
+          "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
+        },
+        {
+          "q": "¿Sirve para esterilizar instrumental empaquetado y mangueras?",
+          "r": "Sí. Es clase B con prevacío, que es la clase que saca el aire de las bolsas, de los lúmenes y de las telas. Un clase N o un clase S no te garantizan eso."
+        },
+        {
+          "q": "¿Funciona en ciudades de altura?",
+          "r": "El equipo estándar opera hasta 2000 m sobre el nivel del mar. Por encima de esa altura el fabricante hace una versión de altura, que se solicita al pedirlo: dinos la ciudad donde va a trabajar y lo verificamos antes de cotizar."
+        },
+        {
+          "q": "¿En cuánto tiempo lo entregan y llega a provincias?",
+          "r": "De {plazo}, porque es stock nuestro. Entregamos en Lima y en todo el país; el envío a provincias se coordina al emitir la cotización."
+        },
+        {
+          "q": "¿Qué garantía tiene y qué pasa después?",
+          "r": "{garantia} meses de garantía. Terminada la garantía seguimos haciendo el mantenimiento del equipo."
+        },
+        {
+          "q": "¿Entra en una cotización para una licitación?",
+          "r": "Sí. Emitimos cotización formal con los datos de tu expediente, y si nos mandas la especificación técnica te devolvemos el cuadro de cumplimiento punto por punto."
+        }
+      ]
+    },
+    "biobase-bkm-z60b": {
+      "guia": [
+        {
+          "h": "Para qué sirve este autoclave",
+          "p": "El BKM-Z60B esteriliza con vapor de agua a presión. Es de mesa, de 60 litros: el mayor de la serie y el que corresponde a una central de esterilización que trabaja todo el día, a una clínica con varias salas o a un centro quirúrgico.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces por turno con un equipo más chico, este te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso."
+        },
+        {
+          "h": "Qué significa que sea clase B",
+          "p": "La norma europea EN 13060 separa los autoclaves de mesa en tres clases, según lo que son capaces de esterilizar. No es una etiqueta comercial: es lo que define si el equipo te sirve para lo que haces.<br><br>Un autoclave <b>clase N</b> solo esteriliza instrumental sólido y sin empaquetar. Si metes una bolsa o una manguera, el aire que queda dentro no sale y el vapor no llega al interior. Un <b>clase S</b> esteriliza lo que el fabricante declare en su ficha, ni más ni menos, así que hay que leer la ficha de ese modelo en concreto.<br><br>El <b>clase B</b> hace vacío antes de inyectar el vapor, y por eso saca el aire de los lúmenes y de las telas. Es la única clase que esteriliza material poroso, instrumental hueco y cargas empaquetadas. En la práctica: si esterilizas en bolsa, o tienes turbinas, cánulas, mangueras o campos de tela, necesitas clase B. Este equipo lo es, con prevacío."
+        },
+        {
+          "h": "Qué trae el equipo",
+          "p": "<b>Cámara de 60 litros</b> en acero S30408, con rack de 3 bandejas.<br><b>Puerta automática</b> y <b>pantalla táctil LCD de 7 pulgadas</b>.<br><b>Generador de vapor</b>: el equipo produce su propio vapor.<br><b>Vacío de alta eficiencia</b>, con bomba de agua de alta presión y eyector.<br><b>Tanque de agua de 14 litros</b> en acero inoxidable, con filtros de desmontaje rápido y filtro de aire de 0,22 μm.<br><b>Impresora y puerto USB de serie</b>, y sonda móvil que mide la temperatura dentro del líquido.<br><b>Alimentación a 220 V</b>, la red común en el Perú.<br><br>La tabla completa, con presiones, temperaturas, medidas y pesos, está en la pestaña «Parámetros técnicos» de esta misma página, y también en la ficha técnica en PDF que puedes descargar arriba."
+        },
+        {
+          "h": "Si lo vas a instalar en altura",
+          "p": "El equipo estándar opera <b>hasta 2000 m sobre el nivel del mar</b>, que cubre Lima, la costa y buena parte de la sierra baja. Por encima de esa altura el fabricante hace una <b>versión de altura</b>, que se solicita al pedirlo: dinos la ciudad donde va a trabajar y lo verificamos antes de cotizar."
+        },
+        {
+          "h": "Dónde se usa",
+          "p": "Está pensado para <b>central de esterilización</b> y <b>centro quirúrgico</b>. Por capacidad, 60 litros es la medida que suele corresponder a una central de esterilización de clínica, a un centro quirúrgico y a un centro odontológico grande."
+        },
+        {
+          "h": "Entrega, garantía y forma de pago",
+          "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
+        },
+        {
+          "h": "Si compras para el Estado",
+          "p": "Este equipo lleva el <b>Cod. {codigo}</b>, con capacidad de <b>{capacidad}</b>. Si nos mandas la especificación técnica de tu expediente, te devolvemos el cuadro de cumplimiento punto por punto con este modelo."
+        }
+      ],
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta el autoclave Biobase BKM-Z60B en Perú?",
+          "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
+        },
+        {
+          "q": "¿Sirve para esterilizar instrumental empaquetado y mangueras?",
+          "r": "Sí. Es clase B con prevacío, que es la clase que saca el aire de las bolsas, de los lúmenes y de las telas. Un clase N o un clase S no te garantizan eso."
+        },
+        {
+          "q": "¿Funciona en ciudades de altura?",
+          "r": "El equipo estándar opera hasta 2000 m sobre el nivel del mar. Por encima de esa altura el fabricante hace una versión de altura, que se solicita al pedirlo: dinos la ciudad donde va a trabajar y lo verificamos antes de cotizar."
+        },
+        {
+          "q": "¿En cuánto tiempo lo entregan y llega a provincias?",
+          "r": "De {plazo}, porque es stock nuestro. Entregamos en Lima y en todo el país; el envío a provincias se coordina al emitir la cotización."
+        },
+        {
+          "q": "¿Qué garantía tiene y qué pasa después?",
+          "r": "{garantia} meses de garantía. Terminada la garantía seguimos haciendo el mantenimiento del equipo."
+        },
+        {
+          "q": "¿Entra en una cotización para una licitación?",
+          "r": "Sí. Emitimos cotización formal con los datos de tu expediente, y si nos mandas la especificación técnica te devolvemos el cuadro de cumplimiento punto por punto."
+        }
+      ]
+    }
   }
 }
