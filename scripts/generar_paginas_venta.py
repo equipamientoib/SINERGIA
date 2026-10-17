@@ -798,77 +798,35 @@ def pagina_hub(productos, cats_orden, cats, catsx, cfg, promos, base, fijas, loc
 # BKM-Z60B»: perfecta para quien ya sabe qué modelo quiere, inútil para
 # quien escribe «autoclave de vapor precio» en Google, que es casi todo el
 # mundo. Esta página es la puerta de entrada de esa búsqueda: reúne la
-# familia entera, pone los precios en un cuadro comparable y explica cómo
-# elegir. El texto vive en data/venta.json › landings; aquí solo se arma.
-
-RX_CAPACIDAD = re.compile(r'(\d{1,4})\s*(?:l\b|lt\b|lts\b|litros?\b)', re.I)
-RX_CLASE = re.compile(r'clase\s+([bns])\b', re.I)
-
-
-def capacidad_de(p):
-    """Litros de la cámara, sacados del nombre («de 60 L», «de 430 litros»)."""
-    m = RX_CAPACIDAD.search(p.get('nom') or '')
-    return int(m.group(1)) if m else None
-
-
-def clase_de(p):
-    m = RX_CLASE.search(p.get('nom') or '')
-    return m.group(1).upper() if m else ''
-
-
-def cuadro_precios(ps, promos):
-    """Cuadro comparable de la familia: lo que la gente va a mirar primero.
-
-    Las columnas se ponen solas: capacidad y clase solo aparecen si los
-    equipos de esa familia las tienen en el nombre (los autoclaves sí, los
-    estetoscopios no). Una columna vacía en 33 filas es ruido.
-    """
-    con_cap = any(capacidad_de(p) for p in ps)
-    con_cl = any(clase_de(p) for p in ps)
-    if con_cap:
-        orden = lambda x: (capacidad_de(x) or 10 ** 6, x.get('precio') or 10 ** 9)
-    else:
-        orden = lambda x: (x.get('precio') or 10 ** 9, x.get('nom') or '')
-    filas = []
-    for p in sorted(ps, key=orden):
-        cel = []
-        if con_cap:
-            cap = capacidad_de(p)
-            cel.append('<td>%s</td>' % (('%d L' % cap) if cap else '—'))
-        if con_cl:
-            cl = clase_de(p)
-            cel.append('<td>%s</td>' % (('Clase %s' % cl) if cl else '—'))
-        precio = ('<b>%s</b>' % soles(p['precio'])) if p.get('precio') else 'Consultar'
-        if promo(p, promos):
-            precio += ' <em class="lp-of">precio especial</em>'
-        st = ('<span class="lp-si">En stock · %s</span>' % e(stock_txt(int(p['stock'])))
-              if (p.get('stock') or 0) > 0 else '<span class="lp-no">Stock agotado</span>')
-        filas.append(
-            '<tr><th scope="row"><a href="/venta/%s/">%s</a><small>%s</small></th>'
-            '%s<td class="lp-p">%s</td><td>%s</td></tr>'
-            % (p['id'], e(p['nom']),
-               e(' · '.join(x for x in (p.get('marca'), p.get('modelo')) if x)),
-               ''.join(cel), precio, st))
-    cab = ['<th scope="col">Equipo</th>']
-    if con_cap:
-        cab.append('<th scope="col">Capacidad</th>')
-    if con_cl:
-        cab.append('<th scope="col">Clase</th>')
-    cab.append('<th scope="col">Precio con IGV</th><th scope="col">Entrega</th>')
-    return ('<div class="lp-tabla"><table>'
-            '<caption class="sr-only">Precios con IGV</caption>'
-            '<thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>'
-            % (''.join(cab), ''.join(filas)))
+# familia entera y explica cómo elegir. El texto vive en
+# data/venta.json › landings; aquí solo se arma.
+#
+# AQUÍ NO VA UN CUADRO DE PRECIOS, en ninguna forma: ni tabla, ni lista
+# ordenada por precio, ni «comparativa». Lo hubo y se quitó por decisión
+# del dueño, por tres razones que siguen valiendo:
+#   1. Se veía mal: una tabla densa justo debajo de tarjetas con foto
+#      rompe el ritmo de la página.
+#   2. Repetía lo de arriba: el cliente ya vio esos equipos con su precio
+#      en las tarjetas.
+#   3. La de fondo: ponía equipos propios y de otras marcas en la misma
+#      tabla ordenados por precio. Eso invita a comparar precio contra
+#      precio entre equipos que no son comparables, y hace que el negocio
+#      compita consigo mismo en su propia web.
+# La promoción sí se conserva, pero con el lenguaje visual de la tarjeta
+# (etiqueta roja PROMOCIÓN y «Precio especial» en rojo al lado del
+# precio), no como nota al pie en gris.
 
 
 def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
-    """La página de una familia: tarjetas, cuadro de precios, guía y preguntas.
+    """La página de una familia: tarjetas arriba, guía y preguntas abajo.
 
     Las tarjetas son las mismas de la tienda, para que el cliente reconozca
-    dónde está. El cuadro de precios va debajo porque es lo que permite
-    comparar de un vistazo, y es lo que Google puede mostrar como respuesta.
-    La guía y las preguntas son opcionales: una familia sin texto propio
-    igual tiene su página, con sus equipos y sus precios.
+    dónde está; cada una lleva su precio y, si está en promoción, su
+    etiqueta roja. La guía y las preguntas son opcionales: una familia sin
+    texto propio igual tiene su página con sus equipos.
+
+    Entre las tarjetas y la guía no va nada: ver el comentario de arriba
+    sobre el cuadro de precios que se quitó.
     """
     ruta = '/venta/%s/' % L['slug']
     precios = sorted(p['precio'] for p in ps if p.get('precio'))
@@ -904,12 +862,6 @@ def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
   <section class="lp-s">
     <h2>{len(ps)} equipos</h2>
     <div class="vts">{tarjetas}</div>
-  </section>
-  <section class="lp-s">
-    <h2>Cuadro de precios</h2>
-    {cuadro_precios(ps, promos)}
-    <p class="lp-nota">Precios con IGV, válidos con el stock del día. Toca un equipo para ver su
-    ficha completa, sus características y el botón para agregarlo a tu cotización.</p>
   </section>
   {guia}
   {bloque_faq}
@@ -1250,8 +1202,11 @@ def mapa_pie_portada(cambios):
     """
     txt = open(gp.INDEX, encoding='utf-8').read()
     ini, fin = '<!--MAPA-PIE-INICIO-->', '<!--MAPA-PIE-FIN-->'
+    # FUERA de #page-entrada: ese bloque es display:none hasta que corre el
+    # JS, asi que el mapa quedaba invisible para un rastreador que todavia
+    # no ha renderizado. Despues de </main> se ve siempre, con JS y sin el.
     if ini not in txt:
-        txt = txt.replace('<footer class="ent-pie">', ini + fin + '\n  <footer class="ent-pie">', 1)
+        txt = txt.replace('</main>', '</main>\n\n' + ini + fin, 1)
     nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
                    lambda m: ini + gp.mapa_sitio() + fin, txt, flags=re.S)
     gp.escribir('index.html', nuevo, cambios)
