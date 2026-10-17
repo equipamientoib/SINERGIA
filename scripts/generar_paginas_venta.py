@@ -373,26 +373,10 @@ def _sello(ruta):
 
 
 def galeria(p, fts, primera=True):
-    alt = e(' '.join(x for x in (p['nom'], p.get('marca', ''), p.get('modelo', '')) if x))
-    if not fts:
-        return '<div class="gal una"><div class="gal-main sinfoto">%s</div></div>' % gp.ICONO
-    lig = [a for a, _ in fts]
-    gra = [b for _, b in fts]
-    n = len(lig)
-    minis = ''.join('<button type="button" class="%s" data-i="%d" aria-label="Foto %d">'
-                    '<img src="%s" alt="" loading="lazy" decoding="async" width="120" height="90"></button>'
-                    % ('on' if k == 0 else '', k, k + 1, f) for k, f in enumerate(lig)) if n > 1 else ''
-    flechas = ('<button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button>'
-               '<button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button>'
-               '<span class="gal-n">1 / %d</span>' % n) if n > 1 else ''
-    return f'''<div class="gal{' una' if n < 2 else ''}" data-fotos="{e(json.dumps(lig))}" data-grandes="{e(json.dumps(gra))}">
-        {('<div class="gal-minis">' + minis + '</div>') if minis else ''}
-        <div class="gal-main">
-          <img src="{lig[0]}" alt="{alt}" {'fetchpriority="high"' if primera else 'loading="lazy"'} decoding="async" width="700" height="525">
-          {flechas}
-        </div>
-      </div>'''
-
+    """La galería de un equipo de venta: las fotos vienen ya emparejadas
+    (ligera y grande). El HTML lo arma gp.galeria_html, el mismo de alquiler."""
+    return gp.galeria_html(e(' '.join(x for x in (p['nom'], p.get('marca', ''), p.get('modelo', '')) if x)),
+                           [a for a, _ in fts], [b for _, b in fts], primera)
 
 def franja(p):
     d = [(k, c, p.get(c)) for k, c in (('Marca', 'marca'), ('Modelo', 'modelo'), ('Origen', 'origen')) if p.get(c)]
@@ -464,10 +448,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
              'y mantenimiento después de la venta.</p>')
     f = ficha_venta(p['id'])
     if f:
-        filas = ''.join('<tr class="g"><th colspan="2">%s</th></tr>' % e(g['titulo'])
-                        + ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
-                        for g in f['secciones'])
-        pie = '<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del fabricante.</p>' % e(f.get('fuente', 'fabricante'))
+        filas, pie = gp.filas_ficha(f)
     else:
         # «Código» y la capacidad salen de data/venta.json › codigosEquipo,
         # escritos a mano equipo por equipo. No se infiere ninguno: si un
@@ -1179,14 +1160,10 @@ def pagina_nts(productos, cfg):
 def mapa_portada(productos, cambios):
     """window.PAGINA_VENTA = {id: '/venta/<id>/'} en index.html: la tienda lo
     usa para abrir la página propia del equipo."""
-    txt = open(gp.INDEX, encoding='utf-8').read()
-    ini, fin = '<!--VENTA-URL-INICIO-->', '<!--VENTA-URL-FIN-->'
     js = '<script>window.PAGINA_VENTA=%s;</script>' % json.dumps(
         {p['id']: '/venta/%s/' % p['id'] for p in productos}, ensure_ascii=False, sort_keys=True)
-    if ini not in txt:
-        txt = txt.replace('<!--TIPOS-URL-FIN-->', '<!--TIPOS-URL-FIN-->\n' + ini + fin, 1)
-    nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin), lambda m: ini + js + fin, txt, flags=re.S)
-    gp.escribir('index.html', nuevo, cambios)
+    gp.region_index('<!--VENTA-URL-INICIO-->', '<!--VENTA-URL-FIN-->', js, cambios,
+                    ancla='<!--TIPOS-URL-FIN-->')
 
 
 def mapa_pie_portada(cambios):
@@ -1200,16 +1177,11 @@ def mapa_pie_portada(cambios):
     Se escribe entre marcas, igual que el resto de lo que la portada
     recibe generado, para que no haya que mantenerlo a mano.
     """
-    txt = open(gp.INDEX, encoding='utf-8').read()
-    ini, fin = '<!--MAPA-PIE-INICIO-->', '<!--MAPA-PIE-FIN-->'
     # FUERA de #page-entrada: ese bloque es display:none hasta que corre el
     # JS, asi que el mapa quedaba invisible para un rastreador que todavia
     # no ha renderizado. Despues de </main> se ve siempre, con JS y sin el.
-    if ini not in txt:
-        txt = txt.replace('</main>', '</main>\n\n' + ini + fin, 1)
-    nuevo = re.sub(re.escape(ini) + '.*?' + re.escape(fin),
-                   lambda m: ini + gp.mapa_sitio() + fin, txt, flags=re.S)
-    gp.escribir('index.html', nuevo, cambios)
+    gp.region_index('<!--MAPA-PIE-INICIO-->', '<!--MAPA-PIE-FIN-->', gp.mapa_sitio(), cambios,
+                    ancla='</main>', sep='\n\n')
 
 
 def sitemap(paginas, cambios):
