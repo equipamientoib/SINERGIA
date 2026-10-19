@@ -51,7 +51,20 @@ TRAMOS = [(2000, 'Hasta S/ 2 000'), (6000, 'S/ 2 000 – 6 000'), (15000, 'S/ 6 
 # ─────────────────────────── datos ───────────────────────────
 
 def soles(n):
-    return 'S/ {:,.0f}'.format(n)
+    """El precio como lo escribe una factura peruana: S/ 8,000.00
+
+    Con los dos decimales. Sin ellos, «S/ 8,000» es ambiguo para quien lo
+    lee a máquina: en medio mundo la coma es el separador decimal, así que
+    ocho mil soles se leen como ocho. Con el punto decimal delante de los
+    céntimos, la coma solo puede ser separador de miles.
+
+    Esta es la ÚNICA función que escribe un precio para personas: la caja
+    del precio, las tarjetas, la meta descripción, las páginas de familia,
+    el hueco {precio} de los textos largos y la hoja A4. El precio para
+    máquinas —el JSON-LD y el feed— se escribe aparte y SIN separador de
+    miles, que es como lo quiere Google.
+    """
+    return 'S/ {:,.2f}'.format(n)
 
 
 def tramo(p):
@@ -731,7 +744,9 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
               'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/OutOfStock',
               'seller': {'@id': SITIO + '/#negocio'}}
     if p.get('precio'):
-        oferta['price'] = str(int(round(p['precio'])))
+        # «8000.00», nunca «8,000»: sin separador de miles y con los dos
+        # decimales, que es el formato que pide Google para este campo.
+        oferta['price'] = '%.2f' % p['precio']
         if vig:
             oferta['priceValidUntil'] = vig.isoformat()
     jsonld = [{'@type': 'Product', 'name': nombre, 'description': p.get('resumen') or nombre,
@@ -1427,7 +1442,7 @@ def feed_google(productos, cfg, base, fijas, locales, promos, cambios):
             '    <link>%s/venta/%s/</link>\n'
             '    <g:image_link>%s</g:image_link>\n'
             '    <g:availability>%s</g:availability>\n'
-            '    <g:price>%d PEN</g:price>\n'
+            '    <g:price>%.2f PEN</g:price>\n'
             '%s'
             '    <g:condition>new</g:condition>\n'
             '    <g:brand>%s</g:brand>\n'
@@ -1445,7 +1460,7 @@ def feed_google(productos, cfg, base, fijas, locales, promos, cambios):
                 # Solo el precio que se cobra. Si se mandara también el de
                 # lista (g:sale_price), Google mostraría el tachado, que es
                 # justo lo que no queremos.
-                int(round(p['precio'])),
+                float(p['precio']),
                 '',
                 e(marca or 'Sinergia Biomédica'),
                 ('<g:mpn>%s</g:mpn>' % e(modelo)) if modelo else '',
