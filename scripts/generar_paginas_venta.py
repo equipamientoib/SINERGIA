@@ -1047,9 +1047,11 @@ def ficha_a4_venta(p, cfg, base, fijas, locales):
                   + '. Especificaciones sujetas a cambios del fabricante.') if fch else ''
     if fch:
         grupos += ''.join(
-            '<div class="g"><h4>%s</h4><table>%s</table></div>'
+            '<div class="g"><h4>%s</h4><table>%s</table>%s</div>'
             % (e(g['titulo']), ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b))
-                                       for a, b in g['filas']))
+                                       for a, b in g['filas']),
+               ('<p style="font-size:7.6pt;color:#6E727A;line-height:1.35;padding:1.5mm 2.5mm 0">'
+                '%s</p>' % e(g['nota'])) if g.get('nota') else '')
             for g in fch.get('secciones') or [])
         inc = fch.get('incluye') or []
         if inc:

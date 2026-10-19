@@ -155,8 +155,15 @@ def filas_ficha(ficha):
     Cada «sección» es un grupo (Tensión de red, Cámara, Alimentación…)
     con sus filas de etiqueta y valor.
     """
+    # «nota»: una línea al pie de SU sección, no de la tabla entera. La pide
+    # la tabla de tiempos de ciclo, que necesita decir de dónde salen los
+    # números («declarados por el fabricante en el manual») justo debajo de
+    # ellos; al final de la tabla, cinco grupos más abajo, nadie la ata a la
+    # tabla que la necesita. Las secciones sin «nota» salen igual que antes.
     filas = ''.join('<tr class="g"><th colspan="2">%s</th></tr>' % e(g['titulo'])
                     + ''.join('<tr><th>%s</th><td>%s</td></tr>' % (e(a), e(b)) for a, b in g['filas'])
+                    + ('<tr><td colspan="2" class="nota-f">%s</td></tr>' % e(g['nota'])
+                       if g.get('nota') else '')
                     for g in ficha.get('secciones') or [])
     pie = ('<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del '
            'fabricante.</p>' % e(ficha.get('fuente', 'fabricante')))

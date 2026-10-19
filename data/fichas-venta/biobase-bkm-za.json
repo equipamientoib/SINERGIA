@@ -1,0 +1,224 @@
+{
+ "_nota": "Ficha técnica del fabricante. Mismo formato que data/fichas/ (alquiler): scripts/generar_paginas_venta.py la muestra en la pestaña «Parámetros técnicos» de la página del equipo, debajo de la identificación, y arma con ella la hoja A4 de la que sale el PDF. Si este archivo no existe, la página no muestra parámetros ni ofrece el PDF: no hay que tocar código para cargar un equipo nuevo, basta con dejar aquí su archivo. «revisar» es lo que Sinergia debe confirmar con el fabricante.",
+ "id": "biobase-bkm-za",
+ "titulo": "Autoclave de mesa 18 L clase B Biobase BKMZA",
+ "resumen": "Autoclave de vapor clase B de 18 L con bomba de vacío de alta eficiencia, puerta manual y registro por USB.",
+ "fuente": "catálogo BIOBASE «Serie Class B» BKMZA/BKMZB y manual de usuario BIOBASE, versión 2021.02 (versiones en español)",
+ "secciones": [
+  {
+   "titulo": "Cámara y ciclo",
+   "filas": [
+    [
+     "Material de la cámara",
+     "S30408"
+    ],
+    [
+     "Tamaño de la cámara",
+     "φ 247 × 360 mm"
+    ],
+    [
+     "Rack",
+     "1 rack con 3 bandejas"
+    ],
+    [
+     "Temperatura de trabajo",
+     "121 / 134 °C"
+    ],
+    [
+     "Exactitud de temperatura",
+     "0,1 °C"
+    ],
+    [
+     "Temperatura máxima de diseño",
+     "150 °C"
+    ],
+    [
+     "Presión de trabajo",
+     "0,23 MPa"
+    ],
+    [
+     "Presión de diseño",
+     "-0,1 / 0,28 MPa"
+    ],
+    [
+     "Tiempo de esterilización",
+     "Configurable de 1 a 60 minutos"
+    ],
+    [
+     "Tiempo de secado",
+     "Configurable de 0 a 20 minutos, además de unos 7 minutos fijos"
+    ]
+   ]
+  },
+  {
+   "titulo": "Tiempo total del ciclo",
+   "filas": [
+    [
+     "Instrumental sólido · 134 °C",
+     "15 a 20 min"
+    ],
+    [
+     "Instrumental sólido · 121 °C",
+     "30 a 45 min"
+    ],
+    [
+     "Instrumental empacado · 134 °C",
+     "30 a 45 min"
+    ],
+    [
+     "Instrumental empacado · 121 °C",
+     "35 a 50 min"
+    ],
+    [
+     "Textiles · 134 °C",
+     "35 a 45 min"
+    ],
+    [
+     "Textiles · 121 °C",
+     "40 a 55 min"
+    ],
+    [
+     "Esterilización reforzada · 134 °C",
+     "45 a 60 min"
+    ],
+    [
+     "Prueba B&D · 134 °C",
+     "22 a 38 min"
+    ],
+    [
+     "Prueba Helix · 134 °C",
+     "22 a 35 min"
+    ],
+    [
+     "Prueba de vacío",
+     "15 a 20 min"
+    ]
+   ],
+   "nota": "Tiempos declarados por el fabricante en el manual de usuario."
+  },
+  {
+   "titulo": "Vacío, agua y filtros",
+   "filas": [
+    [
+     "Sistema de vacío",
+     "Bomba de vacío de alta eficiencia, de serie"
+    ],
+    [
+     "Tanque de agua",
+     "Abierto, incorporado, con tanque de agua residual también incorporado"
+    ],
+    [
+     "Capacidad del tanque",
+     "3,5 L"
+    ],
+    [
+     "Consumo de agua",
+     "0,5 a 2,5 L por ciclo"
+    ],
+    [
+     "Filtro de aire",
+     "0,22 μm, eficiencia de filtración no menor al 99,5 %"
+    ]
+   ]
+  },
+  {
+   "titulo": "Mando, programas y registro",
+   "filas": [
+    [
+     "Puerta",
+     "Manual"
+    ],
+    [
+     "Pantalla",
+     "LCD de 3,5 pulgadas"
+    ],
+    [
+     "Programas",
+     "Instrumental sólido, instrumental empacado, textiles, esterilización reforzada, prueba B&D, prueba Helix y prueba de vacío"
+    ],
+    [
+     "Registro de ciclos",
+     "Puerto USB de serie; impresora térmica opcional"
+    ],
+    [
+     "Protecciones",
+     "Corte automático de energía por sobretemperatura y sobrepresión, dispositivo antiquemado en seco, alivio automático de presión, protección contra sobrecorriente y contra fugas, y enclavamiento de seguridad de la puerta"
+    ]
+   ]
+  },
+  {
+   "titulo": "Instalación",
+   "filas": [
+    [
+     "Alimentación",
+     "AC 220 V, 50/60 Hz (estándar); AC 110 V, 50/60 Hz (opcional)"
+    ],
+    [
+     "Consumo",
+     "1,95 kW"
+    ],
+    [
+     "Fusible",
+     "F10A / 250 V"
+    ],
+    [
+     "Temperatura ambiente",
+     "5 a 40 °C"
+    ],
+    [
+     "Humedad relativa",
+     "Máximo 80 %, sin condensación"
+    ],
+    [
+     "Ruido",
+     "Menor a 60 dB"
+    ],
+    [
+     "Altitud de operación",
+     "El equipo requiere ajuste de altitud según el lugar de instalación. Por encima de 2000 m s. n. m. el fabricante indica reevaluar el efecto de esterilización."
+    ]
+   ]
+  },
+  {
+   "titulo": "Medidas y peso",
+   "filas": [
+    [
+     "Dimensiones externas",
+     "600 × 495 × 410 mm"
+    ],
+    [
+     "Peso neto",
+     "48 kg"
+    ],
+    [
+     "Dimensiones de embalaje",
+     "Ancho 610 × prof. 810 × alto 590 mm"
+    ],
+    [
+     "Peso bruto",
+     "63 kg"
+    ]
+   ],
+   "nota": "Las tres medidas externas se publican sin indicar cuál es el ancho, cuál el fondo y cuál el alto: los dos documentos del fabricante se contradicen y lo estamos confirmando con él. Si necesitas el dato exacto para preparar el mueble, escríbenos y te lo confirmamos."
+  }
+ ],
+ "incluye": [
+  "Bandejas de aluminio",
+  "Rack de instrumental",
+  "Pinza portabandejas",
+  "Tubo de drenaje",
+  "Empaque de puerta de repuesto",
+  "Fusible de repuesto",
+  "Puerto USB"
+ ],
+ "revisar": [
+  "DIMENSIONES EXTERNAS SIN ORDEN DECLARADO. Los dos documentos se contradicen en los números Y en los ejes: el manual dice «An × Al × Prof» 600 × 495 × 410 mm y el catálogo «An × P × Al» 495 × 650 × 410 mm. Se publican los tres valores del manual sin decir cuál es cuál, porque afirmar un orden sería inventarlo. Pendiente de confirmar con el fabricante.",
+  "El embalaje sí lleva cada eje con su palabra: solo lo trae el catálogo, que declara «An × P × Al», y ahí no hay contradicción.",
+  "Los tiempos de ciclo salen del Anexo II del manual de usuario, que es COMÚN al BKMZA (18 L) y al BKMZB (23 L): el fabricante declara la misma tabla para los dos modelos de la serie. Pendiente de confirmar con el fabricante si el de 23 L tiene tiempos propios.",
+  "La altitud se publica con el dato del MANUAL (ajuste por altitud y reevaluación por encima de 2000 m). El catálogo dice «≤ 2700 m» a secas y no se publica: no explica el ajuste, que es lo que importa para la sierra.",
+  "El tiempo de esterilización se publica como «1 a 60 minutos», que es el rango del manual. El catálogo escribe «0~60 min».",
+  "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (5 a 40 °C), como el resto de las fichas del sitio. Los números son los del fabricante.",
+  "La capacidad va solo en «Identificación», al lado del código, que es donde la busca el comprador.",
+  "El peso neto se publica con el dato del MANUAL. El catálogo da 50 kg."
+ ]
+}
