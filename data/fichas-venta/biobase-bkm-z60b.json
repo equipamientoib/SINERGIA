@@ -187,16 +187,16 @@
    "titulo": "Medidas y peso",
    "filas": [
     [
-     "Dimensiones externas (an × prof × al)",
-     "805 × 940 × 700 mm"
+     "Dimensiones externas",
+     "Ancho 805 × prof. 940 × alto 700 mm"
     ],
     [
      "Peso neto",
      "175 kg"
     ],
     [
-     "Dimensiones de embalaje (an × prof × al)",
-     "960 × 1130 × 940 mm"
+     "Dimensiones de embalaje",
+     "Ancho 960 × prof. 1130 × alto 940 mm"
     ],
     [
      "Peso bruto",
@@ -212,6 +212,7 @@
   "Sensor móvil"
  ],
  "revisar": [
+  "Las medidas llevan cada eje escrito con su palabra (ancho, prof., alto) en vez de una clave al pie del encabezado: el cliente mide el mueble antes de comprar y una clave mal leída le cuesta una devolución. El manual las declara como «Largo × Ancho × Alto» y el catálogo como «An × P × Al»; son los mismos valores con otros nombres, y coinciden.",
   "Los tiempos de ciclo salen de la tabla de programas del manual de usuario, que es COMÚN a los modelos de la serie: la del BKM-Z45B y la del BKM-Z60B son idénticas fila por fila, y la del Z60B la comparte además con el BKM-Z80B, que Sinergia no vende. Pendiente de confirmar con el fabricante si cada capacidad tiene tiempos propios.",
   "El manual de usuario del Z45B y del Z60B NO trae consumo de agua por ciclo ni nivel de ruido en dB. No se publican: no están en ninguno de los dos documentos del fabricante.",
   "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (105 a 134 °C), como el resto de las fichas del sitio. Los números son los del catálogo.",

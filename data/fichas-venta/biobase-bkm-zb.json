@@ -183,7 +183,7 @@
    "titulo": "Medidas y peso",
    "filas": [
     [
-     "Dimensiones externas (an × al × prof)",
+     "Dimensiones externas",
      "700 × 495 × 410 mm"
     ],
     [
@@ -191,14 +191,15 @@
      "53 kg"
     ],
     [
-     "Dimensiones de embalaje (an × prof × al)",
-     "610 × 810 × 590 mm"
+     "Dimensiones de embalaje",
+     "Ancho 610 × prof. 810 × alto 590 mm"
     ],
     [
      "Peso bruto",
      "67 kg"
     ]
-   ]
+   ],
+   "nota": "Las tres medidas externas se publican sin indicar cuál es el ancho, cuál el fondo y cuál el alto: los dos documentos del fabricante se contradicen y lo estamos confirmando con él. Si necesitas el dato exacto para preparar el mueble, escríbenos y te lo confirmamos."
   }
  ],
  "incluye": [
@@ -211,11 +212,13 @@
   "Puerto USB"
  ],
  "revisar": [
+  "DIMENSIONES EXTERNAS SIN ORDEN DECLARADO. Los dos documentos dan los mismos tres números pero con los ejes cambiados: el manual dice «An × Al × Prof» 700 × 495 × 410 mm y el catálogo «An × P × Al» 495 × 700 × 410 mm. El del manual NO PUEDE SER: daría un fondo de 410 mm para una cámara de 470 mm de largo, que no cabría. Se publican los tres valores sin decir cuál es cuál. Pendiente de confirmar con el fabricante; lo más probable es que valga el catálogo (ancho 495, fondo 700, alto 410).",
+  "El embalaje sí lleva cada eje con su palabra: solo lo trae el catálogo, que declara «An × P × Al», y ahí no hay contradicción.",
   "Los tiempos de ciclo salen del Anexo II del manual de usuario, que es COMÚN al BKMZA (18 L) y al BKMZB (23 L): el fabricante declara la misma tabla para los dos modelos de la serie. Pendiente de confirmar con el fabricante si el de 23 L tiene tiempos propios.",
-  "El peso neto se publica con el dato del MANUAL (53 kg). El catálogo dice 55 kg. Las dimensiones llevan los mismos tres números en los dos documentos, pero con los ejes en distinto orden (manual an × al × prof, catálogo an × prof × al). Confirmar con el fabricante.",
   "La altitud se publica con el dato del MANUAL (ajuste por altitud y reevaluación por encima de 2000 m). El catálogo dice «≤ 2700 m» a secas y no se publica: no explica el ajuste, que es lo que importa para la sierra.",
   "El tiempo de esterilización se publica como «1 a 60 minutos», que es el rango del manual. El catálogo escribe «0~60 min».",
   "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (5 a 40 °C), como el resto de las fichas del sitio. Los números son los del fabricante.",
-  "La capacidad va solo en «Identificación», al lado del código, que es donde la busca el comprador."
+  "La capacidad va solo en «Identificación», al lado del código, que es donde la busca el comprador.",
+  "El peso neto se publica con el dato del MANUAL. El catálogo da 55 kg."
  ]
 }
