@@ -1846,7 +1846,7 @@
         },
         {
           "h": "Los parámetros completos del fabricante",
-          "p": "Los tiempos de cada programa, las temperaturas, las medidas de la cámara y los consumos salen de la ficha técnica del fabricante: <b>te la mandamos junto con la cotización</b>, o antes si nos la pides por WhatsApp. Preferimos entregarte el documento del fabricante a resumirlo aquí a medias, porque es el dato con el que después se arma una especificación técnica o se compara contra otra oferta."
+          "p": "Los parámetros completos del fabricante están en la pestaña <b>Parámetros técnicos</b>, y puedes descargar la ficha en PDF desde el botón de arriba. Si necesitas algún dato que no esté ahí, escríbenos por WhatsApp."
         },
         {
           "h": "Dónde se usa",
@@ -1854,6 +1854,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {
@@ -1900,7 +1901,7 @@
         },
         {
           "h": "Los parámetros completos del fabricante",
-          "p": "Los tiempos de cada programa, las temperaturas, las medidas de la cámara y los consumos salen de la ficha técnica del fabricante: <b>te la mandamos junto con la cotización</b>, o antes si nos la pides por WhatsApp. Preferimos entregarte el documento del fabricante a resumirlo aquí a medias, porque es el dato con el que después se arma una especificación técnica o se compara contra otra oferta."
+          "p": "Los parámetros completos del fabricante están en la pestaña <b>Parámetros técnicos</b>, y puedes descargar la ficha en PDF desde el botón de arriba. Si necesitas algún dato que no esté ahí, escríbenos por WhatsApp."
         },
         {
           "h": "Dónde se usa",
@@ -1908,6 +1909,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {
@@ -1962,6 +1964,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {
@@ -2020,6 +2023,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {

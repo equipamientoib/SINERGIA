@@ -217,6 +217,70 @@ def barra_movil(p, wa, foto):
             % (precio, boton_carrito(p, foto, 'pbar-add', 'Agregar a mi cotización'), wa))
 
 
+def parametros(p, grupos, ce):
+    """La pestaña de parámetros, en tres niveles en vez de una lista plana.
+
+    Antes eran cuarenta filas seguidas, todas con el mismo peso: el fusible
+    al lado de la capacidad. Quien compara equipos se perdía.
+
+    Ahora: arriba las cinco cosas que deciden la compra, en tarjetas;
+    debajo los tiempos de ciclo abiertos, que es el argumento que ningún
+    competidor publica; y el resto plegado, un bloque por grupo.
+
+    Lo plegado va en <details>, que es el elemento del navegador para esto:
+    el texto está en el HTML —Google lo lee igual— y se abre aunque el
+    JavaScript falle. No es el display:none de la tienda.
+    """
+    def dato(gt, et):
+        for t, filas, _ in grupos:
+            if not t.lower().startswith(gt):
+                continue
+            for k, v in filas:
+                if k.lower().startswith(et):
+                    return v
+        return None
+    tiempos = next((g for g in grupos if g[0].lower().startswith('tiempo total')), None)
+    primer_ciclo = None
+    if tiempos and tiempos[1]:
+        k, v = tiempos[1][0]
+        primer_ciclo = '%s · %s' % (v, k.split('·')[0].strip().lower())
+    alim = (dato('instalaci', 'alimentaci') or '').split(';')[0].split('(')[0].strip()
+    destacados = [('Capacidad', ce.get('capacidad')),
+                  ('Ciclo más corto', primer_ciclo),
+                  ('Medidas externas', dato('medidas', 'dimensiones externas')),
+                  ('Peso neto', dato('medidas', 'peso neto')),
+                  ('Alimentación', alim)]
+    destacados = [(k, v) for k, v in destacados if v]
+    html = ''
+    if destacados:
+        html += '<div class="pt-dest">%s</div>' % ''.join(
+            '<div><span>%s</span><b>%s</b></div>' % (e(k), v) for k, v in destacados)
+
+    def tabla(filas, nota):
+        cuerpo = ''.join(('<tr><td colspan="2" class="car">%s</td></tr>' % v) if not k
+                         else ('<tr><th>%s</th><td>%s</td></tr>' % (k, v)) for k, v in filas)
+        pie_n = ('<p class="pt-nota">%s</p>' % e(nota)) if nota else ''
+        return '<table class="pt-tabla">%s</table>%s' % (cuerpo, pie_n)
+
+    # Si no hay tabla de tiempos, el primer bloque se abre solo. Si no, los
+    # equipos sin parámetros del fabricante —que son casi todos— abrirían la
+    # pestaña y verían dos barras cerradas y nada más: justo el problema que
+    # esto venía a arreglar.
+    # Los tiempos van ARRIBA del todo, debajo de las tarjetas, no en el
+    # orden en que estén escritos en el archivo: son el argumento de venta
+    # y tienen que verse sin abrir nada.
+    if tiempos and tiempos[1]:
+        html += '<h3 class="pt-h">%s</h3>%s' % (e(tiempos[0]), tabla(tiempos[1], tiempos[2]))
+    abrir = tiempos is None
+    for titulo, filas, nota in grupos:
+        if not filas or titulo.lower().startswith('tiempo total'):
+            continue
+        html += ('<details class="pt"%s><summary>%s</summary>%s</details>'
+                 % (' open' if abrir else '', e(titulo), tabla(filas, nota)))
+        abrir = False
+    return html
+
+
 def ficha_venta(pid):
     ruta = os.path.join(FICHAS_VENTA, pid + '.json')
     return gp.leer_json(ruta) if os.path.exists(ruta) else None
@@ -433,11 +497,19 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     else:
         doc = ''
 
-    # Pestañas: Descripción · Parámetros técnicos · Código
+    # Pestañas: Descripción · Garantía y entrega · Parámetros técnicos · Código
+    #
+    # El texto largo, si el equipo lo tiene, va DENTRO de las pestañas, cada
+    # sección en la suya. Antes se pintaba suelto debajo y las pestañas se
+    # quedaban con un resumen de tres líneas.
+    txt = texto_ficha(p)[0]
     areas = ''.join('<li>%s</li>' % e(a) for a in p.get('areas') or [])
     desc = '<p>%s</p>' % e(p.get('resumen') or '')
-    if areas:
+    # Con texto largo, la lista «Se usa en» sobra: el texto ya trae su
+    # propia sección de dónde se usa, escrita y no en viñetas.
+    if areas and not txt.get('descripcion'):
         desc += '<p class="nota-p"><b>Se usa en:</b></p><ul>%s</ul>' % areas
+    desc += txt.get('descripcion') or ''
     desc += ('<p class="nota-p">Incluye asesoría para elegir el modelo, entrega en Lima y provincias '
              'y mantenimiento después de la venta.</p>')
     # La identificación va SIEMPRE, con o sin parámetros del fabricante.
@@ -454,26 +526,30 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     ident = [('Equipo', p['nom']), ('Marca', p.get('marca')), ('Modelo', p.get('modelo')),
              ('Capacidad', ce.get('capacidad')), ('Código', cod_de(p)),
              ('Procedencia', p.get('origen')), ('Categoría', cat)]
-    filas = '<tr class="g"><th colspan="2">Identificación</th></tr>' + ''.join(
-        '<tr><th>%s</th><td>%s</td></tr>' % (k, e(v)) for k, v in ident if v)
+    grupos = [('Identificación', [(k, e(v)) for k, v in ident if v], None)]
     if f:
         # Con los parámetros del fabricante no se repiten las cuatro o cinco
         # características del catálogo: las mismas («45 litros», «220 V»)
         # saldrían otra vez dos filas más abajo, y con menos detalle.
-        mas, pie = gp.filas_ficha(f)
-        filas += mas
+        grupos += [(g['titulo'], [(e(a_), e(b_)) for a_, b_ in g['filas']], g.get('nota'))
+                   for g in f.get('secciones') or []]
+        pie = ('<p class="nota-p fuente">Fuente: %s. Especificaciones sujetas a cambios del '
+               'fabricante.</p>' % e(f.get('fuente', 'fabricante')))
     else:
         car = p.get('caracteristicas') or []
         if car:
-            filas += '<tr class="g"><th colspan="2">Características principales</th></tr>' + ''.join(
-                '<tr><td colspan="2" class="car">%s</td></tr>' % e(c) for c in car)
+            grupos.append(('Características principales', [('', e(c)) for c in car], None))
         pie = ('<p class="nota-p fuente">Los parámetros completos del fabricante van en la ficha técnica, '
                'que te enviamos con la cotización.</p>')
     pest = [('Descripción', desc)]
-    cond = condiciones(p)
+    # Garantía y entrega: si el texto largo trae su propia sección, esa
+    # manda y la tabla de tres filas no se pinta. Decían lo mismo, y la
+    # tabla decía menos: dos versiones del mismo dato en la misma página
+    # es la forma más segura de que una se quede vieja.
+    cond = txt.get('garantia') or condiciones(p)
     if cond:
         pest.append(('Garantía y entrega', cond))
-    pest.append(('Parámetros técnicos', '<table>%s</table>%s' % (filas, pie)))
+    pest.append(('Parámetros técnicos', parametros(p, grupos, ce) + pie))
     if p.get('expediente') or p.get('clave'):
         exp = '<table>'
         if p.get('clave'):
@@ -500,9 +576,10 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     # Botón ESTÁTICO a la página de la familia. El de la tienda va a una
     # ruta con almohadilla, que Google no sigue: sin este, la ficha no
     # devolvía ningún enlace rastreable hacia arriba más que la miga.
-    # El texto largo, si este equipo lo tiene. Sin él no se deja ni una
-    # línea en blanco: las 159 páginas sin texto salen byte por byte iguales.
-    largo = texto_ficha(p)[0]
+    # Debajo de las pestañas solo quedan las preguntas frecuentes. Sin
+    # ellas no se deja ni una línea en blanco: las páginas sin texto salen
+    # byte por byte iguales.
+    largo = texto_ficha(p)[0].get('faq') or ''
     txt_largo = ('\n    ' + largo) if largo else ''
     lnd = (LANDINGS or {}).get(p.get('cat') or '')
     fam_btn = ('<a class="btn fill" href="/venta/%s/">Ver todos los de %s</a> '
@@ -974,7 +1051,7 @@ def texto_ficha(p):
     """
     T = (TEXTOS or {}).get(p['id']) or {}
     if not T:
-        return '', []
+        return {}, []
     d = datos_texto(p)
     # El relleno llega también al TÍTULO y a la PREGUNTA, no solo al párrafo
     # y a la respuesta. Antes se quedaban fuera, y justo la pregunta
@@ -985,13 +1062,26 @@ def texto_ficha(p):
     # revés, o las comillas del valor saldrían escapadas dos veces.
     def rell(t):
         return str(t or '').format(**d)
-    guia = ''.join('<section class="lp-g"><h2>%s</h2><p>%s</p></section>'
-                   % (e(rell(g['h'])), rell(g['p'])) for g in T.get('guia') or [])
+    # Cada sección dice en qué pestaña va («pestana»): sin marca, en
+    # «Descripción». Antes el texto entero se pintaba SUELTO debajo de las
+    # pestañas, así que el cliente abría «Descripción» y leía tres líneas
+    # mientras la descripción de verdad —setecientas palabras— estaba más
+    # abajo, fuera de la pestaña. La marca va en los datos y no se adivina
+    # por el título: un título se reescribe cualquier día.
+    por_pest = {}
+    for g in T.get('guia') or []:
+        html = ('<section class="lp-g"><h2>%s</h2><p>%s</p></section>'
+                % (e(rell(g['h'])), rell(g['p'])))
+        por_pest.setdefault(g.get('pestana') or 'descripcion', []).append(html)
+    texto = {k: ''.join(v) for k, v in por_pest.items()}
     faq = [(rell(f['q']), rell(f['r'])) for f in T.get('faq') or []]
-    bloque = ('<section class="lp-s"><h2>Preguntas frecuentes</h2>%s</section>' % ''.join(
-        '<details class="lp-faq"><summary>%s</summary><p>%s</p></details>' % (e(q), r)
-        for q, r in faq)) if faq else ''
-    return '<div class="ficha-texto">%s%s</div>' % (guia, bloque), faq
+    # Las preguntas frecuentes se quedan FUERA de las pestañas, abajo: ahí
+    # funcionan, y además son las que Google lee como FAQPage.
+    texto['faq'] = ('<div class="ficha-texto"><section class="lp-s"><h2>Preguntas frecuentes</h2>%s'
+                    '</section></div>' % ''.join(
+                        '<details class="lp-faq"><summary>%s</summary><p>%s</p></details>' % (e(q), r)
+                        for q, r in faq)) if faq else ''
+    return texto, faq
 
 
 LANDINGS = {}              # lo llena main(): categoría → su página de aterrizaje
