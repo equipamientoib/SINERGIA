@@ -9,8 +9,8 @@
    Qué hace:
    1. Pide al Apps Script los códigos de la hoja de venta.
    2. Pide el catálogo al portal con la misma consulta de su botón «Ver más
-      productos», en bloques de 500 (≈17 consultas, una a la vez y con
-      pausa), y lee de cada tarjeta:
+      productos», en bloques de 200 (una consulta a la vez y con pausa de
+      3 s), y lee de cada tarjeta:
         addCesta('009.055','5481','1','0','1.22','')
                   código    stock            precio US$ (IGV incl.)
    3. Lee el tipo de cambio de la cabecera («TC: S/ 3.471»).
@@ -25,8 +25,14 @@
   var CFG = window.SB_ATL || {};
   /* Trato amable con el portal: pocas consultas, una a la vez y con pausa,
      como lo haría una persona. */
-  var BLOQUES = [500, 250];   // productos por consulta (si 500 falla, 250)
-  var MAX_CONSULTAS = 36;     // tope total de consultas al portal por uso
+  /* Bloques CHICOS. Se empezó pidiendo 500 productos de una vez y el
+     portal dejó de contestar: dos consultas seguidas devolvieron algo que
+     no era un listado y la corrida murió sin leer un solo equipo. Un
+     bloque chico tarda menos en armarse del lado del portal, cabe en
+     cualquier conexión y, si una falla, se pierde poco. Se prueban de
+     mayor a menor hasta que una traiga tarjetas. */
+  var BLOQUES = [200, 100, 50];
+  var MAX_CONSULTAS = 48;     // tope total de consultas al portal por uso
   var PAUSA = 3000;           // ms entre una consulta y la siguiente
   var REUSO_MIN = 60;         // si se usó hace menos de esto, pide confirmar
   var LOTE_FOTOS = 100;       // fotos por clic (una descarga cada ~3 s)
@@ -51,6 +57,34 @@
     '<div id="sbAtlBtns" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"></div>';
   document.body.appendChild(caja);
   function txt(t) { document.getElementById('sbAtlTxt').innerHTML = t; }
+  /* Un mensaje con los segundos corriendo. Mientras una consulta está en
+     curso el panel se quedaba con el texto fijo, sin reloj y sin señal de
+     vida: no había forma de distinguir «va lento» de «se colgó». */
+  function conReloj(mensaje) {
+    var t0 = Date.now(), vivo = true;
+    var pinta = function () {
+      if (!vivo) return;
+      var s = Math.round((Date.now() - t0) / 1000);
+      txt(mensaje + (s ? ' · ' + s + ' s' : '') + '…');
+    };
+    pinta();
+    var id = setInterval(pinta, 1000);
+    return { parar: function () { vivo = false; clearInterval(id); } };
+  }
+
+  /* Rastro en la consola del navegador (F12 > Console). El panel negro
+     dice lo justo para el dueño; aquí queda el detalle para pegárselo a
+     Claude cuando algo falle: qué se pidió, qué contestó el portal, con
+     qué código y en cuántos milisegundos. Sin esto, «no devolvió
+     productos» puede ser cinco cosas distintas y no hay forma de saber
+     cuál. */
+  function log() {
+    try {
+      var a = ['%c[Sinergia]', 'color:#9A7F4E;font-weight:bold'];
+      for (var i = 0; i < arguments.length; i++) a.push(arguments[i]);
+      console.log.apply(console, a);
+    } catch (e) { }
+  }
   function bar(p) { document.getElementById('sbAtlBar').style.width = Math.round(p * 100) + '%'; }
   function boton(t, fn) {
     var b = document.createElement('button');
@@ -112,9 +146,30 @@
         .forEach(function (x) { f.append(x[0], String(x[1])); });
       var x = new XMLHttpRequest();
       x.open('POST', '/controlador/controller_home.php', true);
-      x.timeout = 90000;
-      x.onload = function () { ok(x.status === 200 ? x.responseText : ''); };
-      x.onerror = x.ontimeout = function () { ok(''); };
+      /* 45 s y no 90: cuando el portal deja de contestar, el navegador se
+         queda esperando el tope entero sin decir nada. Con tres tamaños de
+         bloque que probar, 90 s eran cuatro minutos y medio de silencio
+         antes del aviso; 45 s sobran para un bloque de 200 productos. */
+      x.timeout = ESPERA_MAX;
+      /* Se devuelve SIEMPRE el detalle de lo que pasó, no solo el texto.
+         Antes, un 403, un 500, un corte de red y una respuesta vacía
+         acababan los cuatro en la misma cadena vacía, y el aviso culpaba
+         a la sesión aunque la sesión estuviera perfecta. */
+      var t0 = Date.now();
+      var fin = function (motivo, estado, texto) {
+        var r = { texto: texto || '', estado: estado || 0, motivo: motivo,
+                  ms: Date.now() - t0, kb: Math.round((texto || '').length / 1024) };
+        log('consulta → ' + motivo + ' · HTTP ' + r.estado + ' · ' + r.ms + ' ms · ' + r.kb + ' KB'
+            + (r.texto ? ' · ¿trae tarjetas? ' + (/card card-product/.test(r.texto) ? 'sí' : 'NO') : ''));
+        if (r.texto && !/card card-product/.test(r.texto)) log('   el portal contestó: ' + recorte(r.texto));
+        ok(r);
+      };
+      x.onload = function () {
+        fin(x.status === 200 ? 'respuesta' : 'error del portal', x.status,
+            x.status === 200 ? x.responseText : '');
+      };
+      x.onerror = function () { fin('sin respuesta (red)', 0, ''); };
+      x.ontimeout = function () { fin('pasó de ' + Math.round(ESPERA_MAX / 1000) + ' segundos', 0, ''); };
       x.send(f);
     });
   }
@@ -561,26 +616,62 @@
          recibido hasta que el portal devuelva un bloque vacío (fin de la
          lista). Así sirve tanto si el portal respeta el rango pedido como
          si recorta cada respuesta. */
-      var P = 0, r = null;
+      var P = 0, r = null, ult = null;
       for (var t = 0; t < BLOQUES.length && !P; t++) {
         if (consultas) await espera(PAUSA);
         consultas++;
-        txt('Leyendo los equipos del proveedor (consulta ' + consultas + ')…');
-        r = leer(await bloque(1, BLOQUES[t], 1, Math.ceil(9000 / BLOQUES[t])), mapa);
+        var reloj = conReloj('Leyendo los equipos del proveedor (consulta ' + consultas
+                             + ', bloques de ' + BLOQUES[t] + ')');
+        log('pidiendo productos 1 a ' + BLOQUES[t]);
+        ult = await bloque(1, BLOQUES[t], 1, Math.ceil(9000 / BLOQUES[t]));
+        reloj.parar();
+        r = leer(ult.texto, mapa);
         if (r.tarjetas === 20) return error('El portal entrega solo 20 productos por consulta. Para no hacer cientos de consultas, me detuve. Avísale a Claude.');
         if (r.tarjetas) P = BLOQUES[t];
+        /* Un 429 («demasiadas consultas») o un 403 no se arreglan pidiendo
+           menos productos: el portal no llegó a mirar la consulta. Insistir
+           con bloques más chicos solo le manda dos consultas más a un portal
+           que acaba de pedir que pares. */
+        else if (ult.estado === 429 || ult.estado === 403) { log('HTTP ' + ult.estado + ': no se insiste con bloques más chicos'); break; }
+        else log('con bloques de ' + BLOQUES[t] + ' no vinieron tarjetas; se prueba más chico');
       }
-      if (!P) return error('El portal no devolvió productos. Revisa que tu sesión siga abierta y vuelve a intentar más tarde.');
+      /* Tres situaciones distintas, tres avisos distintos. Antes las cinco
+         terminaban en «revisa tu sesión», que mandaba al dueño a repetir
+         algo que ya había hecho bien. */
+      if (!P) {
+        var pista = !ult ? '' :
+          ult.estado === 429
+            ? 'El portal te está <b>frenando</b> por hacer muchas consultas (error 429). Espera un rato largo —media hora o más— y vuelve a intentar. No toques el favorito varias veces seguidas.'
+          : ult.estado === 403
+            ? 'El portal <b>rechazó</b> la consulta (error 403). Vuelve a entrar al portal con tu usuario y clave, abre Productos y toca el favorito otra vez.'
+          : ult.estado >= 400
+            ? 'El portal respondió con un error <b>' + ult.estado + '</b>. Es un problema de su lado: espera un rato y vuelve a intentar.'
+          : ult.motivo !== 'respuesta'
+            ? 'El portal <b>no contestó</b> (' + ult.motivo + '). Puede ser tu conexión o que el portal esté caído.'
+          : 'El portal contestó, pero <b>sin productos dentro</b>. O la sesión se cerró, o cambiaron su página. Abre F12 › Console y mándale a Claude lo que aparece ahí.';
+        return error('No pude leer el catálogo.<br>' + pista);
+      }
+      log('bloque bueno: ' + P + ' productos por consulta');
       var desde = 1 + r.tarjetas, pag = 2;
       while (consultas < MAX_CONSULTAS) {
         bar(Math.min(0.9, desde / 900));
-        txt('Consulta ' + consultas + ' · equipos leídos: <b>' + Object.keys(mapa).length + '</b>…');
+        /* consultas + 1: el número que se pinta es el de la consulta que
+           está por hacerse, no el de la anterior ya terminada. */
+        var reloj2 = conReloj('Consulta ' + (consultas + 1) + ' · equipos leídos: <b>'
+                              + Object.keys(mapa).length + '</b>');
         await espera(PAUSA);
         consultas++;
-        var html = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P));
-        if (!html) { await espera(PAUSA); consultas++; html = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P)); }
-        if (!html) break;                                   // sin respuesta: se envía lo leído
-        r = leer(html, mapa);
+        var res = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P));
+        if (!res.texto) {                                   // un fallo suelto: se reintenta una vez
+          log('reintento de ' + desde + ' a ' + (desde + P - 1));
+          await espera(PAUSA);
+          consultas++;
+          res = await bloque(desde, desde + P - 1, pag, Math.ceil(9000 / P));
+        }
+        reloj2.parar();
+        if (!res.texto) { log('sin respuesta dos veces: se envía lo leído hasta aquí'); break; }
+        r = leer(res.texto, mapa);
+        log('leídos ' + r.tarjetas + ' (nuevos ' + r.nuevos + ') · total ' + Object.keys(mapa).length);
         if (!r.tarjetas || !r.nuevos) { completo = true; break; }   // fin de la lista
         desde += r.tarjetas; pag++;
       }
