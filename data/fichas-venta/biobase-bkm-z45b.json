@@ -3,7 +3,7 @@
  "id": "biobase-bkm-z45b",
  "titulo": "Autoclave de mesa 45 L clase B Biobase BKM-Z45B",
  "resumen": "Autoclave de vapor clase B de 45 L con prevacío, generador de vapor incorporado y puerta automática.",
- "fuente": "catálogo BIOBASE «Serie Class B», páginas 09-10 (versión en español)",
+ "fuente": "catálogo BIOBASE «Serie Class B», páginas 09-10, y manual de usuario BIOBASE del BKM-Z45B (versiones en español)",
  "secciones": [
   {
    "titulo": "Cámara y ciclo",
@@ -49,6 +49,48 @@
      "Configurable de 1 a 99 minutos"
     ]
    ]
+  },
+  {
+   "titulo": "Tiempo total del ciclo",
+   "filas": [
+    [
+     "Instrumental sin empaque · 134 °C",
+     "45 min"
+    ],
+    [
+     "Instrumental empacado · 134 °C",
+     "55 min"
+    ],
+    [
+     "Apósitos · 134 °C",
+     "90 min"
+    ],
+    [
+     "Caucho · 121 °C",
+     "80 min"
+    ],
+    [
+     "Líquidos · 121 °C",
+     "120 min"
+    ],
+    [
+     "Esterilización reforzada · 134 °C",
+     "90 min"
+    ],
+    [
+     "Prueba B&D y Helix · 134 °C",
+     "50 min"
+    ],
+    [
+     "Prueba de vacío",
+     "40 min"
+    ],
+    [
+     "DIY sólidos, DIY líquidos, esterilización y disolución de medios",
+     "Programas configurables por el usuario: el fabricante no declara tiempo total"
+    ]
+   ],
+   "nota": "Tiempos declarados por el fabricante en el manual de usuario."
   },
   {
    "titulo": "Vacío, agua y filtros",
@@ -124,8 +166,20 @@
      "5,8 kW"
     ],
     [
+     "Fusible",
+     "Φ 5 × 20 mm, 10 A"
+    ],
+    [
+     "Temperatura ambiente",
+     "5 a 40 °C"
+    ],
+    [
+     "Humedad relativa",
+     "No mayor a 85 %"
+    ],
+    [
      "Altitud de operación",
-     "Hasta 2000 m s. n. m.; versión para 2000 a 3000 m bajo pedido"
+     "Presión atmosférica de trabajo: 70 a 106 kPa. El equipo cuenta con ajuste de presión atmosférica según el lugar de instalación; el fabricante indica considerar la presión atmosférica local al fijar los parámetros. El catálogo del fabricante indica altitud de hasta 2000 m s. n. m., con versión para 2000 a 3000 m bajo pedido."
     ]
    ]
   },
@@ -158,8 +212,8 @@
   "Sensor móvil"
  ],
  "revisar": [
-  "El catálogo da «1~99 min» como RANGO CONFIGURABLE de esterilización y de secado, no como duración de ciclo. No se publica ninguna duración real por programa porque el catálogo no la trae.",
-  "Confirmar con el fabricante la duración real de cada programa, para poder publicarla.",
+  "Los tiempos de ciclo salen de la tabla de programas del manual de usuario, que es COMÚN a los modelos de la serie: la del BKM-Z45B y la del BKM-Z60B son idénticas fila por fila, y la del Z60B la comparte además con el BKM-Z80B, que Sinergia no vende. Pendiente de confirmar con el fabricante si cada capacidad tiene tiempos propios.",
+  "El manual de usuario del Z45B y del Z60B NO trae consumo de agua por ciclo ni nivel de ruido en dB. No se publican: no están en ninguno de los dos documentos del fabricante.",
   "Los decimales se escriben con coma (0,23 MPa) y los rangos con «a» (105 a 134 °C), como el resto de las fichas del sitio. Los números son los del catálogo.",
   "La capacidad va solo en «Identificación», al lado del código, que es donde la busca el comprador. Antes salía también en «Cámara y ciclo», repetida tres filas más abajo."
  ]
