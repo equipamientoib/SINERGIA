@@ -1854,6 +1854,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {
@@ -1908,6 +1909,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {
@@ -1962,6 +1964,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {
@@ -2020,6 +2023,7 @@
         },
         {
           "h": "Entrega, garantía y forma de pago",
+          "pestana": "garantia",
           "p": "Este equipo es de <b>stock propio</b>: no se pide al fabricante, ya está en nuestro almacén en Lima. La entrega es <b>{plazo}</b> desde la orden de compra, en Lima y en provincias.<br><br>La <b>garantía es de {garantia} meses</b>, y después de la venta seguimos haciendo el mantenimiento del equipo.<br><br>La forma de pago es <b>{pago}</b><br><br>Con el equipo va el <b>manual de usuario</b>, el <b>certificado de garantía</b> y la <b>capacitación de uso en la entrega</b>: quien lo va a operar aprende a cargar la cámara, elegir el programa y leer el resultado del ciclo. La capacitación no se cobra aparte. La instalación se cotiza aparte según la ciudad."
         },
         {

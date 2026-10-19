@@ -251,3 +251,30 @@
 /* Nota al pie de UNA sección de la ficha del fabricante (p. ej. de dónde
    salen los tiempos de ciclo). Va dentro de la tabla, pegada a su grupo. */
 .panel td.nota-f,.ficha td.nota-f{font-size:.86rem;line-height:1.45;color:var(--humo,#6E727A);font-weight:400;padding-top:8px}
+
+/* ── Pestaña de parámetros, en tres niveles ─────────────────────────
+   Arriba lo que decide la compra, luego los tiempos de ciclo abiertos y
+   el resto plegado. Antes eran cuarenta filas seguidas con el mismo peso
+   visual y el comprador no sabía dónde mirar. */
+.pt-dest{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:0 0 22px}
+.pt-dest div{background:#FBFAF6;border:1px solid #e7e3da;border-radius:10px;padding:12px 14px}
+.pt-dest span{display:block;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:#8c8679;margin-bottom:4px}
+.pt-dest b{font-size:1.05rem;line-height:1.25;color:var(--tinta,#17191D)}
+.pt-h{font-family:'Chakra Petch',sans-serif;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;
+      color:#fff;background:var(--tinta,#17191D);padding:9px 14px;border-radius:8px 8px 0 0;margin:0}
+.pt-tabla{width:100%;border-collapse:collapse;margin:0 0 20px}
+.pt-tabla th,.pt-tabla td{padding:9px 14px;border-bottom:1px solid #ece9e1;text-align:left;vertical-align:top}
+.pt-tabla th{font-weight:400;color:var(--humo,#6E727A);width:44%}
+.pt-tabla td{font-weight:600}
+details.pt{border:1px solid #e7e3da;border-radius:10px;margin-bottom:8px;background:#fff}
+details.pt summary{cursor:pointer;padding:13px 16px;font-weight:600;list-style:none;
+                   display:flex;justify-content:space-between;align-items:center;gap:12px}
+details.pt summary::-webkit-details-marker{display:none}
+details.pt summary::after{content:"+";color:var(--bronce,#9A7F4E);font-size:1.3rem;line-height:1}
+details.pt[open] summary::after{content:"\2013"}
+details.pt .pt-tabla{margin:0}
+.pt-nota{font-size:.86rem;line-height:1.45;color:var(--humo,#6E727A);padding:8px 14px 12px;margin:0}
+@media (max-width:560px){
+  .pt-dest{grid-template-columns:1fr 1fr}
+  .pt-tabla th{width:46%}
+}
