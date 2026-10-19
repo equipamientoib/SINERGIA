@@ -62,7 +62,7 @@
         "cat": "esterilizacion",
         "nom": "Autoclave de mesa 23 L clase B",
         "marca": "Biobase",
-        "modelo": "BKM-ZB",
+        "modelo": "BKMZB",
         "origen": "China",
         "resumen": "Autoclave de vapor clase B de 23 litros para consultorios, odontología y centros de salud.",
         "caracteristicas": [
@@ -89,7 +89,7 @@
         "cat": "esterilizacion",
         "nom": "Autoclave de mesa 18 L clase B",
         "marca": "Biobase",
-        "modelo": "BKM-ZA",
+        "modelo": "BKMZA",
         "origen": "China",
         "resumen": "Autoclave de vapor clase B de 18 litros para consultorios y odontología.",
         "caracteristicas": [
@@ -1834,7 +1834,7 @@
       "guia": [
         {
           "h": "Para qué sirve este autoclave",
-          "p": "El BKM-ZA esteriliza con vapor de agua a presión. Es de mesa, de 18 litros, la medida de un consultorio: dental, de podología, de medicina estética o de curaciones, donde entran una o dos bandejas de instrumental por ciclo.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces en el mismo turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso. Es la cuenta que conviene hacer antes de elegir, y la hacemos contigo sin compromiso."
+          "p": "El {modelo} esteriliza con vapor de agua a presión. Es de mesa, de 18 litros, la medida de un consultorio: dental, de podología, de medicina estética o de curaciones, donde entran una o dos bandejas de instrumental por ciclo.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces en el mismo turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso. Es la cuenta que conviene hacer antes de elegir, y la hacemos contigo sin compromiso."
         },
         {
           "h": "Qué significa que sea clase B",
@@ -1863,7 +1863,7 @@
       ],
       "faq": [
         {
-          "q": "¿Cuánto cuesta el autoclave Biobase BKM-ZA en Perú?",
+          "q": "¿Cuánto cuesta el autoclave {marca} {modelo} en Perú?",
           "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
         },
         {
@@ -1888,7 +1888,7 @@
       "guia": [
         {
           "h": "Para qué sirve este autoclave",
-          "p": "El BKM-ZB esteriliza con vapor de agua a presión. Es de mesa, de 23 litros: el escalón siguiente al de 18, para el consultorio que llena la cámara todos los días o que esteriliza cargas empaquetadas de forma seguida.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces en el mismo turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso. Es la cuenta que conviene hacer antes de elegir, y la hacemos contigo sin compromiso."
+          "p": "El {modelo} esteriliza con vapor de agua a presión. Es de mesa, de 23 litros: el escalón siguiente al de 18, para el consultorio que llena la cámara todos los días o que esteriliza cargas empaquetadas de forma seguida.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces en el mismo turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso. Es la cuenta que conviene hacer antes de elegir, y la hacemos contigo sin compromiso."
         },
         {
           "h": "Qué significa que sea clase B",
@@ -1917,7 +1917,7 @@
       ],
       "faq": [
         {
-          "q": "¿Cuánto cuesta el autoclave Biobase BKM-ZB en Perú?",
+          "q": "¿Cuánto cuesta el autoclave {marca} {modelo} en Perú?",
           "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
         },
         {
@@ -1942,7 +1942,7 @@
       "guia": [
         {
           "h": "Para qué sirve este autoclave",
-          "p": "El BKM-Z45B esteriliza con vapor de agua a presión. Es de mesa, de 45 litros, y cubre el salto entre el equipo de consultorio y la autoclave grande de central: una clínica, un centro odontológico de varios sillones o una central de esterilización chica.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces por turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso."
+          "p": "El {modelo} esteriliza con vapor de agua a presión. Es de mesa, de 45 litros, y cubre el salto entre el equipo de consultorio y la autoclave grande de central: una clínica, un centro odontológico de varios sillones o una central de esterilización chica.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces por turno, el modelo de arriba te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso."
         },
         {
           "h": "Qué significa que sea clase B",
@@ -1971,7 +1971,7 @@
       ],
       "faq": [
         {
-          "q": "¿Cuánto cuesta el autoclave Biobase BKM-Z45B en Perú?",
+          "q": "¿Cuánto cuesta el autoclave {marca} {modelo} en Perú?",
           "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
         },
         {
@@ -2000,7 +2000,7 @@
       "guia": [
         {
           "h": "Para qué sirve este autoclave",
-          "p": "El BKM-Z60B esteriliza con vapor de agua a presión. Es de mesa, de 60 litros: el mayor de la serie y el que corresponde a una central de esterilización que trabaja todo el día, a una clínica con varias salas o a un centro quirúrgico.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces por turno con un equipo más chico, este te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso."
+          "p": "El {modelo} esteriliza con vapor de agua a presión. Es de mesa, de 60 litros: el mayor de la serie y el que corresponde a una central de esterilización que trabaja todo el día, a una clínica con varias salas o a un centro quirúrgico.<br><br>La medida que decide no es el tamaño del local, sino cuánto instrumental sale por turno. Si llenas la cámara dos veces por turno con un equipo más chico, este te sale más barato con el tiempo: cada ciclo gasta luz, agua y vida útil del equipo, y hacer el doble de ciclos es pagar el doble de todo eso."
         },
         {
           "h": "Qué significa que sea clase B",
@@ -2029,7 +2029,7 @@
       ],
       "faq": [
         {
-          "q": "¿Cuánto cuesta el autoclave Biobase BKM-Z60B en Perú?",
+          "q": "¿Cuánto cuesta el autoclave {marca} {modelo} en Perú?",
           "r": "Hoy está en <b>{precio}</b> con IGV incluido. Es un precio especial, válido hasta agotar el stock de esta promoción; se confirma por escrito en la cotización."
         },
         {

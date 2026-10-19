@@ -952,7 +952,14 @@ def datos_texto(p):
             'garantia': str(TERMINOS.get('garantiaMeses') or 12),
             'pago': TERMINOS.get('pago') or '',
             'codigo': cod_de(p) or '',
-            'capacidad': ce.get('capacidad') or ''}
+            'capacidad': ce.get('capacidad') or '',
+            # La marca y el modelo faltaban en esta lista, así que el texto
+            # largo los llevaba escritos a mano. El día que el fabricante
+            # cambia cómo escribe un modelo hay que corregirlo en dos sitios,
+            # y el segundo se olvida: la ficha acaba diciendo «BKMZA» arriba
+            # y «BKM-ZA» tres párrafos más abajo.
+            'marca': p.get('marca') or '',
+            'modelo': p.get('modelo') or ''}
 
 
 def texto_ficha(p):
@@ -969,9 +976,18 @@ def texto_ficha(p):
     if not T:
         return '', []
     d = datos_texto(p)
+    # El relleno llega también al TÍTULO y a la PREGUNTA, no solo al párrafo
+    # y a la respuesta. Antes se quedaban fuera, y justo la pregunta
+    # «¿Cuánto cuesta el autoclave Biobase BKM-ZA en Perú?» es uno de los
+    # sitios donde el modelo estaba escrito a mano. Un hueco que no se
+    # rellena en todos los campos del mismo texto es un hueco a medias.
+    # El orden importa: primero se rellena y después se escapa, nunca al
+    # revés, o las comillas del valor saldrían escapadas dos veces.
+    def rell(t):
+        return str(t or '').format(**d)
     guia = ''.join('<section class="lp-g"><h2>%s</h2><p>%s</p></section>'
-                   % (e(g['h']), g['p'].format(**d)) for g in T.get('guia') or [])
-    faq = [(f['q'], f['r'].format(**d)) for f in T.get('faq') or []]
+                   % (e(rell(g['h'])), rell(g['p'])) for g in T.get('guia') or [])
+    faq = [(rell(f['q']), rell(f['r'])) for f in T.get('faq') or []]
     bloque = ('<section class="lp-s"><h2>Preguntas frecuentes</h2>%s</section>' % ''.join(
         '<details class="lp-faq"><summary>%s</summary><p>%s</p></details>' % (e(q), r)
         for q, r in faq)) if faq else ''
