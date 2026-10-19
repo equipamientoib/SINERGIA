@@ -43,7 +43,8 @@ e = gp.e
 VENTA = os.path.join(ROOT, 'data', 'venta.json')
 FICHAS_VENTA = os.path.join(ROOT, 'data', 'fichas-venta')
 
-VIGENCIA_DIAS = 14
+VIGENCIA_DIAS = 14          # lo que se le promete al cliente, desde la fecha de la hoja
+VIGENCIA_SCHEMA_DIAS = 120  # lo que se le dice a Google, desde el día 1 del mes (mínimo 90 días)
 TRAMOS = [(2000, 'Hasta S/ 2 000'), (6000, 'S/ 2 000 – 6 000'), (15000, 'S/ 6 000 – 15 000'),
           (40000, 'S/ 15 000 – 40 000'), (100000, 'S/ 40 000 – 100 000'), (float('inf'), 'Más de S/ 100 000')]
 
@@ -78,6 +79,30 @@ def ordenar(productos):
     """Mismo orden que la tienda: tramo de precio, puesto en el estudio, precio."""
     return sorted(productos, key=lambda p: (tramo(p), p.get('ranking') or 999,
                                             0 if p.get('destacado') else 1, p.get('precio') or 1e12, p['nom']))
+
+
+def vigencia_schema(hoy=None):
+    """La fecha de «priceValidUntil» del JSON-LD. Siempre lejos, en el futuro.
+
+    NO es la misma que la vigencia comercial que ve el cliente. Aquella sale
+    de la fecha de la hoja y dura VIGENCIA_DIAS: es lo que Sinergia se
+    compromete a respetar. Esta solo le dice a Google hasta cuándo puede
+    fiarse del precio que acaba de leer, y la página se regenera todas las
+    mañanas con el precio de la hoja, así que el dato nunca está viejo.
+
+    Antes se usaba la comercial para las dos cosas, y eso ataba el dato de
+    Google a la última vez que se tocó la hoja: dos semanas sin tocarla y
+    los 161 equipos se quedaban con la fecha vencida a la vez, con lo que
+    Google deja de mostrar el precio en el resultado de búsqueda.
+
+    Se ancla al día 1 del mes y se le suman 120 días, en vez de contar desde
+    hoy. Contando desde hoy, la fecha cambiaría cada madrugada y el robot
+    reescribiría las 161 páginas todos los días aunque no hubiera cambiado
+    ni un precio. Así cambia una vez al mes, y aun en el peor día del mes
+    quedan 90 días por delante.
+    """
+    hoy = hoy or datetime.date.today()
+    return hoy.replace(day=1) + datetime.timedelta(days=VIGENCIA_SCHEMA_DIAS)
 
 
 def vigencia(actualizado):
@@ -754,8 +779,9 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, 
         # «8000.00», nunca «8,000»: sin separador de miles y con los dos
         # decimales, que es el formato que pide Google para este campo.
         oferta['price'] = '%.2f' % p['precio']
-        if vig:
-            oferta['priceValidUntil'] = vig.isoformat()
+        # Nunca la vigencia comercial: esa vence a los 14 días de tocar la
+        # hoja y apagaría el precio en Google sin que nadie se entere.
+        oferta['priceValidUntil'] = vigencia_schema().isoformat()
     jsonld = [{'@type': 'Product', 'name': nombre, 'description': p.get('resumen') or nombre,
                **({'additionalProperty': [{'@type': 'PropertyValue', 'name': 'Código',
                                            'value': cod_de(p)}]}

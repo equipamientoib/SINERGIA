@@ -115,6 +115,15 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .tabs{display:flex;border-bottom:1px solid var(--linea);background:var(--crema);overflow-x:auto}
 .tab{font-family:var(--ff-d);font-weight:600;font-size:14px;padding:14px 22px;border:0;border-bottom:2px solid transparent;background:none;cursor:pointer;color:var(--gris);white-space:nowrap}
 .tab.on{color:var(--onix);border-bottom-color:var(--bronce);background:#fff}
+/* En el celular las pestañas BAJAN de línea en vez de desplazarse. Con
+   overflow-x, «Parámetros técnicos» se quedaba cortada 55 px a 390 px de
+   ancho y 125 px a 320, sin ninguna señal de que hubiera más a la derecha:
+   justo la pestaña con los tiempos de ciclo, medio escondida. Ahora se ven
+   las tres enteras, en dos filas si hace falta. */
+@media(max-width:620px){
+  .tabs{flex-wrap:wrap;overflow-x:visible}
+  .tab{flex:1 1 auto;padding:12px 14px;font-size:13.5px;text-align:center}
+}
 .panel{padding:20px 22px;font-size:15px;color:var(--grafito)}
 .panel p{max-width:80ch}
 .panel ul{padding-left:20px;margin-top:10px;columns:2;column-gap:36px}
