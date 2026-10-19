@@ -564,9 +564,6 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
     # los calibra y cuándo vencen. El dato se queda en la hoja para uso
     # interno. No volver a pintarlo, ni el enlace ni las fechas.
     enl = []
-    vig = vigencia_calibracion(eq)
-    if vig:
-        enl.append(e(vig))
     if eq.get('ficha'):
         enl.append('<a href="%s" target="_blank" rel="noopener">Manual del fabricante</a>' % e(eq['ficha']))
     precio = ''
@@ -586,6 +583,14 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
                       medio if hay_medio else d, 'medio día' if hay_medio else 'día',
                       ('<p class="ptarifas">%s</p>' % '  ·  '.join([x for x in [' · '.join(otras), modo] if x]))
                       if (otras or modo) else '')
+    # La calibración, en su propia línea y con su propio recuadro, debajo
+    # del precio. Antes iba metida en el mismo renglón y se leía todo
+    # revuelto: precio, unidad, IGV y calibración peleando por el mismo
+    # sitio. Es un argumento de venta que se sostiene solo.
+    vig = vigencia_calibracion(eq)
+    sello = ('<p class="cal-ok"><span aria-hidden="true">✓</span>'
+             'Calibración vigente hasta <b>%s</b></p>'
+             % e(vig.replace('Calibración vigente hasta ', ''))) if vig else ''
     resumen = (ficha or {}).get('resumen') or eq.get('desc', '')
 
     # pestaña Descripción: el equipo + para qué sirve el tipo
@@ -621,6 +626,7 @@ def producto(eq, t, cfg, locales, ficha=None, primera=False):
         <div class="marca">{e(eq.get('marca', ''))}</div>
         <p class="prod-desc">{e(resumen)}</p>
         {precio}
+        {sello}
         <div class="prod-btns">{botones}</div>
         {doc}
         {('<div class="prod-docs">' + ' · '.join(enl) + '</div>') if enl else ''}

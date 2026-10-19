@@ -87,3 +87,39 @@ ${SITE.nav.filter(n=>n.r!=='#/').map(n=>`        <a onclick="go('${n.r}')">${n.p
 
 renderHeader();
 renderFooter();
+
+/* ── Vigencia de la calibración ───────────────────────────────────────
+   «Calibración vigente hasta agosto 2027», o cadena vacía.
+
+   Vive AQUÍ, en un solo sitio, porque lo pintan la tarjeta del catálogo
+   (03-catalogo.js) y la ficha del equipo (05-detalle.js). Estaba escrito
+   dos veces con formatos distintos: la ficha decía «agosto 2027» y la
+   tarjeta soltaba la fecha entera, «31/08/2027», que es justo el dato
+   que no se publica.
+
+   SOLO mes y año: el cliente ve que la trazabilidad está al día y nadie
+   sabe la fecha exacta en que toca renovar. El certificado NO se
+   publica: lleva el número de serie del patrón y el número de
+   certificado del laboratorio. Nunca pintar aquí el día, la fecha de
+   emisión, el laboratorio ni el enlace al documento.
+
+   Si la fecha ya pasó devuelve vacío: ni fecha, ni «vencido», ni aviso.
+   La web no le anuncia a un cliente que un patrón está fuera de
+   vigencia antes de que la empresa lo renueve. */
+const SB_MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+                  'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+function sbCalVigente(calFin){
+  const cf = String(calFin || '').trim();
+  if(!cf) return '';
+  const p = cf.replace(/-/g, '/').split('/').map(Number);
+  if(p.length !== 3 || p.some(isNaN)) return '';
+  let d, m, a;
+  if(p[0] > 31){ a = p[0]; m = p[1]; d = p[2]; }      // 2027/08/31
+  else { d = p[0]; m = p[1]; a = p[2]; if(a < 100) a += 2000; }   // 31/08/2027
+  const fin = new Date(a, m - 1, d);
+  if(fin.getFullYear() !== a || fin.getMonth() !== m - 1 || fin.getDate() !== d) return '';
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  if(fin < hoy) return '';
+  return 'Calibración vigente hasta ' + SB_MESES[m - 1] + ' ' + a;
+}

@@ -35,6 +35,18 @@
     .eq:hover .eqcar-f,.eqcar-f:focus-visible{opacity:1}}
   .eq .img .grid-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(23,25,29,.05) 1px,transparent 1px);background-size:16px 16px;opacity:.55}
   /* Fondo sólido: sobre fotos oscuras el semitransparente no se leía. */
+  /* Calibración: la etiqueta dice que está vigente y el mes y año van en
+     el título emergente. NUNCA el día: la fecha exacta de vencimiento no
+     se publica, y el certificado tampoco. */
+  /* El mismo recuadro, en la ficha de la tienda, debajo del precio. */
+  .cal-ok{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:8px 13px;
+    border-radius:9px;background:#EAF4EF;border:1px solid rgba(46,139,107,.35);
+    font-size:13.5px;line-height:1.2;color:var(--grafito)}
+  .cal-ok span{color:var(--ok);font-weight:700;font-size:12px}
+  .cal-ok b{font-family:var(--ff-d);font-weight:600;color:var(--ok);letter-spacing:.2px}
+  .eq .calchip{margin-top:7px;display:inline-block;font-family:var(--ff-d);font-weight:600;font-size:10px;
+    letter-spacing:.8px;padding:4px 9px;border-radius:6px;background:#EAF4EF;color:var(--ok);
+    border:1px solid rgba(46,139,107,.35)}
   .eq .badge{position:absolute;top:13px;left:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:#EAF4EF;color:var(--ok);border:1px solid rgba(46,139,107,.35);box-shadow:0 1px 4px rgba(23,25,29,.12)}
   .eq .tier{position:absolute;top:13px;right:13px;z-index:2;font-family:var(--ff-d);font-weight:600;font-size:10px;letter-spacing:1px;padding:5px 10px;border-radius:6px;background:#F4EEE3;color:var(--cobre-d);border:1px solid var(--linea-b);box-shadow:0 1px 4px rgba(23,25,29,.12)}
   .eq .body{padding:20px;flex:1;display:flex;flex-direction:column}

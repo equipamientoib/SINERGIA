@@ -74,6 +74,16 @@ section h2{font-size:20px;margin-bottom:12px;padding-bottom:8px;border-bottom:2p
 .pprecio span{font-size:15px;color:var(--grafito)}
 .pprecio em{font-style:normal;font-size:12.5px;color:var(--gris)}
 .ptarifas{margin-top:4px;font-size:13.5px;color:var(--gris)}
+/* Calibración vigente: recuadro propio, debajo del precio y separado de
+   él. El lenguaje visual es el de la etiqueta DISPONIBLE de las tarjetas
+   (verde suave, texto legible), porque es un argumento de venta: ningún
+   competidor publica la trazabilidad de sus patrones.
+   Va el mes y el año, nunca el día, y si la fecha pasó no sale nada. */
+.cal-ok{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:8px 13px;
+  border-radius:9px;background:#EAF4EF;border:1px solid rgba(46,139,107,.35);
+  font-size:13.5px;line-height:1.2;color:var(--grafito)}
+.cal-ok span{color:var(--ok);font-weight:700;font-size:12px}
+.cal-ok b{font-family:var(--ff-d);font-weight:600;color:var(--ok);letter-spacing:.2px}
 .prod-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
 .prod-docs{margin-top:12px;font-size:14px;color:var(--gris)}
 .prod-docs a{color:var(--cobre-d);font-weight:600}
