@@ -85,7 +85,14 @@
     if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial, por confirmar en la cotización';
   });
   /* La barra del celular se esconde mientras los botones de verdad están
-     en pantalla: así no los tapa ni se repite al pie de la ficha. */
+     en pantalla: así no los tapa ni se repite al pie de la ficha.
+
+     El margen de abajo es 0 y no -70: con -70, los últimos 70 px de la
+     pantalla no contaban como «visible», así que en cuanto el botón de
+     verdad entraba por abajo la barra ya se había encendido ENCIMA de él.
+     Medido: 62 px de solape, con los dos botones «Agregar a mi
+     cotización» pisados uno sobre otro. Con 0, la barra solo sale cuando
+     el botón se ha ido del todo. */
   (function(){
     var bar = document.getElementById('pbar'), btns = document.querySelector('.prod-btns');
     if(!bar || !btns) return;
@@ -93,7 +100,7 @@
     if(!('IntersectionObserver' in window)){ bar.classList.add('on'); return; }
     new IntersectionObserver(function(e){
       bar.classList.toggle('on', !e[0].isIntersecting);
-    }, {rootMargin: '-10px 0px -70px 0px'}).observe(btns);
+    }, {rootMargin: '-10px 0px 0px 0px'}).observe(btns);
   })();
 </script>
 </main>
