@@ -212,6 +212,15 @@ def vigencia_calibracion(eq):
     return 'Calibración vigente hasta %s %d' % (MESES_ES[m - 1], a)
 
 
+def grande(f):
+    """La version de 1200 px de una foto; las «-m» son la copia de 700 para
+    las tarjetas. Google pide 1200 px de ancho para dar la miniatura grande
+    en el resultado, asi que og:image y el JSON-LD tienen que apuntar aqui y
+    no a la pequeña. La <img> de la pagina sigue con la de 700: lo que el
+    visitante descarga no cambia."""
+    return f.replace('-m.webp', '.webp').replace('-m.jpg', '.jpg')
+
+
 def fotos_de(eq, locales):
     urls = eq.get('fotos') or ([eq['photo']] if eq.get('photo') else [])
     out = []
@@ -681,11 +690,32 @@ def pagina_tipo(t, equipos, todos, cfg, locales, fichas=None):
         'provider': {'@id': SITIO + '/#negocio'},
         'areaServed': {'@type': 'Country', 'name': 'Perú'},
         'url': SITIO + ruta,
+        # Sin esto el buscador no tiene de donde sacar la miniatura: el marcado
+        # no declaraba ninguna imagen, y quedaba a su criterio adivinarla del
+        # cuerpo de la pagina. Unas paginas salian con foto y otras no.
+        **({'image': [SITIO + grande(f) for f in fotos[:3]]} if fotos else {}),
     }]
     migas = [('Inicio', '/'), ('Catálogo', '/alquiler/'), (t['nombre'], ruta)]
     return ruta, pagina(cfg, ruta=ruta, title=t['title'], descripcion=t['descripcion'],
                         migas=migas, cuerpo=cuerpo, jsonld=jsonld,
-                        imagen=fotos[0] if fotos else None)
+                        imagen=grande(fotos[0]) if fotos else None)
+
+
+def resumen(t):
+    """El texto de la tarjeta en /alquiler/.
+
+    Tiene que ser distinto del <meta description> de la ficha. Antes se usaba
+    la primera frase de «descripcion», que es justo ese meta: Google acababa
+    enseñando el mismo parrafo para /alquiler/ y para /alquiler/<tipo>/, y las
+    dos URLs competian entre ellas en el mismo resultado de busqueda.
+
+    Los tipos genericos —una categoria de la hoja que todavia no esta en
+    seo-tipos.json— no tienen «resumen», y para esos se recorta el «intro»,
+    que tampoco es el meta.
+    """
+    if t.get('resumen'):
+        return t['resumen']
+    return (t.get('intro') or t['descripcion']).split('.')[0] + '.'
 
 
 def pagina_hub(hub, publicados, cfg, locales):
@@ -704,7 +734,7 @@ def pagina_hub(hub, publicados, cfg, locales):
     <a class="tipo" href="/alquiler/{t['slug']}/">
       <div class="foto">{img}</div>
       <div class="info"><h3>{e(t['nombre'])}</h3>
-        <p>{e(t['descripcion'].split('.')[0])}.</p>
+        <p>{e(resumen(t))}</p>
         <span class="ir">{n} {"modelo" if n == 1 else "modelos"} →</span></div>
     </a>''')
     cuerpo = f'''

@@ -1,5 +1,5 @@
 {
-  "_nota": "Una página por TIPO de herramienta, no por modelo: la gente busca «alquiler de analizador de seguridad eléctrica», no «ESA620». Cada tipo agrupa los equipos cuya columna «categoria» de la hoja Equipos esté en «categorias». Si compras otro equipo del mismo tipo, basta con ponerle la misma categoría y aparece solo en la misma página. Lo genera scripts/generar_paginas.py.",
+  "_nota": "Una página por TIPO de herramienta, no por modelo: la gente busca «alquiler de analizador de seguridad eléctrica», no «ESA620». Cada tipo agrupa los equipos cuya columna «categoria» de la hoja Equipos esté en «categorias». Si compras otro equipo del mismo tipo, basta con ponerle la misma categoría y aparece solo en la misma página. Lo genera scripts/generar_paginas.py. El «resumen» es el texto de la tarjeta en /alquiler/: tiene que ser DISTINTO de «descripcion», que es el <meta description> de la ficha. Si se repiten, Google enseña el mismo párrafo para las dos URLs y compiten entre ellas en el mismo resultado.",
   "hub": {
     "slug": "alquiler",
     "title": "Alquiler de analizadores y simuladores biomédicos en Lima | Sinergia Biomédica",
@@ -15,6 +15,7 @@
         "Analizador de seguridad eléctrica"
       ],
       "nombre": "Analizador de seguridad eléctrica",
+      "resumen": "La prueba eléctrica que se exige después de reparar un equipo médico.",
       "title": "Analizador de seguridad eléctrica: alquiler en Lima | S/ 180",
       "h1": "Alquiler de analizador de seguridad eléctrica",
       "descripcion": "Analizador de seguridad eléctrica en alquiler: S/ 180 el día, S/ 108 el medio día. Fugas, tierra y aislamiento según IEC 62353. Lima y provincias.",
@@ -48,6 +49,7 @@
         "Analizador de desfibriladores"
       ],
       "nombre": "Analizador de desfibriladores",
+      "resumen": "Comprueba que la descarga entrega los julios que marca la pantalla.",
       "title": "Alquiler de analizador de desfibriladores en Lima | Sinergia Biomédica",
       "h1": "Alquiler de analizador de desfibriladores",
       "descripcion": "Alquila un analizador de desfibriladores para medir la energía entregada, el tiempo de carga y la cardioversión sincronizada. Por hora, día o semana. Lima y provincias.",
@@ -82,6 +84,7 @@
         "Simulador ECG"
       ],
       "nombre": "Simulador de signos vitales (ECG)",
+      "resumen": "Un paciente de mentira para poner a prueba monitores y electrocardiógrafos.",
       "title": "Alquiler de simulador de signos vitales y ECG en Lima | Sinergia Biomédica",
       "h1": "Alquiler de simulador de signos vitales (simulador de paciente ECG)",
       "descripcion": "Alquila un simulador de paciente para verificar monitores y electrocardiógrafos: ECG con arritmias, respiración y temperatura. Lima y provincias.",
@@ -115,6 +118,7 @@
         "Simulador de SpO2"
       ],
       "nombre": "Simulador de SpO2",
+      "resumen": "Imita el dedo del paciente delante de un pulsioxímetro.",
       "title": "Alquiler de simulador de SpO2 para pulsioxímetros en Lima | Sinergia Biomédica",
       "h1": "Alquiler de simulador de SpO2 para pulsioxímetros",
       "descripcion": "Alquila un simulador de SpO2 para verificar pulsioxímetros y módulos de oximetría: saturación, frecuencia de pulso y perfusión. Por hora, día o semana. Lima y provincias.",
@@ -148,6 +152,7 @@
         "Phantom"
       ],
       "nombre": "Phantom de punción ecoguiada",
+      "resumen": "Tejido artificial con vasos: entrenamiento de punción y demostraciones de ecógrafo.",
       "title": "Alquiler de phantom de flujo para punción ecoguiada en Lima | Sinergia Biomédica",
       "h1": "Alquiler de phantom de flujo para punción ecoguiada",
       "descripcion": "Alquila un phantom de flujo sanguíneo para practicar accesos vasculares guiados por ecografía y para demostraciones de ecógrafos. Lima y provincias.",
@@ -174,6 +179,7 @@
         "Sonómetro"
       ],
       "nombre": "Sonómetro",
+      "resumen": "Cuánto suenan de verdad las alarmas y los equipos, en decibelios.",
       "title": "Alquiler de sonómetro en Lima | Sinergia Biomédica",
       "h1": "Alquiler de sonómetro",
       "descripcion": "Alquila un sonómetro para medir ruido en decibelios: alarmas de equipos médicos, unidades dentales, compresores y ambientes hospitalarios. Lima y provincias.",
@@ -201,6 +207,7 @@
         "Termómetro"
       ],
       "nombre": "Termómetro digital de termocupla",
+      "resumen": "Punta de termocupla para lo que calienta y para lo que enfría.",
       "title": "Alquiler de termómetro digital de termocupla en Lima | Sinergia Biomédica",
       "h1": "Alquiler de termómetro digital (termocupla)",
       "descripcion": "Alquila un termómetro digital de termocupla para verificar incubadoras, esterilizadores, refrigeradoras de vacunas y baños maría. Lima y provincias.",
@@ -228,6 +235,7 @@
         "Manómetro"
       ],
       "nombre": "Manómetro digital",
+      "resumen": "Compara la presión que marca el equipo con un valor de referencia.",
       "title": "Alquiler de manómetro digital diferencial en Lima | Sinergia Biomédica",
       "h1": "Alquiler de manómetro digital diferencial",
       "descripcion": "Alquila un manómetro digital diferencial para verificar tensiómetros, módulos de presión no invasiva (NIBP), aspiradores y unidades dentales. Lima y provincias.",
@@ -255,6 +263,7 @@
         "Luxómetro"
       ],
       "nombre": "Luxómetro",
+      "resumen": "Cuánta luz llega al campo quirúrgico, medida en lux.",
       "title": "Alquiler de luxómetro en Lima | Sinergia Biomédica",
       "h1": "Alquiler de luxómetro",
       "descripcion": "Alquila un luxómetro para medir la iluminación de lámparas cialíticas, quirófanos, lámparas de examen y puestos de trabajo. Lima y provincias.",
@@ -282,6 +291,7 @@
         "Tacómetro"
       ],
       "nombre": "Tacómetro",
+      "resumen": "Las vueltas reales de una centrífuga, sin tocarla.",
       "title": "Alquiler de tacómetro digital en Lima | Sinergia Biomédica",
       "h1": "Alquiler de tacómetro digital (contacto y óptico)",
       "descripcion": "Alquila un tacómetro digital para verificar las revoluciones por minuto (rpm) de centrífugas, agitadores y motores. Lima y provincias.",
@@ -308,6 +318,7 @@
         "Multímetro"
       ],
       "nombre": "Multímetro digital",
+      "resumen": "La herramienta de diagnóstico de siempre: fuentes, baterías y cableado.",
       "title": "Alquiler de multímetro digital en Lima | Sinergia Biomédica",
       "h1": "Alquiler de multímetro digital",
       "descripcion": "Alquila un multímetro digital para mantenimiento de equipos biomédicos: tensión, corriente, resistencia y continuidad. Lima y provincias.",

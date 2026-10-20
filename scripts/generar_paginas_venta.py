@@ -803,7 +803,10 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, prev, sig, mismo
                   ('/venta/#' + (p.get('cat') or ''))
     migas = [('Inicio', '/'), ('Venta', '/venta/'), (cat or 'Equipos', destino_cat),
              (p['nom'], ruta)]
-    img = fts[0][0] if fts and fts[0][0].startswith('/') else None
+    # La grande (fts[..][1]) y no la «-m» de las tarjetas: og:image es de donde
+    # sale la miniatura del resultado de busqueda, y pedirle que trabaje con la
+    # copia de 700 px cuando hay una de 1200 al lado no tiene sentido.
+    img = fts[0][1] if fts and fts[0][1].startswith('/') else None
     return ruta, pagina(cfg, ruta=ruta, title=title, descripcion=descripcion, migas=migas,
                         cuerpo=cuerpo, jsonld=jsonld, imagen=img)
 
