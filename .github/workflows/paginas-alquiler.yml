@@ -34,18 +34,26 @@ jobs:
           # del repositorio: las páginas no se rompen y el job no falla.
           if python3 -c "import json,sys; d=json.load(open('/tmp/vivo.json')); n=sum(1 for e in d.get('equipos',[]) if e.get('id') and e.get('nom')); print('equipos en vivo:',n); sys.exit(0 if n else 1)"; then
             echo "datos=/tmp/vivo.json" >> "$GITHUB_OUTPUT"
+            echo "ok=1" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::El Apps Script no devolvió el catálogo; se usa data/catalogo.json. Inicio de la respuesta:"
+            echo "::error::El Apps Script no devolvió el catálogo. NO se regenera nada: las páginas de ayer se quedan como están. Inicio de la respuesta:"
             # Título y texto visible de la página que devolvió Google (suele
             # decir el error del script o que pide iniciar sesión).
             python3 -c "import re,html;t=open('/tmp/vivo.json',errors='ignore').read();m=re.search(r'<title>(.*?)</title>',t,re.S);print('titulo:',html.unescape(m.group(1)).strip() if m else '-');b=re.sub(r'(?s)<(script|style).*?</\\1>','',t);print('texto:',re.sub(r'\\s+',' ',html.unescape(re.sub(r'<[^>]+>',' ',b))).strip()[:500])" || true
-            echo "datos=data/catalogo.json" >> "$GITHUB_OUTPUT"
+            # Antes aquí se caía a data/catalogo.json. Esa copia es un espejo
+            # viejo de la hoja —el 20/10/2026 era del 25/09 y no traía ni un
+            # cal_fin— así que regenerar con ella BORRA «Calibración vigente
+            # hasta …» de las siete páginas que la tienen, sin que nadie se
+            # entere. Mejor no tocar nada: lo de ayer sigue siendo correcto.
+            echo "ok=0" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Generar páginas
+        if: steps.vivo.outputs.ok == '1'
         run: python3 scripts/generar_paginas.py --datos "${{ steps.vivo.outputs.datos }}"
 
       - name: PDF de fichas técnicas (solo si cambió alguna ficha)
+        if: steps.vivo.outputs.ok == '1'
         run: |
           if [ -n "$(git status --porcelain fichas)" ]; then
             npm install --no-save --silent playwright@1
@@ -60,6 +68,7 @@ jobs:
           fi
 
       - name: Publicar si algo cambió
+        if: steps.vivo.outputs.ok == '1'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
