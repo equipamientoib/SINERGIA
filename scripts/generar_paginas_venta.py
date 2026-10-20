@@ -937,7 +937,12 @@ def pagina_hub(productos, cats_orden, cats, catsx, cfg, promos, base, fijas, loc
 
 
 RE_LITROS = re.compile(r'(\d+)\s*(?:L\b|litros?\b)', re.I)
-UMBRAL_RANGO = 5        # si el maximo pasa de 5x el minimo, solo se enseña «Desde»
+UMBRAL_RANGO = 10       # si el maximo pasa de 10x el minimo, solo se enseña «Desde»
+# A 10x la regla separa dos casos distintos. Imagenologia (6.2x) y cadena de
+# frio (8.5x) son equipos del mismo tipo con precios que escalan: ahi el rango
+# informa. Laboratorio llega a 1046x porque mete una pipeta y una centrifuga de
+# S/ 157,958 en la misma cuenta, y ahi el rango no dice nada. A 5x se activaba
+# en las diez familias y la regla dejaba de decidir.
 
 
 def capacidad(p):
