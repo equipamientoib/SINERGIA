@@ -148,7 +148,11 @@ function json_(obj) {
 // ═════════════════════ venta ═════════════════════
 /* Arriba de los encabezados van los parámetros:
      A1 margen      B1 35          (% que se suma al precio del proveedor)
-     A2 actualizado B2 06/10/2026  (fecha de la última revisión, cada lunes)
+     A2 actualizado B2 06/10/2026  (fecha de la última revisión; la sella
+                                   atlActualizar_ cuando el robot contrasta
+                                   los precios contra el proveedor. De aquí
+                                   sale el «Precio vigente hasta el …» de la
+                                   web, sumándole 14 días)
      A3 stock %     B3 30          (% del stock del proveedor que se muestra)
      A4 instalacion desde      B4 10000   (utilidad desde la que va incluida)
      A5 pasaje completo desde  B5 20000   (utilidad desde la que el pasaje va entero)
@@ -471,7 +475,7 @@ function atlActualizar_(datos) {
   lista.forEach(function (it) { var cd = codAtl_(it.c); if (cd) mapa[cd] = it; });
   if (datos.todos && lista.length) hojaProveedor_(ss, lista, tc);
 
-  var n = vals.length - fh - 1, act = 0, porModelo = 0, sinStock = 0, pubSin = 0;
+  var n = vals.length - fh - 1, act = 0, porModelo = 0, sinStock = 0, pubSin = 0, cambiados = 0;
   var rango = function (c) { return sh.getRange(fh + 2, c + 1, n, 1); };
   var cod = rango(cCod).getValues(), pp = rango(cPP).getValues(), sp = rango(cSP).getValues(),
       usd = rango(cUSD).getValues(), coi = rango(cCoi).getValues();
@@ -485,6 +489,12 @@ function atlActualizar_(datos) {
       if (m) { it = m.it; via = 'marca+modelo' + (m.n > 1 ? ' (de ' + m.n + ' versiones)' : ''); cod[i][0] = "'" + it.c; porModelo++; }
     }
     if (it) {
+      /* Lo que cuenta como cambio del proveedor es el precio en DOLARES.
+         El de soles sale de multiplicarlo por el tipo de cambio, que se
+         mueve casi a diario: contarlo seria contar el dolar, no al
+         proveedor. Medio centimo de margen para no contar el redondeo. */
+      var antesUsd = Number(usd[i][0]) || 0, ahoraUsd = Number(it.p) || 0;
+      if (Math.abs(ahoraUsd - antesUsd) >= 0.005) cambiados++;
       usd[i][0] = Number(it.p) || '';
       if (tc && Number(it.p)) pp[i][0] = Math.round(Number(it.p) * tc * 100) / 100;
       sp[i][0] = Number(it.s) || 0;
@@ -503,10 +513,20 @@ function atlActualizar_(datos) {
   }
   rango(cCod).setValues(cod); rango(cPP).setValues(pp); rango(cSP).setValues(sp);
   rango(cUSD).setValues(usd); rango(cCoi).setValues(coi);
-  sh.getRange('B2').setValue(new Date());
+  /* B2 es la fecha que la web convierte en «Precio vigente hasta el ...»
+     (mas VIGENCIA_DIAS en generar_paginas_venta.py). Se sella solo si esta
+     corrida CONTRASTO precios contra el proveedor: si el envio llego vacio
+     o no cuadro con ningun equipo, no se verifico nada y la promesa no se
+     puede renovar. Antes se sellaba siempre, y un envio fallido renovaba la
+     fecha sin haber comprobado un solo precio.
+     Que no cambiara ninguno NO impide sellar: que los equipos coincidan con
+     el proveedor es precisamente la confirmacion de que lo publicado sigue
+     vigente. Por eso la condicion es «se verifico», no «cambio algo». */
+  if (act) sh.getRange('B2').setValue(new Date());
   if (tc) { sh.getRange('D2').setValue('Tipo de cambio usado: S/ ' + tc); }
   limpiarCache();
-  var res = { ok: true, id: datos.id || '', actualizados: act, por_modelo: porModelo, sin_stock: sinStock,
+  var res = { ok: true, id: datos.id || '', actualizados: act, cambiados: cambiados, sellada: !!act,
+    por_modelo: porModelo, sin_stock: sinStock,
     pub_sin: pubSin, proveedor: lista.length, tc: tc, fecha: new Date().toISOString() };
   PropertiesService.getScriptProperties().setProperty('ATL_ULTIMO', JSON.stringify(res));
   return res;
