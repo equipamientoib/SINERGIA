@@ -426,6 +426,11 @@ def pdf_ficha(eq_id):
 
 
 def pagina_ficha_a4(f, eq, cfg, locales):
+    # La misma regla que en la web: mes y año, nunca el día, y si la fecha
+    # ya pasó no sale NADA. En un PDF importa el doble, porque el archivo se
+    # queda en el expediente del cliente y no se apaga solo; por eso el pie
+    # lleva la fecha de generación, para que se sepa de cuándo es.
+    vig_a4 = vigencia_calibracion(eq)
     """Hoja A4 imprimible: de aquí sale el PDF (scripts/generar_pdf_fichas.js)."""
     fotos = fotos_de(eq, locales)
     foto = fotos[0] if fotos else ''   # la ligera: el PDF pesa ~3 veces menos
@@ -468,6 +473,8 @@ def pagina_ficha_a4(f, eq, cfg, locales):
   .incluye ul{{columns:2;margin-top:1.5mm;padding-left:4mm}}
   footer{{margin-top:auto;padding-top:5mm;border-top:1px solid #e3e0d8;display:flex;justify-content:space-between;gap:6mm;font-size:8pt;color:#6E727A}}
   footer b{{color:#17191D}}
+  .cal{{margin:2mm 0 0;font-size:9pt;color:#1C7A4A;font-weight:600}}
+  .gen{{color:#8A8E96}}
   .boton{{position:fixed;right:20px;bottom:20px;font-family:'Chakra Petch',sans-serif;font-weight:600;background:#17191D;color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer}}
   @media print{{.boton{{display:none}}}}
 </style></head>
@@ -481,13 +488,14 @@ def pagina_ficha_a4(f, eq, cfg, locales):
       <div class="marca">{e(eq.get('marca', ''))}</div>
       <p class="resumen">{e(f.get('resumen', ''))}</p>
       {f'<p class="normas"><b>Normas:</b> {normas}</p>' if normas else ''}
+      {f'<p class="cal">&#10003; {e(vig_a4)}</p>' if vig_a4 else ''}
     </div>
   </div>
   <div class="grupos">{grupos}</div>
   {f'<div class="incluye"><b>Incluye en el alquiler</b><ul>{incluye}</ul></div>' if incluye else ''}
   <footer>
     <div><b>Sinergia Biomédica</b> · Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú · {e(cfg['email'])} · {e(cfg['telefono'])}</div>
-    <div style="text-align:right">sinergiabiomedica.pe<br>Fuente: {e(f.get('fuente', 'fabricante'))}</div>
+    <div style="text-align:right">sinergiabiomedica.pe<br>Fuente: {e(f.get('fuente', 'fabricante'))}<br><span class="gen">{{FECHA_HOJA}}</span></div>
   </footer>
 </div>
 <button class="boton" onclick="print()">Guardar como PDF</button>
@@ -800,6 +808,38 @@ def mapa_sitio():
             '</div></nav>' % (''.join(fam), ''.join(alq)))
 
 
+SELLO_HOJA = re.compile(r'Hoja generada el \d{2}/\d{2}/\d{4}')
+
+
+def sellar_hoja(ruta_rel, html):
+    """Pone «Hoja generada el DD/MM/AAAA» conservando la fecha anterior si el
+    resto de la hoja no cambió.
+
+    Cualquier documento que circule tiene que decir de cuándo es: el PDF se
+    adjunta a un expediente y lo revisan dos años despues, cuando la
+    calibracion que anuncia pudo vencer. La fecha pone esa responsabilidad
+    donde corresponde.
+
+    Pero no puede ser «hoy» a secas. Las hojas se regeneran todas las
+    mañanas: si la fecha cambiara cada dia, cambiaria el archivo, con el la
+    huella que mira generar_pdf_fichas.js, y el robot reescribiria los ~160
+    PDF todos los dias para no cambiar ni una letra del contenido. Es justo
+    lo que se arreglo con las huellas.
+
+    Asi que la fecha dice cuando cambio EL CONTENIDO, que ademas es lo que
+    significa de verdad «hoja generada el». Si lo unico distinto respecto a
+    la hoja anterior seria la fecha, se devuelve la hoja anterior tal cual.
+    """
+    marca = 'Hoja generada el ' + datetime.date.today().strftime('%d/%m/%Y')
+    nuevo = html.replace('{FECHA_HOJA}', marca)
+    ruta = os.path.join(ROOT, ruta_rel)
+    if os.path.exists(ruta):
+        viejo = open(ruta, encoding='utf-8').read()
+        if SELLO_HOJA.sub('', viejo) == SELLO_HOJA.sub('', nuevo):
+            return viejo
+    return nuevo
+
+
 def escribir(ruta_rel, contenido, cambios):
     ruta = os.path.join(ROOT, ruta_rel)
     viejo = open(ruta, encoding='utf-8').read() if os.path.exists(ruta) else None
@@ -926,7 +966,8 @@ def main():
     por_id = {x['id']: x for x in equipos}
     for fid, f in fichas.items():
         if fid in por_id:
-            escribir('fichas/%s/index.html' % fid, pagina_ficha_a4(f, por_id[fid], cfg, locales), cambios)
+            rel = 'fichas/%s/index.html' % fid
+        escribir(rel, sellar_hoja(rel, pagina_ficha_a4(f, por_id[fid], cfg, locales)), cambios)
     ruta, doc = pagina_hub(seo['hub'], publicados, cfg, locales)
     escribir('alquiler/index.html', doc, cambios)
     paginas.append((ruta, 'alquiler/index.html'))

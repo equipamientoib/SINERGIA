@@ -1321,6 +1321,7 @@ def ficha_a4_venta(p, cfg, base, fijas, locales):
   .incluye ul{{columns:2;margin-top:1.5mm;padding-left:4mm}}
   footer{{margin-top:auto;padding-top:5mm;border-top:1px solid #e3e0d8;display:flex;justify-content:space-between;gap:6mm;font-size:8pt;color:#6E727A}}
   footer b{{color:#17191D}}
+  .gen{{color:#8A8E96}}
   .boton{{position:fixed;right:20px;bottom:20px;font-family:'Chakra Petch',sans-serif;font-weight:600;background:#17191D;color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer}}
   @media print{{.boton{{display:none}}}}
 </style></head>
@@ -1339,7 +1340,7 @@ def ficha_a4_venta(p, cfg, base, fijas, locales):
   {f'<div class="incluye"><b>Se usa en</b><ul>{areas}</ul></div>' if areas else ''}
   <footer>
     <div><b>Sinergia Biomédica</b> · Servicios Integrales Sinergia S.A.C. · RUC 20615862682<br>Pueblo Libre, Lima — Perú · {e(cfg['email'])} · {e(cfg['telefono'])}</div>
-    <div style="text-align:right">sinergiabiomedica.pe<br>Precio y disponibilidad: consultar{fuente_pie}</div>
+    <div style="text-align:right">sinergiabiomedica.pe<br>Precio y disponibilidad: consultar{fuente_pie}<br><span class="gen">{{FECHA_HOJA}}</span></div>
   </footer>
 </div>
 <button class="boton" onclick="print()">Guardar como PDF</button>
@@ -1686,8 +1687,10 @@ def main():
         # La hoja A4 con el logo de la casa. De aquí sale el PDF que se
         # publica (scripts/generar_pdf_fichas.js). No va al sitemap: es
         # material de apoyo, no una página que Google deba indexar.
-        gp.escribir('fichas/venta/%s/index.html' % p['id'],
-                    ficha_a4_venta(p, cfg, base, fijas, locales), cambios)
+        rel_a4 = 'fichas/venta/%s/index.html' % p['id']
+        gp.escribir(rel_a4,
+                    gp.sellar_hoja(rel_a4, ficha_a4_venta(p, cfg, base, fijas, locales)),
+                    cambios)
 
     # Equipos que ya no se publican (sin stock o despublicados): su página se
     # borra. Lo vigente sale de las páginas que esta corrida generó de verdad,
