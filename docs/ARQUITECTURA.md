@@ -120,30 +120,49 @@ no se estaba tocando, algo se perdió.
 git diff --name-only origin/main -- alquiler/
 ```
 
-### Los PDF de las fichas técnicas: revisar SIEMPRE qué sale modificado
+### Los PDF de las fichas técnicas: solo se rehace el que cambió
 
 `scripts/generar_pdf_fichas.js` convierte cada hoja A4 (`fichas/<id>/` y
-`fichas/venta/<id>/`) en su PDF. Compara los bytes antes de escribir y se
-salta el archivo si son idénticos, pero **eso no basta**:
+`fichas/venta/<id>/`) en su PDF.
+
+El problema que resuelve:
 
 > **Un PDF puede salir distinto aunque su contenido no haya cambiado ni una
 > letra.** Basta con que el navegador que lo genera sea de otra versión:
 > cambian el subconjunto de fuentes incrustado y el orden interno de los
 > objetos, y los bytes ya no coinciden. El 17/10/2026 una corrida reescribió
-> **98 PDF** cuyo contenido era el mismo; solo dos habían cambiado de verdad.
+> **98 PDF** cuyo contenido era el mismo; solo dos habían cambiado de verdad,
+> y había que devolver los otros 96 a mano antes de hacer commit.
 
-Por eso, **antes de hacer commit después de correr ese script**:
+Por eso el script no pregunta «¿salió distinto el PDF?» sino **«¿cambió lo
+que lo genera?»**. Guarda en `fichas/.huellas.json` una huella de cada hoja
+—su HTML **y** todo lo que el HTML carga: la hoja de estilos de las fuentes
+y las imágenes— y si la huella no cambió, ese PDF ni siquiera se abre en el
+navegador.
 
 ```bash
-git status --short fichas/            # ¿qué salió modificado?
+node scripts/generar_pdf_fichas.js            # solo las que cambiaron
+node scripts/generar_pdf_fichas.js --todos    # todas, a la fuerza
 ```
 
-Si aparecen archivos de equipos que no se tocaron, hay que devolverlos:
+Medido el 20/10/2026, con 175 fichas:
+
+| Situación | Qué hace |
+|---|---|
+| Nada cambió | 175 saltadas, **0,3 s**, sin abrir el navegador |
+| Una hoja tocada | **1** rehecha, 1 escrita |
+| La hoja de fuentes tocada | las 175, porque todas la enlazan |
+| `--todos` | las 175, pase lo que pase |
+
+Queda además la red de siempre: aunque la huella diga que hay que
+rehacerlo, si el PDF sale byte por byte igual **no se toca el archivo**.
+
+**`--todos` hace falta** cuando cambia algo que la huella no puede ver: otra
+versión de Chromium o una fuente del sistema. Después de usarlo, revisa qué
+salió modificado antes de hacer commit:
 
 ```bash
-git status --porcelain fichas/ | awk '$1=="M" && $2 ~ /\.pdf$/ {print $2}' \
-  | grep -v <el id que sí cambió> | xargs -r git checkout --
-git status --porcelain fichas/ | awk '$1=="??"{print $2}' | xargs -r rm -f
+git status --short fichas/
 ```
 
 Cada PDF pesa unos 180 KB: publicar 150 sin motivo son 27 MB de basura en
