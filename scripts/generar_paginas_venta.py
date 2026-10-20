@@ -43,7 +43,6 @@ e = gp.e
 VENTA = os.path.join(ROOT, 'data', 'venta.json')
 FICHAS_VENTA = os.path.join(ROOT, 'data', 'fichas-venta')
 
-VIGENCIA_DIAS = 14          # lo que se le promete al cliente, desde la fecha de la hoja
 VIGENCIA_SCHEMA_DIAS = 120  # lo que se le dice a Google, desde el día 1 del mes (mínimo 90 días)
 TRAMOS = [(2000, 'Hasta S/ 2 000'), (6000, 'S/ 2 000 – 6 000'), (15000, 'S/ 6 000 – 15 000'),
           (40000, 'S/ 15 000 – 40 000'), (100000, 'S/ 40 000 – 100 000'), (float('inf'), 'Más de S/ 100 000')]
@@ -84,16 +83,20 @@ def ordenar(productos):
 def vigencia_schema(hoy=None):
     """La fecha de «priceValidUntil» del JSON-LD. Siempre lejos, en el futuro.
 
-    NO es la misma que la vigencia comercial que ve el cliente. Aquella sale
-    de la fecha de la hoja y dura VIGENCIA_DIAS: es lo que Sinergia se
-    compromete a respetar. Esta solo le dice a Google hasta cuándo puede
-    fiarse del precio que acaba de leer, y la página se regenera todas las
-    mañanas con el precio de la hoja, así que el dato nunca está viejo.
+    NO es una promesa al cliente, y el cliente no la ve. Al cliente se le
+    dice «hasta agotar stock», que es el límite de verdad de este negocio:
+    mientras haya equipo el precio vale, y cuando se acaba lo dice la
+    etiqueta de stock. Eso Google ya lo sabe por «availability», que sale
+    del stock real de cada equipo.
 
-    Antes se usaba la comercial para las dos cosas, y eso ataba el dato de
-    Google a la última vez que se tocó la hoja: dos semanas sin tocarla y
-    los 161 equipos se quedaban con la fecha vencida a la vez, con lo que
-    Google deja de mostrar el precio en el resultado de búsqueda.
+    Esta fecha responde otra pregunta: cuánto tiempo puede Google fiarse del
+    número que acaba de leer. La página se regenera todas las mañanas con el
+    precio de la hoja, así que el dato nunca está viejo.
+
+    Hubo un tiempo en que esta fecha y la frase del cliente eran la misma, y
+    salían de la última vez que se tocó la hoja: dos semanas sin tocarla y
+    los 161 equipos se quedaban vencidos a la vez, con lo que Google deja de
+    mostrar el precio en el resultado de búsqueda.
 
     Se ancla al día 1 del mes y se le suman 120 días, en vez de contar desde
     hoy. Contando desde hoy, la fecha cambiaría cada madrugada y el robot
@@ -103,14 +106,6 @@ def vigencia_schema(hoy=None):
     """
     hoy = hoy or datetime.date.today()
     return hoy.replace(day=1) + datetime.timedelta(days=VIGENCIA_SCHEMA_DIAS)
-
-
-def vigencia(actualizado):
-    m = re.match(r'(\d{1,2})/(\d{1,2})/(\d{4})', actualizado or '')
-    if not m:
-        return None
-    d = datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
-    return d + datetime.timedelta(days=VIGENCIA_DIAS)
 
 
 def ajustar(p, repo):
@@ -485,7 +480,7 @@ def franja(p):
         '<div class="ft-%s"><dt>%s</dt><dd>%s</dd></div>' % (c, k, e(v)) for k, c, v in d)
 
 
-def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, locales):
+def producto(p, cat, cfg, fts, promos, prev, sig, mismos, base, fijas, locales):
     texto = mensaje_wa(p)
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(texto))
     correo = 'mailto:%s?subject=%s&body=%s' % (cfg['email'], urllib.parse.quote('Cotización: ' + p['nom']),
@@ -499,8 +494,11 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
              % ('si' if isinstance(stock, (int, float)) and stock > 0 else 'agotado', e(et))) if et else ''
     of = promo(p, promos)
     if p.get('precio'):
-        nota = ('Incluye IGV · <span>Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización</span>'
-                % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial, se confirma en la cotización'
+        # El precio no caduca en una fecha: caduca cuando se acaba el equipo.
+        # Si el stock llega a cero lo dice stock_etiqueta(): «Stock agotado ·
+        # consultar plazo de nuevo lote». Las promociones sí llevan fecha
+        # cuando la tienen, porque ese fin lo decide la empresa.
+        nota = 'Incluye IGV · hasta agotar stock'
         if of:
             nota = ('Incluye IGV · <b>%s hasta el %s</b> · se confirma en la cotización'
                     % ('Promoción válida',
@@ -656,11 +654,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
   <p class="volver">{fam_btn}<a class="btn" href="/#/venta/tienda">← Ver toda la tienda</a></p>'''
 
 
-VIG_JS = '''<script>
-  /* Si la página se generó hace tiempo y la vigencia ya pasó, no se muestra vencida. */
-  document.querySelectorAll('[data-vig]').forEach(function(b){
-    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial, por confirmar en la cotización';
-  });
+PAGINA_JS = '''<script>
   /* La barra del celular se esconde mientras los botones de verdad están
      en pantalla: así no los tapa ni se repite al pie de la ficha.
 
@@ -764,14 +758,14 @@ def descripcion_ficha(p):
     return ' '.join((base + cola).split())
 
 
-def pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, mismos):
+def pagina_producto(p, cats, cfg, base, fijas, locales, promos, prev, sig, mismos):
     cat = cats.get(p.get('cat'), '')
     fts = fotos(p, base, fijas, locales)
     ruta = '/venta/%s/' % p['id']
     nombre = ' '.join(x for x in (p['nom'], p.get('marca'), p.get('modelo')) if x)
     title = titulo_ficha(p)
     descripcion = descripcion_ficha(p)
-    cuerpo = producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, locales) + VIG_JS
+    cuerpo = producto(p, cat, cfg, fts, promos, prev, sig, mismos, base, fijas, locales) + PAGINA_JS
     oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
               'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/OutOfStock',
               'seller': {'@id': SITIO + '/#negocio'}}
@@ -1594,7 +1588,6 @@ def main():
     promos = {k: v for k, v in (repo.get('promociones') or {}).items()
               if not k.startswith('_')}
     aplicar_promos(productos, promos)      # el precio de oferta manda en todo
-    vig = vigencia(vivo.get('actualizado'))
 
     orden = ordenar(productos)
     cambios, paginas = [], []
@@ -1626,7 +1619,7 @@ def main():
         prev = orden[i - 1] if i > 0 else None
         sig = orden[i + 1] if i + 1 < len(orden) else None
         mismos = [o for o in orden if o.get('cat') == p.get('cat') and o['id'] != p['id']]
-        ruta, doc = pagina_producto(p, cats, cfg, base, fijas, locales, promos, vig, prev, sig, mismos)
+        ruta, doc = pagina_producto(p, cats, cfg, base, fijas, locales, promos, prev, sig, mismos)
         rel = 'venta/%s/index.html' % p['id']
         gp.escribir(rel, doc, cambios)
         paginas.append((ruta, rel))

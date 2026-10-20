@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=9188a348';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=6f95fd50';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=9188a348';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=6f95fd50';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=9188a348','js/06-tablero.js?v=9188a348'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=6f95fd50','js/06-tablero.js?v=6f95fd50'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=9188a348'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=6f95fd50'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -2088,25 +2088,11 @@ function vMarcaModelo(p, grande){
     `<div class="v-ft-${c}"><dt>${k}</dt><dd>${vEsc(v)}</dd></div>`).join('')}</dl>`;
 }
 
-/* Vigencia del precio: 14 días desde la última actualización con el
-   portal del proveedor (fecha «actualizado» de la hoja, dd/mm/aaaa).
-   Devuelve '15/10/2026' o '' si no hay fecha; vencida → 'vencido'. */
-const V_VIGENCIA_DIAS = 14;
-function vVigencia(){
-  const m = String((VENTA && VENTA.actualizado) || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(!m) return '';
-  const f = new Date(+m[3], +m[2]-1, +m[1] + V_VIGENCIA_DIAS);
-  const hoy = new Date(); hoy.setHours(0,0,0,0);
-  if(f < hoy) return 'vencido';
-  const d2 = n => String(n).padStart(2,'0');
-  return `${d2(f.getDate())}/${d2(f.getMonth()+1)}/${f.getFullYear()}`;
-}
-function vNotaPrecio(larga){
-  const v = vVigencia();
-  if(v === 'vencido') return larga ? 'Precio referencial, por confirmar en la cotización' : 'por confirmar';
-  if(v) return larga ? `Precio vigente hasta el ${v} · se confirma en la cotización` : `vigente hasta el ${v}`;
-  return larga ? 'Precio referencial, sujeto a confirmación en la cotización' : 'sujeto a confirmación';
-}
+/* El precio no caduca en una fecha: caduca cuando se acaba el equipo. Por eso
+   la nota es «hasta agotar stock» y no un día del calendario. Cuando el stock
+   llega a cero lo dice vStock(): «Stock agotado · consultar plazo de nuevo
+   lote». Las promociones sí llevan fecha cuando la tienen, porque ese fin lo
+   decide la empresa y es una fecha de verdad. */
 
 /* Cada equipo tiene su página propia (venta/<id>/, la genera
    scripts/generar_paginas_venta.py y la anota en window.PAGINA_VENTA).
@@ -2493,7 +2479,7 @@ function vProducto(id){
         ${p.resumen?`<p class="v-resumen">${vEsc(p.resumen)}</p>`:''}
         ${p.precio||vStock(p)?(of => `<div class="v-precio-caja${of?' con-promo':''}">${p.precio?`<b>${vSoles(p.precio)}</b>`:''}${
           of?'<span class="v-baja">Precio especial</span>':''}${vStock(p,true)}<small>${
-          p.precio?(of?`Incluye IGV · <b>${of.fin?('Promoción válida hasta el '+of.fin.toLocaleDateString('es-PE')):'Precio especial, hasta agotar stock'}</b>`:'Incluye IGV · '+vNotaPrecio(true)):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
+          p.precio?(of?`Incluye IGV · <b>${of.fin?('Promoción válida hasta el '+of.fin.toLocaleDateString('es-PE')):'Precio especial, hasta agotar stock'}</b>`:'Incluye IGV · hasta agotar stock'):'Consulta precio y plazo de entrega'}</small></div>`)(vPromo(p)):''}
         ${chips.length?`<div class="v-chips">${chips.map(x=>`<span>${x[0]} <b>${vEsc(x[1])}</b></span>`).join('')}</div>`:''}
         ${areas}
         <div class="v-btns">

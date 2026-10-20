@@ -120,14 +120,12 @@ La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (c
 
 **Parámetros (arriba de los encabezados):**
 - `A1 margen · B1 35`: el % que se suma al precio del proveedor.
-- `A2 actualizado · B2 fecha`: la fecha de la última revisión de precios y stock. La web muestra
-  «Precios y stock al …», y las páginas de venta le suman 14 días para el «Precio vigente hasta el …».
-  **La sella el favorito**, no hace falta escribirla a mano: `atlActualizar_` pone la fecha del día
-  cuando la corrida cuadra con al menos **la mitad de los equipos con `publicar = SI`**. Si cuadra con
-  menos —un envío fallido, o una corrida manual sobre unos pocos equipos— no se toca, porque esa
-  corrida no verificó los precios que la web promete. Que ningún precio cambiara no impide sellar:
-  que coincidan con el proveedor es justamente la confirmación de que lo publicado sigue vigente.
-  El favorito lo dice en pantalla al terminar («Vigencia renovada: … de … publicados»).
+- `A2 actualizado · B2 fecha`: la fecha de la última revisión de precios y stock contra el
+  proveedor. **Es un registro interno: la web no la muestra ni depende de ella.** El precio
+  dice «hasta agotar stock», porque el límite de este negocio es el stock y no el calendario;
+  cuando el stock llega a cero la etiqueta pasa a «Stock agotado · consultar plazo de nuevo
+  lote». El `priceValidUntil` del JSON-LD tampoco sale de aquí: lo calcula solo el generador
+  (día 1 del mes + 120 días), y a Google el «hasta agotar stock» se le dice por `availability`.
 
 **Columnas (fila de encabezados que empieza con `id`):**
 
