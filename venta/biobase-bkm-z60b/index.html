@@ -94,7 +94,7 @@
   <p class="volver"><a class="btn fill" href="/venta/autoclaves-y-esterilizadores/">Ver todos los de esterilización</a> <a class="btn" href="/#/venta/tienda">← Ver toda la tienda</a></p><script>
   /* Si la página se generó hace tiempo y la vigencia ya pasó, no se muestra vencida. */
   document.querySelectorAll('[data-vig]').forEach(function(b){
-    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial, por confirmar en la cotización';
+    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial · escríbenos para confirmarlo';
   });
   /* La barra del celular se esconde mientras los botones de verdad están
      en pantalla: así no los tapa ni se repite al pie de la ficha.
