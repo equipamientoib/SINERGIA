@@ -120,7 +120,14 @@ La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (c
 
 **Parámetros (arriba de los encabezados):**
 - `A1 margen · B1 35`: el % que se suma al precio del proveedor.
-- `A2 actualizado · B2 fecha`: la fecha de la última revisión de precios y stock, cada lunes. La web muestra «Precios y stock al …».
+- `A2 actualizado · B2 fecha`: la fecha de la última revisión de precios y stock. La web muestra
+  «Precios y stock al …», y las páginas de venta le suman 14 días para el «Precio vigente hasta el …».
+  **La sella el favorito**, no hace falta escribirla a mano: `atlActualizar_` pone la fecha del día
+  cuando la corrida cuadra con al menos **la mitad de los equipos con `publicar = SI`**. Si cuadra con
+  menos —un envío fallido, o una corrida manual sobre unos pocos equipos— no se toca, porque esa
+  corrida no verificó los precios que la web promete. Que ningún precio cambiara no impide sellar:
+  que coincidan con el proveedor es justamente la confirmación de que lo publicado sigue vigente.
+  El favorito lo dice en pantalla al terminar («Vigencia renovada: … de … publicados»).
 
 **Columnas (fila de encabezados que empieza con `id`):**
 
@@ -154,7 +161,7 @@ El portal solo deja entrar desde Perú y con usuario, así que no lo puede leer 
    - `precio_proveedor`: el precio en soles, igual a US$ × TC;
    - `precio_proveedor_usd`;
    - `stock_proveedor`;
-   - la fecha en B2.
+   - la fecha en B2 (solo si cuadró con la mitad de los publicados; ver arriba).
 
 **Instalación (una vez):** en el proyecto de `Venta.gs` ejecuta `crearBotonProveedor` (▶) y copia lo que sale en **Registros** como dirección (URL) de un favorito nuevo.
 

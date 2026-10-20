@@ -476,6 +476,7 @@ function atlActualizar_(datos) {
   if (datos.todos && lista.length) hojaProveedor_(ss, lista, tc);
 
   var n = vals.length - fh - 1, act = 0, porModelo = 0, sinStock = 0, pubSin = 0, cambiados = 0;
+  var pubs = 0, actPub = 0;   // publicados en la hoja, y de esos los que cuadraron hoy
   var rango = function (c) { return sh.getRange(fh + 2, c + 1, n, 1); };
   var cod = rango(cCod).getValues(), pp = rango(cPP).getValues(), sp = rango(cSP).getValues(),
       usd = rango(cUSD).getValues(), coi = rango(cCoi).getValues();
@@ -483,6 +484,7 @@ function atlActualizar_(datos) {
     var fila = vals[fh + 1 + i];
     if (!s_(fila[0])) continue;
     var pub = s_(fila[col('publicar')]).toUpperCase() === 'SI';
+    if (pub) pubs++;
     var cd = codAtl_(cod[i][0]), it = cd ? mapa[cd] : null, via = 'código';
     if (!it && !cd && datos.todos) {                         // sin código: marca + modelo
       var m = matchModelo_(fila[col('marca')], fila[col('modelo')], fila[col('nombre')], lista);
@@ -500,6 +502,7 @@ function atlActualizar_(datos) {
       sp[i][0] = Number(it.s) || 0;
       coi[i][0] = via + ': ' + s_(it.d).slice(0, 120);
       act++;
+      if (pub) actPub++;
     } else {
       if (datos.completo && cd) { sp[i][0] = 0; sinStock++; }
       if (datos.todos) {
@@ -521,11 +524,20 @@ function atlActualizar_(datos) {
      fecha sin haber comprobado un solo precio.
      Que no cambiara ninguno NO impide sellar: que los equipos coincidan con
      el proveedor es precisamente la confirmacion de que lo publicado sigue
-     vigente. Por eso la condicion es «se verifico», no «cambio algo». */
-  if (act) sh.getRange('B2').setValue(new Date());
+     vigente. Por eso la condicion es «se verifico», no «cambio algo».
+
+     El minimo es la MITAD de los equipos con publicar = SI, que son los que
+     salen en la web y a los que alcanza la promesa. Una corrida manual sobre
+     cinco equipos sueltos no puede renovar la vigencia de todos los demas.
+     Se cuentan los publicados y no los del portal del proveedor: el portal
+     trae cientos que no vendemos, y hacer la cuenta sobre ellos mediria otra
+     cosa. */
+  var verificoMitad = pubs > 0 && actPub * 2 >= pubs;
+  if (verificoMitad) sh.getRange('B2').setValue(new Date());
   if (tc) { sh.getRange('D2').setValue('Tipo de cambio usado: S/ ' + tc); }
   limpiarCache();
-  var res = { ok: true, id: datos.id || '', actualizados: act, cambiados: cambiados, sellada: !!act,
+  var res = { ok: true, id: datos.id || '', actualizados: act, cambiados: cambiados,
+    publicados: pubs, verificados: actPub, sellada: verificoMitad,
     por_modelo: porModelo, sin_stock: sinStock,
     pub_sin: pubSin, proveedor: lista.length, tc: tc, fecha: new Date().toISOString() };
   PropertiesService.getScriptProperties().setProperty('ATL_ULTIMO', JSON.stringify(res));

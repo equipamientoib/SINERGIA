@@ -696,10 +696,22 @@
       }
       if (est.id !== id) return error('Los datos se enviaron, pero tu hoja no confirmó. Revisa en unos minutos si cambió la fecha (celda B2).');
       if (!est.ok) return error('Tu hoja respondió: ' + (est.motivo || 'error') + '.');
+      /* ¿Se renovó la fecha de vigencia? La hoja sella B2 solo si cuadró con
+         al menos la mitad de los equipos publicados, así que conviene verlo
+         aquí y no ir a mirar la celda. Si la hoja aún tiene la versión
+         anterior no manda «sellada» y no se enseña nada. */
+      var vig = '';
+      if (est.sellada === true)
+        vig = 'Vigencia renovada: se contrastaron <b>' + est.verificados + '</b> de <b>' +
+              est.publicados + '</b> equipos publicados.<br>';
+      else if (est.sellada === false)
+        vig = '<b style="color:#ffcf8a">La vigencia NO se renovó.</b> Cuadraron ' + est.verificados +
+              ' de ' + est.publicados + ' publicados, y hace falta al menos la mitad.<br>';
       txt('<b style="color:#9be3b5">¡Listo!</b> Se leyeron <b>' + leidos + '</b> equipos del proveedor' + (TC ? ' (TC S/ ' + TC + ')' : '') + '.<br>' +
         'Tus equipos con precio y stock: <b>' + est.actualizados + '</b>' +
         (est.por_modelo ? ' (' + est.por_modelo + ' encontrados por marca y modelo)' : '') + '.<br>' +
         (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal: mira la columna «coincidencia».<br>' : '') +
+        vig +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
       await ofrecerFotos();
       await ofrecerDocs();
