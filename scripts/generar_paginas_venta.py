@@ -936,6 +936,35 @@ def pagina_hub(productos, cats_orden, cats, catsx, cfg, promos, base, fijas, loc
 # precio), no como nota al pie en gris.
 
 
+RE_LITROS = re.compile(r'(\d+)\s*(?:L\b|litros?\b)', re.I)
+UMBRAL_RANGO = 5        # si el maximo pasa de 5x el minimo, solo se enseña «Desde»
+
+
+def capacidad(p):
+    """«48 litros», leido del nombre del equipo.
+
+    Antes la capacidad iba escrita a mano junto a un numero que se calcula
+    solo, asi que se separaban en cuanto cambiaba el catalogo: la pagina
+    llego a poder decir «desde S/ 13,757 (18 litros)» siendo 13,757 una
+    incubadora de indicadores biologicos.
+    """
+    m = RE_LITROS.search(p.get('nom') or '')
+    return ('%s litros' % m.group(1)) if m else ''
+
+
+def subrango(ps, filtro):
+    """Los equipos de la familia cuyo nombre contenga «filtro», por precio.
+
+    Una familia junta cosas que el cliente no compara entre si: en
+    «esterilizacion» conviven autoclaves de mesa de consultorio y un
+    horizontal de 430 L para central. Preguntado por el autoclave de mesa,
+    el rango tiene que salir de los autoclaves de mesa.
+    """
+    f = (filtro or '').lower()
+    sel = [q for q in ps if q.get('precio') and f in (q.get('nom') or '').lower()]
+    return sorted(sel, key=lambda q: q['precio'])
+
+
 def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
     """La página de una familia: tarjetas arriba, guía y preguntas abajo.
 
@@ -955,14 +984,37 @@ def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
              'garantia': str(TERMINOS.get('garantiaMeses') or 12)}
     guia = ''.join('<section class="lp-g"><h2>%s</h2><p>%s</p></section>' % (e(g['h']), g['p'])
                    for g in (L.get('guia') or []))
-    faq = L.get('faq') or []
-    for f in faq:
-        f['r_'] = f['r'].format(**rango)
+    # Subrangos declarados en data/venta.json › landings › <fam> › rangos:
+    # {"mesa": "autoclave de mesa"} da {mesa_min}, {mesa_max} y sus capacidades.
+    for nombre, filtro in (L.get('rangos') or {}).items():
+        sel = subrango(ps, filtro)
+        if sel:
+            rango[nombre + '_min'] = soles(sel[0]['precio'])
+            rango[nombre + '_max'] = soles(sel[-1]['precio'])
+            rango[nombre + '_min_cap'] = capacidad(sel[0])
+            rango[nombre + '_max_cap'] = capacidad(sel[-1])
+
+    # Si a una respuesta le falta un dato, se cae esa respuesta y no la
+    # pagina: mejor una pregunta de menos que una cifra inventada, y mejor
+    # un aviso que una generacion rota a las seis de la mañana.
+    faq = []
+    for f in (L.get('faq') or []):
+        try:
+            f['r_'] = f['r'].format(**rango)
+        except KeyError as err:
+            print('aviso: la pregunta «%s» de %s pide %s y no hay equipos que '
+                  'lo calculen; se omite.' % (f.get('q', '')[:50], L.get('slug'), err))
+            continue
+        faq.append(f)
     bloque_faq = ('<section class="lp-s"><h2>Preguntas frecuentes</h2>%s</section>' % ''.join(
         '<details class="lp-faq"><summary>%s</summary><p>%s</p></details>' % (e(f['q']), e(f['r_']))
         for f in faq)) if faq else ''
     desde = ''
-    if len(precios) > 1:
+    if len(precios) > 1 and precios[-1] > precios[0] * UMBRAL_RANGO:
+        # Un rango de 70x no le dice nada a nadie, y pone seis cifras delante
+        # de quien buscaba un equipo de consultorio.
+        desde = '<p class="lp-desde">Desde <b>%s</b>, con IGV incluido.</p>' % rango['min']
+    elif len(precios) > 1:
         desde = ('<p class="lp-desde">Desde <b>%s</b> hasta <b>%s</b>, con IGV incluido.</p>'
                  % (rango['min'], rango['max']))
     elif precios:

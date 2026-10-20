@@ -4,6 +4,9 @@
 
 - **Frontend:** un `index.html` (HTML + CSS + JS, sin dependencias).
 - **Datos:** `data/catalogo.json` o **Google Sheets en vivo** (Apps Script).
+  Ojo con VENTA: su catálogo son **dos fuentes** —la hoja vía Apps Script **más**
+  `data/venta.json › equiposPropios`—, y el generador las suma. Consultar sólo una
+  da un resultado incompleto; ver `docs/GOOGLE-SHEETS.md › Catálogo de VENTA en vivo`.
 - **Hosting:** Vercel Hobby o GitHub Pages (gratis).
 - **Sincroniza:** sí — editas la hoja y la web cambia.
 - **Formulario:** Formspree → correo a logística (opcional).

@@ -1697,7 +1697,7 @@
     }
   },
   "landings": {
-    "_nota": "Páginas de aterrizaje por categoría: una página por familia de equipos, pensada para lo que la gente escribe en Google («autoclave de vapor precio», «esterilizador clase B»), no para el modelo. La ficha de cada equipo sigue existiendo; esta es la puerta de entrada que las reúne, compara precios y explica cómo elegir. El cuadro de precios, el rango y la lista de equipos se arman solos con el catálogo: aquí solo va el texto. Para crear otra, copia este bloque con el id de la categoría (los ids están en «categorias»).",
+    "_nota": "Páginas de aterrizaje por categoría: una página por familia de equipos, pensada para lo que la gente escribe en Google («autoclave de vapor precio», «esterilizador clase B»), no para el modelo. La ficha de cada equipo sigue existiendo; esta es la puerta de entrada que las reúne, compara precios y explica cómo elegir. El cuadro de precios, el rango y la lista de equipos se arman solos con el catálogo: aquí solo va el texto. Para crear otra, copia este bloque con el id de la categoría (los ids están en «categorias»). «rangos» declara subconjuntos de la familia para las respuestas: {\"mesa\": \"autoclave de mesa\"} filtra por el nombre del equipo y deja usar {mesa_min}, {mesa_max}, {mesa_min_cap} y {mesa_max_cap}. Hace falta porque una familia junta equipos que el cliente no compara entre sí: en esterilización conviven autoclaves de consultorio y un horizontal de 430 L para central, y el rango de toda la familia no responde a ninguna pregunta. Las capacidades NUNCA se escriben a mano junto a un número calculado: se separan en cuanto cambia el stock.",
     "esterilizacion": {
       "slug": "autoclaves-y-esterilizadores",
       "h1": "Autoclaves y esterilizadores",
@@ -1725,7 +1725,7 @@
       "faq": [
         {
           "q": "¿Cuánto cuesta un autoclave de vapor en Perú?",
-          "r": "Depende de la capacidad y de la marca. En nuestro catálogo los autoclaves de vapor clase B van desde {min} (18 litros, de mesa) hasta {max} (430 litros, horizontal de dos puertas para central de esterilización). Un equipo de 23 litros para consultorio está alrededor de S/ 10,000 y uno de 60 litros para clínica alrededor de S/ 29,000. Todos los precios incluyen IGV."
+          "r": "Depende de la capacidad. Un autoclave de mesa clase B, que es lo que usan consultorios y clínicas, cuesta entre {mesa_min} ({mesa_min_cap}) y {mesa_max} ({mesa_max_cap}), con IGV incluido: los de menor litraje para consultorio y los de mayor para clínica. Para central de esterilización hay equipos horizontales de mucha más capacidad, con precio según la instalación."
         },
         {
           "q": "¿Qué significa que un autoclave sea clase B?",
@@ -1743,7 +1743,10 @@
           "q": "¿Puedo pedir una cotización formal?",
           "r": "Sí, y la armas tú mismo en segundos: marca los equipos que te interesan, pon las cantidades y te sale el documento con el detalle, el IGV y el total, listo para adjuntarlo a tu expediente. También puedes escribirnos por WhatsApp y te la mandamos."
         }
-      ]
+      ],
+      "rangos": {
+        "mesa": "autoclave de mesa"
+      }
     },
     "monitoreo": {
       "slug": "monitores-de-signos-vitales",

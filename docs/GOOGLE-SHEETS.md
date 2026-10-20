@@ -116,6 +116,30 @@ Las apps web de Apps Script suelen leerse sin problema desde el navegador. Si en
 
 ## Catálogo de VENTA en vivo
 
+> ### ⚠ El catálogo de venta son DOS fuentes, no una
+>
+> | | de dónde sale | hoy |
+> |---|---|---|
+> | **La hoja** | Apps Script `VENTA_URL` (`Venta.gs`) | 157 productos |
+> | **Stock propio** | `data/venta.json › equiposPropios.equipos` | 4 productos |
+> | | | **161 en total** |
+>
+> `scripts/generar_paginas_venta.py` **suma las dos** y por eso imprime «161
+> equipos de venta con página». **Consultar sólo el Apps Script da un catálogo
+> incompleto**, y las cuentas que salgan de ahí —rangos de precio, stock,
+> cuántos equipos hay— serán falsas sin avisar.
+>
+> Los de stock propio no están en la hoja ni en el portal del proveedor: se
+> publican desde `data/venta.json`, con su precio y su stock tal cual. Hoy son
+> los cuatro autoclaves Biobase, y son **los más baratos de su familia**: una
+> cuenta hecha sin ellos se salta justo el precio de entrada.
+>
+> Esto no contradice la regla de «usa el catálogo en vivo, nunca la copia del
+> repositorio». Esa regla es contra `data/catalogo.json`, que es un espejo
+> viejo de la hoja. `equiposPropios` no es espejo de nada: es una fuente.
+>
+> Si una cuenta da 157 y el generador dice 161, faltan los propios.
+
 La sección **Venta** (`#/venta`) se alimenta de la hoja **«Sinergia - Venta (catálogo en vivo)»** (Drive › 3. Página WEB) a través de un **Apps Script propio**: `google-apps-script/Venta.gs`, separado del principal para no tocar alquiler, clientes ni expedientes. Su URL `/exec` va en `VENTA_URL` (`js/00-config.js`). Si no responde, la web usa `data/venta.json` como respaldo.
 
 **Parámetros (arriba de los encabezados):**
