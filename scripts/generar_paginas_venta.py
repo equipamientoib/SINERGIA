@@ -43,7 +43,8 @@ e = gp.e
 VENTA = os.path.join(ROOT, 'data', 'venta.json')
 FICHAS_VENTA = os.path.join(ROOT, 'data', 'fichas-venta')
 
-VIGENCIA_DIAS = 14          # lo que se le promete al cliente, desde la fecha de la hoja
+# Lo que se le promete al cliente: hasta el último día del mes siguiente,
+# contado desde el día en que se genera la página (ver vigencia()).
 VIGENCIA_SCHEMA_DIAS = 120  # lo que se le dice a Google, desde el día 1 del mes (mínimo 90 días)
 TRAMOS = [(2000, 'Hasta S/ 2 000'), (6000, 'S/ 2 000 – 6 000'), (15000, 'S/ 6 000 – 15 000'),
           (40000, 'S/ 15 000 – 40 000'), (100000, 'S/ 40 000 – 100 000'), (float('inf'), 'Más de S/ 100 000')]
@@ -105,12 +106,31 @@ def vigencia_schema(hoy=None):
     return hoy.replace(day=1) + datetime.timedelta(days=VIGENCIA_SCHEMA_DIAS)
 
 
-def vigencia(actualizado):
-    m = re.match(r'(\d{1,2})/(\d{1,2})/(\d{4})', actualizado or '')
-    if not m:
-        return None
-    d = datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
-    return d + datetime.timedelta(days=VIGENCIA_DIAS)
+def vigencia(actualizado=None, hoy=None):
+    """Hasta cuándo se le promete el precio al cliente. Se renueva sola.
+
+    ANTES salía de la celda B2 de la hoja («actualizado») más 14 días. Era
+    una bomba de relojería: el robot regenera las páginas todas las mañanas,
+    pero esa fecha no se mueve si nadie toca B2. Dos semanas sin tocarla y
+    los 157 equipos pasaban A LA VEZ a «precio referencial», sin que nadie
+    se enterara, porque el cambio lo hace el JavaScript en el navegador del
+    cliente y no deja rastro en el repositorio.
+
+    AHORA se cuenta desde el día en que se genera la página, no desde la
+    hoja, así que cada corrida del robot la renueva. Se ancla al último día
+    del mes SIGUIENTE en vez de sumar días a hoy: contando desde hoy, la
+    fecha cambiaría cada madrugada y el robot reescribiría las 157 páginas
+    todos los días. Así cambia una vez al mes y nunca quedan menos de 31
+    días por delante.
+
+    La celda B2 se queda como estaba y sigue siendo la fecha de la última
+    revisión de la hoja: se guarda en data/venta-vivo.json. Lo que ya no
+    hace es decidir hasta cuándo vale el precio.
+    """
+    hoy = hoy or datetime.date.today()
+    # primer día del mes siguiente, y de ahí al último día del otro
+    sig = (hoy.replace(day=1) + datetime.timedelta(days=32)).replace(day=1)
+    return (sig + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(days=1)
 
 
 def ajustar(p, repo):
@@ -500,7 +520,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
     of = promo(p, promos)
     if p.get('precio'):
         nota = ('Incluye IGV · <span>Precio vigente hasta el <b data-vig="%s">%s</b> · se confirma en la cotización</span>'
-                % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial, se confirma en la cotización'
+                % (vig.isoformat(), vig.strftime('%d/%m/%Y'))) if vig else 'Incluye IGV · Precio referencial · escríbenos para confirmarlo'
         if of:
             nota = ('Incluye IGV · <b>%s hasta el %s</b> · se confirma en la cotización'
                     % ('Promoción válida',
@@ -659,7 +679,7 @@ def producto(p, cat, cfg, fts, promos, vig, prev, sig, mismos, base, fijas, loca
 VIG_JS = '''<script>
   /* Si la página se generó hace tiempo y la vigencia ya pasó, no se muestra vencida. */
   document.querySelectorAll('[data-vig]').forEach(function(b){
-    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial, por confirmar en la cotización';
+    if(new Date(b.dataset.vig + 'T23:59:59') < new Date()) b.parentNode.textContent = 'Precio referencial · escríbenos para confirmarlo';
   });
   /* La barra del celular se esconde mientras los botones de verdad están
      en pantalla: así no los tapa ni se repite al pie de la ficha.
@@ -1594,7 +1614,7 @@ def main():
     promos = {k: v for k, v in (repo.get('promociones') or {}).items()
               if not k.startswith('_')}
     aplicar_promos(productos, promos)      # el precio de oferta manda en todo
-    vig = vigencia(vivo.get('actualizado'))
+    vig = vigencia()
 
     orden = ordenar(productos)
     cambios, paginas = [], []
