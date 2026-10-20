@@ -50,9 +50,15 @@
 #  js/app.js y css/app.css SI llevan merge=ours: empaquetar_web.py los
 #  escribe completos en cada corrida (une los sueltos de css/ y js/), asi
 #  que no hay nada propio que perder en ellos.
+#  Las hojas A4 (fichas/**/index.html) y sus PDF tambien: las escribe
+#  generar_paginas_venta.py y las convierte generar_pdf_fichas.js. Se
+#  quedaron fuera de esta lista cuando se escribio, y con 163 PDF en el
+#  repositorio cada rama que tocara la plantilla chocaba con ellos.
 # ─────────────────────────────────────────────────────────────────────
 
 venta/**/index.html     merge=ours
+fichas/**/index.html    merge=ours
+fichas/**/*.pdf         merge=ours
 alquiler/**/index.html  merge=ours
 promociones/index.html  merge=ours
 sitemap.xml             merge=ours

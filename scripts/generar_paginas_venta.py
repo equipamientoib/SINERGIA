@@ -1220,11 +1220,30 @@ def ficha_a4_venta(p, cfg, base, fijas, locales):
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="/css/00-fuentes.css">
 <style>
-  @page{{size:A4;margin:0}}
+  /* El margen lo pone la PÁGINA, no la hoja. Con margin:0 y el relleno
+     dentro de .hoja, la segunda página salía sin margen arriba: el
+     encabezado negro quedaba cortado por el borde del papel, a 1,6 mm,
+     cuando en la primera el texto empieza a 13,9 mm. El relleno de un
+     bloque no se repite cuando el bloque se parte de página; el margen
+     de @page sí. */
+  @page{{size:A4;margin:14mm 14mm 12mm}}
   *{{box-sizing:border-box;margin:0;padding:0}}
-  body{{font-family:'Titillium Web',system-ui,sans-serif;color:#17191D;background:#e9e7e2;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-  .hoja{{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:14mm 14mm 12mm;display:flex;flex-direction:column}}
-  @media screen{{.hoja{{margin:16px auto;box-shadow:0 10px 40px -12px rgba(0,0,0,.3)}}}}
+  body{{font-family:'Titillium Web',system-ui,sans-serif;color:#17191D;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  .hoja{{margin:0;background:#fff;display:flex;flex-direction:column}}
+  /* En pantalla se sigue viendo la hoja blanca sobre el gris, con su
+     sombra y su relleno. Eso es solo para mirarla: al imprimir manda
+     @page. */
+  @media screen{{
+    body{{background:#e9e7e2}}
+    .hoja{{width:210mm;min-height:297mm;margin:16px auto;padding:14mm 14mm 12mm;
+          box-shadow:0 10px 40px -12px rgba(0,0,0,.3)}}
+  }}
+  @media print{{
+    /* La hoja blanca llega hasta abajo en TODAS las páginas. Antes el
+       gris del fondo asomaba al pie de la última: 63 mm de 297 en el ZA,
+       una quinta parte de la hoja. */
+    body{{background:#fff}}
+  }}
   header{{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #9A7F4E;padding-bottom:6mm}}
   .logo{{height:13mm}}.logo text{{font-family:'Chakra Petch',sans-serif}}
   .tag{{font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:3px;font-size:9pt;color:#9A7F4E;text-align:right}}

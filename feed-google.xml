@@ -3,7 +3,7 @@
 <channel>
   <title>Sinergia Biomédica — equipos biomédicos</title>
   <link>https://sinergiabiomedica.pe</link>
-  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-19.</description>
+  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-20.</description>
   <item>
     <g:id>edan-h100b</g:id>
     <title>Pulsioxímetro de mano Edan H100B</title>
@@ -11,7 +11,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h100b/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h100b.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>980.00 PEN</g:price>
+    <g:price>978.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H100B</g:mpn>
@@ -26,12 +26,27 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h100b-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h100b-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1290.00 PEN</g:price>
+    <g:price>1286.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H100B</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>gemmy-030070</g:id>
+    <title>Centrífuga de 8 tubos Gemmy PLC-03</title>
+    <description>Centrífuga clínica compacta para separación de suero y plasma. 8 tubos de 15 ml Hasta 4000 rpm</description>
+    <link>https://sinergiabiomedica.pe/venta/gemmy-030070/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-030070.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>1997.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Gemmy</g:brand>
+    <g:mpn>PLC-03</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -41,7 +56,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-econom/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-econom.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1360.00 PEN</g:price>
+    <g:price>1357.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Econom</g:mpn>
@@ -56,7 +71,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-g5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-g5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>399.00 PEN</g:price>
+    <g:price>398.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Gamma G5</g:mpn>
@@ -71,7 +86,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben-3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben-3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>732.00 PEN</g:price>
+    <g:price>730.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Big Ben</g:mpn>
@@ -86,7 +101,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>980.00 PEN</g:price>
+    <g:price>978.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Big Ben</g:mpn>
@@ -101,7 +116,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-xxl-lf-w/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-xxl-lf-w.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1131.00 PEN</g:price>
+    <g:price>1128.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Gamma XXL LF-W</g:mpn>
@@ -116,7 +131,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1426.00 PEN</g:price>
+    <g:price>1422.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Big Ben</g:mpn>
@@ -131,7 +146,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-008008/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-008008.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>183.00 PEN</g:price>
+    <g:price>182.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Duplex Baby</g:mpn>
@@ -146,7 +161,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-sd3-plus/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd3-plus.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>929.00 PEN</g:price>
+    <g:price>926.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SD-3 Plus</g:mpn>
@@ -161,7 +176,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-sonotrax-ii-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sonotrax-ii-pro.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>929.00 PEN</g:price>
+    <g:price>926.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Sonotrax II Pro</g:mpn>
@@ -176,7 +191,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-ri-standard/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-ri-standard.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1149.00 PEN</g:price>
+    <g:price>1146.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Ri-standard</g:mpn>
@@ -191,7 +206,7 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-072210/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-072210.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1745.00 PEN</g:price>
+    <g:price>1740.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>VM 300P</g:mpn>
@@ -206,7 +221,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-010664/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-010664.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2204.00 PEN</g:price>
+    <g:price>2198.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BTB-3C</g:mpn>
@@ -221,7 +236,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-081262/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-081262.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2597.00 PEN</g:price>
+    <g:price>2590.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BM-117</g:mpn>
@@ -251,7 +266,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-092796/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092796.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5159.00 PEN</g:price>
+    <g:price>5146.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>X8</g:mpn>
@@ -266,7 +281,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-092797/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092797.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5417.00 PEN</g:price>
+    <g:price>5403.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>X10</g:mpn>
@@ -281,7 +296,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-im3s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-im3s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5675.00 PEN</g:price>
+    <g:price>5660.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iM3s</g:mpn>
@@ -296,7 +311,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5675.00 PEN</g:price>
+    <g:price>5660.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Elite V5</g:mpn>
@@ -311,7 +326,7 @@
     <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-50d/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-50d.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>3752.00 PEN</g:price>
+    <g:price>3742.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron 50D</g:mpn>
@@ -326,7 +341,7 @@
     <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-80/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-80.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>4141.00 PEN</g:price>
+    <g:price>4130.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron 80</g:mpn>
@@ -341,7 +356,7 @@
     <link>https://sinergiabiomedica.pe/venta/cu-medical-cu-sp1-auto/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-cu-sp1-auto.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5933.00 PEN</g:price>
+    <g:price>5917.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CU Medical</g:brand>
     <g:mpn>CU-SP1 Auto</g:mpn>
@@ -356,7 +371,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-m3a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2992.00 PEN</g:price>
+    <g:price>2984.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>M3A</g:mpn>
@@ -371,7 +386,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-m3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>3714.00 PEN</g:price>
+    <g:price>3705.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>M3</g:mpn>
@@ -386,7 +401,7 @@
     <link>https://sinergiabiomedica.pe/venta/ca-mi-new-askir-230-12v-br/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-new-askir-230-12v-br.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2470.00 PEN</g:price>
+    <g:price>2463.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CA-MI</g:brand>
     <g:mpn>New Askir 230 12V BR</g:mpn>
@@ -401,27 +416,12 @@
     <link>https://sinergiabiomedica.pe/venta/ca-mi-askir-36-br/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-askir-36-br.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>3276.00 PEN</g:price>
+    <g:price>3268.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CA-MI</g:brand>
     <g:mpn>Askir 36 BR</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>gemmy-030070</g:id>
-    <title>Centrífuga de 8 tubos Gemmy PLC-03</title>
-    <description>Centrífuga clínica compacta para separación de suero y plasma. 8 tubos de 15 ml Hasta 4000 rpm</description>
-    <link>https://sinergiabiomedica.pe/venta/gemmy-030070/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-030070.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2003.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Gemmy</g:brand>
-    <g:mpn>PLC-03</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -431,7 +431,7 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-071351/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-071351.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2082.00 PEN</g:price>
+    <g:price>2077.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>PLC-05</g:mpn>
@@ -446,7 +446,7 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-010542/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-010542.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>3433.00 PEN</g:price>
+    <g:price>3424.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>KHT-410E</g:mpn>
@@ -461,7 +461,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-mini-3000-led/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-mini-3000-led.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2439.00 PEN</g:price>
+    <g:price>2432.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>mini 3000 LED</g:mpn>
@@ -476,7 +476,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2679.00 PEN</g:price>
+    <g:price>2672.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200</g:mpn>
@@ -491,7 +491,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>3907.00 PEN</g:price>
+    <g:price>3897.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200 LED</g:mpn>
@@ -506,7 +506,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-led.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>4216.00 PEN</g:price>
+    <g:price>4205.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200 LED</g:mpn>
@@ -521,7 +521,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-beta-100/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-beta-100.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5597.00 PEN</g:price>
+    <g:price>5582.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200 / BETA 100</g:mpn>
@@ -545,13 +545,28 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
+    <g:id>heine-beta-200-led-4</g:id>
+    <title>Set otoscopio y oftalmoscopio LED a pilas Heine BETA 200 LED</title>
+    <description>Set de diagnóstico LED con otoscopio de fibra óptica y oftalmoscopio. Otoscopio y oftalmoscopio LED Mango a pilas de 2.5 V Cod. D-131.</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-4/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-4.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>5996.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>BETA 200 LED</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
     <g:id>edan-se301</g:id>
     <title>Electrocardiógrafo de 3 canales Edan SE-301</title>
     <description>Electrocardiógrafo interpretativo para consulta, emergencia y hospitalización. 3 canales Pantalla táctil a color de 5 pulgadas Interpretación automática Papel de 80 mm, puerto USB Cod. D-1.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-se301/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-se301-real.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>4127.00 PEN</g:price>
+    <g:price>4116.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SE-301</g:mpn>
@@ -566,7 +581,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-094577/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-094577.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5675.00 PEN</g:price>
+    <g:price>5660.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SE-601B</g:mpn>
@@ -581,7 +596,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-xxl-lf-s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-xxl-lf-s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2255.00 PEN</g:price>
+    <g:price>2249.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Gamma XXL LF-S</g:mpn>
@@ -596,7 +611,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-sd5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2167.00 PEN</g:price>
+    <g:price>2161.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SD-5</g:mpn>
@@ -611,7 +626,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-sd-6/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd-6.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2683.00 PEN</g:price>
+    <g:price>2676.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SD-6</g:mpn>
@@ -626,7 +641,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-ri-modul/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-ri-modul.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2996.00 PEN</g:price>
+    <g:price>2988.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Ri-modul</g:mpn>
@@ -641,7 +656,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-076505/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-076505.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>3354.00 PEN</g:price>
+    <g:price>3345.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BBL 64</g:mpn>
@@ -656,7 +671,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-077672/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-077672.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>4207.00 PEN</g:price>
+    <g:price>4196.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BWL 51</g:mpn>
@@ -671,7 +686,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-083007/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-083007.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>4887.00 PEN</g:price>
+    <g:price>4875.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>EL3 LED</g:mpn>
@@ -686,7 +701,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-084117/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-084117.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5772.00 PEN</g:price>
+    <g:price>5757.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>EL3 LED</g:mpn>
@@ -701,7 +716,7 @@
     <link>https://sinergiabiomedica.pe/venta/optika-b-382pli-alc/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-382pli-alc.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9427.00 PEN</g:price>
+    <g:price>9403.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Optika</g:brand>
     <g:mpn>B-382PLi-ALC</g:mpn>
@@ -716,7 +731,7 @@
     <link>https://sinergiabiomedica.pe/venta/optika-b-290tb/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-290tb.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>12836.00 PEN</g:price>
+    <g:price>12802.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Optika</g:brand>
     <g:mpn>B-290TB</g:mpn>
@@ -731,7 +746,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-100807/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100807.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9286.00 PEN</g:price>
+    <g:price>9262.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iX12</g:mpn>
@@ -746,7 +761,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v6/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v6.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>6707.00 PEN</g:price>
+    <g:price>6689.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Elite V6</g:mpn>
@@ -761,7 +776,7 @@
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx10/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx10.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>6913.00 PEN</g:price>
+    <g:price>6895.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>CX10</g:mpn>
@@ -776,7 +791,7 @@
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx12/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx12.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7429.00 PEN</g:price>
+    <g:price>7410.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>CX12</g:mpn>
@@ -791,7 +806,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v8/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v8.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7738.00 PEN</g:price>
+    <g:price>7718.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Elite V8</g:mpn>
@@ -806,7 +821,7 @@
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx15/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx15.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>8461.00 PEN</g:price>
+    <g:price>8439.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>CX15</g:mpn>
@@ -821,7 +836,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-100806/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100806.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>8770.00 PEN</g:price>
+    <g:price>8747.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iX10</g:mpn>
@@ -836,7 +851,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-100808/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100808.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>10318.00 PEN</g:price>
+    <g:price>10291.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iX15</g:mpn>
@@ -851,7 +866,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-095443/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-095443.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>13413.00 PEN</g:price>
+    <g:price>13378.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>X12</g:mpn>
@@ -866,7 +881,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-iv12/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv12.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>14023.00 PEN</g:price>
+    <g:price>13986.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iV12</g:mpn>
@@ -881,7 +896,7 @@
     <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-200/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-200.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9577.00 PEN</g:price>
+    <g:price>9552.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron 200</g:mpn>
@@ -896,7 +911,7 @@
     <link>https://sinergiabiomedica.pe/venta/meling-biomedi-100408/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-biomedi-100408.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7926.00 PEN</g:price>
+    <g:price>7905.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Meling</g:brand>
     <g:mpn>YC-130L</g:mpn>
@@ -911,7 +926,7 @@
     <link>https://sinergiabiomedica.pe/venta/cu-medical-dea/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-dea.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>11256.00 PEN</g:price>
+    <g:price>11227.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CU Medical</g:brand>
     <g:mpn>Serie i-PAD</g:mpn>
@@ -926,7 +941,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-f3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7429.00 PEN</g:price>
+    <g:price>7410.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>F3</g:mpn>
@@ -941,7 +956,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-f9/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f9.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>13929.00 PEN</g:price>
+    <g:price>13893.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>F9</g:mpn>
@@ -956,7 +971,7 @@
     <link>https://sinergiabiomedica.pe/venta/cami-new-hospivac-350/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cami-new-hospivac-350.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7027.00 PEN</g:price>
+    <g:price>7009.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CA-MI</g:brand>
     <g:mpn>New Hospivac 350 Full5</g:mpn>
@@ -971,7 +986,7 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-076299/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-076299.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7091.00 PEN</g:price>
+    <g:price>7073.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>PLC-024</g:mpn>
@@ -986,7 +1001,7 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-010762/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-010762.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9286.00 PEN</g:price>
+    <g:price>9262.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>PLC-012H</g:mpn>
@@ -1001,7 +1016,7 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-087719/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-087719.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9567.00 PEN</g:price>
+    <g:price>9543.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>PLC-025</g:mpn>
@@ -1016,7 +1031,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-082095/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-082095.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>12008.00 PEN</g:price>
+    <g:price>11977.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>SC-8</g:mpn>
@@ -1031,27 +1046,12 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-ba88a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-ba88a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>12622.00 PEN</g:price>
+    <g:price>12589.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>BA-88A</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200-led-4</g:id>
-    <title>Set otoscopio y oftalmoscopio LED a pilas Heine BETA 200 LED</title>
-    <description>Set de diagnóstico LED con otoscopio de fibra óptica y oftalmoscopio. Otoscopio y oftalmoscopio LED Mango a pilas de 2.5 V Cod. D-131.</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-4/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-4.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>6012.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1061,7 +1061,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200s-led-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200s-led-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7143.00 PEN</g:price>
+    <g:price>7124.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200S LED</g:mpn>
@@ -1076,7 +1076,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7239.00 PEN</g:price>
+    <g:price>7220.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200</g:mpn>
@@ -1091,7 +1091,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-096982/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-096982.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>6707.00 PEN</g:price>
+    <g:price>6689.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SE-601C</g:mpn>
@@ -1106,7 +1106,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-099606/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099606.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7738.00 PEN</g:price>
+    <g:price>7718.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SE-1201</g:mpn>
@@ -1121,7 +1121,7 @@
     <link>https://sinergiabiomedica.pe/venta/ugaiya-099169/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-ugaiya-099169.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>13793.00 PEN</g:price>
+    <g:price>13757.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ugaiya</g:brand>
     <g:mpn>UG-AR200</g:mpn>
@@ -1136,7 +1136,7 @@
     <link>https://sinergiabiomedica.pe/venta/memmert-sn-75/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-sn-75.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>14961.00 PEN</g:price>
+    <g:price>14922.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Memmert</g:brand>
     <g:mpn>SN-75</g:mpn>
@@ -1151,7 +1151,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-087895/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-087895.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7429.00 PEN</g:price>
+    <g:price>7410.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BPS 40 Plus</g:mpn>
@@ -1181,7 +1181,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-sa-10/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sa-10.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>8629.00 PEN</g:price>
+    <g:price>8607.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SA-10</g:mpn>
@@ -1196,7 +1196,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-084116/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-084116.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>8770.00 PEN</g:price>
+    <g:price>8747.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>EL 10 LED</g:mpn>
@@ -1211,7 +1211,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-091592/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-091592.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9380.00 PEN</g:price>
+    <g:price>9356.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>CT3</g:mpn>
@@ -1226,7 +1226,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-076898/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-076898.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>10226.00 PEN</g:price>
+    <g:price>10199.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BAS 31 Plus</g:mpn>
@@ -1256,7 +1256,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-097596/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-097596.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>11016.00 PEN</g:price>
+    <g:price>10987.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Delta 30</g:mpn>
@@ -1271,7 +1271,7 @@
     <link>https://sinergiabiomedica.pe/venta/hugemed-097345/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hugemed-097345.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>11701.00 PEN</g:price>
+    <g:price>11671.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Hugemed</g:brand>
     <g:mpn>VL3R</g:mpn>
@@ -1286,12 +1286,27 @@
     <link>https://sinergiabiomedica.pe/venta/keewell-ft2800/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-keewell-ft2800.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>11725.00 PEN</g:price>
+    <g:price>11694.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Keewell</g:brand>
     <g:mpn>FT2800</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Ventilación e infusión</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>cardioline-walk400h</g:id>
+    <title>Holter de ECG de 3/12 canales Cardioline Walk400h</title>
+    <description>Grabador Holter con pantalla y Bluetooth para registros de 24 a 48 horas. 3 o 12 canales Bluetooth 24/48 horas</description>
+    <link>https://sinergiabiomedica.pe/venta/cardioline-walk400h/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/cardioline-walk400h.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>14983.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Cardioline</g:brand>
+    <g:mpn>Walk400h</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1316,7 +1331,7 @@
     <link>https://sinergiabiomedica.pe/venta/baix-100921/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/baix-100921.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>25794.00 PEN</g:price>
+    <g:price>25728.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Baix</g:brand>
     <g:mpn>DS-25</g:mpn>
@@ -1331,7 +1346,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-077612/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-077612.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>20280.00 PEN</g:price>
+    <g:price>20228.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BIB-100</g:mpn>
@@ -1346,7 +1361,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-iv15/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv15.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>16180.00 PEN</g:price>
+    <g:price>16138.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iV15</g:mpn>
@@ -1361,7 +1376,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-086825/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-086825.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>17822.00 PEN</g:price>
+    <g:price>17775.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iM70</g:mpn>
@@ -1376,7 +1391,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-iv17/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv17.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>18338.00 PEN</g:price>
+    <g:price>18290.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iV17</g:mpn>
@@ -1391,7 +1406,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-092463/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092463.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>27670.00 PEN</g:price>
+    <g:price>27599.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iM80</g:mpn>
@@ -1406,7 +1421,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-095440/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-095440.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22924.00 PEN</g:price>
+    <g:price>22865.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED E3</g:mpn>
@@ -1421,7 +1436,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-hyled-200m/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-hyled-200m.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19698.00 PEN</g:price>
+    <g:price>19647.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>HyLED 200M</g:mpn>
@@ -1436,7 +1451,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-087352/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-087352.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22417.00 PEN</g:price>
+    <g:price>22359.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED E3</g:mpn>
@@ -1451,7 +1466,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-084199/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-084199.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22797.00 PEN</g:price>
+    <g:price>22738.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED E3</g:mpn>
@@ -1466,7 +1481,7 @@
     <link>https://sinergiabiomedica.pe/venta/ledspa-surtron-300/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/ledspa-surtron-300.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>29771.00 PEN</g:price>
+    <g:price>29694.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron 300 HP</g:mpn>
@@ -1481,7 +1496,7 @@
     <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-touch-200/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-touch-200.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19416.00 PEN</g:price>
+    <g:price>19366.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron Touch 200</g:mpn>
@@ -1496,7 +1511,7 @@
     <link>https://sinergiabiomedica.pe/venta/meling-dw-fl528/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-dw-fl528.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>32782.00 PEN</g:price>
+    <g:price>32697.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Meling</g:brand>
     <g:mpn>DW-FL528</g:mpn>
@@ -1511,7 +1526,7 @@
     <link>https://sinergiabiomedica.pe/venta/cu-medical-hd1/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-hd1.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19698.00 PEN</g:price>
+    <g:price>19647.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CU Medical</g:brand>
     <g:mpn>CU-HD1</g:mpn>
@@ -1526,7 +1541,7 @@
     <link>https://sinergiabiomedica.pe/venta/cu-medical-096614/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-096614.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>36816.00 PEN</g:price>
+    <g:price>36720.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CU Medical</g:brand>
     <g:mpn>Life Gain CU-HD1</g:mpn>
@@ -1541,7 +1556,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-f9-express/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f9-express.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22183.00 PEN</g:price>
+    <g:price>22126.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>F9 Express</g:mpn>
@@ -1556,7 +1571,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-f15/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f15.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>28890.00 PEN</g:price>
+    <g:price>28815.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>F15</g:mpn>
@@ -1571,7 +1586,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-075437/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-075437.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>21528.00 PEN</g:price>
+    <g:price>21472.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>C-28A</g:mpn>
@@ -1586,7 +1601,7 @@
     <link>https://sinergiabiomedica.pe/venta/hettich-rotofix-32a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hettich-rotofix-32a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19444.00 PEN</g:price>
+    <g:price>19394.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Hettich</g:brand>
     <g:mpn>Rotofix 32A</g:mpn>
@@ -1601,7 +1616,7 @@
     <link>https://sinergiabiomedica.pe/venta/hettich-haematokrit-200/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hettich-haematokrit-200.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19510.00 PEN</g:price>
+    <g:price>19459.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Hettich</g:brand>
     <g:mpn>Haematokrit 200</g:mpn>
@@ -1616,7 +1631,7 @@
     <link>https://sinergiabiomedica.pe/venta/cardioline-touchecg-tab7/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-cardioline-touchecg-tab7.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>15700.00 PEN</g:price>
+    <g:price>15659.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Cardioline</g:brand>
     <g:mpn>TouchECG Tab7</g:mpn>
@@ -1631,7 +1646,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h30-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h30-pro.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22652.00 PEN</g:price>
+    <g:price>22594.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H30 Pro</g:mpn>
@@ -1646,7 +1661,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-bc-30s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-bc-30s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>33430.00 PEN</g:price>
+    <g:price>33343.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>BC-30S</g:mpn>
@@ -1661,7 +1676,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-093683/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-093683.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>39254.00 PEN</g:price>
+    <g:price>39153.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H30</g:mpn>
@@ -1676,27 +1691,12 @@
     <link>https://sinergiabiomedica.pe/venta/memmert-un-110/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-un-110.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19294.00 PEN</g:price>
+    <g:price>19244.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Memmert</g:brand>
     <g:mpn>UN-110</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>cardioline-walk400h</g:id>
-    <title>Holter de ECG de 3/12 canales Cardioline Walk400h</title>
-    <description>Grabador Holter con pantalla y Bluetooth para registros de 24 a 48 horas. 3 o 12 canales Bluetooth 24/48 horas</description>
-    <link>https://sinergiabiomedica.pe/venta/cardioline-walk400h/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/cardioline-walk400h.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>15022.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Cardioline</g:brand>
-    <g:mpn>Walk400h</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1721,7 +1721,7 @@
     <link>https://sinergiabiomedica.pe/venta/diagnostico-c6a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-diagnostico-c6a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>18009.00 PEN</g:price>
+    <g:price>17963.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>C6A</g:mpn>
@@ -1736,7 +1736,7 @@
     <link>https://sinergiabiomedica.pe/venta/sibelmed-datospir-touch-diagnostic/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/sibelmed-datospir-touch-diagnostic.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19866.00 PEN</g:price>
+    <g:price>19815.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Sibelmed</g:brand>
     <g:mpn>Datospir Touch Diagnostic</g:mpn>
@@ -1751,7 +1751,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-073492/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-073492.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22782.00 PEN</g:price>
+    <g:price>22723.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Omega 500</g:mpn>
@@ -1766,7 +1766,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-097070/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-097070.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>23173.00 PEN</g:price>
+    <g:price>23113.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>MW-12A</g:mpn>
@@ -1811,7 +1811,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-mr-96a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-mr-96a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>34799.00 PEN</g:price>
+    <g:price>34709.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>MR-96A</g:mpn>
@@ -1826,7 +1826,7 @@
     <link>https://sinergiabiomedica.pe/venta/tuttnauer-087186/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-087186.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>36007.00 PEN</g:price>
+    <g:price>35914.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Tuttnauer</g:brand>
     <g:mpn>Elara 11D</g:mpn>
@@ -1841,7 +1841,7 @@
     <link>https://sinergiabiomedica.pe/venta/baix-48l/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/baix-48l.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>51589.00 PEN</g:price>
+    <g:price>51455.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Baix</g:brand>
     <g:mpn>48 L clase B</g:mpn>
@@ -1856,7 +1856,7 @@
     <link>https://sinergiabiomedica.pe/venta/tuttnauer-3870-ea/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-3870-ea.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>91453.00 PEN</g:price>
+    <g:price>91216.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Tuttnauer</g:brand>
     <g:mpn>3870 EA</g:mpn>
@@ -1871,7 +1871,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-acclarix-lx3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-acclarix-lx3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>95205.00 PEN</g:price>
+    <g:price>94958.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Acclarix LX3</g:mpn>
@@ -1901,7 +1901,7 @@
     <link>https://sinergiabiomedica.pe/venta/siare-aria-104/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/siare-aria-104.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>93798.00 PEN</g:price>
+    <g:price>93555.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Siare</g:brand>
     <g:mpn>Aria 104</g:mpn>
@@ -1916,7 +1916,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-tv50/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-tv50.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>85915.00 PEN</g:price>
+    <g:price>85693.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>TV50</g:mpn>
@@ -1931,7 +1931,7 @@
     <link>https://sinergiabiomedica.pe/venta/david-yp-2000/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/david-yp-2000.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>56842.00 PEN</g:price>
+    <g:price>56694.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ningbo David</g:brand>
     <g:mpn>YP-2000</g:mpn>
@@ -1946,7 +1946,7 @@
     <link>https://sinergiabiomedica.pe/venta/led-spa-075336/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-075336.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>50482.00 PEN</g:price>
+    <g:price>50351.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron 400 HP</g:mpn>
@@ -1961,7 +1961,7 @@
     <link>https://sinergiabiomedica.pe/venta/meling-dw-hl530/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-meling-dw-hl530.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>67535.00 PEN</g:price>
+    <g:price>67360.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Meling</g:brand>
     <g:mpn>DW-HL530</g:mpn>
@@ -1976,7 +1976,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-091295/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-091295.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>56623.00 PEN</g:price>
+    <g:price>56477.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>U-320</g:mpn>
@@ -1991,7 +1991,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-bs-240-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-bs-240-pro.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>97925.00 PEN</g:price>
+    <g:price>97671.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>BS-240 Pro</g:mpn>
@@ -2006,7 +2006,7 @@
     <link>https://sinergiabiomedica.pe/venta/laboratorio-h60s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-h60s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>64721.00 PEN</g:price>
+    <g:price>64553.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H60S</g:mpn>
@@ -2021,7 +2021,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h80s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h80s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>78790.00 PEN</g:price>
+    <g:price>78586.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H80S</g:mpn>
@@ -2036,7 +2036,7 @@
     <link>https://sinergiabiomedica.pe/venta/memmert-089258/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-089258.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>42800.00 PEN</g:price>
+    <g:price>42689.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Memmert</g:brand>
     <g:mpn>ICO 50</g:mpn>
@@ -2066,7 +2066,7 @@
     <link>https://sinergiabiomedica.pe/venta/laboratorio-bc-60/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-bc-60.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>64721.00 PEN</g:price>
+    <g:price>64553.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Autobio</g:brand>
     <g:mpn>BC 60</g:mpn>
@@ -2081,7 +2081,7 @@
     <link>https://sinergiabiomedica.pe/venta/tuttnauer-101144/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-tuttnauer-101144.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>562788.00 PEN</g:price>
+    <g:price>561330.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Tuttnauer</g:brand>
     <g:mpn>T-MAX6 EP 2V</g:mpn>
@@ -2096,7 +2096,7 @@
     <link>https://sinergiabiomedica.pe/venta/imagenes-v5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-imagenes-v5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>144449.00 PEN</g:price>
+    <g:price>144075.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Samsung</g:brand>
     <g:mpn>V5</g:mpn>
@@ -2111,7 +2111,7 @@
     <link>https://sinergiabiomedica.pe/venta/sonoscape-096501/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-sonoscape-096501.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>194725.00 PEN</g:price>
+    <g:price>194220.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>SonoScape</g:brand>
     <g:mpn>P20</g:mpn>
@@ -2126,7 +2126,7 @@
     <link>https://sinergiabiomedica.pe/venta/imagenes-v8/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-imagenes-v8.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>271461.00 PEN</g:price>
+    <g:price>270758.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Samsung</g:brand>
     <g:mpn>V8</g:mpn>
@@ -2141,7 +2141,7 @@
     <link>https://sinergiabiomedica.pe/venta/siare-094409/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/siare-094409.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>117248.00 PEN</g:price>
+    <g:price>116944.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Siare</g:brand>
     <g:mpn>Aria 150</g:mpn>
@@ -2156,7 +2156,7 @@
     <link>https://sinergiabiomedica.pe/venta/perlove-099414/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/perlove-rx-digital.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>433347.00 PEN</g:price>
+    <g:price>432224.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Perlove</g:brand>
     <g:mpn>PLD6500E</g:mpn>
@@ -2171,7 +2171,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-074705/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-074705.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>101871.00 PEN</g:price>
+    <g:price>101607.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED V16/V10</g:mpn>
@@ -2186,7 +2186,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-096941/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-096941.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>219487.00 PEN</g:price>
+    <g:price>218919.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED X/X</g:mpn>
@@ -2201,7 +2201,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-a7/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-a7.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>334138.00 PEN</g:price>
+    <g:price>333273.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>A7</g:mpn>
@@ -2216,7 +2216,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-hybase-6100-plus/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-hybase-6100-plus.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>209170.00 PEN</g:price>
+    <g:price>208628.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>HyBase 6100 Plus</g:mpn>
@@ -2231,7 +2231,7 @@
     <link>https://sinergiabiomedica.pe/venta/medifa-089727/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/medifa-089727.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>284489.00 PEN</g:price>
+    <g:price>283752.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Medifa</g:brand>
     <g:mpn>601120</g:mpn>
@@ -2246,7 +2246,7 @@
     <link>https://sinergiabiomedica.pe/venta/laboratorio-h100-plus/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-h100-plus.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>121159.00 PEN</g:price>
+    <g:price>120845.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Lifotronic</g:brand>
     <g:mpn>H100 Plus</g:mpn>
@@ -2261,7 +2261,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-c3510/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-c3510.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>152178.00 PEN</g:price>
+    <g:price>151784.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>C3510</g:mpn>
@@ -2276,7 +2276,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-cl-900i/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-cl-900i.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>158369.00 PEN</g:price>
+    <g:price>157958.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>CL-900i</g:mpn>
