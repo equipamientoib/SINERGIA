@@ -500,10 +500,10 @@ def producto(p, cat, cfg, fts, promos, prev, sig, mismos, base, fijas, locales):
         # cuando la tienen, porque ese fin lo decide la empresa.
         nota = 'Incluye IGV · hasta agotar stock'
         if of:
-            nota = ('Incluye IGV · <b>%s hasta el %s</b> · se confirma en la cotización'
+            nota = ('Incluye IGV · <b>%s hasta el %s</b> · escríbenos para confirmarlo'
                     % ('Promoción válida',
                        of['fin'].strftime('%d/%m/%Y'))) if of['fin'] else (
-                   'Incluye IGV · <b>%s, hasta agotar stock</b> · se confirma en la cotización'
+                   'Incluye IGV · <b>%s, hasta agotar stock</b> · escríbenos para confirmarlo'
                     % 'Precio especial')
         # Nunca se muestra el precio anterior ni el porcentaje: el cliente
         # de este negocio vuelve a comprar y negocia, y anunciar la rebaja
