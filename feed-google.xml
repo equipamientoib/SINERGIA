@@ -3,7 +3,7 @@
 <channel>
   <title>Sinergia Biomédica — equipos biomédicos</title>
   <link>https://sinergiabiomedica.pe</link>
-  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-27.</description>
+  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-28.</description>
   <item>
     <g:id>edan-h100b</g:id>
     <title>Pulsioxímetro de mano Edan H100B</title>
@@ -125,21 +125,6 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>edan-sd3-plus</g:id>
-    <title>Detector de latidos fetales portátil Edan SD-3 Plus</title>
-    <description>Doppler fetal de bolsillo para control prenatal. Sonda de 2,0 MHz Batería recargable Cod. D-97.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-sd3-plus/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd3-plus.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>926.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SD-3 Plus</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Neonatología y obstetricia</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
     <g:id>gemmy-072210</g:id>
     <title>Agitador vórtex de mesa Gemmy VM 300P</title>
     <description>Agitador vórtex de mesa para mezclar muestras en tubos. Velocidad regulable Funcionamiento continuo o por contacto Cabezal de goma</description>
@@ -182,21 +167,6 @@
     <g:mpn>BM-117</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-099004</g:id>
-    <title>Monitor de signos vitales de 12&quot; Slim Edan X12</title>
-    <description>Monitor multiparámetro delgado, sin impresora. Pantalla de 12&quot; 5 parámetros Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-099004/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099004.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>4794.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>X12</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -465,21 +435,6 @@
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200 / BETA 100</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200s-led</g:id>
-    <title>Oftalmoscopio LED con mango recargable Heine BETA 200S LED</title>
-    <description>Oftalmoscopio premium con mango recargable por USB. LED Mango recargable BETA 4 USB Estuche</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200s-led/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200s-led.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>5762.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200S LED</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -1040,21 +995,6 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>edan-099606</g:id>
-    <title>Electrocardiógrafo de 12 canales Edan SE-1201</title>
-    <description>Electrocardiógrafo interpretativo con algoritmo Glasgow. 12 canales Pantalla táctil de 7&quot; Interpretación Glasgow Cod. D-1.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-099606/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099606.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>7718.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SE-1201</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
     <g:id>ugaiya-099169</g:id>
     <title>Incubadora de indicadores biológicos Ugaiya UG-AR200</title>
     <description>Incubadora de lectura para controlar la esterilización con indicadores biológicos. 3 viales Impresora integrada</description>
@@ -1217,21 +1157,6 @@
     <g:mpn>FT2800</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Ventilación e infusión</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>tuttnauer-t-top-11</g:id>
-    <title>Autoclave de mesa de 25 litros clase B Tuttnauer T-Top 11 P</title>
-    <description>Autoclave de vapor clase B para consultorios, odontología y centros de salud. 25 litros Clase B Impresora incorporada Cod. D-212.</description>
-    <link>https://sinergiabiomedica.pe/venta/tuttnauer-t-top-11/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-t-top-11.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>34207.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Tuttnauer</g:brand>
-    <g:mpn>T-Top 11 P</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Esterilización</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1640,21 +1565,6 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>sibelmed-sibelsound-duo</g:id>
-    <title>Audiómetro clínico de 2 canales Sibelmed Sibelsound DUO</title>
-    <description>Audiómetro clínico con pantalla táctil para evaluación auditiva completa. 2 canales Pantalla LCD táctil a color</description>
-    <link>https://sinergiabiomedica.pe/venta/sibelmed-sibelsound-duo/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/sibelmed-sibelsound-duo.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>17685.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Sibelmed</g:brand>
-    <g:mpn>Sibelsound DUO</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
     <g:id>diagnostico-c6a</g:id>
     <title>Videocolposcopio LED rodable Edan C6A</title>
     <description>Videocolposcopio con brazo articulado para ginecología. 50X LED Brazo articulado</description>
@@ -1815,21 +1725,6 @@
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Acclarix LX3</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Imagenología</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>imagenes-hs40</g:id>
-    <title>Ecógrafo rodable con pantalla de 21.5&quot; Samsung HS40</title>
-    <description>Ecógrafo de carro para consulta general y obstetricia (transductores aparte). Monitor LED de 21.5&quot; Pantalla táctil de 10.1&quot; 4 puertos</description>
-    <link>https://sinergiabiomedica.pe/venta/imagenes-hs40/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-imagenes-hs40.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>70006.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Samsung</g:brand>
-    <g:mpn>HS40</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Imagenología</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
