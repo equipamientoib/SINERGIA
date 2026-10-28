@@ -721,22 +721,29 @@
       var id = String(Date.now());
       txt('Enviando <b>' + leidos + '</b> equipos del proveedor a tu hoja…');
       /* ¿Se leyó el catálogo entero? De eso depende que la hoja ponga en CERO
-         el stock de los equipos que hoy no estaban en el portal.
+         el stock de los equipos que hoy no estaban en el portal. Poner un
+         cero de más es grave: ese equipo desaparece de la web o se anuncia
+         agotado sin estarlo. Así que la regla es conservadora.
 
-         Antes se exigía «leidos >= 1000». El catálogo entero del proveedor
-         son 542, así que esa condición NO SE CUMPLÍA NUNCA y la regla de
-         poner en cero no se ejecutó ni una vez: los equipos retirados se
-         quedaban con el stock del último día en que aparecieron, y la web
-         los seguía anunciando «En stock».
+         Se compara con la MEJOR lectura que se recuerde, no con la última:
+         si el portal está en mantenimiento y hoy devuelve la mitad, esa
+         media lectura no puede rebajar la vara para mañana. El proveedor
+         avisó de un mantenimiento de sábado y domingo; una corrida en medio
+         de eso no debe vaciar el stock de medio catálogo.
 
-         Ahora se compara con la última corrida buena: si hoy se leyó al
-         menos el 80 % de aquello, se da por completa. Así sigue valiendo si
-         el proveedor crece o encoge, y sigue protegiendo de lo que protegía
-         el número fijo: una lectura a medias no pone nada en cero. */
-      var ULT = 0;
-      try { ULT = Number(localStorage.getItem('sbAtlLeidos')) || 0; } catch (e) { }
-      var entero = completo && !FILTRADO && leidos >= Math.max(200, Math.round(ULT * 0.8));
-      if (completo && !FILTRADO) { try { localStorage.setItem('sbAtlLeidos', String(leidos)); } catch (e) { } }
+         Y la PRIMERA corrida nunca pone nada en cero: todavía no hay con qué
+         comparar. Se limita a guardar la marca. Como el favorito se corre
+         todos los días, el coste es un día.
+
+         Historia de los guardias que había antes, los dos inútiles:
+           · «leidos >= 1000», con un catálogo de 796 → nunca se cumplía.
+           · «!FILTRADO», con FILTRADO escrito a true y sin cambiar nunca. */
+      var MEJOR = 0;
+      try { MEJOR = Number(localStorage.getItem('sbAtlMejor')) || 0; } catch (e) { }
+      var entero = !FILTRADO && completo && MEJOR > 0 && leidos >= Math.round(MEJOR * 0.8);
+      if (!FILTRADO && completo && leidos > MEJOR) {
+        try { localStorage.setItem('sbAtlMejor', String(leidos)); } catch (e) { }
+      }
       await enviar(JSON.stringify({ k: CFG.k, id: id, tc: TC, todos: true, completo: entero, items: items }));
       /* La respuesta del POST es opaca (otro dominio): se consulta el resultado
          hasta que la hoja termine de procesar este envío. */
