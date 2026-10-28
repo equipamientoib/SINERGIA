@@ -194,6 +194,10 @@
      llegar a la hoja para que la web deje de anunciarlo. Antes este
      comentario decía que no se guardaban; el código de abajo sí lo hacía. */
   var saltadas = 0;   // tarjetas agotadas de las que no se pudo sacar el código
+  /* Y una muestra de las dos primeras, para poder mirarlas. Sin ver el HTML
+     de una tarjeta de estas no hay forma de saber dónde esconde el portal su
+     código, y escribir expresiones a ciegas es perder corridas. */
+  var muestras = [];
   var DEC = document.createElement('textarea');
   function texto(t) { DEC.innerHTML = String(t || '').replace(/<[^>]*>/g, ' '); return DEC.value.replace(/\s+/g, ' ').trim(); }
 
@@ -217,7 +221,11 @@
         /* Sin código no hay forma de casarla con la hoja. Se cuentan para
            avisarlo al final: si salen muchas, hay equipos agotados que no
            llegan a la hoja y la web los sigue anunciando con stock viejo. */
-        if (!cm) { saltadas++; return; }
+        if (!cm) {
+          saltadas++;
+          if (muestras.length < 2) muestras.push(t.slice(0, 2500));
+          return;
+        }
         var pm = t.match(/US\$\s*([\d,]+(?:\.\d+)?)/);
         m = [null, cm[1], '0', pm ? pm[1].replace(/,/g, '') : '0'];
       }
@@ -772,9 +780,31 @@
         (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal' +
             (entero ? ': se les puso el stock en <b>0</b>.' : ': mira la columna «coincidencia».') + '<br>' : '') +
         (entero ? '' : '<span style="color:#f0c674">Esta lectura no se dio por completa, así que NO se puso ningún stock en cero.</span><br>') +
-        (saltadas ? '<span style="color:#f0c674">' + saltadas + ' tarjetas agotadas no traían código y no se pudieron leer. Avísame si este número no es 0.</span><br>' : '') +
+        (saltadas ? '<span style="color:#f0c674">' + saltadas + ' tarjetas agotadas no traían código y no se pudieron leer.</span><br>' : '') +
         vig +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
+      if (muestras.length) {
+        var pm = document.createElement('div');
+        pm.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #333';
+        pm.innerHTML = '🔎 Para arreglar esas ' + saltadas + ' tarjetas hace falta ver cómo es una por dentro. ' +
+          'Dale al botón y pégamelo en el chat.';
+        document.getElementById('sbAtlTxt').appendChild(pm);
+        boton('Copiar una tarjeta sin leer', function () {
+          var txtm = muestras.join('\n\n──────── otra ────────\n\n');
+          var ok = function () { this.textContent = '¡Copiado! Pégamelo en el chat'; }.bind(this);
+          try {
+            navigator.clipboard.writeText(txtm).then(ok, function () {
+              var a = document.createElement('textarea');
+              a.value = txtm; document.body.appendChild(a); a.select();
+              document.execCommand('copy'); a.remove(); ok();
+            });
+          } catch (e) {
+            var a2 = document.createElement('textarea');
+            a2.value = txtm; document.body.appendChild(a2); a2.select();
+            document.execCommand('copy'); a2.remove(); ok();
+          }
+        });
+      }
       await ofrecerFotos();
       await ofrecerDocs();
       boton('Cerrar', cerrar);
