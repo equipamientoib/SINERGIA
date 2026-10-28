@@ -177,8 +177,12 @@
      pasar por el DOM: el portal no escapa las comillas del título y el DOM
      lo corta en «5"»). De cada tarjeta: código, stock y precio (addCesta),
      descripción completa, modelo del proveedor y foto.
-     Devuelve {nuevos, tarjetas}; las tarjetas sin botón de compra (sin
-     stock) cuentan para avanzar de página pero no se guardan. */
+     Devuelve {nuevos, tarjetas}. Las tarjetas sin botón de compra son las
+     AGOTADAS, y SÍ se guardan, con stock 0: que el portal deje de ofrecer
+     un equipo es justo la señal de que no hay stock, y es lo que tiene que
+     llegar a la hoja para que la web deje de anunciarlo. Antes este
+     comentario decía que no se guardaban; el código de abajo sí lo hacía. */
+  var saltadas = 0;   // tarjetas agotadas de las que no se pudo sacar el código
   var DEC = document.createElement('textarea');
   function texto(t) { DEC.innerHTML = String(t || '').replace(/<[^>]*>/g, ' '); return DEC.value.replace(/\s+/g, ' ').trim(); }
 
@@ -191,8 +195,18 @@
       if (!m) {
         /* «Agotado»: sin botón de compra. El código sale del nombre de la
            foto (products/080.741.png) o de algún onclick; stock 0. */
-        var cm = t.match(/products\/(\d{3}\.\d{3})\.\w+/) || t.match(/onclick="[^"]*'(\d{3}\.\d{3})'/);
-        if (!cm) return;
+        var cm = t.match(/products\/(\d{2,3}\.\d{3})\.\w+/)
+             || t.match(/onclick="[^"]*'(\d{2,3}\.\d{3})'/)
+             || t.match(/\bdata-(?:cod|codigo|producto)="(\d{2,3}\.\d{3})"/)
+             || t.match(/\bvalue="(\d{3}\.\d{3})"/)
+             /* Último recurso: el código suelto en el texto de la tarjeta.
+                Se exige que no venga pegado a otra cifra, para no confundirlo
+                con un precio como «1,234.567». */
+             || t.match(/(?:^|[^\d,.])(\d{3}\.\d{3})(?![\d.])/);
+        /* Sin código no hay forma de casarla con la hoja. Se cuentan para
+           avisarlo al final: si salen muchas, hay equipos agotados que no
+           llegan a la hoja y la web los sigue anunciando con stock viejo. */
+        if (!cm) { saltadas++; return; }
         var pm = t.match(/US\$\s*([\d,]+(?:\.\d+)?)/);
         m = [null, cm[1], '0', pm ? pm[1].replace(/,/g, '') : '0'];
       }
@@ -685,7 +699,24 @@
       try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
       var id = String(Date.now());
       txt('Enviando <b>' + leidos + '</b> equipos del proveedor a tu hoja…');
-      await enviar(JSON.stringify({ k: CFG.k, id: id, tc: TC, todos: true, completo: completo && !FILTRADO && leidos >= 1000, items: items }));
+      /* ¿Se leyó el catálogo entero? De eso depende que la hoja ponga en CERO
+         el stock de los equipos que hoy no estaban en el portal.
+
+         Antes se exigía «leidos >= 1000». El catálogo entero del proveedor
+         son 542, así que esa condición NO SE CUMPLÍA NUNCA y la regla de
+         poner en cero no se ejecutó ni una vez: los equipos retirados se
+         quedaban con el stock del último día en que aparecieron, y la web
+         los seguía anunciando «En stock».
+
+         Ahora se compara con la última corrida buena: si hoy se leyó al
+         menos el 80 % de aquello, se da por completa. Así sigue valiendo si
+         el proveedor crece o encoge, y sigue protegiendo de lo que protegía
+         el número fijo: una lectura a medias no pone nada en cero. */
+      var ULT = 0;
+      try { ULT = Number(localStorage.getItem('sbAtlLeidos')) || 0; } catch (e) { }
+      var entero = completo && !FILTRADO && leidos >= Math.max(200, Math.round(ULT * 0.8));
+      if (completo && !FILTRADO) { try { localStorage.setItem('sbAtlLeidos', String(leidos)); } catch (e) { } }
+      await enviar(JSON.stringify({ k: CFG.k, id: id, tc: TC, todos: true, completo: entero, items: items }));
       /* La respuesta del POST es opaca (otro dominio): se consulta el resultado
          hasta que la hoja termine de procesar este envío. */
       var est = {};
@@ -710,7 +741,10 @@
       txt('<b style="color:#9be3b5">¡Listo!</b> Se leyeron <b>' + leidos + '</b> equipos del proveedor' + (TC ? ' (TC S/ ' + TC + ')' : '') + '.<br>' +
         'Tus equipos con precio y stock: <b>' + est.actualizados + '</b>' +
         (est.por_modelo ? ' (' + est.por_modelo + ' encontrados por marca y modelo)' : '') + '.<br>' +
-        (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal: mira la columna «coincidencia».<br>' : '') +
+        (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal' +
+            (entero ? ': se les puso el stock en <b>0</b>.' : ': mira la columna «coincidencia».') + '<br>' : '') +
+        (entero ? '' : '<span style="color:#f0c674">Esta lectura no se dio por completa, así que NO se puso ningún stock en cero.</span><br>') +
+        (saltadas ? '<span style="color:#f0c674">' + saltadas + ' tarjetas agotadas no traían código y no se pudieron leer. Avísame si este número no es 0.</span><br>' : '') +
         vig +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
       await ofrecerFotos();
