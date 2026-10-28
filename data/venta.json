@@ -1699,6 +1699,7 @@
   "landings": {
     "_nota": "Páginas de aterrizaje por categoría: una página por familia de equipos, pensada para lo que la gente escribe en Google («autoclave de vapor precio», «esterilizador clase B»), no para el modelo. La ficha de cada equipo sigue existiendo; esta es la puerta de entrada que las reúne, compara precios y explica cómo elegir. El cuadro de precios, el rango y la lista de equipos se arman solos con el catálogo: aquí solo va el texto. Para crear otra, copia este bloque con el id de la categoría (los ids están en «categorias»). «rangos» declara subconjuntos de la familia para las respuestas: {\"mesa\": \"autoclave de mesa\"} filtra por el nombre del equipo y deja usar {mesa_min}, {mesa_max}, {mesa_min_cap} y {mesa_max_cap}. Hace falta porque una familia junta equipos que el cliente no compara entre sí: en esterilización conviven autoclaves de consultorio y un horizontal de 430 L para central, y el rango de toda la familia no responde a ninguna pregunta. Las capacidades NUNCA se escriben a mano junto a un número calculado: se separan en cuanto cambia el stock.",
     "esterilizacion": {
+      "foto": "biobase-bkm-za",
       "slug": "autoclaves-y-esterilizadores",
       "h1": "Autoclaves y esterilizadores",
       "titulo": "Autoclaves de vapor clase B en Perú: precios y modelos",
@@ -1749,6 +1750,7 @@
       }
     },
     "monitoreo": {
+      "foto": "edan-100806",
       "slug": "monitores-de-signos-vitales",
       "h1": "Monitores de signos vitales",
       "titulo": "Monitores de signos vitales: precios en Perú",
@@ -1756,6 +1758,7 @@
       "entrada": "Monitores de cabecera, de transporte y de UCI, pulsioxímetros de mesa y de mano. Aquí están los modelos que tenemos, con su precio con IGV. Lo que define el precio es el número de parámetros (ECG, SpO2, presión, temperatura, capnografía), el tamaño de la pantalla y si lleva impresora."
     },
     "reanimacion": {
+      "foto": "cu-medical-dea",
       "slug": "desfibriladores-y-dea",
       "h1": "Desfibriladores y reanimación",
       "titulo": "Desfibriladores y DEA: precios en Perú",
@@ -1770,6 +1773,7 @@
       "entrada": "Es la familia más variada: desde un estetoscopio hasta un electrocardiógrafo de 12 canales o un oftalmoscopio indirecto. Aquí están todos los equipos con su precio con IGV, para que ubiques rápido lo que buscas."
     },
     "neonatal": {
+      "foto": "david-yp-2000",
       "slug": "incubadoras-y-equipos-neonatales",
       "h1": "Neonatología y obstetricia",
       "titulo": "Incubadoras, cunas de calor radiante y monitores fetales: precios en Perú",
@@ -1784,6 +1788,7 @@
       "entrada": "Todo lo que lleva una sala de operaciones: la mesa, la lámpara de techo o rodable, el electrobisturí, la máquina de anestesia y el aspirador. Si estás equipando un quirófano completo, arma la cotización con todo junto y te la mandamos en un solo documento."
     },
     "uci": {
+      "foto": "siare-aria-104",
       "slug": "ventiladores-mecanicos-y-bombas-de-infusion",
       "h1": "Ventilación e infusión",
       "titulo": "Ventiladores mecánicos y bombas de infusión: precios en Perú",

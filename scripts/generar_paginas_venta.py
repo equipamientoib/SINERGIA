@@ -500,10 +500,10 @@ def producto(p, cat, cfg, fts, promos, prev, sig, mismos, base, fijas, locales):
         # cuando la tienen, porque ese fin lo decide la empresa.
         nota = 'Incluye IGV · hasta agotar stock'
         if of:
-            nota = ('Incluye IGV · <b>%s hasta el %s</b> · se confirma en la cotización'
+            nota = ('Incluye IGV · <b>%s hasta el %s</b> · escríbenos para confirmarlo'
                     % ('Promoción válida',
                        of['fin'].strftime('%d/%m/%Y'))) if of['fin'] else (
-                   'Incluye IGV · <b>%s, hasta agotar stock</b> · se confirma en la cotización'
+                   'Incluye IGV · <b>%s, hasta agotar stock</b> · escríbenos para confirmarlo'
                     % 'Precio especial')
         # Nunca se muestra el precio anterior ni el porcentaje: el cliente
         # de este negocio vuelve a comprar y negocia, y anunciar la rebaja
@@ -1059,10 +1059,26 @@ def pagina_categoria(cid, L, ps, cats, cfg, promos, base, fijas, locales):
                        'mainEntity': [{'@type': 'Question', 'name': f['q'],
                                        'acceptedAnswer': {'@type': 'Answer', 'text': f['r_']}}
                                       for f in faq]})
+    # La foto del primer equipo de la familia que tenga una. Sin esto la página
+    # caía en la imagen de reserva del generador, que es una foto del
+    # analizador de desfibriladores: la página de autoclaves le ofrecía al
+    # buscador —y a WhatsApp, y a Facebook— la foto de otro equipo. Son las
+    # diez familias y la portada las que estaban así.
+    # «foto» en data/venta.json es el id del equipo que representa a la
+    # familia; si no se pone, vale el primero con foto. Hace falta elegirlo a
+    # mano porque el primero de la lista casi nunca es el representativo: en
+    # «desfibriladores y DEA» era un laringoscopio.
+    orden = [q for q in ps if q['id'] == L.get('foto')] + list(ps)
+    img = None
+    for q in orden:
+        f = fotos(q, base, fijas, locales)
+        if f and f[0][1].startswith('/'):
+            img = f[0][1]
+            break
     return ruta, pagina(cfg, ruta=ruta, title='%s | Sinergia Biomédica' % L['titulo'],
                         descripcion=L['descripcion'],
                         migas=[('Inicio', '/'), ('Venta', '/venta/'), (L['h1'], ruta)],
-                        cuerpo=cuerpo, jsonld=jsonld)
+                        cuerpo=cuerpo, jsonld=jsonld, imagen=img)
 
 
 CODIGOS_EQUIPO = {}        # lo llena main(): equipo → {codigo, capacidad}
@@ -1492,21 +1508,27 @@ def sitemap(paginas, cambios):
     """Agrega/actualiza las URL de /venta/ sin tocar las demás."""
     txt = open(gp.SITEMAP, encoding='utf-8').read() if os.path.exists(gp.SITEMAP) else ''
     previas = gp.fechas_previas()
-    otras = [u for u in re.findall(r'  <url>.*?</url>', txt) if '/venta/' not in u]
+    # Se mira SOLO la direccion de la pagina, no la linea entera: ahora cada
+    # <url> lleva dentro sus fotos, y una pagina de alquiler cuya foto viviera
+    # en /img/venta/ se habria borrado sola al pasar este generador.
+    def ajena(u):
+        m = re.search(r'<loc>([^<]+)</loc>', u)
+        return bool(m) and '/venta/' not in m.group(1)
+    otras = [u for u in re.findall(r'  <url>.*?</url>', txt) if ajena(u)]
     hoy = datetime.date.today().isoformat()
     nuevas = []
     mias = set()
     for ruta, rel in paginas:
         loc = SITIO + ruta
         fecha = hoy if (rel in cambios or loc not in previas) else previas[loc]
-        nuevas.append('  <url><loc>%s</loc><lastmod>%s</lastmod></url>' % (loc, fecha))
+        nuevas.append(gp.fila_url(loc, fecha, rel))
         mias.add('<loc>%s</loc>' % loc)
     # /promociones/ la escribe este generador pero su URL no lleva /venta/,
     # asi que sobrevivia en «otras» y volvia a entrar en «nuevas»: dos veces
     # la misma URL en el sitemap. Se queda la que acabamos de calcular.
     otras = [u for u in otras if not any(m in u for m in mias)]
     gp.escribir('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n'
-                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                + gp.URLSET
                 + '\n'.join(otras + nuevas) + '\n</urlset>\n', cambios)
 
 
