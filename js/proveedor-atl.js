@@ -221,13 +221,24 @@
         /* Sin código no hay forma de casarla con la hoja. Se cuentan para
            avisarlo al final: si salen muchas, hay equipos agotados que no
            llegan a la hoja y la web los sigue anunciando con stock viejo. */
-        if (!cm) {
+        /* EL CÓDIGO NO ESTÁ EN LA TARJETA. Comprobado el 28/10 con el HTML
+           real de dos de ellas: la foto es «img_default.jpg», el chip lleva
+           el MODELO («iM70», «Duplex 2.0») y el enlace lleva el código
+           CIFRADO (?cd=…), nunca el 083.025. El número solo aparece dentro
+           del botón «Añadir al carrito», y un equipo agotado no lo tiene.
+
+           Así que la tarjeta ya NO se tira. Se manda sin código, con su
+           descripción, su modelo y su precio, y es la hoja la que la casa
+           por marca y modelo (matchModelo_ en Venta.gs). Antes se perdían
+           258 de 798 en cada corrida, y sus equipos se quedaban con el
+           precio y el stock del último día en que hubo existencias. */
+        var pm = t.match(/US\$\s*([\d,]+(?:\.\d+)?)/);
+        var sinCodigo = !cm;
+        if (sinCodigo) {
           saltadas++;
           if (muestras.length < 2) muestras.push(t.slice(0, 2500));
-          return;
         }
-        var pm = t.match(/US\$\s*([\d,]+(?:\.\d+)?)/);
-        m = [null, cm[1], '0', pm ? pm[1].replace(/,/g, '') : '0'];
+        m = [null, sinCodigo ? '' : cm[1], '0', pm ? pm[1].replace(/,/g, '') : '0'];
       }
       var tit = (t.match(/<h3[^>]*?title="([\s\S]*?)">/) || [])[1] || (t.match(/<h3[^>]*>([\s\S]*?)<\/h3>/) || [])[1] || '';
       var al = (t.match(/class="alert[^"]*"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '';
@@ -239,7 +250,13 @@
          esa ficha donde están los documentos. */
       var ur = (t.match(/href="([^"]*product-details[^"]*)"/) || [])[1] || '';
       try { ur = ur ? new URL(ur.replace(/&amp;/g, '&'), location.href).href : ''; } catch (e) { ur = ''; }
-      var k = cod6(m[1]); if (!mapa[k]) nuevos++;
+      /* Sin código, la clave sale del ?cd= del enlace, que el portal usa
+         para identificar el producto y es único y estable. Sin algo así,
+         todas las tarjetas sin código caerían en la misma clave y se
+         pisarían entre ellas. */
+      var cdu = sinCodigo ? ((ur.match(/[?&]cd=([^&]+)/) || [])[1] || texto(tit)) : '';
+      var k = sinCodigo ? ('sc:' + cdu) : cod6(m[1]);
+      if (!mapa[k]) nuevos++;
       mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src, u: ur };
     });
     return { nuevos: nuevos, tarjetas: /card card-product/.test(html || '') ? trozos.length : nuevos };

@@ -486,9 +486,27 @@ function atlActualizar_(datos) {
     var pub = s_(fila[col('publicar')]).toUpperCase() === 'SI';
     if (pub) pubs++;
     var cd = codAtl_(cod[i][0]), it = cd ? mapa[cd] : null, via = 'código';
-    if (!it && !cd && datos.todos) {                         // sin código: marca + modelo
+    /* Si el código no salió hoy, se busca por marca y modelo IGUAL. Antes
+       esto solo se intentaba cuando la fila no tenía código («!cd»), así que
+       una fila con código que el portal no devolviera hoy se daba por
+       perdida — aunque el equipo estuviera ahí delante. La prueba está en la
+       propia columna «coincidencia»: decía «parecido en stock: 082.946 …»,
+       es decir, LO HABÍA ENCONTRADO, y no lo usaba.
+       Pasa en dos casos, los dos reales:
+         · el equipo está AGOTADO, y una tarjeta agotada no trae el código;
+         · el proveedor le cambió el código al producto. */
+    if (!it && datos.todos) {
       var m = matchModelo_(fila[col('marca')], fila[col('modelo')], fila[col('nombre')], lista);
-      if (m) { it = m.it; via = 'marca+modelo' + (m.n > 1 ? ' (de ' + m.n + ' versiones)' : ''); cod[i][0] = "'" + it.c; porModelo++; }
+      if (m) {
+        it = m.it;
+        via = (cd ? 'marca+modelo (el código ' + s_(cod[i][0]) + ' no salió hoy)' : 'marca+modelo') +
+              (m.n > 1 ? ' (de ' + m.n + ' versiones)' : '');
+        /* El código de la fila solo se pisa si el hallazgo trae uno: las
+           tarjetas de agotado vienen sin él, y dejar la celda en blanco
+           perdería el que ya teníamos. */
+        if (codAtl_(it.c)) cod[i][0] = "'" + it.c;
+        porModelo++;
+      }
     }
     if (it) {
       /* Lo que cuenta como cambio del proveedor es el precio en DOLARES.
