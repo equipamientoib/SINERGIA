@@ -133,9 +133,20 @@
     ['s', 'm', 'c', 'p', 'u', 'u2', 'tp'].forEach(function (k) { r[k] = q.get(k) || ''; });
     return r;
   })();
-  /* Sin filtro puesto, se usa Tipo = EQUIPOS (tp=2, ≈789 productos): 2 consultas. */
-  if (!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp)) FIL.tp = '2';
-  var FILTRADO = true;
+  /* ¿Había un filtro puesto en la página del portal? Se mira ANTES de
+     forzar el nuestro. De esto depende que la hoja se atreva a poner en
+     cero el stock de lo que hoy no salga: con un filtro puesto, lo que no
+     sale puede estar perfectamente en stock y solo quedar fuera del filtro.
+
+     Estaba escrito «var FILTRADO = true» a secas, sin cambiarlo nunca. Como
+     la regla de poner en cero exige «!FILTRADO», esa regla NO SE EJECUTÓ
+     NUNCA, ni siquiera después de arreglar el otro guardia que la bloqueaba.
+     Dos candados en serie sobre la misma puerta. */
+  var FILTRADO = !!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp);
+  /* Sin filtro del usuario, se usa Tipo = EQUIPOS (tp=2): es TODO el
+     catálogo que a Sinergia le interesa, así que la lectura sigue contando
+     como completa. */
+  if (!FILTRADO) FIL.tp = '2';
 
   function bloque(desde, hasta, pagina, nrodivs) {
     return new Promise(function (ok) {
@@ -623,7 +634,7 @@
 
       /* Se lee el catálogo en bloques grandes, de uno en uno y con pausa.
          Si el portal no acepta 500 por consulta, se prueba con 250. */
-      var mapa = {}, consultas = 0, completo = false;
+      var mapa = {}, consultas = 0, completo = false, vacios = 0;
       var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
       var hallados = function () { return Object.keys(mios).filter(function (c) { return mapa[c]; }).length; };
       /* 1.ª consulta: bloque grande. Luego se sigue desde donde terminó lo
@@ -686,7 +697,17 @@
         if (!res.texto) { log('sin respuesta dos veces: se envía lo leído hasta aquí'); break; }
         r = leer(res.texto, mapa);
         log('leídos ' + r.tarjetas + ' (nuevos ' + r.nuevos + ') · total ' + Object.keys(mapa).length);
-        if (!r.tarjetas || !r.nuevos) { completo = true; break; }   // fin de la lista
+        /* Fin de la lista: SOLO cuando el portal deja de devolver tarjetas.
+           Antes se paraba también cuando un bloque no traía ninguna NUEVA, y
+           eso cortaba la lectura a media lista: un bloque entero de repetidos
+           igual adelanta la ventana («desde += r.tarjetas»), así que el
+           siguiente sí puede traer novedades. Con el corte viejo se leían 542
+           productos de los ~789 que tiene el tipo EQUIPOS, y los ~247 que
+           quedaban fuera salían en la hoja como «no aparece hoy en el
+           portal» aunque estuvieran ahí, con su precio y su stock. */
+        if (!r.tarjetas) { completo = true; break; }
+        vacios = r.nuevos ? 0 : vacios + 1;
+        if (vacios >= 3) { completo = true; break; }   // tres seguidos sin novedad: es el final
         desde += r.tarjetas; pag++;
       }
       /* Se manda la lista completa: la hoja guarda la base del proveedor
