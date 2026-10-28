@@ -133,9 +133,20 @@
     ['s', 'm', 'c', 'p', 'u', 'u2', 'tp'].forEach(function (k) { r[k] = q.get(k) || ''; });
     return r;
   })();
-  /* Sin filtro puesto, se usa Tipo = EQUIPOS (tp=2, ≈789 productos): 2 consultas. */
-  if (!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp)) FIL.tp = '2';
-  var FILTRADO = true;
+  /* ¿Había un filtro puesto en la página del portal? Se mira ANTES de
+     forzar el nuestro. De esto depende que la hoja se atreva a poner en
+     cero el stock de lo que hoy no salga: con un filtro puesto, lo que no
+     sale puede estar perfectamente en stock y solo quedar fuera del filtro.
+
+     Estaba escrito «var FILTRADO = true» a secas, sin cambiarlo nunca. Como
+     la regla de poner en cero exige «!FILTRADO», esa regla NO SE EJECUTÓ
+     NUNCA, ni siquiera después de arreglar el otro guardia que la bloqueaba.
+     Dos candados en serie sobre la misma puerta. */
+  var FILTRADO = !!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp);
+  /* Sin filtro del usuario, se usa Tipo = EQUIPOS (tp=2): es TODO el
+     catálogo que a Sinergia le interesa, así que la lectura sigue contando
+     como completa. */
+  if (!FILTRADO) FIL.tp = '2';
 
   function bloque(desde, hasta, pagina, nrodivs) {
     return new Promise(function (ok) {
@@ -623,7 +634,7 @@
 
       /* Se lee el catálogo en bloques grandes, de uno en uno y con pausa.
          Si el portal no acepta 500 por consulta, se prueba con 250. */
-      var mapa = {}, consultas = 0, completo = false;
+      var mapa = {}, consultas = 0, completo = false, vacios = 0;
       var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
       var hallados = function () { return Object.keys(mios).filter(function (c) { return mapa[c]; }).length; };
       /* 1.ª consulta: bloque grande. Luego se sigue desde donde terminó lo
@@ -686,7 +697,17 @@
         if (!res.texto) { log('sin respuesta dos veces: se envía lo leído hasta aquí'); break; }
         r = leer(res.texto, mapa);
         log('leídos ' + r.tarjetas + ' (nuevos ' + r.nuevos + ') · total ' + Object.keys(mapa).length);
-        if (!r.tarjetas || !r.nuevos) { completo = true; break; }   // fin de la lista
+        /* Fin de la lista: SOLO cuando el portal deja de devolver tarjetas.
+           Antes se paraba también cuando un bloque no traía ninguna NUEVA, y
+           eso cortaba la lectura a media lista: un bloque entero de repetidos
+           igual adelanta la ventana («desde += r.tarjetas»), así que el
+           siguiente sí puede traer novedades. Con el corte viejo se leían 542
+           productos de los ~789 que tiene el tipo EQUIPOS, y los ~247 que
+           quedaban fuera salían en la hoja como «no aparece hoy en el
+           portal» aunque estuvieran ahí, con su precio y su stock. */
+        if (!r.tarjetas) { completo = true; break; }
+        vacios = r.nuevos ? 0 : vacios + 1;
+        if (vacios >= 3) { completo = true; break; }   // tres seguidos sin novedad: es el final
         desde += r.tarjetas; pag++;
       }
       /* Se manda la lista completa: la hoja guarda la base del proveedor
@@ -700,22 +721,29 @@
       var id = String(Date.now());
       txt('Enviando <b>' + leidos + '</b> equipos del proveedor a tu hoja…');
       /* ¿Se leyó el catálogo entero? De eso depende que la hoja ponga en CERO
-         el stock de los equipos que hoy no estaban en el portal.
+         el stock de los equipos que hoy no estaban en el portal. Poner un
+         cero de más es grave: ese equipo desaparece de la web o se anuncia
+         agotado sin estarlo. Así que la regla es conservadora.
 
-         Antes se exigía «leidos >= 1000». El catálogo entero del proveedor
-         son 542, así que esa condición NO SE CUMPLÍA NUNCA y la regla de
-         poner en cero no se ejecutó ni una vez: los equipos retirados se
-         quedaban con el stock del último día en que aparecieron, y la web
-         los seguía anunciando «En stock».
+         Se compara con la MEJOR lectura que se recuerde, no con la última:
+         si el portal está en mantenimiento y hoy devuelve la mitad, esa
+         media lectura no puede rebajar la vara para mañana. El proveedor
+         avisó de un mantenimiento de sábado y domingo; una corrida en medio
+         de eso no debe vaciar el stock de medio catálogo.
 
-         Ahora se compara con la última corrida buena: si hoy se leyó al
-         menos el 80 % de aquello, se da por completa. Así sigue valiendo si
-         el proveedor crece o encoge, y sigue protegiendo de lo que protegía
-         el número fijo: una lectura a medias no pone nada en cero. */
-      var ULT = 0;
-      try { ULT = Number(localStorage.getItem('sbAtlLeidos')) || 0; } catch (e) { }
-      var entero = completo && !FILTRADO && leidos >= Math.max(200, Math.round(ULT * 0.8));
-      if (completo && !FILTRADO) { try { localStorage.setItem('sbAtlLeidos', String(leidos)); } catch (e) { } }
+         Y la PRIMERA corrida nunca pone nada en cero: todavía no hay con qué
+         comparar. Se limita a guardar la marca. Como el favorito se corre
+         todos los días, el coste es un día.
+
+         Historia de los guardias que había antes, los dos inútiles:
+           · «leidos >= 1000», con un catálogo de 796 → nunca se cumplía.
+           · «!FILTRADO», con FILTRADO escrito a true y sin cambiar nunca. */
+      var MEJOR = 0;
+      try { MEJOR = Number(localStorage.getItem('sbAtlMejor')) || 0; } catch (e) { }
+      var entero = !FILTRADO && completo && MEJOR > 0 && leidos >= Math.round(MEJOR * 0.8);
+      if (!FILTRADO && completo && leidos > MEJOR) {
+        try { localStorage.setItem('sbAtlMejor', String(leidos)); } catch (e) { }
+      }
       await enviar(JSON.stringify({ k: CFG.k, id: id, tc: TC, todos: true, completo: entero, items: items }));
       /* La respuesta del POST es opaca (otro dominio): se consulta el resultado
          hasta que la hoja termine de procesar este envío. */
