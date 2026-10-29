@@ -3,7 +3,7 @@
 <channel>
   <title>Sinergia Biomédica — equipos biomédicos</title>
   <link>https://sinergiabiomedica.pe</link>
-  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-28.</description>
+  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-10-29.</description>
   <item>
     <g:id>edan-h100b</g:id>
     <title>Pulsioxímetro de mano Edan H100B</title>
@@ -2365,7 +2365,7 @@
     <description>Sistema de radiología digital directa con dos detectores planos. 65 kW 2 detectores de 17x17&quot; Mesa flotante Cod. D-20.</description>
     <link>https://sinergiabiomedica.pe/venta/perlove-099414/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/perlove-rx-digital.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>backorder</g:availability>
     <g:price>434844.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Perlove</g:brand>
