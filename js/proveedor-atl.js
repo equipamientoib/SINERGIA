@@ -479,6 +479,29 @@
 
      Si aun así no viniera el bloque, se reintenta con la cabecera: puede
      que algún día el portal cambie de idea. */
+  /* Cuántos documentos dice el portal que tiene, preguntándoselo.
+
+     El número que la página enseña en la pestaña lo pone su propio
+     JavaScript con esta misma llamada (countArchivosProd en ajaxV11.js),
+     así que en la página recién pedida viene VACÍO. Preguntándolo aquí se
+     tiene el dato de verdad, y con él se sabe si llegaron todos o faltan.
+
+     Si el portal no contesta un número, se devuelve -1 y se sigue como si
+     no lo hubiera dicho: nunca se da un equipo por completo sin saberlo. */
+  async function pedirCuantos(cod) {
+    var visible = cod.slice(0, 3) + '.' + cod.slice(3);
+    var cuerpo = new FormData();
+    cuerpo.append('tipoAccion', 'countArchivosProd');
+    cuerpo.append('codProd', visible);
+    try {
+      var r = await xhrFull('POST', '/controlador/controller_pedido.php', cuerpo, 20000,
+                            { 'X-Requested-With': 'XMLHttpRequest' });
+      if (r.estado < 200 || r.estado >= 400) return -1;
+      var m = String(r.texto || '').replace(/<[^>]*>/g, ' ').match(/\d+/);
+      return m ? Number(m[0]) : -1;
+    } catch (e) { return -1; }
+  }
+
   async function pedirFicha(url) {
     var ultimo = null;
     for (var i = 0; i < 2; i++) {
@@ -612,7 +635,7 @@
          Antes bastaba con que la página cargara para dar el equipo por
          resuelto, y la otra vía no se intentaba nunca: un equipo con seis
          documentos se marcaba «no tiene ninguno» para siempre. */
-      var dice = (ft.ok && typeof ft.dice === 'number') ? ft.dice : -1;
+      var dice = (ft.ok && typeof ft.dice === 'number' && ft.dice >= 0) ? ft.dice : await pedirCuantos(cod);
       if (!ft.ok || dice < 0 || dice > (ft.docs || []).length) {
         var alt = await pedirPanel(cod, 'viewArchivosProd');
         if (alt.ok) {
@@ -638,10 +661,14 @@
       });
       /* El portal prometía más de los que llegaron: no se marca el equipo,
          para que vuelva a la cola en vez de quedarse así para siempre. */
-      var prometidos = (ft.ok && typeof ft.dice === 'number' && ft.dice >= 0) ? ft.dice : -1;
-      if (prometidos > hallados.length) {
+      /* El contador del portal cuenta SOLO la pestaña «Ficha técnica», así
+         que se compara contra esos, no contra el total ya mezclado con el
+         registro sanitario: si no, un registro sanitario de más taparía una
+         ficha técnica de menos. */
+      var deFicha = (ft.docs || []).length;
+      if (dice > deFicha) {
         incompletos++;
-        log('incompleto: ' + visible + ' · el portal dice ' + prometidos + ' y llegaron ' + hallados.length);
+        log('incompleto: ' + visible + ' · el portal dice ' + dice + ' y llegaron ' + deFicha);
         fallas++;
         await espera(2000);
         continue;
