@@ -445,6 +445,20 @@
     t = String(t || '');
     return /divDocProd|id="technicalSheet"/.test(t);
   }
+  /* CUÁNTOS documentos dice el portal que tiene. Lo pone él mismo en la
+     etiqueta de la pestaña «Ficha técnica»:
+
+         <span class="badge …"><div id="divCountDoc">2</div></span>
+
+     Es el único juez fiable de si los trajimos todos: el bloque de
+     documentos se rellena por JavaScript al pulsar la pestaña, así que la
+     página recién pedida puede venir con el bloque VACÍO aunque el equipo
+     tenga seis. Sin este número, cero documentos y «no tiene ninguno» son
+     indistinguibles, y el equipo se marcaba como revisado para siempre. */
+  function cuantosDice(t) {
+    var m = String(t || '').match(/id="divCountDoc"[^>]*>\s*(\d+)/);
+    return m ? Number(m[1]) : -1;      // -1: el portal no lo dice
+  }
   function docsDeFicha(html) {
     var t = String(html || ''), i = t.indexOf('divDocProd');
     if (i < 0) return [];
@@ -471,7 +485,7 @@
       var cab = i ? { 'X-Requested-With': 'XMLHttpRequest' } : null, r;
       try { r = await xhrFull('GET', url, null, 30000, cab); }
       catch (e) { ultimo = { forma: 'ficha', estado: 0, texto: String((e && e.message) || e) }; continue; }
-      if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto) };
+      if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto), dice: cuantosDice(r.texto) };
       ultimo = { forma: i ? 'ficha+ajax' : 'ficha', estado: r.estado, texto: r.texto };
     }
     return { ok: false, ultimo: ultimo };
@@ -576,7 +590,7 @@
   }
 
   async function bajarDocs(lista) {
-    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null;
+    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null, incompletos = 0;
     for (var i = 0; i < lista.length && !parar; i++) {
       var cod = lista[i].c, visible = cod.slice(0, 3) + '.' + cod.slice(3);
       txt('Buscando documentos: <b>' + (i + 1) + ' de ' + lista.length + '</b> equipos…<br>' +
@@ -590,7 +604,22 @@
          cola: así no se pierde el registro sanitario por un tropiezo. Lo
          que ya se bajó no se vuelve a bajar, la hoja lo reconoce. */
       var ft = lista[i].u ? await pedirFicha(lista[i].u) : { ok: false, ultimo: null };
-      if (!ft.ok) ft = await pedirPanel(cod, 'viewArchivosProd');
+      /* Que la página cargue no basta: su bloque de documentos se rellena
+         por JavaScript al pulsar la pestaña, así que puede venir vacío. Si
+         el portal dice que hay más de los que trajimos —o si no dijo
+         nada—, se pide además el panel por la otra vía y se junta todo.
+
+         Antes bastaba con que la página cargara para dar el equipo por
+         resuelto, y la otra vía no se intentaba nunca: un equipo con seis
+         documentos se marcaba «no tiene ninguno» para siempre. */
+      var dice = (ft.ok && typeof ft.dice === 'number') ? ft.dice : -1;
+      if (!ft.ok || dice < 0 || dice > (ft.docs || []).length) {
+        var alt = await pedirPanel(cod, 'viewArchivosProd');
+        if (alt.ok) {
+          ft = ft.ok ? { ok: true, docs: (ft.docs || []).concat(alt.docs || []), dice: dice }
+                     : { ok: true, docs: alt.docs || [], dice: dice };
+        }
+      }
       var rs = ft.ok ? await pedirPanel(cod, 'viewRRSSProd', true) : { ok: false, ultimo: null };
       if (!ft.ok || !rs.ok) {
         /* No se anota NADA: este equipo vuelve a la cola otro día. */
@@ -607,6 +636,16 @@
         if (vistos[k]) return;
         vistos[k] = 1; hallados.push(d);
       });
+      /* El portal prometía más de los que llegaron: no se marca el equipo,
+         para que vuelva a la cola en vez de quedarse así para siempre. */
+      var prometidos = (ft.ok && typeof ft.dice === 'number' && ft.dice >= 0) ? ft.dice : -1;
+      if (prometidos > hallados.length) {
+        incompletos++;
+        log('incompleto: ' + visible + ' · el portal dice ' + prometidos + ' y llegaron ' + hallados.length);
+        fallas++;
+        await espera(2000);
+        continue;
+      }
       if (!hallados.length) {
         sin++;
         await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
@@ -648,6 +687,7 @@
     }
     txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
       (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron (se reintentan otro día)' : '') + '.' +
+      (incompletos ? '<br><span style="color:#f0c674">' + incompletos + ' equipos dicen tener más documentos de los que llegaron: no se marcan y vuelven a la cola.</span>' : '') +
       (docsIlegibles ? '<br><span style="color:#f0c674">' + docsIlegibles + ' documentos del portal no se pudieron leer. Avísame si este número no es 0.</span>' : '') +
       '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
   }
