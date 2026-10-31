@@ -447,12 +447,30 @@
     var j = t.indexOf('id="healthRegistration"', i);
     return leerDocs(t.slice(i, j > i ? j : i + 30000));
   }
+  /* La ficha se pide COMO LA PIDE UNA PERSONA, sin la cabecera
+     «X-Requested-With». Se mandaba, y es la cabecera con la que se piden
+     fragmentos por AJAX: el portal devolvía otra cosa, sin el bloque de
+     documentos, así que fichaValida() fallaba y el equipo se quedaba con
+     lo poco que diera el panel aparte.
+
+     Lo que costaba: el Edan SD-5 (075.554) tiene SEIS documentos en su
+     pestaña «Ficha técnica» —catálogo traducido, catálogo original,
+     MANUALES, registro sanitario y dos de especificaciones técnicas— y en
+     Drive solo quedó uno. Con la página guardada a mano desde el navegador
+     el lector encuentra los seis.
+
+     Si aun así no viniera el bloque, se reintenta con la cabecera: puede
+     que algún día el portal cambie de idea. */
   async function pedirFicha(url) {
-    var r;
-    try { r = await xhrFull('GET', url, null, 30000, { 'X-Requested-With': 'XMLHttpRequest' }); }
-    catch (e) { return { ok: false, ultimo: { forma: 'ficha', estado: 0, texto: String((e && e.message) || e) } }; }
-    if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto) };
-    return { ok: false, ultimo: { forma: 'ficha', estado: r.estado, texto: r.texto } };
+    var ultimo = null;
+    for (var i = 0; i < 2; i++) {
+      var cab = i ? { 'X-Requested-With': 'XMLHttpRequest' } : null, r;
+      try { r = await xhrFull('GET', url, null, 30000, cab); }
+      catch (e) { ultimo = { forma: 'ficha', estado: 0, texto: String((e && e.message) || e) }; continue; }
+      if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto) };
+      ultimo = { forma: i ? 'ficha+ajax' : 'ficha', estado: r.estado, texto: r.texto };
+    }
+    return { ok: false, ultimo: ultimo };
   }
 
   /* accion: 'viewArchivosProd' (ficha técnica, catálogo del fabricante) o
@@ -497,15 +515,24 @@
     return { ok: false, ultimo: ultimo };
   }
 
+  /* Un documento que no se sepa leer se CUENTA, no se tira en silencio.
+     La expresión de antes exigía las tres comillas simples con contenido y
+     el paréntesis de cierre justo después, así que se perdía sin avisar
+     cualquier llamada con un dato vacío, con comillas dobles o con un
+     cuarto argumento. De ocho formas probadas, cinco se perdían. */
+  var RX_DOC = /descargarDoc\(\s*(['"])([\s\S]*?)\1\s*,\s*(['"])([\s\S]*?)\3\s*,\s*(['"])([\s\S]*?)\5/;
+  var docsIlegibles = 0;
   function leerDocs(html) {
     var partes = String(html || '').split('descargarDoc('), out = [], visto = {};
     for (var i = 1; i < partes.length; i++) {
-      var m = ('descargarDoc(' + partes[i]).match(/descargarDoc\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/);
-      if (!m) continue;
-      var clave = m[1] + '|' + m[2] + '|' + m[3];
+      var m = ('descargarDoc(' + partes[i]).match(RX_DOC);
+      if (!m) { docsIlegibles++; log('documento que no se pudo leer: descargarDoc(' + partes[i].slice(0, 60)); continue; }
+      var op = m[2], sis = m[4], tipo = m[6];
+      if (!op) { docsIlegibles++; continue; }           // sin «op» no hay nada que descargar
+      var clave = op + '|' + sis + '|' + tipo;
       if (visto[clave]) continue;
       visto[clave] = 1;
-      out.push({ op: m[1], sis: m[2], tipo: m[3], nom: nombreDoc(partes[i - 1]) });
+      out.push({ op: op, sis: sis, tipo: tipo, nom: nombreDoc(partes[i - 1]) });
     }
     return out;
   }
@@ -617,6 +644,7 @@
     }
     txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
       (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron (se reintentan otro día)' : '') + '.' +
+      (docsIlegibles ? '<br><span style="color:#f0c674">' + docsIlegibles + ' documentos del portal no se pudieron leer. Avísame si este número no es 0.</span>' : '') +
       '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
   }
 
