@@ -141,12 +141,16 @@
      Estaba escrito «var FILTRADO = true» a secas, sin cambiarlo nunca. Como
      la regla de poner en cero exige «!FILTRADO», esa regla NO SE EJECUTÓ
      NUNCA, ni siquiera después de arreglar el otro guardia que la bloqueaba.
-     Dos candados en serie sobre la misma puerta. */
-  var FILTRADO = !!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp);
-  /* Sin filtro del usuario, se usa Tipo = EQUIPOS (tp=2): es TODO el
-     catálogo que a Sinergia le interesa, así que la lectura sigue contando
-     como completa. */
-  if (!FILTRADO) FIL.tp = '2';
+     Dos candados en serie sobre la misma puerta.
+
+     Y «Tipo = Equipos» (tp = 2) NO cuenta como filtro: es exactamente lo
+     que el favorito pide por su cuenta cuando no hay ninguno, y es TODO el
+     catálogo que a Sinergia le interesa. Contarlo como filtro dejaba la
+     regla bloqueada otra vez para cualquiera que tuviera ese chip puesto en
+     la página, que es lo normal al navegar el portal. */
+  var FILTRADO = !!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 ||
+                    (FIL.tp && FIL.tp !== '2'));
+  if (!FIL.tp) FIL.tp = '2';
 
   function bloque(desde, hasta, pagina, nrodivs) {
     return new Promise(function (ok) {
@@ -825,31 +829,9 @@
         (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal' +
             (entero ? ': se les puso el stock en <b>0</b>.' : ': mira la columna «coincidencia».') + '<br>' : '') +
         (entero ? '' : '<span style="color:#f0c674">Esta lectura no se dio por completa, así que NO se puso ningún stock en cero.</span><br>') +
-        (saltadas ? '<span style="color:#f0c674">' + saltadas + ' tarjetas agotadas no traían código y no se pudieron leer.</span><br>' : '') +
+        (saltadas ? '<span style="color:#aeb4bc">' + saltadas + ' de esos equipos están agotados y su tarjeta no trae el código; se reconocen por marca y modelo.</span><br>' : '') +
         vig +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
-      if (muestras.length) {
-        var pm = document.createElement('div');
-        pm.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #333';
-        pm.innerHTML = '🔎 Para arreglar esas ' + saltadas + ' tarjetas hace falta ver cómo es una por dentro. ' +
-          'Dale al botón y pégamelo en el chat.';
-        document.getElementById('sbAtlTxt').appendChild(pm);
-        boton('Copiar una tarjeta sin leer', function () {
-          var txtm = muestras.join('\n\n──────── otra ────────\n\n');
-          var ok = function () { this.textContent = '¡Copiado! Pégamelo en el chat'; }.bind(this);
-          try {
-            navigator.clipboard.writeText(txtm).then(ok, function () {
-              var a = document.createElement('textarea');
-              a.value = txtm; document.body.appendChild(a); a.select();
-              document.execCommand('copy'); a.remove(); ok();
-            });
-          } catch (e) {
-            var a2 = document.createElement('textarea');
-            a2.value = txtm; document.body.appendChild(a2); a2.select();
-            document.execCommand('copy'); a2.remove(); ok();
-          }
-        });
-      }
       await ofrecerFotos();
       await ofrecerDocs();
       boton('Cerrar', cerrar);
