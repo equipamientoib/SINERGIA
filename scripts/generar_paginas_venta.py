@@ -766,16 +766,22 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, prev, sig, mismo
     title = titulo_ficha(p)
     descripcion = descripcion_ficha(p)
     cuerpo = producto(p, cat, cfg, fts, promos, prev, sig, mismos, base, fijas, locales) + PAGINA_JS
-    oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
-              'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/OutOfStock',
-              'seller': {'@id': SITIO + '/#negocio'}}
+    # Una oferta sin precio es un error crítico para Google: contesta
+    # «Either "price" or "priceSpecification.price" should be specified»,
+    # marca la ficha como elemento no válido y deja de mostrar el precio en
+    # la búsqueda. Así que si no hay precio en la fuente no hay bloque
+    # «offers»: el dato que no tenemos no se menciona.
+    oferta = None
     if p.get('precio'):
-        # «8000.00», nunca «8,000»: sin separador de miles y con los dos
-        # decimales, que es el formato que pide Google para este campo.
-        oferta['price'] = '%.2f' % p['precio']
-        # Nunca la vigencia comercial: esa vence a los 14 días de tocar la
-        # hoja y apagaría el precio en Google sin que nadie se entere.
-        oferta['priceValidUntil'] = vigencia_schema().isoformat()
+        oferta = {'@type': 'Offer', 'priceCurrency': 'PEN', 'url': SITIO + ruta,
+                  'availability': 'https://schema.org/InStock' if (p.get('stock') or 0) > 0 else 'https://schema.org/OutOfStock',
+                  'seller': {'@id': SITIO + '/#negocio'},
+                  # «8000.00», nunca «8,000»: sin separador de miles y con los dos
+                  # decimales, que es el formato que pide Google para este campo.
+                  'price': '%.2f' % p['precio'],
+                  # Nunca la vigencia comercial: esa vence a los 14 días de tocar la
+                  # hoja y apagaría el precio en Google sin que nadie se entere.
+                  'priceValidUntil': vigencia_schema().isoformat()}
     jsonld = [{'@type': 'Product', 'name': nombre, 'description': p.get('resumen') or nombre,
                **({'additionalProperty': [{'@type': 'PropertyValue', 'name': 'Código',
                                            'value': cod_de(p)}]}
@@ -785,7 +791,7 @@ def pagina_producto(p, cats, cfg, base, fijas, locales, promos, prev, sig, mismo
                # La grande (no la ligera): Google pide la mayor resolución
                # disponible para mostrar la ficha con foto y precio.
                'image': [SITIO + b if b.startswith('/') else b for _, b in fts][:3],
-               'offers': oferta}]
+               **({'offers': oferta} if oferta else {})}]
     # Las preguntas de la ficha, para que Google pueda mostrarlas debajo
     # del resultado. Son las mismas que ve el cliente en la página: si no
     # estuvieran visibles no se podrían publicar así.
