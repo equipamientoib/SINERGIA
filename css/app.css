@@ -1180,6 +1180,29 @@ body.cot-bloq .wafab{display:none}
   font-size:15px;font-weight:700;line-height:1;background:#2e7d32;color:#fff}
 .cot-ofn{margin:7px 0 0;font-size:11.5px;color:var(--gris);line-height:1.55}
 
+/* ── Códigos del proveedor en la pantalla de emisión ──────────────────
+   Solo los ve la empresa: este bloque vive en el formulario, no en el
+   documento que se descarga. El fondo ámbar es el aviso visual de que lo
+   que hay dentro no se comparte. */
+.emi-cods{list-style:none;margin:0 0 18px;padding:12px 14px;
+  background:#fff8e6;border:1px solid #f0dca8;border-radius:10px}
+.emi-cods li{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;
+  padding:7px 0;border-bottom:1px solid #f0e4c4}
+.emi-cods li:last-child{border-bottom:0}
+.emi-cods b{font-size:.92rem}
+.emi-cods code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:.95rem;font-weight:700;background:#fff;border:1px solid #e3d3a4;
+  border-radius:6px;padding:2px 8px;letter-spacing:.02em}
+.emi-cods span{flex:1 1 100%;font-size:.8rem;color:#7a6a45;line-height:1.35}
+.emi-cod-no{flex:0 1 auto;font-size:.8rem;color:#9a7b2f;font-style:italic}
+@media (prefers-color-scheme:dark){
+  .emi-cods{background:#2b2417;border-color:#4d412a}
+  .emi-cods li{border-bottom-color:#3d3422}
+  .emi-cods code{background:#1d1a12;border-color:#5a4c30;color:#f0e2bd}
+  .emi-cods span{color:#c3b188}
+  .emi-cod-no{color:#d2b56b}
+}
+
 /* ===== css/19-venta-cot.css ===== */
 /* =====================================================================
    19-venta-cot.css — Cotizador de venta (#/cotizar-venta)

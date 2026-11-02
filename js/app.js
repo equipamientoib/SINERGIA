@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=6f95fd50';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=52ae89f0';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=6f95fd50';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=52ae89f0';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=6f95fd50','js/06-tablero.js?v=6f95fd50'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=52ae89f0','js/06-tablero.js?v=52ae89f0'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=6f95fd50'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=52ae89f0'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -3730,8 +3730,60 @@ async function cotEntrar(){
     ok = [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('') === esperado;
   }catch(e){ ok = false; }
   if(!ok){ avisar('emiAviso', 'Clave incorrecta.', 'err'); if(el){ el.value = ''; el.focus(); } return; }
-  try{ sessionStorage.setItem('sb-emitir', '1'); }catch(e){}
+  /* La clave queda en la pestaña, no en disco: se pierde al cerrarla. La
+     necesitamos para pedirle a Apps Script los códigos del proveedor, que
+     no vienen en el catálogo público. */
+  try{ sessionStorage.setItem('sb-emitir', '1'); sessionStorage.setItem('sb-emitir-k', v); }catch(e){}
   cotEmitir(location.hash.slice('#/emitir/'.length));
+}
+
+/* ── Códigos del proveedor ───────────────────────────────────────────
+   Qué hay que pedirle al proveedor para atender este pedido. El código NO
+   está en el catálogo que descarga el navegador: dice a quién le compramos
+   y eso no se publica. Se le pide a Apps Script con la misma clave de
+   emisión, y solo contesta si la clave es la correcta.
+
+   Si la petición falla —sin conexión, clave cambiada, Apps Script sin la
+   propiedad COT_CLAVE— la pantalla de emisión funciona igual: simplemente
+   no aparece el recuadro. Nunca bloquea la cotización. */
+var COT_CODS = null;
+
+function cotClaveGuardada(){
+  try{ return sessionStorage.getItem('sb-emitir-k') || ''; }catch(e){ return ''; }
+}
+
+async function cotCodigosPedir(){
+  if(COT_CODS) return COT_CODS;
+  const k = cotClaveGuardada();
+  const url = (typeof CONFIG !== 'undefined' && CONFIG.VENTA_URL) || '';
+  if(!k || !url) return null;
+  try{
+    const r = await fetch(url + '?cot=codigos&k=' + encodeURIComponent(k), {cache: 'no-store'});
+    const j = await r.json();
+    if(j && j.ok && j.codigos){ COT_CODS = j.codigos; return COT_CODS; }
+  }catch(e){}
+  return null;
+}
+
+/* Se pinta SOLO en el formulario de emisión. Nunca en cotHTML(): ese HTML
+   es el que se convierte en PDF y lo recibe el cliente. */
+async function cotPintarCodigos(d){
+  const caja = document.getElementById('emiCods');
+  if(!caja || !d || d.tipo !== 'venta' || !d.items || !d.items.length) return;
+  const m = await cotCodigosPedir();
+  if(!m) return;
+  const filas = d.items.map(e => {
+    const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
+      : {nom: e.n || e.i || 'Equipo'};
+    const c = m[e.i];
+    if(!c) return `<li><b>${cotEsc(inf.nom)}</b>
+      <span class="emi-cod-no">sin código en la hoja</span></li>`;
+    return `<li><b>${cotEsc(inf.nom)}</b> <code>${cotEsc(c.c)}</code>
+      ${c.d ? `<span>${cotEsc(c.d)}</span>` : ''}</li>`;
+  }).join('');
+  caja.innerHTML = `<div class="emi-g"><b>0</b> Para pedirle al proveedor
+      <small>solo lo ves tú; no sale en la cotización</small></div>
+    <ul class="emi-cods">${filas}</ul>`;
 }
 
 function cotEmitir(codigo){
@@ -3772,6 +3824,7 @@ function cotEmitir(codigo){
     </div>
     <div class="wrap emi">
       <div class="emi-form">
+        <div id="emiCods"></div>
         <div class="emi-g"><b>1</b> Datos de la cotización</div>
         <label>N° de cotización <small>tu correlativo</small>
           <input id="emiNum" value="${cotEsc(COT_EMI.num)}" oninput="cotEmiCambio()"></label>
@@ -3796,6 +3849,7 @@ function cotEmitir(codigo){
       <div class="emi-vista"><div class="cotv-hoja"><iframe title="Cotización"></iframe></div></div>
     </div>`;
   cotEmiCambio();
+  cotPintarCodigos(d);
 }
 
 function cotEmiCambio(){

@@ -358,6 +358,45 @@ function limpiarCache() {
    repositorio. Créala con crearBotonProveedor().                          */
 function claveAtl_() { return PropertiesService.getScriptProperties().getProperty('ATL_CLAVE') || ''; }
 
+/* ── Códigos del proveedor para la pantalla de emisión ──────────────
+   Cuando llega el pedido de un cliente hay que saber QUÉ pedirle al
+   proveedor, y eso es su código: el 077.555 del Edan M3A. Ese dato dice a
+   quién le compramos, así que NO viaja en el catálogo público: cualquiera
+   puede abrir data/venta-vivo.json. Vive aquí, detrás de la clave, y solo
+   lo recibe quien la escribe en #/emitir.
+
+   La clave se guarda en Propiedades del script con el nombre COT_CLAVE, y
+   es la MISMA que la de emisión. Nunca entra al repositorio. Si la
+   propiedad no existe, la respuesta es siempre «clave incorrecta» y la
+   pantalla de emisión sigue funcionando sin el recuadro. */
+function claveCot_() { return PropertiesService.getScriptProperties().getProperty('COT_CLAVE') || ''; }
+
+/* Mapa id → { c: código como lo escribe el portal, d: lo que el portal
+   devolvió para esa fila }. La descripción sale de «coincidencia» y sirve
+   para reconocer el artículo cuando el proveedor tiene varias versiones del
+   mismo modelo (IN-55 y IN-55plus, por ejemplo). */
+function cotCodigos_() {
+  var sh = hojaVenta_(abrirLibro_(VENTA_ID));
+  var vals = sh.getDataRange().getValues(), fh = -1;
+  for (var k = 0; k < Math.min(vals.length, LIM_CABECERA); k++) {
+    if (s_(vals[k][0]).toLowerCase() === 'id') { fh = k; break; }
+  }
+  if (fh < 0) return {};
+  var heads = vals[fh].map(function (h) { return s_(h); });
+  var cC = heads.indexOf('codigo_proveedor'), cCoi = heads.indexOf('coincidencia');
+  if (cC < 0) return {};
+  var out = {};
+  for (var i = fh + 1; i < vals.length; i++) {
+    var id = s_(vals[i][0]); if (!id) continue;
+    /* codAtl_ normaliza a seis dígitos: la hoja guarda unos como «077.555» y
+       otros como «77.555», porque Sheets les come el cero de delante. */
+    var d6 = codAtl_(vals[i][cC]); if (!d6) continue;
+    var desc = cCoi >= 0 ? s_(vals[i][cCoi]).replace(/^[^:]*:\s*/, '') : '';
+    out[id] = { c: d6.slice(0, 3) + '.' + d6.slice(3), d: desc.slice(0, 120) };
+  }
+  return out;
+}
+
 /** Código del proveedor normalizado a 6 dígitos: 90.97 (número), "090.970" → "090970". */
 function codAtl_(v) {
   if (typeof v === 'number') v = v.toFixed(3);
@@ -935,6 +974,11 @@ function doGet(e) {
     if (p.atl === 'docs')  return json_({ ok: true, docs: atlDocsPendientes_() });
     return ContentService.createTextOutput(PropertiesService.getScriptProperties().getProperty('ATL_ULTIMO') || '{"ok":false}')
       .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (p.cot === 'codigos') {                     // pantalla de emisión (#/emitir)
+    if (!claveCot_() || p.k !== claveCot_()) return json_({ ok: false, motivo: 'clave incorrecta' });
+    return json_({ ok: true, codigos: cotCodigos_() });
   }
 
   // catálogo de venta (cacheado 10 minutos)
