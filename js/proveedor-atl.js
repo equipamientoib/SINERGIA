@@ -613,7 +613,7 @@
   }
 
   async function bajarDocs(lista) {
-    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null, incompletos = 0;
+    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null, incompletos = 0, sinCerteza = 0;
     for (var i = 0; i < lista.length && !parar; i++) {
       var cod = lista[i].c, visible = cod.slice(0, 3) + '.' + cod.slice(3);
       txt('Buscando documentos: <b>' + (i + 1) + ' de ' + lista.length + '</b> equipos…<br>' +
@@ -673,7 +673,23 @@
         await espera(2000);
         continue;
       }
+      /* «No tiene ningún documento» es una marca DEFINITIVA: con ella puesta,
+         el equipo no se vuelve a consultar NUNCA. Por eso solo se anota con
+         el contador del portal diciendo CERO.
+
+         Si el contador no se pudo leer, pedirCuantos devuelve -1, y eso es
+         «no sé», no «no hay». Antes los dos casos caían aquí por igual y se
+         cerraron para siempre 16 equipos que sí tenían catálogo, entre ellos
+         el Mindray BA-88A (097.072), al que después bajamos dos catálogos a
+         mano desde el portal. Sin certeza, el equipo vuelve a la cola. */
       if (!hallados.length) {
+        if (dice !== 0) {
+          sinCerteza++;
+          log('sin certeza: ' + visible + ' · no llegó ningún documento y el contador no contestó');
+          fallas++;
+          await espera(2000);
+          continue;
+        }
         sin++;
         await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
       } else {
@@ -715,6 +731,7 @@
     txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
       (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron (se reintentan otro día)' : '') + '.' +
       (incompletos ? '<br><span style="color:#f0c674">' + incompletos + ' equipos dicen tener más documentos de los que llegaron: no se marcan y vuelven a la cola.</span>' : '') +
+      (sinCerteza ? '<br><span style="color:#f0c674">' + sinCerteza + ' equipos no devolvieron ningún documento y el portal tampoco dijo cuántos tienen: NO se marcan como «sin documentos», vuelven a la cola.</span>' : '') +
       (docsIlegibles ? '<br><span style="color:#f0c674">' + docsIlegibles + ' documentos del portal no se pudieron leer. Avísame si este número no es 0.</span>' : '') +
       '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
   }
