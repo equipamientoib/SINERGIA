@@ -917,7 +917,15 @@ function atlGuardarDoc_(d) {
   return { ok: true };
 }
 
-function nrmDoc_(v) { return s_(v).toUpperCase().replace(/\s+/g, ' ').trim(); }
+/* Para comparar el nombre de un documento con los que ya estan guardados.
+   Se quitan las tildes ademas de las mayusculas y los espacios de mas: el
+   portal escribe «Catalogo Traducido» y la hoja puede tener «CATÁLOGO
+   TRADUCIDO». Sin esto el mismo documento no se reconoce, se vuelve a bajar
+   y queda duplicado en Drive y en la hoja. */
+function nrmDoc_(v) {
+  return s_(v).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+              .toUpperCase().replace(/\s+/g, ' ').trim();
+}
 
 /* Para el nombre del archivo en Drive: sin barras ni dos puntos. */
 function limpiarNombre_(v) {
