@@ -1,0 +1,190 @@
+{
+ "_nota": "Ficha técnica del fabricante. Mismo formato que data/fichas/ (alquiler): scripts/generar_paginas_venta.py la muestra en la pestaña «Parámetros técnicos» de la página del equipo, debajo de la identificación, y arma con ella la hoja A4 de la que sale el PDF. Si este archivo no existe, la página no muestra parámetros ni ofrece el PDF: no hay que tocar código para cargar un equipo nuevo, basta con dejar aquí su archivo. «revisar» es lo que Sinergia debe confirmar con el fabricante.",
+ "id": "ca-mi-new-askir-230-12v-br",
+ "titulo": "Aspirador de secreciones portátil CA-MI New Askir 230 12V BR",
+ "resumen": "Unidad de succión eléctrica de sobremesa con batería interna recargable, vacuómetro y regulador de vacío, para aspiración oral, nasal y traqueal en adultos y niños.",
+ "fuente": "catálogo CA-MI «New Askir 230 12V BR», página 10, versión traducida al español",
+ "secciones": [
+  {
+   "titulo": "Aspiración",
+   "filas": [
+    [
+     "Clasificación ISO 10079-1",
+     "Alto vacío / bajo flujo"
+    ],
+    [
+     "Vacío máximo, ajustable",
+     "-0,75 bar · -75 kPa · -563 mmHg"
+    ],
+    [
+     "Flujo de aire libre",
+     "16 L/min"
+    ],
+    [
+     "Regulador de vacío",
+     "Sí, con vacuómetro en bar y kPa"
+    ],
+    [
+     "Ciclo de trabajo",
+     "Operación continua"
+    ],
+    [
+     "Motor",
+     "Bomba de pistón, libre de mantenimiento y lubricación"
+    ]
+   ]
+  },
+  {
+   "titulo": "Alimentación y batería",
+   "filas": [
+    [
+     "Tensión de alimentación",
+     "14 V ⎓ 4 A, con adaptador universal AC/DC (100-240 V, 50/60 Hz, 100 VA)"
+    ],
+    [
+     "Batería interna",
+     "Recargable de plomo, 12 V ⎓ 4 A"
+    ],
+    [
+     "Autonomía",
+     "80 minutos"
+    ],
+    [
+     "Tiempo de recarga",
+     "240 minutos"
+    ],
+    [
+     "Alarma de batería baja",
+     "Visual y acústica"
+    ],
+    [
+     "Alimentación en vehículo",
+     "Adaptador de auto de 12 V incluido"
+    ]
+   ]
+  },
+  {
+   "titulo": "Normas y protección",
+   "filas": [
+    [
+     "Marcado",
+     "CE 0123"
+    ],
+    [
+     "Grado de protección",
+     "IP21"
+    ],
+    [
+     "Norma de configuración",
+     "EN 60601-1-11, para uso en atención domiciliaria"
+    ],
+    [
+     "Garantía del fabricante",
+     "2 años"
+    ],
+    [
+     "Lugar de fabricación",
+     "Italia"
+    ]
+   ]
+  },
+  {
+   "titulo": "Medidas, peso y ruido",
+   "filas": [
+    [
+     "Medidas",
+     "35 × 21 × 18 cm"
+    ],
+    [
+     "Peso",
+     "3,50 kg"
+    ],
+    [
+     "Nivel de ruido",
+     "63,0 dB"
+    ],
+    [
+     "Embalaje",
+     "3 unidades por caja"
+    ]
+   ]
+  },
+  {
+   "titulo": "Se usa en",
+   "filas": [
+    [
+     "Ambulancia",
+     "Sí"
+    ],
+    [
+     "Atención domiciliaria",
+     "Sí"
+    ],
+    [
+     "Transporte de pacientes",
+     "Sí"
+    ],
+    [
+     "Pabellón quirúrgico y sala de operaciones",
+     "Sí"
+    ],
+    [
+     "Traqueotomía",
+     "Sí"
+    ],
+    [
+     "Veterinaria",
+     "Sí"
+    ]
+   ]
+  },
+  {
+   "titulo": "Configuraciones del fabricante",
+   "filas": [
+    [
+     "RE 310211",
+     "Con frasco de 1 000 ml autoclavable, de policarbonato"
+    ],
+    [
+     "RE 310211/01",
+     "Con frasco de 2 000 ml autoclavable, de policarbonato"
+    ],
+    [
+     "Bolsa desechable Flovac y contenedor reutilizable",
+     "Bajo pedido"
+    ],
+    [
+     "Frasco APEC autoclavable hasta 143 °C",
+     "Bajo pedido"
+    ]
+   ]
+  },
+  {
+   "titulo": "Accesorios opcionales",
+   "filas": [
+    [
+     "Carrito de transporte",
+     "Ref. 27730"
+    ],
+    [
+     "Bolsa de transporte",
+     "Ref. SP 0207, para la unidad y sus accesorios desechables"
+    ]
+   ]
+  }
+ ],
+ "incluye": [
+  "Frasco de recolección con sistema de válvula de desagüe",
+  "Tubos de silicona autoclavable 6×10 con conector cónico Ø 8-9-10 mm",
+  "Filtro antibacterial e hidrófugo, de uso único por paciente",
+  "Sonda de aspiración CH20",
+  "Cable de conexión con enchufe tipo Schuko",
+  "Adaptador de auto de 12 V"
+ ],
+ "revisar": [
+  "GARANTÍA. El catálogo del fabricante declara DOS AÑOS. Las cotizaciones de Sinergia ofrecen 12 meses por condición propia. Decidir cuál se publica: si el fabricante da dos años, ofrecer solo uno deja plata sobre la mesa frente a la competencia.",
+  "CONFIGURACIÓN QUE SE VENDE. El portal del proveedor declara el Part Number RE 310211, que según el catálogo es la versión con frasco de 1 000 ml. La web dice «frasco de 1 L», que concuerda. Confirmar antes de prometer la de 2 000 ml.",
+  "ACCESORIOS OPCIONALES. El carrito (ref. 27730) y la bolsa de transporte (ref. SP 0207) no están cotizados ni figuran en el portal del proveedor. Consultar precio antes de ofrecerlos.",
+  "El catálogo no declara el caudal con frasco lleno ni la vida útil del filtro antibacterial. No se publican."
+ ]
+}
