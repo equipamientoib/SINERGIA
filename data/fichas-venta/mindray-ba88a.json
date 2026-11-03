@@ -1,0 +1,199 @@
+{
+ "_nota": "Ficha técnica del fabricante. Mismo formato que data/fichas/ (alquiler): scripts/generar_paginas_venta.py la muestra en la pestaña «Parámetros técnicos» de la página del equipo, debajo de la identificación, y arma con ella la hoja A4 de la que sale el PDF. Si este archivo no existe, la página no muestra parámetros ni ofrece el PDF: no hay que tocar código para cargar un equipo nuevo, basta con dejar aquí su archivo. «revisar» es lo que Sinergia debe confirmar con el fabricante.",
+ "id": "mindray-ba88a",
+ "titulo": "Analizador bioquímico semiautomático Mindray BA-88A",
+ "resumen": "Analizador semiautomático de química clínica con celda de flujo termostatizada, ocho filtros estándar e impresora térmica incorporada.",
+ "fuente": "catálogo Mindray del BA-88A «Analizador semiautomático de quimica clinica», versiones original y traducida al español, páginas 1 y 4",
+ "secciones": [
+  {
+   "titulo": "Menú de pruebas y métodos",
+   "filas": [
+    [
+     "Pruebas programables",
+     "Hasta 200"
+    ],
+    [
+     "Menú de pruebas",
+     "ALT, AST, ALP, ACP, GGT, α-HBDH, LDH, CK, AMY, TG, TC, HDL-c, LDL-c, UA, UREA, Cr, Glu, TP, Alb, T-Bil, D-Bil, TBA, NH4+, CO3-, Ca, Mg, Cl, Na, K, apoA1, apoB, Lp(a), C3, C4, IgG, IgA, IgM, HbA1c, Alcohol, Amphetamines, Barbiturates, Benzodiazepine, entre otras"
+    ],
+    [
+     "Métodos de análisis",
+     "Punto final, con o sin blanco de reactivo; punto final con blanco de muestra y de reactivo; cinético, con o sin blanco de reactivo; cinético de dos puntos o de tiempo fijo, con o sin blanco de reactivo; absorbancia; turbidimetría"
+    ],
+    [
+     "Calibración",
+     "Lineal y no lineal"
+    ],
+    [
+     "Programación de factor K",
+     "Disponible"
+    ],
+    [
+     "Pruebas bicromáticas",
+     "Disponibles"
+    ]
+   ]
+  },
+  {
+   "titulo": "Sistema óptico",
+   "filas": [
+    [
+     "Fuente de luz",
+     "Lámpara de tungsteno-halógeno de 6 V / 10 W"
+    ],
+    [
+     "Selección de longitud de onda",
+     "Automática, rueda de 8 posiciones con filtro"
+    ],
+    [
+     "Filtros estándar",
+     "340, 405, 450, 510, 546, 578, 630 y 670 nm"
+    ],
+    [
+     "Posiciones libres",
+     "2, para longitudes de onda opcionales"
+    ],
+    [
+     "Ancho de banda",
+     "Menor que 8 nm"
+    ],
+    [
+     "Interferencia de luz",
+     "Menor que 0,1 % a 340 nm"
+    ],
+    [
+     "Rango fotométrico",
+     "0 a 3,5 ABS"
+    ],
+    [
+     "Estabilidad",
+     "Menor que 0,005 A en 20 min a 340 nm"
+    ]
+   ]
+  },
+  {
+   "titulo": "Celda de flujo y muestra",
+   "filas": [
+    [
+     "Modos de análisis",
+     "Celda de flujo o cubetas, intercambiables"
+    ],
+    [
+     "Material de la celda",
+     "Acero inoxidable con ventana de cuarzo"
+    ],
+    [
+     "Volumen de medición",
+     "32 µL"
+    ],
+    [
+     "Paso óptico",
+     "10 mm"
+    ],
+    [
+     "Volumen de aspiración",
+     "Programable de 200 a 9 000 µL"
+    ]
+   ]
+  },
+  {
+   "titulo": "Control de temperatura",
+   "filas": [
+    [
+     "Sistema",
+     "Elementos Peltier"
+    ],
+    [
+     "Temperaturas de trabajo",
+     "Temperatura ambiente, 25 °C, 30 °C o 37 °C"
+    ],
+    [
+     "Cambio entre temperaturas",
+     "Intercambio rápido entre las cuatro opciones"
+    ]
+   ]
+  },
+  {
+   "titulo": "Mando, memoria e interfaces",
+   "filas": [
+    [
+     "Pantalla",
+     "Táctil TFT de 7,0 pulgadas"
+    ],
+    [
+     "Entrada de datos",
+     "Teclado emergente en pantalla; teclado o ratón por USB"
+    ],
+    [
+     "Memoria de muestras",
+     "Más de 3 000 resultados"
+    ],
+    [
+     "Memoria de control de calidad",
+     "Más de 1 000 resultados"
+    ],
+    [
+     "Impresora",
+     "Térmica incorporada; admite impresoras serie HP"
+    ],
+    [
+     "Interfaz de datos",
+     "Puerto serie RS-232"
+    ],
+    [
+     "Puertos USB",
+     "USB 2.0, para teclado, ratón e impresora"
+    ],
+    [
+     "Seguimiento de la reacción",
+     "Curva de reacción, datos y temperatura en tiempo real"
+    ]
+   ]
+  },
+  {
+   "titulo": "Instalación",
+   "filas": [
+    [
+     "Alimentación",
+     "100 a 240 V CA, 50/60 Hz"
+    ],
+    [
+     "Fuente de poder",
+     "Universal"
+    ],
+    [
+     "Protección eléctrica",
+     "Protección ante interrupción de energía"
+    ],
+    [
+     "Temperatura de operación",
+     "15 a 30 °C"
+    ],
+    [
+     "Humedad de operación",
+     "35 % a 85 %, sin condensación"
+    ]
+   ]
+  },
+  {
+   "titulo": "Medidas y peso",
+   "filas": [
+    [
+     "Medidas (largo × ancho × alto)",
+     "430 × 360 × 170 mm"
+    ],
+    [
+     "Peso",
+     "6,8 kg"
+    ]
+   ]
+  }
+ ],
+ "revisar": [
+  "RANGO FOTOMÉTRICO. El catálogo traducido lo imprime como «03.5 ABS», sin separar el cero. Aquí se publica «0 a 3,5 ABS», que es la lectura evidente y el valor habitual del equipo, pero conviene confirmarlo con Mindray antes de usarlo en un expediente técnico.",
+  "POSICIONES LIBRES DE LA RUEDA DE FILTROS. El catálogo traducido dice «2 posiciones libres para longitud de onda opcional: 450nm and 670nm», pero esas dos longitudes ya figuran entre los ocho filtros estándar. La ficha solo declara que existen dos posiciones libres; falta confirmar qué longitudes de onda admiten.",
+  "ACCESORIOS INCLUIDOS. El catálogo no declara qué viene en la caja, así que esta ficha no lleva sección «Incluye». Confirmar con el fabricante antes de prometer accesorios en una cotización.",
+  "MENÚ DE PRUEBAS. El catálogo lo cierra con «etc.» y mezcla nombres en inglés (Alcohol, Amphetamines, Barbiturates, Benzodiazepine). Se transcribió tal cual, sin traducir ni completar: el menú real depende de los reactivos que se carguen.",
+  "El catálogo no declara rendimiento por hora (throughput), consumo eléctrico ni nivel de ruido. No se publican."
+ ]
+}

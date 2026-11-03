@@ -1,0 +1,235 @@
+{
+ "_nota": "Ficha técnica del fabricante. Mismo formato que data/fichas/ (alquiler): scripts/generar_paginas_venta.py la muestra en la pestaña «Parámetros técnicos» de la página del equipo, debajo de la identificación, y arma con ella la hoja A4 de la que sale el PDF. Si este archivo no existe, la página no muestra parámetros ni ofrece el PDF: no hay que tocar código para cargar un equipo nuevo, basta con dejar aquí su archivo. «revisar» es lo que Sinergia debe confirmar con el fabricante.",
+ "id": "meling-xc-630l",
+ "titulo": "Refrigeradora para banco de sangre 630 L Meling XC-630L",
+ "resumen": "Refrigeradora vertical de 630 L a 4 °C para hemocomponentes, con control por microprocesador, registro de datos por USB y batería de reserva.",
+ "fuente": "catálogo Meling «Refrigerador del banco de sangre a 4 °C» del XC-630L (Zhongke Meling Cryogenics Co., Ltd.), versión traducida al español, y hoja de especificaciones técnicas completas del fabricante",
+ "secciones": [
+  {
+   "titulo": "Capacidad y gabinete",
+   "filas": [
+    [
+     "Tipo de gabinete",
+     "Vertical"
+    ],
+    [
+     "Capacidad",
+     "630 L"
+    ],
+    [
+     "Capacidad en bolsas",
+     "408 bolsas de sangre de 400 ml"
+    ],
+    [
+     "Canastas de sangre",
+     "24 marcos con revestimiento por inmersión"
+    ],
+    [
+     "Estantes",
+     "6, de rejilla de alambre de acero revestido"
+    ],
+    [
+     "Material exterior",
+     "PCM"
+    ],
+    [
+     "Material interior",
+     "Acero inoxidable"
+    ],
+    [
+     "Grosor del aislamiento",
+     "55 mm en los laterales y 50 mm en el fondo"
+    ],
+    [
+     "Cerradura de puerta con llave",
+     "Sí"
+    ],
+    [
+     "Puerto de acceso",
+     "1, de Ø 25 mm"
+    ],
+    [
+     "Ruedas",
+     "4, dos de ellas con freno"
+    ]
+   ]
+  },
+  {
+   "titulo": "Temperatura y refrigeración",
+   "filas": [
+    [
+     "Rango de temperatura",
+     "2 a 6 °C"
+    ],
+    [
+     "Precisión del control",
+     "0,1 °C dentro del gabinete"
+    ],
+    [
+     "Temperatura ambiente admitida",
+     "16 a 32 °C"
+    ],
+    [
+     "Clase climática",
+     "N"
+    ],
+    [
+     "Compresor",
+     "1, de marca de alta eficiencia"
+    ],
+    [
+     "Método de enfriamiento",
+     "Por aire, con conducto de aire de retorno"
+    ],
+    [
+     "Velocidad del ventilador",
+     "1 300 RPM"
+    ],
+    [
+     "Descongelación",
+     "Automática, con descongelación forzada"
+    ],
+    [
+     "Sensores incorporados",
+     "Zona superior e inferior, temperatura ambiente y evaporador"
+    ]
+   ]
+  },
+  {
+   "titulo": "Control y registro",
+   "filas": [
+    [
+     "Controlador",
+     "Microprocesador"
+    ],
+    [
+     "Pantalla",
+     "Digital de alto brillo, de 1 pulgada"
+    ],
+    [
+     "Precisión de la visualización",
+     "0,1 °C"
+    ],
+    [
+     "Registro de datos",
+     "Por USB, una toma cada 10 minutos"
+    ],
+    [
+     "Capacidad de memoria",
+     "100 000 datos"
+    ],
+    [
+     "Batería de reserva",
+     "Sí"
+    ],
+    [
+     "Gestión de energía",
+     "Módulo de administración de energía y control de voltaje de alta precisión"
+    ]
+   ]
+  },
+  {
+   "titulo": "Alarmas",
+   "filas": [
+    [
+     "Tipo de aviso",
+     "Visual y audible"
+    ],
+    [
+     "De temperatura",
+     "Temperatura alta, temperatura baja y temperatura ambiente alta"
+    ],
+    [
+     "Eléctricas",
+     "Fallo de energía y batería baja"
+    ],
+    [
+     "De sistema",
+     "Error de sensor, error de comunicación de la placa base, puerta entreabierta, sobrecalentamiento del condensador y falla del registrador de datos USB"
+    ]
+   ]
+  },
+  {
+   "titulo": "Instalación",
+   "filas": [
+    [
+     "Alimentación",
+     "220 a 240 V, 50/60 Hz"
+    ],
+    [
+     "Potencia",
+     "470 W"
+    ],
+    [
+     "Consumo de energía",
+     "4,85 kWh cada 24 h"
+    ],
+    [
+     "Corriente nominal",
+     "3 A"
+    ],
+    [
+     "Accesorio estándar",
+     "Contacto de alarma remota, RS-485"
+    ]
+   ]
+  },
+  {
+   "titulo": "Medidas y peso",
+   "filas": [
+    [
+     "Medidas internas (ancho × prof. × alto)",
+     "685 × 690 × 1 373 mm"
+    ],
+    [
+     "Medidas externas (ancho × prof. × alto)",
+     "812 × 912 × 1 978 mm"
+    ],
+    [
+     "Medidas con embalaje (ancho × prof. × alto)",
+     "852 × 962 × 2 131 mm"
+    ],
+    [
+     "Peso neto",
+     "185 kg"
+    ]
+   ]
+  },
+  {
+   "titulo": "Accesorios opcionales",
+   "filas": [
+    [
+     "Termógrafo",
+     "Con impresor de hasta 7 días"
+    ],
+    [
+     "Papel para termógrafo",
+     "Paquete de 100"
+    ],
+    [
+     "Estabilizador de voltaje",
+     "Opcional"
+    ],
+    [
+     "Módulo de alarma GSM",
+     "Opcional"
+    ],
+    [
+     "Puerta interior transparente",
+     "De PVC, opcional"
+    ],
+    [
+     "Estantes extraíbles de acero inoxidable",
+     "Opcionales"
+    ]
+   ]
+  }
+ ],
+ "revisar": [
+  "ACCESORIOS OPCIONALES. Ninguno está cotizado. Confirmar precio y disponibilidad con el proveedor antes de ofrecerlos: el termógrafo suele ser requisito para un banco de sangre.",
+  "TEMPERATURA DECLARADA. La portada del catálogo anuncia el equipo «a 4 °C» y la tabla de especificaciones declara una configuración de 2 a 6 °C. La ficha publica el rango de la tabla, que es el dato técnico; el «4 °C» del título es el punto de trabajo habitual.",
+  "PUERTA INTERIOR Y ESTANTES. La puerta interior de PVC y los estantes extraíbles de acero inoxidable figuran como opcionales. Confirmar si la unidad que se importe los trae antes de prometerlos.",
+  "El catálogo no declara nivel de ruido, tiempo de autonomía de la batería de reserva ni tiempo de recuperación tras abrir la puerta. No se publican.",
+  "EQUIPO DE IMPORTACIÓN. No hay stock propio ni del proveedor (código 098.497). El plazo que se viene ofreciendo es de 50 días calendario desde la orden de compra; confirmarlo por escrito en cada cotización."
+ ]
+}
