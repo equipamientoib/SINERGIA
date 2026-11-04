@@ -207,11 +207,10 @@
   "Rack de instrumental",
   "Pinza portabandejas",
   "Tubo de drenaje",
-  "Empaque de puerta de repuesto",
-  "Fusible de repuesto",
   "Puerto USB"
  ],
  "revisar": [
+  "REPUESTOS FUERA DE «INCLUYE». El empaque de puerta y el fusible que trae la caja son piezas de recambio, no accesorios de trabajo: no sirven para esterilizar y listarlos junto a las bandejas y el rack hacía parecer que el equipo venía con mas de lo que de verdad usa el cliente. Si hace falta declararlos en un expediente, estan en el manual del fabricante.",
   "DIMENSIONES EXTERNAS SIN ORDEN DECLARADO. Los dos documentos dan los mismos tres números pero con los ejes cambiados: el manual dice «An × Al × Prof» 700 × 495 × 410 mm y el catálogo «An × P × Al» 495 × 700 × 410 mm. El del manual NO PUEDE SER: daría un fondo de 410 mm para una cámara de 470 mm de largo, que no cabría. Se publican los tres valores sin decir cuál es cuál. Pendiente de confirmar con el fabricante; lo más probable es que valga el catálogo (ancho 495, fondo 700, alto 410).",
   "El embalaje sí lleva cada eje con su palabra: solo lo trae el catálogo, que declara «An × P × Al», y ahí no hay contradicción.",
   "Los tiempos de ciclo salen del Anexo II del manual de usuario, que es COMÚN al BKMZA (18 L) y al BKMZB (23 L): el fabricante declara la misma tabla para los dos modelos de la serie. Pendiente de confirmar con el fabricante si el de 23 L tiene tiempos propios.",

@@ -207,11 +207,10 @@
   "Rack de instrumental",
   "Pinza portabandejas",
   "Tubo de drenaje",
-  "Empaque de puerta de repuesto",
-  "Fusible de repuesto",
   "Puerto USB"
  ],
  "revisar": [
+  "REPUESTOS FUERA DE «INCLUYE». El empaque de puerta y el fusible que trae la caja son piezas de recambio, no accesorios de trabajo: no sirven para esterilizar y listarlos junto a las bandejas y el rack hacía parecer que el equipo venía con mas de lo que de verdad usa el cliente. Si hace falta declararlos en un expediente, estan en el manual del fabricante.",
   "DIMENSIONES EXTERNAS SIN ORDEN DECLARADO. Los dos documentos se contradicen en los números Y en los ejes: el manual dice «An × Al × Prof» 600 × 495 × 410 mm y el catálogo «An × P × Al» 495 × 650 × 410 mm. Se publican los tres valores del manual sin decir cuál es cuál, porque afirmar un orden sería inventarlo. Pendiente de confirmar con el fabricante.",
   "El embalaje sí lleva cada eje con su palabra: solo lo trae el catálogo, que declara «An × P × Al», y ahí no hay contradicción.",
   "Los tiempos de ciclo salen del Anexo II del manual de usuario, que es COMÚN al BKMZA (18 L) y al BKMZB (23 L): el fabricante declara la misma tabla para los dos modelos de la serie. Pendiente de confirmar con el fabricante si el de 23 L tiene tiempos propios.",
