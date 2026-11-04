@@ -1,0 +1,140 @@
+{
+ "_nota": "Ficha técnica del fabricante. Mismo formato que data/fichas/ (alquiler): scripts/generar_paginas_venta.py la muestra en la pestaña «Parámetros técnicos» de la página del equipo, debajo de la identificación, y arma con ella la hoja A4 de la que sale el PDF. Si este archivo no existe, la página no muestra parámetros ni ofrece el PDF: no hay que tocar código para cargar un equipo nuevo, basta con dejar aquí su archivo. «revisar» es lo que Sinergia debe confirmar con el fabricante.",
+ "id": "heine-mini-3000-led",
+ "titulo": "Set de diagnóstico de bolsillo HEINE mini 3000 LED",
+ "resumen": "Set de oftalmoscopio directo y otoscopio de fibra óptica con iluminación LED HQ de 50 000 horas, dos mangos a pilas y estuche rígido.",
+ "fuente": "hoja de especificaciones técnicas HEINE del set mini 3000 LED (oftalmoscopio y otoscopio F.O.) y catálogo original del fabricante",
+ "secciones": [
+  {
+   "titulo": "Cabezal de oftalmoscopio",
+   "filas": [
+    [
+     "Exploración sin dilatación",
+     "Sí"
+    ],
+    [
+     "Lentes",
+     "18, en la gama de -20 a +20 D"
+    ],
+    [
+     "Diafragmas",
+     "5: estrella de fijación, círculo grande, círculo pequeño, semicírculo y filtro exento de rojo"
+    ],
+    [
+     "Estrella de fijación",
+     "Con filtro gris, para pacientes sensibles a la luz"
+    ],
+    [
+     "Imagen",
+     "Nítida, con reflejos mínimos"
+    ]
+   ]
+  },
+  {
+   "titulo": "Cabezal de otoscopio de fibra óptica",
+   "filas": [
+    [
+     "Aumento",
+     "3×"
+    ],
+    [
+     "Temperatura de color",
+     "4 000 K ± 500 K"
+    ],
+    [
+     "Índice de reproducción cromática",
+     "CRI 92"
+    ],
+    [
+     "Ventana de observación",
+     "Fija, y puede girarse hacia un lado"
+    ],
+    [
+     "Prueba neumática de tímpanos",
+     "Sí, por puerto de insuflación integrado"
+    ],
+    [
+     "Iluminación",
+     "Uniforme y sin reflejos, por fibra óptica"
+    ]
+   ]
+  },
+  {
+   "titulo": "Iluminación",
+   "filas": [
+    [
+     "Tecnología",
+     "LED HQ en los dos cabezales"
+    ],
+    [
+     "Vida útil",
+     "Aproximadamente 50 000 horas"
+    ],
+    [
+     "Cambio de lámpara",
+     "No requiere: el LED no se sustituye"
+    ]
+   ]
+  },
+  {
+   "titulo": "Mangos",
+   "filas": [
+    [
+     "Cantidad",
+     "2"
+    ],
+    [
+     "Alimentación",
+     "2 pilas AA por mango · las pilas NO vienen incluidas"
+    ],
+    [
+     "Forma",
+     "Oval y compacta, de agarre ergonómico"
+    ],
+    [
+     "Carcasa",
+     "Aleación de cromo y plástico refinado"
+    ],
+    [
+     "Encendido",
+     "Interruptor integrado en el clip de sujeción"
+    ],
+    [
+     "Apagado automático",
+     "Al fijarlo al bolsillo · 20 000 ciclos garantizados"
+    ],
+    [
+     "Conexión del cabezal",
+     "Rosca de metal, sin desgaste"
+    ]
+   ]
+  },
+  {
+   "titulo": "Identificación",
+   "filas": [
+    [
+     "Procedencia",
+     "Alemania"
+    ],
+    [
+     "Uso previsto",
+     "Diagnóstico de bolsillo, apto para uso móvil"
+    ]
+   ]
+  }
+ ],
+ "incluye": [
+  "1 cabezal de oftalmoscopio mini 3000 LED",
+  "1 cabezal de otoscopio de fibra óptica mini 3000 LED",
+  "2 mangos para pilas AA",
+  "1 juego de 4 espéculos de uso continuo",
+  "10 espéculos desechables AllSpec de 4 mm Ø",
+  "1 estuche rígido"
+ ],
+ "revisar": [
+  "LAS PILAS NO VAN INCLUIDAS. La hoja del fabricante lo dice expresamente: «Uso para 2 pilas AA (pilas no incluidas)». Son 4 pilas AA en total para los dos mangos. Decidir si se regalan con el equipo o se cotizan aparte, pero NO prometerlas como incluidas.",
+  "NO EXISTE «MÓDULO LED DE REPUESTO». El fabricante declara LED HQ de unas 50 000 horas y dice que no hace falta cambiar la lámpara. Si un cliente lo pide en sus especificaciones, hay que explicárselo: no es que no se consiga, es que el equipo no lo lleva.",
+  "La hoja no declara peso, medidas del estuche ni grado de protección. No se publican.",
+  "El set es A PILAS. La versión con mango recargable es otra referencia del fabricante (BETA4 USB) y no está en el catálogo del proveedor: consultar antes de ofrecerla."
+ ]
+}
