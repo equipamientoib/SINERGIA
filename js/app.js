@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=52ae89f0';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=cf9416ee';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=52ae89f0';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=cf9416ee';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=52ae89f0','js/06-tablero.js?v=52ae89f0'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=cf9416ee','js/06-tablero.js?v=cf9416ee'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=52ae89f0'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=cf9416ee'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -3274,6 +3274,19 @@ function cotHTML(d, formal){
      exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   /* Venta: cada equipo con su cantidad y su precio unitario. */
+  /* Qué trae el equipo, dentro de su propia fila del cuadro y no en una
+     nota al pie. El cliente que compara dos cotizaciones mira el cuadro:
+     si los accesorios están veinte líneas más abajo, no los ve y cree que
+     no van incluidos. Pasó con un oftalmoscopio cuyo estuche sí venía en
+     la caja y el cliente lo pidió aparte.
+
+     La lista viaja en el propio ítem («inc»), así que una cotización sin
+     ese dato sale exactamente igual que antes. */
+  const listaIncluye = e => {
+    const L = (e.inc || []).filter(Boolean);
+    if (!L.length) return '';
+    return '<br><b class="inc-t">Incluye:</b> ' + L.map(x => cotEsc(x)).join(' · ');
+  };
   const filasVenta = () => d.items.map((e, i) => {
     const pu = e.pu / 1.18, pt = neta(e.t);
     const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
@@ -3283,7 +3296,7 @@ function cotHTML(d, formal){
       <td><b>${cotEsc(inf.nom.toUpperCase())}</b>
         ${inf.foto ? `<img class="mini" src="${cotEsc(inf.foto)}" alt="">` : ''}
         <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Cod. ' + cotEsc(inf.nts) : ''}
-        <br>Equipo nuevo, con garantía del fabricante.</span></td>
+        <br>Equipo nuevo, con garantía del fabricante.${listaIncluye(e)}</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
   }).join('') + filasServicio();

@@ -299,3 +299,8 @@ body.cot-bloq .wafab{display:none}
   .emi-cods span{color:#c3b188}
   .emi-cod-no{color:#d2b56b}
 }
+
+/* «Incluye:» dentro de la fila del cuadro de la cotización. Va en el
+   documento que recibe el cliente, así que hereda el tamaño del detalle y
+   solo marca la palabra en negrita. */
+.cot-doc .det .inc-t{font-weight:700;color:#17191d}

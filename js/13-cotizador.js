@@ -723,6 +723,19 @@ function cotHTML(d, formal){
      exactamente con el total que vio el cliente. */
   const factor = d.base ? d.unit / d.base : 0;
   /* Venta: cada equipo con su cantidad y su precio unitario. */
+  /* Qué trae el equipo, dentro de su propia fila del cuadro y no en una
+     nota al pie. El cliente que compara dos cotizaciones mira el cuadro:
+     si los accesorios están veinte líneas más abajo, no los ve y cree que
+     no van incluidos. Pasó con un oftalmoscopio cuyo estuche sí venía en
+     la caja y el cliente lo pidió aparte.
+
+     La lista viaja en el propio ítem («inc»), así que una cotización sin
+     ese dato sale exactamente igual que antes. */
+  const listaIncluye = e => {
+    const L = (e.inc || []).filter(Boolean);
+    if (!L.length) return '';
+    return '<br><b class="inc-t">Incluye:</b> ' + L.map(x => cotEsc(x)).join(' · ');
+  };
   const filasVenta = () => d.items.map((e, i) => {
     const pu = e.pu / 1.18, pt = neta(e.t);
     const inf = (typeof vcInfoDe === 'function') ? vcInfoDe(e)
@@ -732,7 +745,7 @@ function cotHTML(d, formal){
       <td><b>${cotEsc(inf.nom.toUpperCase())}</b>
         ${inf.foto ? `<img class="mini" src="${cotEsc(inf.foto)}" alt="">` : ''}
         <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Cod. ' + cotEsc(inf.nts) : ''}
-        <br>Equipo nuevo, con garantía del fabricante.</span></td>
+        <br>Equipo nuevo, con garantía del fabricante.${listaIncluye(e)}</span></td>
       <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
       <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
   }).join('') + filasServicio();

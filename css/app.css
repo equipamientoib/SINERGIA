@@ -1203,6 +1203,11 @@ body.cot-bloq .wafab{display:none}
   .emi-cod-no{color:#d2b56b}
 }
 
+/* «Incluye:» dentro de la fila del cuadro de la cotización. Va en el
+   documento que recibe el cliente, así que hereda el tamaño del detalle y
+   solo marca la palabra en negrita. */
+.cot-doc .det .inc-t{font-weight:700;color:#17191d}
+
 /* ===== css/19-venta-cot.css ===== */
 /* =====================================================================
    19-venta-cot.css — Cotizador de venta (#/cotizar-venta)
