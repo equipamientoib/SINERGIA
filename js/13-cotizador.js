@@ -705,6 +705,14 @@ function cotTerminos(c){
      · formal = true  → COTIZACIÓN de la empresa, con membrete, firma, número
        propio y los ajustes que haya hecho quien la emite.
    El cliente nunca genera la segunda: eso lo decide la empresa. */
+/* El documento del cliente no siempre es un RUC: una persona natural
+   cotiza con su DNI, y la cotización le ponía «RUC:» delante de ocho
+   dígitos igual. En Perú el DNI tiene 8 y el RUC 11, así que el propio
+   número dice cuál es. */
+function cotEtiquetaDoc(v){
+  return String(v).replace(/\D/g, '').length === 8 ? 'DNI' : 'RUC';
+}
+
 function cotHTML(d, formal){
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const venta = d.tipo === 'venta';
@@ -999,7 +1007,7 @@ function cotHTML(d, formal){
       <div class="lin"></div>
       <div class="nf"><span>N° ${cotEsc(d.num)}</span><span>${fechaLarga}</span></div>
       <p class="cli">Señores:<br><b>${cotEsc((d.nom || '[RAZÓN SOCIAL DEL CLIENTE]').toUpperCase())}</b><br>
-        ${d.ruc ? 'RUC: ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
+        ${d.ruc ? cotEtiquetaDoc(d.ruc) + ': ' + cotEsc(d.ruc) + '<br>' : ''}${d.aten ? 'Atención: ' + cotEsc(d.aten) + '<br>' : ''}
         ${d.tel ? 'Teléfono: ' + cotEsc(d.tel) + '<br>' : ''}${d.mail ? 'Correo: ' + cotEsc(d.mail) + '<br>' : ''}Presente.-</p>
       <p class="campo"><b>Asunto:</b> ${venta
         ? 'Venta de equipamiento biomédico, según el detalle del Cuadro N° 1.'
