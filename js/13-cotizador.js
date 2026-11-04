@@ -692,8 +692,12 @@ function cotTerminos(c){
     'S/ ' + fmt(gar) + ' al retiro de los instrumentos, contra presentación del documento de identidad. No constituye un cobro: se devuelve íntegramente al retornar los instrumentos en buen estado y dentro del plazo.']);
   T.push(['7. Responsabilidad del cliente.',
     'La pérdida o el daño de un instrumento durante el alquiler obliga a su reposición, así como a la recalibración cuando el equipo se devuelva fuera de rango.']);
+  /* El alquiler se paga POR ADELANTADO. Cobrar contra entrega dejaba el
+     instrumento saliendo de la oficina sin un sol cobrado: si el cliente no
+     aparece, se pierde el día de alquiler y el instrumento queda bloqueado
+     para otro. La garantía en depósito cubre el equipo, no el alquiler. */
   T.push(['8. Forma de pago.',
-    'Íntegro a la entrega de los instrumentos, salvo acuerdo distinto por escrito.']);
+    'Íntegro por adelantado, antes de la entrega de los instrumentos, salvo acuerdo distinto por escrito.']);
   T.push(['9. Ampliación del plazo.',
     'La extensión del alquiler se cotiza por separado antes de ejecutarse y se factura a la tarifa vigente.']);
   return T;
