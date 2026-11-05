@@ -1,0 +1,50 @@
+{
+ "_nota": "Lámpara de repuesto para cuna de calor radiante David HKN-93. Es un COMPATIBLE, no el repuesto original K05 009 00 que pidió el cliente: eso va dicho en la nota, porque él preguntó expresamente por el original. Precio armado con el costo de importación: lámpara 38.99 + envío 60.00 + 28.00 de DHL y aduana = 126.99 USD, por 3.5 de tipo de cambio y por 1.3 de margen.",
+ "salida": "Cotizacion COT-SB-1126-011 - Lampara para cuna David HKN-93 - Harold Aleman.pdf",
+ "terminos": {
+  "Plazo de entrega": "De 60 a 90 días calendario desde la conformidad de la orden de compra. Es un repuesto de importación: el plazo comprende el despacho desde origen y el trámite de aduana.",
+  "Garantía": "La lámpara se entrega nueva y sellada en su empaque. Se cubre el defecto de fábrica verificado a la entrega. Por tratarse de un consumible, no aplica garantía por horas de uso.",
+  "Incluye": "La lámpara en su empaque original. No requiere instalación especializada."
+ },
+ "doc": {
+  "tipo": "venta",
+  "num": "COT-SB-1126-011",
+  "numCot": "COT-SB-1126-011",
+  "nom": "SR. HAROLD ALEMÁN",
+  "ruc": "",
+  "aten": "",
+  "mail": "",
+  "tel": "982096925",
+  "nota": "REPUESTO COMPATIBLE, NO ORIGINAL. El repuesto original que indica el manual de servicio es el código K05 009 00 (Cold Lamp) de Ningbo David. Lo que se cotiza es una lámpara equivalente de las mismas características eléctricas y el mismo casquillo: 14,5 V · 50 W · casquillo GX5.3 · formato MR16, declarada por su fabricante para la cuna David HKN. Si su expediente exige el repuesto original de fábrica, indíquenoslo y lo gestionamos por separado, con otro plazo y otro precio. Repuesto de importación: no hay stock en Lima.",
+  "items": [
+   {
+    "i": "lampara-hkn93-14v5-50w",
+    "q": 1,
+    "pu": 578,
+    "t": 578,
+    "n": "Lámpara de 14,5 V y 50 W para cuna de calor radiante David HKN-93",
+    "m": "Genérico · Genérico",
+    "nts": "",
+    "inc": [
+     "14,5 V · 50 W",
+     "Casquillo GX5.3",
+     "Formato MR16",
+     "Equivalente del código original K05 009 00 (Cold Lamp)"
+    ],
+    "f": "img/cotizacion/items/lampara-hkn93.jpg"
+   }
+  ],
+  "srv": null,
+  "total": 578,
+  "qty": 1,
+  "mod": "unidad",
+  "gar": 0,
+  "tec": 0,
+  "pas": 0,
+  "via": 0,
+  "inc": [],
+  "ajuste": 0,
+  "base": 578,
+  "unit": 578
+ }
+}

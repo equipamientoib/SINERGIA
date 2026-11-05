@@ -86,6 +86,12 @@ async function main() {
     process.exit(1);
   }
   const c = leerJSON(path.resolve(spec));
+  /* La foto de un item puede venir como ruta del repositorio
+     (img/cotizacion/items/…): se resuelve contra el sitio servido, para que
+     la solicitud no dependa de una direccion de este equipo. */
+  (c.doc.items || []).forEach(it => {
+    if (it.f && !/^https?:\/\//.test(it.f)) it.f = SITIO + '/' + String(it.f).replace(/^\//, '');
+  });
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'cot-'));
 
   const b = await chromium.launch({ args: ['--no-sandbox'] });
