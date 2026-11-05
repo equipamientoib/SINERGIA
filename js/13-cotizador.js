@@ -31,6 +31,12 @@ const cotEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
    neto se redondea y el IGV sale de restarlo, así subtotal + IGV da
    exactamente el total que ve el cliente. */
 const soles = n => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
+/* Un importe del cuadro de la cotizacion: miles separados y dos decimales.
+   toFixed(2) a secas imprime «50000.00», y a un ojo que recorre una columna
+   de cifras eso se confunde con «5000.00»: un cero de diferencia en el monto
+   que el cliente va a pagar. Con la coma, «50,000.00» no se lee mal. */
+const mil = n => (Number(n) || 0).toLocaleString('en-US',
+  { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const cotNeto = total => Math.round(Number(total || 0) / 1.18);
 
 /* Instrumentos que se pueden cotizar (las complementarias van incluidas). */
@@ -758,8 +764,8 @@ function cotHTML(d, formal){
         ${inf.foto ? `<img class="mini" src="${cotEsc(inf.foto)}" alt="">` : ''}
         <span class="det">${cotEsc(inf.mm || '—')}${inf.nts ? '<br>Cod. ' + cotEsc(inf.nts) : ''}
         <br>Equipo nuevo, con garantía del fabricante.${listaIncluye(e)}</span></td>
-      <td class="c">UNIDAD</td><td class="c">${Number(e.q).toFixed(2)}</td>
-      <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
+      <td class="c">UNIDAD</td><td class="c">${mil(Number(e.q))}</td>
+      <td class="d">${mil(pu)}</td><td class="d">${mil(pt)}</td></tr>`;
   }).join('') + filasServicio();
   /* Servicio fuera de Lima Metropolitana, desglosado por partidas como en
      el alquiler: personal, pasajes y viáticos en filas propias. Un total
@@ -772,7 +778,7 @@ function cotHTML(d, formal){
     /* Cada partida se registra UNA vez: el mismo importe se imprime en la
        columna unitaria y en la total, pero al subtotal entra una sola. */
     const vPers = neta(s.pers), vPas = s.pas ? neta(s.pas) : 0, vVia = s.via ? neta(s.via) : 0;
-    const f = v => Number(v).toFixed(2);
+    const f = v => mil(v);
     const F = [];
     F.push(`<tr>
       <td class="c">${n + 1}</td>
@@ -780,8 +786,8 @@ function cotHTML(d, formal){
         <span class="det">Personal calificado para la instalación, la puesta en funcionamiento y la
         capacitación del personal del cliente.<br>${per} ${per === 1 ? 'persona' : 'personas'} ·
         ${dias} ${dias === 1 ? 'día' : 'días'} en sitio.</span></td>
-      <td class="c">DÍA</td><td class="c">${(dias * per).toFixed(2)}</td>
-      <td class="d">${(sin(s.pers) / (dias * per)).toFixed(2)}</td><td class="d">${f(vPers)}</td></tr>`);
+      <td class="c">DÍA</td><td class="c">${mil((dias * per))}</td>
+      <td class="d">${mil((sin(s.pers) / (dias * per)))}</td><td class="d">${f(vPers)}</td></tr>`);
     if(s.pas) F.push(`<tr>
       <td class="c">${n + 2}</td>
       <td><b>PASAJES IDA Y VUELTA${s.ciu ? ' · ' + cotEsc(String(s.ciu).toUpperCase()) : ''}</b>
@@ -817,33 +823,33 @@ function cotHTML(d, formal){
         Procedencia: ${cotEsc((pr[1] || '—').trim())}<br>
         Con certificado de calibración vigente.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
-      <td class="d">${pu.toFixed(2)}</td><td class="d">${pt.toFixed(2)}</td></tr>`;
+      <td class="d">${mil(pu)}</td><td class="d">${mil(pt)}</td></tr>`;
   }).join('') + (d.tec ? `<tr>
       <td class="c">${d.items.length + 1}</td>
       <td><b>INSTRUMENTISTA METROLÓGICO</b>
         <span class="det">Manejo del instrumento y registro de las mediciones.<br>Mínimo de medio día.</span></td>
       <td class="c">${und}</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.tec / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.tec).toFixed(2)}</td></tr>` : '')
+      <td class="d">${mil((d.tec / d.qty / 1.18))}</td><td class="d">${mil(neta(d.tec))}</td></tr>` : '')
     + (d.mov ? `<tr>
       <td class="c">${d.items.length + 2}</td>
       <td><b>MOVILIZACIÓN DENTRO DE LIMA</b>
         <span class="det">Traslado del instrumentista y de los instrumentos al local del cliente,
         de ida y vuelta, por cada jornada de trabajo.</span></td>
       <td class="c">JORNADA</td><td class="c">${d.qty}.00</td>
-      <td class="d">${(d.mov / d.qty / 1.18).toFixed(2)}</td><td class="d">${neta(d.mov).toFixed(2)}</td></tr>` : '')
+      <td class="d">${mil((d.mov / d.qty / 1.18))}</td><td class="d">${mil(neta(d.mov))}</td></tr>` : '')
     + (d.pas ? `<tr>
       <td class="c">${d.items.length + 3}</td>
       <td><b>PASAJES IDA Y VUELTA${d.ciu ? ' · ' + cotEsc(d.ciu.toUpperCase()) : ''}</b>
         <span class="det">Traslado del instrumentista y de los instrumentos a la ciudad del cliente.<br>Se cobra una sola vez.</span></td>
       <td class="c">SERVICIO</td><td class="c">1.00</td>
-      <td class="d">${(d.pas / 1.18).toFixed(2)}</td><td class="d">${neta(d.pas).toFixed(2)}</td></tr>` : '')
+      <td class="d">${mil((d.pas / 1.18))}</td><td class="d">${mil(neta(d.pas))}</td></tr>` : '')
     + (d.via ? `<tr>
       <td class="c">${d.items.length + 4}</td>
       <td><b>VIÁTICOS DEL INSTRUMENTISTA</b>
         <span class="det">Alimentación por cada día de trabajo en sitio${d.noc
           ? ' y hospedaje por ' + d.noc + (d.noc === 1 ? ' noche' : ' noches') : ''}.</span></td>
       <td class="c">GLOBAL</td><td class="c">1.00</td>
-      <td class="d">${(d.via / 1.18).toFixed(2)}</td><td class="d">${neta(d.via).toFixed(2)}</td></tr>` : '');
+      <td class="d">${mil((d.via / 1.18))}</td><td class="d">${mil(neta(d.via))}</td></tr>` : '');
   const filas = venta ? filasVenta() : filasAlq();
   const neto = Math.round(MONTOS.reduce((a, c) => a + c, 0) * 100) / 100;
   const igv = Math.round((d.total - neto) * 100) / 100;
@@ -851,9 +857,9 @@ function cotHTML(d, formal){
       <tr><th style="width:34px">ÍTEM</th><th>DESCRIPCIÓN</th><th style="width:66px">UND</th>
         <th style="width:48px">CANT.</th><th style="width:70px">P. UNIT. S/</th><th style="width:74px">P. TOTAL S/</th></tr>
       ${filas}
-      <tr class="tot"><td class="k" colspan="5">SUBTOTAL (S/)</td><td class="d">${neto.toFixed(2)}</td></tr>
-      <tr class="tot"><td class="k" colspan="5">IGV (18%) (S/)</td><td class="d">${igv.toFixed(2)}</td></tr>
-      <tr class="gran"><td class="k" colspan="5">TOTAL CON IGV (S/)</td><td class="d">${d.total.toFixed(2)}</td></tr>
+      <tr class="tot"><td class="k" colspan="5">SUBTOTAL (S/)</td><td class="d">${mil(neto)}</td></tr>
+      <tr class="tot"><td class="k" colspan="5">IGV (18%) (S/)</td><td class="d">${mil(igv)}</td></tr>
+      <tr class="gran"><td class="k" colspan="5">TOTAL CON IGV (S/)</td><td class="d">${mil(d.total)}</td></tr>
     </table>`;
   const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
                  'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -1021,8 +1027,8 @@ function cotHTML(d, formal){
         detallados en el Cuadro N° 1.</p>
       <h2>Cuadro N° 1 — ${venta ? 'Detalle de los equipos' : 'Detalle del alquiler'}</h2>
       ${cuadro}
-      <p class="nota">Importes en Soles (S/). El valor de venta asciende a S/ ${neto.toFixed(2)} sin IGV;
-        el total con IGV (18%) es de S/ ${d.total.toFixed(2)}. ${cotMontoLetras(d.total)}${d.gar
+      <p class="nota">Importes en Soles (S/). El valor de venta asciende a S/ ${mil(neto)} sin IGV;
+        el total con IGV (18%) es de S/ ${mil(d.total)}. ${cotMontoLetras(d.total)}${d.gar
         ? ' Adicionalmente se deja una garantía en depósito de S/ ' + fmt(d.gar) + ', que se devuelve al retornar los instrumentos.' : ''}</p>
       <h2>Términos y condiciones</h2>
       ${term}
