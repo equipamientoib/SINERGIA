@@ -251,68 +251,41 @@ def barra_movil(p, wa, foto):
 
 
 def parametros(p, grupos, ce):
-    """La pestaña de parámetros, en tres niveles en vez de una lista plana.
+    """La pestaña de parámetros: un bloque plegable por grupo, el primero
+    abierto.
 
-    Antes eran cuarenta filas seguidas, todas con el mismo peso: el fusible
-    al lado de la capacidad. Quien compara equipos se perdía.
+    Hubo un intento de darle a los autoclaves un trato aparte —cinco
+    tarjetas arriba con capacidad, ciclo más corto, medidas, peso y
+    alimentación, y la tabla de tiempos de ciclo abierta— porque son los
+    datos que deciden esa compra. El problema es que esos nombres de campo
+    son DE AUTOCLAVE: una refrigeradora de banco de sangre no tiene «ciclo
+    más corto» y un analizador no tiene «tiempo total del ciclo». Resultado:
+    cuatro fichas con cinco tarjetas, dos con una o dos, y las otras
+    doscientas con ninguna. La misma tienda con tres diseños distintos
+    según el equipo que abrieras.
 
-    Ahora: arriba las cinco cosas que deciden la compra, en tarjetas;
-    debajo los tiempos de ciclo abiertos, que es el argumento que ningún
-    competidor publica; y el resto plegado, un bloque por grupo.
+    Mejor que todas se vean igual. Si algún día conviene destacar datos
+    arriba, el que los elija tiene que ser cada ficha en su propio archivo,
+    no el generador adivinando por el nombre del campo.
 
     Lo plegado va en <details>, que es el elemento del navegador para esto:
     el texto está en el HTML —Google lo lee igual— y se abre aunque el
     JavaScript falle. No es el display:none de la tienda.
     """
-    def dato(gt, et):
-        for t, filas, _ in grupos:
-            if not t.lower().startswith(gt):
-                continue
-            for k, v in filas:
-                if k.lower().startswith(et):
-                    return v
-        return None
-    tiempos = next((g for g in grupos if g[0].lower().startswith('tiempo total')), None)
-    primer_ciclo = None
-    if tiempos and tiempos[1]:
-        k, v = tiempos[1][0]
-        primer_ciclo = '%s · %s' % (v, k.split('·')[0].strip().lower())
-    alim = (dato('instalaci', 'alimentaci') or '').split(';')[0].split('(')[0].strip()
-    destacados = [('Capacidad', ce.get('capacidad')),
-                  ('Ciclo más corto', primer_ciclo),
-                  ('Medidas externas', dato('medidas', 'dimensiones externas')),
-                  ('Peso neto', dato('medidas', 'peso neto')),
-                  ('Alimentación', alim)]
-    destacados = [(k, v) for k, v in destacados if v]
-    html = ''
-    if destacados:
-        html += '<div class="pt-dest">%s</div>' % ''.join(
-            '<div><span>%s</span><b>%s</b></div>' % (e(k), v) for k, v in destacados)
-
     def tabla(filas, nota):
         cuerpo = ''.join(('<tr><td colspan="2" class="car">%s</td></tr>' % v) if not k
                          else ('<tr><th>%s</th><td>%s</td></tr>' % (k, v)) for k, v in filas)
         pie_n = ('<p class="pt-nota">%s</p>' % e(nota)) if nota else ''
         return '<table class="pt-tabla">%s</table>%s' % (cuerpo, pie_n)
 
-    # Si no hay tabla de tiempos, el primer bloque se abre solo. Si no, los
-    # equipos sin parámetros del fabricante —que son casi todos— abrirían la
-    # pestaña y verían dos barras cerradas y nada más: justo el problema que
-    # esto venía a arreglar.
-    # Los tiempos van ARRIBA del todo, debajo de las tarjetas, no en el
-    # orden en que estén escritos en el archivo: son el argumento de venta
-    # y tienen que verse sin abrir nada.
-    if tiempos and tiempos[1]:
-        html += '<h3 class="pt-h">%s</h3>%s' % (e(tiempos[0]), tabla(tiempos[1], tiempos[2]))
-    abrir = tiempos is None
+    html, abrir = '', True
     for titulo, filas, nota in grupos:
-        if not filas or titulo.lower().startswith('tiempo total'):
+        if not filas:
             continue
         html += ('<details class="pt"%s><summary>%s</summary>%s</details>'
                  % (' open' if abrir else '', e(titulo), tabla(filas, nota)))
         abrir = False
     return html
-
 
 def ficha_venta(pid):
     ruta = os.path.join(FICHAS_VENTA, pid + '.json')
