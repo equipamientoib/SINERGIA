@@ -880,17 +880,17 @@ function cargarPortal(){
   PORTAL_ESTADO='cargando';
 
   const css=document.createElement('link');
-  css.rel='stylesheet'; css.href='css/13-clientes.css?v=c952cacd';
+  css.rel='stylesheet'; css.href='css/13-clientes.css?v=8268b308';
   document.head.appendChild(css);
   /* panel de expedientes (proyectos tipo "expediente"): sólo se carga con el portal,
      el resto del sitio no paga sus ~120 KB */
   const cssEx=document.createElement('link');
-  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=c952cacd';
+  cssEx.rel='stylesheet'; cssEx.href='css/15-expediente.css?v=8268b308';
   document.head.appendChild(cssEx);
-  ['js/06-expediente.js?v=c952cacd','js/06-tablero.js?v=c952cacd'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
+  ['js/06-expediente.js?v=8268b308','js/06-tablero.js?v=8268b308'].forEach(src=>{ const e=document.createElement('script'); e.src=src; e.async=false; document.head.appendChild(e); });
 
   const js=document.createElement('script');
-  js.src='js/06-clientes.js?v=c952cacd'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
+  js.src='js/06-clientes.js?v=8268b308'; js.async=false;      // async=false: se ejecuta después de los dos anteriores, en orden
   js.onload=()=>{
     PORTAL_ESTADO='listo';
     /* Ya existen las funciones reales: se pinta lo que corresponda. */
@@ -3062,17 +3062,17 @@ function cotTexto(c, nom, mail, tel){
   if(c.desc) L.push('  Suma por día: S/ ' + fmt(c.base));
   if(c.desc) L.push('  Descuento por combinar ' + c.sel.length + ': −' + Math.round(c.desc * 100) + ' % (S/ ' + fmt(Math.round(c.base * c.desc)) + ')');
   L.push('  Precio por ' + u + ': S/ ' + fmt(c.unit));
-  L.push('  Alquiler (' + per + '): S/ ' + c.alquiler.toFixed(2));
-  if(c.conTecnico) L.push('  Instrumentista metrológico: S/ ' + c.tecnico.toFixed(2));
+  L.push('  Alquiler (' + per + '): S/ ' + mil(c.alquiler));
+  if(c.conTecnico) L.push('  Instrumentista metrológico: S/ ' + mil(c.tecnico));
   if(c.movil) L.push('  Movilización dentro de Lima (S/ ' + fmt(MOVIL_LIMA) + ' × ' + c.qty +
-    (c.qty === 1 ? ' jornada' : ' jornadas') + '): S/ ' + c.movil.toFixed(2));
+    (c.qty === 1 ? ' jornada' : ' jornadas') + '): S/ ' + mil(c.movil));
   if(c.viaja && c.ciudad){
-    L.push('  Pasajes ida y vuelta a ' + c.ciudad.n + ' (una sola vez): S/ ' + c.pasaje.toFixed(2));
-    L.push('  Viáticos (comida y hospedaje): S/ ' + c.viatico.toFixed(2));
+    L.push('  Pasajes ida y vuelta a ' + c.ciudad.n + ' (una sola vez): S/ ' + mil(c.pasaje));
+    L.push('  Viáticos (comida y hospedaje): S/ ' + mil(c.viatico));
     L.push('    comida S/ ' + fmt(VIAJE.viaticoDia) + ' × ' + c.qty + (c.noches
       ? ' · hospedaje S/ ' + fmt(VIAJE.hospedajeNoche) + ' × ' + c.noches : ''));
   }
-  L.push('  TOTAL (IGV incluido): S/ ' + c.total.toFixed(2));
+  L.push('  TOTAL (IGV incluido): S/ ' + mil(c.total));
   if(c.garantia) L.push('  Garantía en depósito (se devuelve): S/ ' + fmt(c.garantia));
 
   L.push('');
@@ -3115,7 +3115,7 @@ function cotEnviar(via){
     : cotTexto(c, nom, mail, tel) + '\n\nResumen de este pedido:\n' + cotEnlace(doc);
   if(typeof enviarAlEndpoint === 'function')
     enviarAlEndpoint({tipo: 'cotizador', equipo: c.sel.map(e => e.nom).join(' + '), modalidad: c.mod,
-                      total: 'S/ ' + c.total.toFixed(2), nombre: nom, correo: mail, telefono: tel});
+                      total: 'S/ ' + mil(c.total), nombre: nom, correo: mail, telefono: tel});
   avisar('cotAviso', c.largo
     ? (via === 'correo' ? 'Abriendo tu correo con tu pedido…' : 'Abriendo WhatsApp con tu pedido…')
     : (via === 'correo' ? 'Abriendo tu correo con el resumen de tu pedido…'
@@ -3628,7 +3628,7 @@ function cotModal(doc){
   m.innerHTML = `<div class="cotm-p" role="dialog" aria-modal="true" aria-label="Vista previa de tu solicitud">
     <div class="cotm-c">
       <div><b>Así le llega tu solicitud</b>
-        <span>N° ${cotEsc(doc.num)} · S/ ${doc.total.toFixed(2)} con IGV</span></div>
+        <span>N° ${cotEsc(doc.num)} · S/ ${mil(doc.total)} con IGV</span></div>
       <button type="button" class="cotm-x" onclick="cotModalCerrar()" aria-label="Cerrar">✕</button>
     </div>
     <div class="cotm-h"><iframe title="Vista previa de la solicitud"></iframe></div>
@@ -3700,14 +3700,14 @@ function cotVer(codigo){
   }
   const S = (typeof SITE !== 'undefined') ? SITE : {};
   const wa = urlWhatsApp(String(S.whatsapp || '').replace(/\D/g, ''),
-    'Hola, quiero confirmar la solicitud ' + d.num + ' por S/ ' + d.total.toFixed(2) +
+    'Hola, quiero confirmar la solicitud ' + d.num + ' por S/ ' + mil(d.total) +
     ' y recibir la cotización formal.\n\n' + location.href);
   caja.innerHTML = `
     <div class="wrap cotv-cab">
       <div>
         <div class="k">Solicitud de cotización</div>
         <h1>${cotEsc(d.num)}</h1>
-        <p>${cotEsc(d.nom || '')} · ${cotEsc(d.fecha)} · <b>S/ ${d.total.toFixed(2)}</b> con IGV</p>
+        <p>${cotEsc(d.nom || '')} · ${cotEsc(d.fecha)} · <b>S/ ${mil(d.total)}</b> con IGV</p>
       </div>
       <div class="cotv-btns">
         <a class="btn btn-fill" href="${wa}" target="_blank" rel="noopener">Enviar este resumen por WhatsApp</a>
@@ -3851,7 +3851,7 @@ function cotEmitir(codigo){
       <div><div class="k">Emitir cotización · solicitud ${cotEsc(d.num)}</div>
         <h1>${cotEsc(d.nom || 'Cliente sin nombre')}</h1>
         <p>${d.items.length} ${d.items.length === 1 ? 'instrumento' : 'instrumentos'} ·
-          ${d.qty} ${COT_UNI[d.mod]}${d.qty === 1 ? '' : 's'} · pedido por S/ ${d.total.toFixed(2)}</p></div>
+          ${d.qty} ${COT_UNI[d.mod]}${d.qty === 1 ? '' : 's'} · pedido por S/ ${mil(d.total)}</p></div>
     </div>
     <div class="wrap emi">
       <div class="emi-form">
@@ -3892,8 +3892,8 @@ function cotEmiCambio(){
   COT_EMI.total = Math.max(0, (COT_EMI.totalBase || (COT_EMI.totalBase = COT_EMI.total)) - desc);
   const t = document.getElementById('emiTot');
   if(t) t.innerHTML = desc
-    ? `Pedido S/ ${COT_EMI.totalBase.toFixed(2)} − descuento S/ ${desc.toFixed(2)} = <b>S/ ${COT_EMI.total.toFixed(2)}</b>`
-    : `Total: <b>S/ ${COT_EMI.total.toFixed(2)}</b>`;
+    ? `Pedido S/ ${mil(COT_EMI.totalBase)} − descuento S/ ${mil(desc)} = <b>S/ ${mil(COT_EMI.total)}</b>`
+    : `Total: <b>S/ ${mil(COT_EMI.total)}</b>`;
   const f = document.querySelector('.emi-vista iframe');
   if(f){
     f.srcdoc = cotHTML(COT_EMI, true);
@@ -4421,7 +4421,7 @@ function vcTerminos(d){
       '(alimentación por día de trabajo y hospedaje por noche fuera).' +
       (d.srv.dto ? ' Por el monto de esta cotización, ' + (d.srv.dto >= (d.srv.pers + d.srv.pas + d.srv.via)
         ? 'este servicio va incluido sin costo.'
-        : 'Sinergia asume S/ ' + Number(d.srv.dto).toFixed(2) + ' de este servicio.') : '') +
+        : 'Sinergia asume S/ ' + mil(d.srv.dto) + ' de este servicio.') : '') +
       ' El envío de los equipos a provincia se realiza por agencia de transporte y su costo lo asume el cliente.']);
   }
   L.push([(d && d.srv ? '8' : '7') + '. Forma de pago.', T.pago]);

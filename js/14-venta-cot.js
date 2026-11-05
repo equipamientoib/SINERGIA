@@ -507,7 +507,7 @@ function vcTerminos(d){
       '(alimentación por día de trabajo y hospedaje por noche fuera).' +
       (d.srv.dto ? ' Por el monto de esta cotización, ' + (d.srv.dto >= (d.srv.pers + d.srv.pas + d.srv.via)
         ? 'este servicio va incluido sin costo.'
-        : 'Sinergia asume S/ ' + Number(d.srv.dto).toFixed(2) + ' de este servicio.') : '') +
+        : 'Sinergia asume S/ ' + mil(d.srv.dto) + ' de este servicio.') : '') +
       ' El envío de los equipos a provincia se realiza por agencia de transporte y su costo lo asume el cliente.']);
   }
   L.push([(d && d.srv ? '8' : '7') + '. Forma de pago.', T.pago]);

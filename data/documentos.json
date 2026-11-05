@@ -1,0 +1,224 @@
+{
+ "_nota": "Indice de los documentos ORIGINALES del proveedor, copiado de la hoja «Documentos» de la hoja de venta. Lo usa scripts/generar_cotizacion.js para adjuntar el documento del fabricante al final de una cotizacion, SIN que haya que buscarlo a mano en Drive. Estos documentos NO se publican en la web: llevan el membrete del proveedor y solo viajan dentro de una cotizacion, donde se sabe a quien le llega. Se refresca con scripts/bajar_documentos.py. Por codigo de proveedor: tipo (RGS registro sanitario, COR catalogo original, CTR catalogo traducido, ETT especificaciones tecnicas), nombre tal como figura en la hoja, e id del archivo en Drive.",
+ "actualizado": "2026-11-05",
+ "docs": {
+  "100.874": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1CKnSFLcx1M3_yNsUSOuIB0n3HCI7oFHi"
+   }
+  ],
+  "089.540": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1nR2fd18yzA7EYqov1ohNTyErPCpOfZBm"
+   },
+   {
+    "tipo": "CTR",
+    "nombre": "CATALOGO TRADUCIDO",
+    "id": "1V2VjFxe-ZbIggKfidR6ecV4eM5yjokUo"
+   }
+  ],
+  "089.544": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1M3Ei9naSmveIGc10aWkAQLFbjKy6R5tJ"
+   }
+  ],
+  "089.538": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1gRN19wQlBOKPD2bA-AaQPOi4sBEeP0TI"
+   }
+  ],
+  "094.407": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1krjyhoEYYjDkJzTagPnDKERvj0yaMm66"
+   }
+  ],
+  "096.610": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1NnsBHkhilBbUzkXiREOBf_mFeKmo1yTi"
+   }
+  ],
+  "098.101": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1Tv-ob3ZknxFSw8YiDVKBcV4qm3GeKwoS"
+   }
+  ],
+  "099.636": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1_Y3OxDlDCl5onlwe-lPl4y5RyTCDT8Eg"
+   }
+  ],
+  "096.774": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1xAhtoOsWXRlFz0iqV5lRL4qZhNM0y8A8"
+   }
+  ],
+  "095.104": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1c6WU3gGod0NYtKw0bMt2XL8pa9vklA9R"
+   }
+  ],
+  "097.596": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "17Yh6yEGV5NlUdbWqwBBHdziCeWTAveVS"
+   }
+  ],
+  "095.247": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1Kich1BTFN5TBXULCObgzm3AQCIf5_2Us"
+   },
+   {
+    "tipo": "CTR",
+    "nombre": "CATALOGO TRADUCIDO",
+    "id": "14TmD-eBirxRwUEoNkNOnf7sYzfsR3cX7"
+   },
+   {
+    "tipo": "ETT",
+    "nombre": "EE.TT. COMPLETA MARCA",
+    "id": "1OttTWM6m9tshwbcOjuVUAoJN3_yBCgOO"
+   },
+   {
+    "tipo": "ETT",
+    "nombre": "EE.TT. BASICA MARCA",
+    "id": "1IoDMUO02vvOv9cWGj-S_xY00z2OWa2ey"
+   }
+  ],
+  "082.438": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1XnzfHo82a4lKIqoJUW62g7LP8MhNmXRu"
+   }
+  ],
+  "096.614": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1Thp8ZXsJieoJevv03zDZdW7GaXMhq-g5"
+   }
+  ],
+  "081.841": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1J4kk5vi-Op11428h7oeEYtzOBdD-qUTA"
+   }
+  ],
+  "076.924": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1wB7jGm_Htuf6mxief7bAzifbtU9KZJ-g"
+   }
+  ],
+  "082.054": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1FXNMJ-0Dj4z6LSmOOKo3nKfZMtt5dD3f"
+   }
+  ],
+  "075.554": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1QDSNdeft-cmd1konCZKSmqcfkL6UBsKt"
+   }
+  ],
+  "075.553": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1gYs1rQFnZQ1W0J0ygiUydhN2QoAy-ngY"
+   }
+  ],
+  "097.640": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1smmPJik2HoRNhEVsEZg_iqzyl60KmgFQ"
+   }
+  ],
+  "096.501": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1f4f9a1hmCv-447IGrLvjhXBo3hTEFofz"
+   }
+  ],
+  "097.072": [
+   {
+    "tipo": "CTR",
+    "nombre": "CATALOGO TRADUCIDO",
+    "id": "1j_e7Ltf0wrjTYTcX9cZfHJOdp8T_ROGz"
+   },
+   {
+    "tipo": "COR",
+    "nombre": "CATALOGO ORIGINAL",
+    "id": "17Gr1L2mP6NbW0izDHjBCCvsJiOQ6ZypN"
+   }
+  ],
+  "098.497": [
+   {
+    "tipo": "CTR",
+    "nombre": "CATALOGO TRADUCIDO",
+    "id": "1-dlQjfEFuHU9C4nkpgtQ30Wd_aU6FA_4"
+   },
+   {
+    "tipo": "COR",
+    "nombre": "CATALOGO ORIGINAL",
+    "id": "1RzscecnAXgGWbuQaU9FmZdjwhcAEBSir"
+   },
+   {
+    "tipo": "ETT",
+    "nombre": "EE.TT. COMPLETA MARCA",
+    "id": "1xWwlRXfu0zKbqKYzmSVEdYyD67zTt4YX"
+   },
+   {
+    "tipo": "ETT",
+    "nombre": "EE.TT. BASICA MARCA",
+    "id": "1gBU2d05uuYIJMQ1CuLcbpkh6HmesxLs3"
+   }
+  ],
+  "085.729": [
+   {
+    "tipo": "RGS",
+    "nombre": "Registro sanitario",
+    "id": "1k5K7uLC-DTBjr-xYKp2tabz6f0zge1fS"
+   },
+   {
+    "tipo": "COR",
+    "nombre": "CATALOGO ORIGINAL",
+    "id": "1zeZC8DNOz6coQXv-Pco53zW436ZNnvK6"
+   },
+   {
+    "tipo": "ETT",
+    "nombre": "EE.TT. BASICA MARCA",
+    "id": "1A47b9oZeucMnALGnmYSB0KCfykY4oqwT"
+   }
+  ]
+ }
+}

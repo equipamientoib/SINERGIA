@@ -1,0 +1,27 @@
+{
+ "_nota": "Solicitud de una cotización formal. La arma scripts/generar_cotizacion.js. «doc» es lo que recibe cotHTML(), la misma función del sitio. «adjuntar» elige qué documentos del fabricante se pegan al final, por tipo: CTR catálogo traducido, COR catálogo original, ETT especificaciones técnicas, RGS registro sanitario. Si se deja fuera, se adjunta el primero que exista según el orden CTR, COR, ETT; el registro sanitario nunca entra solo, hay que pedirlo. El documento del fabricante viaja SOLO dentro de la cotización, nunca en la web.",
+ "adjuntar": ["CTR"],
+ "salida": "Cotizacion COT-SB-1126-009 - DEA CU Medical CU-SP1 Auto - QHSE Energy Services.pdf",
+ "doc": {
+  "tipo": "venta",
+  "num": "COT-SB-1126-009",
+  "numCot": "COT-SB-1126-009",
+  "nom": "QHSE ENERGY SERVICES S.A.C.",
+  "ruc": "20519364931",
+  "aten": "Sra. Lourdes Castañeda",
+  "mail": "Lourdes.castaneda@qhseenergy.com",
+  "tel": "923315459",
+  "nota": "Equipo EN STOCK, disponible para entrega inmediata. Desfibrilador externo TOTALMENTE AUTOMÁTICO: analiza el ritmo y aplica la descarga por sí solo, con guía por voz paso a paso, pensado para ser usado por personal no sanitario. Cuenta con registro sanitario vigente. El equipo se entrega con sus parches y su batería.",
+  "items": [{
+   "i": "cu-medical-cu-sp1-auto",
+   "q": 1, "pu": 5981, "t": 5981,
+   "n": "Desfibrilador externo automático (DEA) básico",
+   "m": "CU Medical · CU-SP1 Auto",
+   "nts": "D-373",
+   "inc": ["Parches de desfibrilación", "Batería"]
+  }],
+  "srv": null, "total": 5981, "qty": 1, "mod": "unidad",
+  "gar": 0, "tec": 0, "pas": 0, "via": 0, "inc": [], "ajuste": 0,
+  "base": 5981, "unit": 5981
+ }
+}

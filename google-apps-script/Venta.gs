@@ -825,6 +825,24 @@ function carpetaDocs_() {
   return f;
 }
 
+/* Ejecuta UNA vez (▶) cuando hayas subido documentos A MANO a la carpeta.
+   Los que sube el botón del proveedor ya quedan compartidos «cualquiera con
+   el enlace», porque así los deja guardarDoc_. Los que arrastras tú a Drive
+   NO: quedan privados, y entonces scripts/generar_cotizacion.js no los puede
+   bajar para adjuntarlos a una cotización, ni el sitio puede abrirlos.
+   Esto los deja todos iguales. Solo lectura, y solo para quien tenga el
+   enlace exacto: no quedan buscables en Google. */
+function compartirDocumentos() {
+  var it = carpetaDocs_().getFiles(), n = 0, ya = 0;
+  while (it.hasNext()) {
+    var f = it.next();
+    if (f.getSharingAccess() === DriveApp.Access.ANYONE_WITH_LINK) { ya++; continue; }
+    try { f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); n++; }
+    catch (e) { Logger.log('No se pudo compartir ' + f.getName() + ': ' + e); }
+  }
+  Logger.log('Compartidos ahora: ' + n + '. Ya lo estaban: ' + ya + '.');
+}
+
 function hojaDocs_(ss) {
   var sh = ss.getSheetByName('Documentos');
   if (!sh) {
