@@ -1,0 +1,30 @@
+{
+ "_nota": "Colchón a medida para cuna de calor radiante. No es un equipo del catálogo: es fabricación nacional a pedido, así que no lleva código de proveedor ni documento del fabricante adjunto.",
+ "salida": "Cotizacion COT-SB-1126-010 - Colchon para cuna de calor radiante - SHENKA.pdf",
+ "terminos": {
+  "Garantía": "12 meses contra defectos de fabricación. No cubre el daño por mal uso ni el desgaste propio del material.",
+  "Incluye": "El colchón se entrega listo para usar, con la funda de la medida indicada. No requiere instalación."
+ },
+ "doc": {
+  "tipo": "venta",
+  "num": "COT-SB-1126-010",
+  "numCot": "COT-SB-1126-010",
+  "nom": "SHENKA E.I.R.L.",
+  "ruc": "20612366145",
+  "aten": "Sra. Sharon Ticlavilca",
+  "mail": "analistaprocura@sumec.pe",
+  "tel": "961824347",
+  "nota": "Colchón de FABRICACIÓN NACIONAL, hecho a medida para la cuna de calor radiante David HKN-93. Medidas: 59 cm de ancho × 73 cm de largo × 3 a 5 cm de espesor. La entrega se realiza en Av. Canaval y Moreyra 480, Of. 10-B, San Isidro, Lima, sin costo adicional.",
+  "items": [{
+   "i": "colchon-cuna-hkn93",
+   "q": 1, "pu": 200, "t": 200,
+   "n": "Colchón para cuna de calor radiante David HKN-93",
+   "m": "Nacional · Nacional",
+   "nts": "",
+   "inc": ["Impermeable", "Antiestático", "Antialérgico", "Atóxico", "59 × 73 cm, espesor de 3 a 5 cm"]
+  }],
+  "srv": null, "total": 200, "qty": 1, "mod": "unidad",
+  "gar": 0, "tec": 0, "pas": 0, "via": 0, "inc": [], "ajuste": 0,
+  "base": 200, "unit": 200
+ }
+}

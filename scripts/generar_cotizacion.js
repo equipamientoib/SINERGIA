@@ -95,7 +95,24 @@ async function main() {
   await pg.goto(SITIO + '/' + ruta, { waitUntil: 'networkidle', timeout: 60000 });
   await pg.waitForTimeout(3000);
 
-  const r = await pg.evaluate(async datos => {
+  const r = await pg.evaluate(async ({ datos, terminos }) => {
+    /* Los terminos son los mismos para todo el catalogo, y casi siempre
+       sirven. Pero una cotizacion de un accesorio a medida no puede decir
+       «capacitacion de uso» ni «atencion en nuestro taller»: queda ridicula
+       delante de un comprador. «terminos» reemplaza el texto de los que
+       haga falta, buscandolos por su nombre y no por su numero, para que no
+       se descoloquen si manana se agrega uno. */
+    if (terminos && typeof vcTerminos === 'function') {
+      const orig = vcTerminos;
+      window.vcTerminos = function (d) {
+        const L = orig(d);
+        Object.keys(terminos).forEach(clave => {
+          const i = L.findIndex(t => t[0].toLowerCase().indexOf(clave.toLowerCase()) >= 0);
+          if (i >= 0) L[i] = [L[i][0], terminos[clave]];
+        });
+        return L;
+      };
+    }
     /* El catálogo de venta no se carga solo en esta pantalla; sin él los
        equipos salen sin marca y sin foto. */
     await new Promise(res => {
@@ -103,7 +120,7 @@ async function main() {
     });
     try { return { html: cotHTML(datos, true) }; }
     catch (e) { return { error: String(e.message) }; }
-  }, c.doc);
+  }, { datos: c.doc, terminos: c.terminos || null });
 
   if (r.error) { console.error('ERROR al dibujar la hoja:', r.error); await b.close(); process.exit(1); }
 
