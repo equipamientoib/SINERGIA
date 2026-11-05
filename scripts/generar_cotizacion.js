@@ -79,6 +79,70 @@ async function bajarDeDrive(id, destino) {
   return destino;
 }
 
+/* La hoja A4 de un repuesto que no esta en el catalogo.
+ *
+ * Los 195 equipos del catalogo ya tienen su ficha propia: la arma
+ * generar_paginas_venta.py y se publica en la web. Un repuesto suelto —una
+ * lampara, un colchon a medida— no tiene pagina ni ficha, y es justo lo que
+ * pide el cliente tecnico: el que leyo el manual de servicio y pregunta por
+ * el codigo de parte. Esta hoja se arma desde la propia solicitud, con el
+ * membrete de la casa, y se adjunta a la cotizacion. No se publica en
+ * ningun sitio. */
+function fichaHTML(f, org) {
+  const esc = t => String(t == null ? '' : t)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const secciones = (f.secciones || []).map(se => `
+    <section>
+      <h2>${esc(se.titulo)}</h2>
+      <table>${(se.filas || []).map(([k, v]) =>
+        `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>
+    </section>`).join('');
+  const foto = f.foto
+    ? `<div class="foto"><img src="${esc(/^https?:\/\//.test(f.foto) ? f.foto : org + '/' + String(f.foto).replace(/^\//, ''))}" alt=""></div>`
+    : '';
+  return `<!doctype html><html lang="es"><meta charset="utf-8"><title>${esc(f.titulo)}</title>
+  <style>
+    @page{size:A4 portrait;margin:14mm 16mm 16mm}
+    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{margin:0;background:#fff;color:#1a1a1a;
+      font:11px/1.5 "Segoe UI",Calibri,Arial,Helvetica,sans-serif}
+    .hoja{width:210mm;min-height:297mm;margin:0 auto;padding:14mm 16mm 16mm}
+    .memb img{width:100%;display:block}
+    h1{margin:16px 0 2px;font-size:15px;color:#17191d}
+    .k{margin:0 0 14px;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:#9A7F4E;font-weight:700}
+    .res{margin:0 0 14px;color:#555}
+    .cab{display:flex;gap:14px;align-items:flex-start}
+    .cab>div:first-child{flex:1}
+    .foto{width:52mm;flex:none;border:1px solid #e3ded4;padding:4px;background:#fff}
+    .foto img{width:100%;display:block}
+    h2{margin:14px 0 5px;font-size:11px;font-weight:700;color:#9A7F4E;
+      letter-spacing:.3px;text-transform:uppercase}
+    table{width:100%;border-collapse:collapse;font-size:10px}
+    th,td{border:1px solid #c9c2b4;padding:5px 6px;vertical-align:top;text-align:left}
+    th{width:42%;background:#f5f2ec;font-weight:600;color:#3a3a3a}
+    .fuente{margin-top:14px;font-size:9px;color:#7A7A7A;text-align:justify}
+    .pie{margin-top:18px;padding-top:7px;border-top:1px solid #d9d2c4;
+      font-size:9px;color:#7A7A7A;text-align:center}
+    @media print{.hoja{width:auto;min-height:0;margin:0;padding:0}
+      section,tr{break-inside:avoid}}
+  </style>
+  <div class="hoja">
+    <div class="memb"><img src="${org}/img/cotizacion/membrete.png" alt=""></div>
+    <div class="cab">
+      <div>
+        <p class="k" style="margin-top:16px">Ficha técnica</p>
+        <h1>${esc(f.titulo)}</h1>
+        ${f.resumen ? `<p class="res">${esc(f.resumen)}</p>` : ''}
+      </div>
+      ${foto}
+    </div>
+    ${secciones}
+    ${f.fuente ? `<p class="fuente">${esc(f.fuente)}</p>` : ''}
+    <p class="pie">Servicios Integrales Sinergia S.A.C. · RUC 20615862682 ·
+      Av. Simón Bolívar 2150, Pueblo Libre, Lima · logistica@sinergiabiomedica.pe</p>
+  </div></html>`;
+}
+
 async function main() {
   const spec = process.argv[2];
   if (!spec) {
@@ -136,11 +200,24 @@ async function main() {
   await pg2.waitForTimeout(2500);
   await pg2.pdf({ path: hoja, format: 'A4', printBackground: true,
                   margin: { top: '0', bottom: '0', left: '0', right: '0' } });
-  await b.close();
   console.log('Hoja de cotización lista.');
 
+  /* La ficha propia del repuesto, si la solicitud la trae. Va DESPUES de la
+     cotizacion y ANTES del documento del fabricante. */
+  let ficha = null;
+  if (c.ficha) {
+    ficha = path.join(tmp, 'ficha.pdf');
+    const pg3 = await b.newPage();
+    await pg3.setContent(fichaHTML(c.ficha, SITIO), { waitUntil: 'networkidle', timeout: 60000 });
+    await pg3.waitForTimeout(1200);
+    await pg3.pdf({ path: ficha, format: 'A4', printBackground: true,
+                    margin: { top: '0', bottom: '0', left: '0', right: '0' } });
+    console.log('Ficha técnica de Sinergia lista.');
+  }
+  await b.close();
+
   /* El documento del fabricante, si el equipo tiene uno registrado. */
-  const partes = [hoja];
+  const partes = ficha ? [hoja, ficha] : [hoja];
   const id = (c.doc.items && c.doc.items[0] || {}).i;
   const cod = c.codigo || codigoDe(id);
   const docs = documentosDe(cod, c.adjuntar);

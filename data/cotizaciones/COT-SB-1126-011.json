@@ -46,5 +46,89 @@
   "ajuste": 0,
   "base": 578,
   "unit": 578
+ },
+ "ficha": {
+  "titulo": "Lámpara de 14,5 V y 50 W para cuna de calor radiante David HKN-93",
+  "resumen": "Lámpara halógena dicroica de repuesto, equivalente del código original K05 009 00 (Cold Lamp) de Ningbo David.",
+  "foto": "img/cotizacion/items/lampara-hkn93.jpg",
+  "secciones": [
+   {
+    "titulo": "Características eléctricas",
+    "filas": [
+     [
+      "Tensión",
+      "14,5 V"
+     ],
+     [
+      "Potencia",
+      "50 W"
+     ]
+    ]
+   },
+   {
+    "titulo": "Conexión y formato",
+    "filas": [
+     [
+      "Casquillo",
+      "GX5.3"
+     ],
+     [
+      "Formato",
+      "MR16"
+     ],
+     [
+      "Tipo",
+      "Lámpara halógena dicroica, con reflector"
+     ]
+    ]
+   },
+   {
+    "titulo": "Equipos en los que se usa",
+    "filas": [
+     [
+      "Cuna de calor radiante",
+      "David HKN · «keep warm box»"
+     ],
+     [
+      "Incubadora",
+      "Sí, como bombilla de incubadora"
+     ],
+     [
+      "Lámpara de manta térmica",
+      "Sí"
+     ],
+     [
+      "Cuna térmica de recién nacido",
+      "Sí"
+     ]
+    ]
+   },
+   {
+    "titulo": "Identificación",
+    "filas": [
+     [
+      "Marca",
+      "Genérico"
+     ],
+     [
+      "Modelo",
+      "Genérico"
+     ],
+     [
+      "Procedencia",
+      "China"
+     ],
+     [
+      "Código original equivalente",
+      "K05 009 00 (Cold Lamp) · Ningbo David"
+     ],
+     [
+      "Contenido del empaque",
+      "1 lámpara"
+     ]
+    ]
+   }
+  ],
+  "fuente": "Datos declarados por el fabricante de la lámpara en su hoja de producto. El código K05 009 00 (Cold Lamp) es el que indica el manual de servicio de la cuna David HKN-93: se consigna como referencia de equivalencia. Esta NO es la pieza original de Ningbo David, sino una lámpara de las mismas características eléctricas y el mismo casquillo. La hoja no declara temperatura de color, vida útil ni ángulo del haz: no se publican."
  }
 }
