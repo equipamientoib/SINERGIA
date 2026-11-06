@@ -1,0 +1,27 @@
+{
+ "_nota": "DEA CU Medical CU-SP1 Auto para SG NATCLAR. Mismo equipo que la COT-SB-1126-009 de QHSE, con el precio del 6/11: el tipo de cambio bajó de 3.502 a 3.487 y los 191 equipos publicados bajaron un 0.43 %. Se cotiza a S/ 5,955, que es lo que muestra la web hoy, y no a los S/ 5,981 que se le confirmaron por WhatsApp: el cliente puede entrar a la página y comparar.",
+ "adjuntar": ["CTR"],
+ "salida": "Cotizacion COT-SB-1126-012 - DEA CU Medical CU-SP1 Auto - SG Natclar.pdf",
+ "doc": {
+  "tipo": "venta",
+  "num": "COT-SB-1126-012",
+  "numCot": "COT-SB-1126-012",
+  "nom": "SG NATCLAR S.A.C.",
+  "ruc": "20431080002",
+  "aten": "Sr. Jhon Linares",
+  "mail": "compras@natclar.com.pe",
+  "tel": "929964490",
+  "nota": "Equipo EN STOCK, disponible para entrega inmediata. Desfibrilador externo TOTALMENTE AUTOMÁTICO: analiza el ritmo y aplica la descarga por sí solo, con guía por voz paso a paso, pensado para ser usado por personal no sanitario. Cuenta con registro sanitario vigente. El equipo se entrega con sus parches y su batería. La entrega se realiza en Calle Los Halcones 104, Surquillo, sin costo adicional.",
+  "items": [{
+   "i": "cu-medical-cu-sp1-auto",
+   "q": 1, "pu": 5955, "t": 5955,
+   "n": "Desfibrilador externo automático (DEA) básico",
+   "m": "CU Medical · CU-SP1 Auto",
+   "nts": "D-373",
+   "inc": ["Parches de desfibrilación", "Batería"]
+  }],
+  "srv": null, "total": 5955, "qty": 1, "mod": "unidad",
+  "gar": 0, "tec": 0, "pas": 0, "via": 0, "inc": [], "ajuste": 0,
+  "base": 5955, "unit": 5955
+ }
+}
