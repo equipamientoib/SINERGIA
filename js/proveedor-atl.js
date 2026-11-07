@@ -133,9 +133,24 @@
     ['s', 'm', 'c', 'p', 'u', 'u2', 'tp'].forEach(function (k) { r[k] = q.get(k) || ''; });
     return r;
   })();
-  /* Sin filtro puesto, se usa Tipo = EQUIPOS (tp=2, ≈789 productos): 2 consultas. */
-  if (!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 || FIL.tp)) FIL.tp = '2';
-  var FILTRADO = true;
+  /* ¿Había un filtro puesto en la página del portal? Se mira ANTES de
+     forzar el nuestro. De esto depende que la hoja se atreva a poner en
+     cero el stock de lo que hoy no salga: con un filtro puesto, lo que no
+     sale puede estar perfectamente en stock y solo quedar fuera del filtro.
+
+     Estaba escrito «var FILTRADO = true» a secas, sin cambiarlo nunca. Como
+     la regla de poner en cero exige «!FILTRADO», esa regla NO SE EJECUTÓ
+     NUNCA, ni siquiera después de arreglar el otro guardia que la bloqueaba.
+     Dos candados en serie sobre la misma puerta.
+
+     Y «Tipo = Equipos» (tp = 2) NO cuenta como filtro: es exactamente lo
+     que el favorito pide por su cuenta cuando no hay ninguno, y es TODO el
+     catálogo que a Sinergia le interesa. Contarlo como filtro dejaba la
+     regla bloqueada otra vez para cualquiera que tuviera ese chip puesto en
+     la página, que es lo normal al navegar el portal. */
+  var FILTRADO = !!(FIL.s || FIL.m || FIL.c || FIL.p || FIL.u || FIL.u2 ||
+                    (FIL.tp && FIL.tp !== '2'));
+  if (!FIL.tp) FIL.tp = '2';
 
   function bloque(desde, hasta, pagina, nrodivs) {
     return new Promise(function (ok) {
@@ -177,8 +192,16 @@
      pasar por el DOM: el portal no escapa las comillas del título y el DOM
      lo corta en «5"»). De cada tarjeta: código, stock y precio (addCesta),
      descripción completa, modelo del proveedor y foto.
-     Devuelve {nuevos, tarjetas}; las tarjetas sin botón de compra (sin
-     stock) cuentan para avanzar de página pero no se guardan. */
+     Devuelve {nuevos, tarjetas}. Las tarjetas sin botón de compra son las
+     AGOTADAS, y SÍ se guardan, con stock 0: que el portal deje de ofrecer
+     un equipo es justo la señal de que no hay stock, y es lo que tiene que
+     llegar a la hoja para que la web deje de anunciarlo. Antes este
+     comentario decía que no se guardaban; el código de abajo sí lo hacía. */
+  var saltadas = 0;   // tarjetas agotadas de las que no se pudo sacar el código
+  /* Y una muestra de las dos primeras, para poder mirarlas. Sin ver el HTML
+     de una tarjeta de estas no hay forma de saber dónde esconde el portal su
+     código, y escribir expresiones a ciegas es perder corridas. */
+  var muestras = [];
   var DEC = document.createElement('textarea');
   function texto(t) { DEC.innerHTML = String(t || '').replace(/<[^>]*>/g, ' '); return DEC.value.replace(/\s+/g, ' ').trim(); }
 
@@ -191,10 +214,35 @@
       if (!m) {
         /* «Agotado»: sin botón de compra. El código sale del nombre de la
            foto (products/080.741.png) o de algún onclick; stock 0. */
-        var cm = t.match(/products\/(\d{3}\.\d{3})\.\w+/) || t.match(/onclick="[^"]*'(\d{3}\.\d{3})'/);
-        if (!cm) return;
+        var cm = t.match(/products\/(\d{2,3}\.\d{3})\.\w+/)
+             || t.match(/onclick="[^"]*'(\d{2,3}\.\d{3})'/)
+             || t.match(/\bdata-(?:cod|codigo|producto)="(\d{2,3}\.\d{3})"/)
+             || t.match(/\bvalue="(\d{3}\.\d{3})"/)
+             /* Último recurso: el código suelto en el texto de la tarjeta.
+                Se exige que no venga pegado a otra cifra, para no confundirlo
+                con un precio como «1,234.567». */
+             || t.match(/(?:^|[^\d,.])(\d{3}\.\d{3})(?![\d.])/);
+        /* Sin código no hay forma de casarla con la hoja. Se cuentan para
+           avisarlo al final: si salen muchas, hay equipos agotados que no
+           llegan a la hoja y la web los sigue anunciando con stock viejo. */
+        /* EL CÓDIGO NO ESTÁ EN LA TARJETA. Comprobado el 28/10 con el HTML
+           real de dos de ellas: la foto es «img_default.jpg», el chip lleva
+           el MODELO («iM70», «Duplex 2.0») y el enlace lleva el código
+           CIFRADO (?cd=…), nunca el 083.025. El número solo aparece dentro
+           del botón «Añadir al carrito», y un equipo agotado no lo tiene.
+
+           Así que la tarjeta ya NO se tira. Se manda sin código, con su
+           descripción, su modelo y su precio, y es la hoja la que la casa
+           por marca y modelo (matchModelo_ en Venta.gs). Antes se perdían
+           258 de 798 en cada corrida, y sus equipos se quedaban con el
+           precio y el stock del último día en que hubo existencias. */
         var pm = t.match(/US\$\s*([\d,]+(?:\.\d+)?)/);
-        m = [null, cm[1], '0', pm ? pm[1].replace(/,/g, '') : '0'];
+        var sinCodigo = !cm;
+        if (sinCodigo) {
+          saltadas++;
+          if (muestras.length < 2) muestras.push(t.slice(0, 2500));
+        }
+        m = [null, sinCodigo ? '' : cm[1], '0', pm ? pm[1].replace(/,/g, '') : '0'];
       }
       var tit = (t.match(/<h3[^>]*?title="([\s\S]*?)">/) || [])[1] || (t.match(/<h3[^>]*>([\s\S]*?)<\/h3>/) || [])[1] || '';
       var al = (t.match(/class="alert[^"]*"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '';
@@ -206,7 +254,13 @@
          esa ficha donde están los documentos. */
       var ur = (t.match(/href="([^"]*product-details[^"]*)"/) || [])[1] || '';
       try { ur = ur ? new URL(ur.replace(/&amp;/g, '&'), location.href).href : ''; } catch (e) { ur = ''; }
-      var k = cod6(m[1]); if (!mapa[k]) nuevos++;
+      /* Sin código, la clave sale del ?cd= del enlace, que el portal usa
+         para identificar el producto y es único y estable. Sin algo así,
+         todas las tarjetas sin código caerían en la misma clave y se
+         pisarían entre ellas. */
+      var cdu = sinCodigo ? ((ur.match(/[?&]cd=([^&]+)/) || [])[1] || texto(tit)) : '';
+      var k = sinCodigo ? ('sc:' + cdu) : cod6(m[1]);
+      if (!mapa[k]) nuevos++;
       mapa[k] = { c: m[1], s: Number(m[2]) || 0, p: Number(m[3]) || 0, d: texto(tit), mo: texto(al), img: src, u: ur };
     });
     return { nuevos: nuevos, tarjetas: /card card-product/.test(html || '') ? trozos.length : nuevos };
@@ -391,18 +445,73 @@
     t = String(t || '');
     return /divDocProd|id="technicalSheet"/.test(t);
   }
+  /* CUÁNTOS documentos dice el portal que tiene. Lo pone él mismo en la
+     etiqueta de la pestaña «Ficha técnica»:
+
+         <span class="badge …"><div id="divCountDoc">2</div></span>
+
+     Es el único juez fiable de si los trajimos todos: el bloque de
+     documentos se rellena por JavaScript al pulsar la pestaña, así que la
+     página recién pedida puede venir con el bloque VACÍO aunque el equipo
+     tenga seis. Sin este número, cero documentos y «no tiene ninguno» son
+     indistinguibles, y el equipo se marcaba como revisado para siempre. */
+  function cuantosDice(t) {
+    var m = String(t || '').match(/id="divCountDoc"[^>]*>\s*(\d+)/);
+    return m ? Number(m[1]) : -1;      // -1: el portal no lo dice
+  }
   function docsDeFicha(html) {
     var t = String(html || ''), i = t.indexOf('divDocProd');
     if (i < 0) return [];
     var j = t.indexOf('id="healthRegistration"', i);
     return leerDocs(t.slice(i, j > i ? j : i + 30000));
   }
+  /* La ficha se pide COMO LA PIDE UNA PERSONA, sin la cabecera
+     «X-Requested-With». Se mandaba, y es la cabecera con la que se piden
+     fragmentos por AJAX: el portal devolvía otra cosa, sin el bloque de
+     documentos, así que fichaValida() fallaba y el equipo se quedaba con
+     lo poco que diera el panel aparte.
+
+     Lo que costaba: el Edan SD-5 (075.554) tiene SEIS documentos en su
+     pestaña «Ficha técnica» —catálogo traducido, catálogo original,
+     MANUALES, registro sanitario y dos de especificaciones técnicas— y en
+     Drive solo quedó uno. Con la página guardada a mano desde el navegador
+     el lector encuentra los seis.
+
+     Si aun así no viniera el bloque, se reintenta con la cabecera: puede
+     que algún día el portal cambie de idea. */
+  /* Cuántos documentos dice el portal que tiene, preguntándoselo.
+
+     El número que la página enseña en la pestaña lo pone su propio
+     JavaScript con esta misma llamada (countArchivosProd en ajaxV11.js),
+     así que en la página recién pedida viene VACÍO. Preguntándolo aquí se
+     tiene el dato de verdad, y con él se sabe si llegaron todos o faltan.
+
+     Si el portal no contesta un número, se devuelve -1 y se sigue como si
+     no lo hubiera dicho: nunca se da un equipo por completo sin saberlo. */
+  async function pedirCuantos(cod) {
+    var visible = cod.slice(0, 3) + '.' + cod.slice(3);
+    var cuerpo = new FormData();
+    cuerpo.append('tipoAccion', 'countArchivosProd');
+    cuerpo.append('codProd', visible);
+    try {
+      var r = await xhrFull('POST', '/controlador/controller_pedido.php', cuerpo, 20000,
+                            { 'X-Requested-With': 'XMLHttpRequest' });
+      if (r.estado < 200 || r.estado >= 400) return -1;
+      var m = String(r.texto || '').replace(/<[^>]*>/g, ' ').match(/\d+/);
+      return m ? Number(m[0]) : -1;
+    } catch (e) { return -1; }
+  }
+
   async function pedirFicha(url) {
-    var r;
-    try { r = await xhrFull('GET', url, null, 30000, { 'X-Requested-With': 'XMLHttpRequest' }); }
-    catch (e) { return { ok: false, ultimo: { forma: 'ficha', estado: 0, texto: String((e && e.message) || e) } }; }
-    if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto) };
-    return { ok: false, ultimo: { forma: 'ficha', estado: r.estado, texto: r.texto } };
+    var ultimo = null;
+    for (var i = 0; i < 2; i++) {
+      var cab = i ? { 'X-Requested-With': 'XMLHttpRequest' } : null, r;
+      try { r = await xhrFull('GET', url, null, 30000, cab); }
+      catch (e) { ultimo = { forma: 'ficha', estado: 0, texto: String((e && e.message) || e) }; continue; }
+      if (r.estado >= 200 && r.estado < 400 && fichaValida(r.texto)) return { ok: true, docs: docsDeFicha(r.texto), dice: cuantosDice(r.texto) };
+      ultimo = { forma: i ? 'ficha+ajax' : 'ficha', estado: r.estado, texto: r.texto };
+    }
+    return { ok: false, ultimo: ultimo };
   }
 
   /* accion: 'viewArchivosProd' (ficha técnica, catálogo del fabricante) o
@@ -447,15 +556,24 @@
     return { ok: false, ultimo: ultimo };
   }
 
+  /* Un documento que no se sepa leer se CUENTA, no se tira en silencio.
+     La expresión de antes exigía las tres comillas simples con contenido y
+     el paréntesis de cierre justo después, así que se perdía sin avisar
+     cualquier llamada con un dato vacío, con comillas dobles o con un
+     cuarto argumento. De ocho formas probadas, cinco se perdían. */
+  var RX_DOC = /descargarDoc\(\s*(['"])([\s\S]*?)\1\s*,\s*(['"])([\s\S]*?)\3\s*,\s*(['"])([\s\S]*?)\5/;
+  var docsIlegibles = 0;
   function leerDocs(html) {
     var partes = String(html || '').split('descargarDoc('), out = [], visto = {};
     for (var i = 1; i < partes.length; i++) {
-      var m = ('descargarDoc(' + partes[i]).match(/descargarDoc\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/);
-      if (!m) continue;
-      var clave = m[1] + '|' + m[2] + '|' + m[3];
+      var m = ('descargarDoc(' + partes[i]).match(RX_DOC);
+      if (!m) { docsIlegibles++; log('documento que no se pudo leer: descargarDoc(' + partes[i].slice(0, 60)); continue; }
+      var op = m[2], sis = m[4], tipo = m[6];
+      if (!op) { docsIlegibles++; continue; }           // sin «op» no hay nada que descargar
+      var clave = op + '|' + sis + '|' + tipo;
       if (visto[clave]) continue;
       visto[clave] = 1;
-      out.push({ op: m[1], sis: m[2], tipo: m[3], nom: nombreDoc(partes[i - 1]) });
+      out.push({ op: op, sis: sis, tipo: tipo, nom: nombreDoc(partes[i - 1]) });
     }
     return out;
   }
@@ -495,7 +613,7 @@
   }
 
   async function bajarDocs(lista) {
-    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null;
+    var docs = 0, equipos = 0, sin = 0, fallas = 0, seguidas = 0, cortado = false, diag = null, incompletos = 0;
     for (var i = 0; i < lista.length && !parar; i++) {
       var cod = lista[i].c, visible = cod.slice(0, 3) + '.' + cod.slice(3);
       txt('Buscando documentos: <b>' + (i + 1) + ' de ' + lista.length + '</b> equipos…<br>' +
@@ -509,7 +627,22 @@
          cola: así no se pierde el registro sanitario por un tropiezo. Lo
          que ya se bajó no se vuelve a bajar, la hoja lo reconoce. */
       var ft = lista[i].u ? await pedirFicha(lista[i].u) : { ok: false, ultimo: null };
-      if (!ft.ok) ft = await pedirPanel(cod, 'viewArchivosProd');
+      /* Que la página cargue no basta: su bloque de documentos se rellena
+         por JavaScript al pulsar la pestaña, así que puede venir vacío. Si
+         el portal dice que hay más de los que trajimos —o si no dijo
+         nada—, se pide además el panel por la otra vía y se junta todo.
+
+         Antes bastaba con que la página cargara para dar el equipo por
+         resuelto, y la otra vía no se intentaba nunca: un equipo con seis
+         documentos se marcaba «no tiene ninguno» para siempre. */
+      var dice = (ft.ok && typeof ft.dice === 'number' && ft.dice >= 0) ? ft.dice : await pedirCuantos(cod);
+      if (!ft.ok || dice < 0 || dice > (ft.docs || []).length) {
+        var alt = await pedirPanel(cod, 'viewArchivosProd');
+        if (alt.ok) {
+          ft = ft.ok ? { ok: true, docs: (ft.docs || []).concat(alt.docs || []), dice: dice }
+                     : { ok: true, docs: alt.docs || [], dice: dice };
+        }
+      }
       var rs = ft.ok ? await pedirPanel(cod, 'viewRRSSProd', true) : { ok: false, ultimo: null };
       if (!ft.ok || !rs.ok) {
         /* No se anota NADA: este equipo vuelve a la cola otro día. */
@@ -526,6 +659,20 @@
         if (vistos[k]) return;
         vistos[k] = 1; hallados.push(d);
       });
+      /* El portal prometía más de los que llegaron: no se marca el equipo,
+         para que vuelva a la cola en vez de quedarse así para siempre. */
+      /* El contador del portal cuenta SOLO la pestaña «Ficha técnica», así
+         que se compara contra esos, no contra el total ya mezclado con el
+         registro sanitario: si no, un registro sanitario de más taparía una
+         ficha técnica de menos. */
+      var deFicha = (ft.docs || []).length;
+      if (dice > deFicha) {
+        incompletos++;
+        log('incompleto: ' + visible + ' · el portal dice ' + dice + ' y llegaron ' + deFicha);
+        fallas++;
+        await espera(2000);
+        continue;
+      }
       if (!hallados.length) {
         sin++;
         await enviar(JSON.stringify({ k: CFG.k, sinDoc: cod }));
@@ -567,6 +714,8 @@
     }
     txt('<b style="color:#9be3b5">Documentos listos.</b> Se guardaron <b>' + docs + '</b> de <b>' + equipos + '</b> equipos' +
       (sin ? ' · ' + sin + ' no tenían ninguno' : '') + (fallas ? ' · ' + fallas + ' fallaron (se reintentan otro día)' : '') + '.' +
+      (incompletos ? '<br><span style="color:#f0c674">' + incompletos + ' equipos dicen tener más documentos de los que llegaron: no se marcan y vuelven a la cola.</span>' : '') +
+      (docsIlegibles ? '<br><span style="color:#f0c674">' + docsIlegibles + ' documentos del portal no se pudieron leer. Avísame si este número no es 0.</span>' : '') +
       '<br><span style="color:#aeb4bc">Quedan en la carpeta «Sinergia - Documentos venta» de tu Drive y en la pestaña «Documentos». La web los muestra en unos minutos.</span>');
   }
 
@@ -609,7 +758,7 @@
 
       /* Se lee el catálogo en bloques grandes, de uno en uno y con pausa.
          Si el portal no acepta 500 por consulta, se prueba con 250. */
-      var mapa = {}, consultas = 0, completo = false;
+      var mapa = {}, consultas = 0, completo = false, vacios = 0;
       var espera = function (ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); };
       var hallados = function () { return Object.keys(mios).filter(function (c) { return mapa[c]; }).length; };
       /* 1.ª consulta: bloque grande. Luego se sigue desde donde terminó lo
@@ -672,7 +821,17 @@
         if (!res.texto) { log('sin respuesta dos veces: se envía lo leído hasta aquí'); break; }
         r = leer(res.texto, mapa);
         log('leídos ' + r.tarjetas + ' (nuevos ' + r.nuevos + ') · total ' + Object.keys(mapa).length);
-        if (!r.tarjetas || !r.nuevos) { completo = true; break; }   // fin de la lista
+        /* Fin de la lista: SOLO cuando el portal deja de devolver tarjetas.
+           Antes se paraba también cuando un bloque no traía ninguna NUEVA, y
+           eso cortaba la lectura a media lista: un bloque entero de repetidos
+           igual adelanta la ventana («desde += r.tarjetas»), así que el
+           siguiente sí puede traer novedades. Con el corte viejo se leían 542
+           productos de los ~789 que tiene el tipo EQUIPOS, y los ~247 que
+           quedaban fuera salían en la hoja como «no aparece hoy en el
+           portal» aunque estuvieran ahí, con su precio y su stock. */
+        if (!r.tarjetas) { completo = true; break; }
+        vacios = r.nuevos ? 0 : vacios + 1;
+        if (vacios >= 3) { completo = true; break; }   // tres seguidos sin novedad: es el final
         desde += r.tarjetas; pag++;
       }
       /* Se manda la lista completa: la hoja guarda la base del proveedor
@@ -685,7 +844,31 @@
       try { localStorage.setItem('sbAtlUltimo', String(Date.now())); } catch (e) { }
       var id = String(Date.now());
       txt('Enviando <b>' + leidos + '</b> equipos del proveedor a tu hoja…');
-      await enviar(JSON.stringify({ k: CFG.k, id: id, tc: TC, todos: true, completo: completo && !FILTRADO && leidos >= 1000, items: items }));
+      /* ¿Se leyó el catálogo entero? De eso depende que la hoja ponga en CERO
+         el stock de los equipos que hoy no estaban en el portal. Poner un
+         cero de más es grave: ese equipo desaparece de la web o se anuncia
+         agotado sin estarlo. Así que la regla es conservadora.
+
+         Se compara con la MEJOR lectura que se recuerde, no con la última:
+         si el portal está en mantenimiento y hoy devuelve la mitad, esa
+         media lectura no puede rebajar la vara para mañana. El proveedor
+         avisó de un mantenimiento de sábado y domingo; una corrida en medio
+         de eso no debe vaciar el stock de medio catálogo.
+
+         Y la PRIMERA corrida nunca pone nada en cero: todavía no hay con qué
+         comparar. Se limita a guardar la marca. Como el favorito se corre
+         todos los días, el coste es un día.
+
+         Historia de los guardias que había antes, los dos inútiles:
+           · «leidos >= 1000», con un catálogo de 796 → nunca se cumplía.
+           · «!FILTRADO», con FILTRADO escrito a true y sin cambiar nunca. */
+      var MEJOR = 0;
+      try { MEJOR = Number(localStorage.getItem('sbAtlMejor')) || 0; } catch (e) { }
+      var entero = !FILTRADO && completo && MEJOR > 0 && leidos >= Math.round(MEJOR * 0.8);
+      if (!FILTRADO && completo && leidos > MEJOR) {
+        try { localStorage.setItem('sbAtlMejor', String(leidos)); } catch (e) { }
+      }
+      await enviar(JSON.stringify({ k: CFG.k, id: id, tc: TC, todos: true, completo: entero, items: items }));
       /* La respuesta del POST es opaca (otro dominio): se consulta el resultado
          hasta que la hoja termine de procesar este envío. */
       var est = {};
@@ -710,7 +893,10 @@
       txt('<b style="color:#9be3b5">¡Listo!</b> Se leyeron <b>' + leidos + '</b> equipos del proveedor' + (TC ? ' (TC S/ ' + TC + ')' : '') + '.<br>' +
         'Tus equipos con precio y stock: <b>' + est.actualizados + '</b>' +
         (est.por_modelo ? ' (' + est.por_modelo + ' encontrados por marca y modelo)' : '') + '.<br>' +
-        (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal: mira la columna «coincidencia».<br>' : '') +
+        (est.pub_sin ? '<b>' + est.pub_sin + '</b> publicados no aparecen hoy en el portal' +
+            (entero ? ': se les puso el stock en <b>0</b>.' : ': mira la columna «coincidencia».') + '<br>' : '') +
+        (entero ? '' : '<span style="color:#f0c674">Esta lectura no se dio por completa, así que NO se puso ningún stock en cero.</span><br>') +
+        (saltadas ? '<span style="color:#aeb4bc">' + saltadas + ' de esos equipos están agotados y su tarjeta no trae el código; se reconocen por marca y modelo.</span><br>' : '') +
         vig +
         '<span style="color:#aeb4bc">La lista completa quedó en la pestaña «Proveedor». La web se actualiza sola en unos minutos.</span>');
       await ofrecerFotos();

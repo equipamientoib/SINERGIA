@@ -338,7 +338,7 @@ def negocio(cfg):
 def pagina(cfg, *, ruta, title, descripcion, migas, cuerpo, jsonld, imagen=None):
     """Documento completo. «ruta» es la dirección canónica, con / final."""
     url = SITIO + ruta
-    og_img = SITIO + (imagen or '/img/catalogo/defib-05.jpg')
+    og_img = SITIO + (imagen or IMAGEN_RESERVA)
     wa = 'https://wa.me/%s?text=%s' % (cfg['whatsapp'], urllib.parse.quote(
         'Hola Sinergia Biomédica, quiero cotizar un alquiler.'))
     # js/whatsapp.js: en el celular manda estos enlaces a la aplicación en vez
@@ -528,9 +528,14 @@ def galeria_html(alt, ligeras, grandes, primera=False):
     if not ligeras:
         return '<div class="gal una"><div class="gal-main sinfoto">%s</div></div>' % ICONO
     fotos = ligeras
+    # Las miniaturas llevan el nombre del equipo en el «alt». Iban vacías, que
+    # para el buscador significa «decorativa, ignórala»: la foto 1 se salvaba
+    # porque la grande de abajo sí lo trae, pero de la 2 en adelante ninguna
+    # tenía texto en toda la página. El botón conserva su aria-label, que es
+    # el que manda para el lector de pantalla, así que no se oye dos veces.
     minis = ''.join('<button type="button" class="%s" data-i="%d" aria-label="Foto %d">'
-                    '<img src="%s" alt="" loading="lazy" decoding="async" width="120" height="90"></button>'
-                    % ('on' if k == 0 else '', k, k + 1, f) for k, f in enumerate(fotos)) if n > 1 else ''
+                    '<img src="%s" alt="%s — foto %d" loading="lazy" decoding="async" width="120" height="90"></button>'
+                    % ('on' if k == 0 else '', k, k + 1, f, alt, k + 1) for k, f in enumerate(fotos)) if n > 1 else ''
     flechas = ('<button type="button" class="gal-f izq" aria-label="Foto anterior">&#8249;</button>'
                '<button type="button" class="gal-f der" aria-label="Foto siguiente">&#8250;</button>'
                '<span class="gal-n">1 / %d</span>' % n) if n > 1 else ''
@@ -885,6 +890,59 @@ def fechas_previas():
     return dict(re.findall(r'<loc>([^<]+)</loc>\s*<lastmod>([^<]+)</lastmod>', txt))
 
 
+# La foto que se usa cuando la pagina no tiene ninguna propia.
+IMAGEN_RESERVA = '/img/catalogo/defib-05.jpg'
+
+
+def imagenes_de(rel):
+    """Las fotos que la pagina ya le declara a Google, para el sitemap.
+
+    No se vuelven a calcular: se leen del JSON-LD que la pagina acaba de
+    escribir, que es donde grande() ya dejo la version de 1200 px. Asi el
+    sitemap no puede decir una cosa y el marcado otra.
+
+    Van en el sitemap porque hasta ahora Google solo podia llegar a estas
+    fotos por el og:image y el JSON-LD. El sitemap de imagenes es la via
+    que el propio Google documenta para encontrarlas, y no costaba nada.
+    """
+    try:
+        h = open(os.path.join(ROOT, rel), encoding='utf-8').read()
+    except OSError:
+        return []
+    m = re.search(r'"image": (\[[^\]]*\]|"[^"]*")', h)
+    v = []
+    if m:
+        try:
+            v = json.loads(m.group(1))
+        except ValueError:
+            v = []
+        if isinstance(v, str):
+            v = [v]
+    if not v:
+        # Las familias y los indices no llevan foto en el JSON-LD —son listas,
+        # no un equipo— pero si tienen og:image, que es una foto de verdad.
+        v = re.findall(r'<meta property="og:image" content="([^"]+)"', h)
+    # La de reserva no entra NUNCA: es la foto de un equipo concreto, y
+    # declararla seria decirle a Google que esa pagina ensena ese equipo.
+    return [u for u in v if not u.endswith(IMAGEN_RESERVA)]
+
+
+def fila_url(loc, fecha, rel):
+    """Una linea del sitemap, con sus fotos dentro.
+
+    TIENE QUE QUEDAR EN UNA SOLA LINEA. Los dos generadores se reparten el
+    sitemap leyendo el del otro con «  <url>.*?</url>» sin DOTALL: si este
+    bloque se parte en varias lineas, cada generador borra las URL del otro.
+    """
+    fotos = ''.join('<image:image><image:loc>%s</image:loc></image:image>'
+                    % u.replace('&', '&amp;') for u in imagenes_de(rel))
+    return '  <url><loc>%s</loc><lastmod>%s</lastmod>%s</url>' % (loc, fecha, fotos)
+
+
+URLSET = ('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+          ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n')
+
+
 def fotos_extra():
     """data/fotos-extra.json: {id_equipo: [rutas en img/catalogo/]}."""
     d = leer_json(EXTRA) if os.path.exists(EXTRA) else {}
@@ -995,7 +1053,7 @@ def main():
     for ruta, rel in urls:
         loc = SITIO + ruta
         fecha = hoy if (rel in cambios or loc not in previas) else previas[loc]
-        filas.append('  <url><loc>%s</loc><lastmod>%s</lastmod></url>' % (loc, fecha))
+        filas.append(fila_url(loc, fecha, rel))
     # Del sitemap anterior se conserva TODO lo que no escribe este generador:
     # las páginas de venta y /promociones/, que las pone
     # scripts/generar_paginas_venta.py. Antes se conservaba solo lo que
@@ -1010,7 +1068,7 @@ def main():
         if loc and loc.group(1) not in mias:
             filas.append(u)
     escribir('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n'
-             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+             + URLSET
              + '\n'.join(filas) + '\n</urlset>\n', cambios)
     escribir('robots.txt', 'User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n' % SITIO, cambios)
 
