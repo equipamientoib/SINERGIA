@@ -1183,6 +1183,134 @@ async function cotEntrar(){
   cotEmitir(location.hash.slice('#/emitir/'.length));
 }
 
+/* ── Correlativo anual de las cotizaciones ───────────────────────────
+   El número se escribía a mano, de memoria, y en 2026 salieron cuatro
+   pares de cotizaciones distintas con el mismo número. Ahora hay una
+   sola serie por año:
+
+       COT-SB-<AÑO 4 cifras>-<correlativo 4 cifras>   ·   COT-SB-2026-0050
+
+   No reinicia por mes y no separa venta de alquiler: es la misma cuenta
+   para todo. La página propone el número ya completo, lo reserva al
+   descargar el PDF —no al abrir la pantalla— y lo deja anotado.
+
+   El siguiente sale de max(correlativos del año) + 1, nunca de
+   cantidad + 1: si se borra una anotación, cantidad + 1 repetiría un
+   número ya emitido.
+
+   La serie vieja COT-SB-MMAA-NN queda cerrada. No se renumera nada de
+   lo ya emitido: solo se deja de producir ese formato.                */
+const COT_SERIE_LS  = 'sb-cot-serie-v1';
+const COT_SERIE_PRE = 'COT-SB-';
+const COT_SERIE_RE  = /^\s*COT-SB-(\d{4})-(\d{1,4})\s*$/i;
+/* De dónde arranca cada año. 2026 parte de 0050 porque la serie a mano
+   ya llegó al 36 (y había otra en 011): así ningún número nuevo pisa uno
+   ya emitido. Los años que no están aquí arrancan en 0001.            */
+const COT_SERIE_DESDE = { 2026: 50 };
+
+function cotSerieNum(anio, n){
+  return COT_SERIE_PRE + anio + '-' + String(n).padStart(4, '0');
+}
+/* Lee un número escrito a mano. Devuelve null si no tiene la forma
+   nueva: así un COT-SB-1126-35 de la serie vieja no pasa.             */
+function cotSeriePartes(txt){
+  const m = COT_SERIE_RE.exec(String(txt == null ? '' : txt));
+  if(!m) return null;
+  const anio = Number(m[1]), n = Number(m[2]);
+  if(anio < 2026 || anio > 2100 || n < 1 || n > 9999) return null;
+  return { anio: anio, n: n };
+}
+function cotSerieLeer(){
+  let r = null;
+  try{ r = JSON.parse(localStorage.getItem(COT_SERIE_LS) || 'null'); }catch(e){}
+  if(!r || typeof r !== 'object' || !r.a || typeof r.a !== 'object') r = { v: 1, a: {} };
+  return r;
+}
+function cotSerieGuardar(r){
+  try{ localStorage.setItem(COT_SERIE_LS, JSON.stringify(r)); return true; }
+  catch(e){ return false; }
+}
+function cotSerieLista(anio){
+  const l = cotSerieLeer().a[String(anio)];
+  return Array.isArray(l) ? l.filter(x => x && Number(x.n) > 0) : [];
+}
+/* El siguiente libre del año: el mayor anotado + 1, nunca por debajo del
+   arranque del año.                                                    */
+function cotSerieProximo(anio){
+  const desde = COT_SERIE_DESDE[anio] || 1;
+  const mayor = cotSerieLista(anio).reduce((a, x) => Math.max(a, Number(x.n) || 0), 0);
+  return Math.min(9999, Math.max(desde, mayor + 1));
+}
+/* ¿Lo tiene ya OTRA cotización? La misma emisión puede volver a
+   descargarse con su propio número (se canceló la impresión, se corrigió
+   un descuento) sin chocar consigo misma.                              */
+function cotSerieUsado(txt, id){
+  const p = cotSeriePartes(txt);
+  if(!p) return null;
+  return cotSerieLista(p.anio).find(x => Number(x.n) === p.n && x.id !== id) || null;
+}
+/* Reserva el número contra esta emisión. Si esta emisión ya tenía otro
+   anotado, se suelta: un número mal tecleado no se queda quemado.      */
+function cotSerieAnotar(txt, doc, id){
+  const p = cotSeriePartes(txt);
+  if(!p) return false;
+  const r = cotSerieLeer();
+  Object.keys(r.a).forEach(k => {
+    if(Array.isArray(r.a[k])) r.a[k] = r.a[k].filter(x => x && x.id !== id);
+  });
+  const k = String(p.anio);
+  if(!Array.isArray(r.a[k])) r.a[k] = [];
+  const h = new Date(), p2 = x => String(x).padStart(2, '0');
+  r.a[k].push({
+    n: p.n, num: cotSerieNum(p.anio, p.n), id: id,
+    /* La fecha del día de aquí, no la de Greenwich: emitir de noche en
+       Lima caía en el día siguiente. */
+    f: h.getFullYear() + '-' + p2(h.getMonth() + 1) + '-' + p2(h.getDate()),
+    cli: String((doc && doc.nom) || '').slice(0, 80),
+    tipo: (doc && doc.tipo === 'venta') ? 'venta' : 'alquiler',
+    total: Number((doc && doc.total) || 0)
+  });
+  r.a[k].sort((x, y) => x.n - y.n);
+  return cotSerieGuardar(r);
+}
+/* Suelta un número anotado por error (se descargó un PDF que no se
+   envió). Solo desde esta pantalla, que ya pide clave.                 */
+function cotSerieLiberar(anio, n){
+  const num = cotSerieNum(anio, n);
+  if(!confirm('¿Liberar el ' + num + '?\n\nQuedará libre para la próxima cotización. '
+    + 'Hazlo solo si ese PDF no llegó a ningún cliente.')) return;
+  const r = cotSerieLeer(), k = String(anio);
+  if(Array.isArray(r.a[k])) r.a[k] = r.a[k].filter(x => Number(x.n) !== Number(n));
+  cotSerieGuardar(r);
+  cotSeriePintar();
+  cotEmiAviso();
+}
+function cotSerieFecha(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+  return m ? m[3] + '/' + m[2] + '/' + m[1] : String(iso || '');
+}
+/* El panel bajo el campo: cuál sigue, cuántas van y cuáles ya salieron. */
+function cotSeriePintar(){
+  const caja = document.getElementById('emiSerie');
+  if(!caja) return;
+  const anio = new Date().getFullYear();
+  const l = cotSerieLista(anio);
+  caja.innerHTML = `<p class="emi-serie-l">Siguiente libre de ${anio}:
+      <b>${cotSerieNum(anio, cotSerieProximo(anio))}</b> ·
+      ${l.length} ${l.length === 1 ? 'cotización emitida' : 'cotizaciones emitidas'} este año.</p>`
+    + `<details class="emi-serie"><summary>Ver el registro de números</summary>`
+    + (l.length
+        ? `<ul>${l.slice().reverse().map(x => `<li><b>${cotEsc(x.num || cotSerieNum(anio, x.n))}</b>
+            <span>${cotEsc(cotSerieFecha(x.f))}${x.cli ? ' · ' + cotEsc(x.cli) : ''}${
+              x.tipo === 'venta' ? ' · venta' : ''}</span>
+            <button type="button" onclick="cotSerieLiberar(${anio},${Number(x.n)})">Liberar</button></li>`).join('')}</ul>`
+        : `<p class="emi-serie-n">Todavía no hay ninguna anotada en ${anio}.</p>`)
+    + `<p class="emi-serie-n">El registro vive en este navegador, en esta computadora. Si algún día
+        emites desde otra, escribe a mano el número que sigue la primera vez: desde ahí la página
+        continúa sola.</p></details>`;
+}
+
+
 function cotEmitir(codigo){
   const caja = document.getElementById('cotEmiBody');
   if(!caja) return;
@@ -1206,10 +1334,16 @@ function cotEmitir(codigo){
     setTimeout(() => { const el = document.getElementById('emiClave'); if(el) el.focus(); }, 60);
     return;
   }
-  /* Número propio sugerido, con el correlativo de la empresa. */
-  const h = new Date(), p2 = n => String(n).padStart(2, '0');
+  /* El número llega relleno, con el correlativo del año que sigue. Se
+     reserva al descargar el PDF, no ahora: abrir esta pantalla y cerrarla
+     no gasta ningún número. Cada vez que se abre es una emisión nueva,
+     con su propia identidad, así dos solicitudes seguidas nunca comparten
+     número. */
+  const anio = new Date().getFullYear();
+  const pedido = cotSeriePartes(d.numCot);
   COT_EMI = Object.assign({}, d, {
-    num: d.numCot || ('COT-SB-' + p2(h.getMonth() + 1) + String(h.getFullYear()).slice(2) + '-'),
+    num: pedido ? cotSerieNum(pedido.anio, pedido.n) : cotSerieNum(anio, cotSerieProximo(anio)),
+    emiId: 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
     ruc: d.ruc || '', aten: d.aten || '', nota: d.nota || '', ajuste: 0
   });
   caja.innerHTML = `
@@ -1222,8 +1356,11 @@ function cotEmitir(codigo){
     <div class="wrap emi">
       <div class="emi-form">
         <div class="emi-g"><b>1</b> Datos de la cotización</div>
-        <label>N° de cotización <small>tu correlativo</small>
-          <input id="emiNum" value="${cotEsc(COT_EMI.num)}" oninput="cotEmiCambio()"></label>
+        <label>N° de cotización <small>lo propone la página; se reserva al descargar</small>
+          <input id="emiNum" value="${cotEsc(COT_EMI.num)}" oninput="cotEmiCambio()"
+            spellcheck="false" autocomplete="off"></label>
+        <div class="form-msg" id="emiNumAviso" role="status" aria-live="polite"></div>
+        <div id="emiSerie"></div>
         <div class="cot-f2">
           <label>RUC del cliente<input id="emiRuc" value="${cotEsc(COT_EMI.ruc)}" oninput="cotEmiCambio()"></label>
           <label>Atención<input id="emiAten" value="${cotEsc(COT_EMI.aten)}" oninput="cotEmiCambio()"></label>
@@ -1239,11 +1376,13 @@ function cotEmitir(codigo){
         <label><textarea id="emiNota" rows="3" oninput="cotEmiCambio()"
           placeholder="Disponibilidad confirmada del 10 al 14 de octubre."></textarea></label>
 
-        <button class="btn btn-fill emi-pdf" onclick="cotImprimir(COT_EMI, true)">Descargar la cotización en PDF</button>
-        <p class="emi-nota">Sale con membrete, firma y datos de pago. Revisa la vista de al lado antes de enviarla.</p>
+        <button class="btn btn-fill emi-pdf" id="emiPdf" onclick="cotEmiDescargar()">Descargar la cotización en PDF</button>
+        <p class="emi-nota">Sale con membrete, firma y datos de pago. Revisa la vista de al lado antes
+          de enviarla. Al descargar, el N° queda reservado y ninguna otra cotización lo vuelve a usar.</p>
       </div>
       <div class="emi-vista"><div class="cotv-hoja"><iframe title="Cotización"></iframe></div></div>
     </div>`;
+  cotSeriePintar();
   cotEmiCambio();
 }
 
@@ -1263,6 +1402,64 @@ function cotEmiCambio(){
     f.srcdoc = cotHTML(COT_EMI, true);
     f.onload = () => { try{ f.style.height = (f.contentDocument.body.scrollHeight + 24) + 'px'; }catch(e){} };
   }
+  cotEmiAviso();
+}
+
+/* ── Revisión del N° antes de descargar ──────────────────────────────
+   Dos cosas: que tenga la forma nueva y que no esté ya usado. Mientras
+   algo falle, el botón del PDF queda bloqueado y el aviso dice qué
+   corregir.                                                            */
+function cotEmiRevisar(){
+  if(!COT_EMI) return 'No hay nada que emitir.';
+  const txt = String(COT_EMI.num || '').trim();
+  const anio = new Date().getFullYear();
+  if(!txt) return 'Falta el N° de cotización. El que sigue es '
+    + cotSerieNum(anio, cotSerieProximo(anio)) + '.';
+  const p = cotSeriePartes(txt);
+  if(!p) return 'El N° va con el año completo y cuatro cifras, así: '
+    + cotSerieNum(anio, cotSerieProximo(anio)) + '. La serie vieja (COT-SB-1126-35) quedó cerrada.';
+  const ya = cotSerieUsado(txt, COT_EMI.emiId);
+  if(ya) return 'El ' + cotSerieNum(p.anio, p.n) + ' ya se emitió'
+    + (ya.f ? ' el ' + cotSerieFecha(ya.f) : '')
+    + (ya.cli ? ' a ' + ya.cli : '') + '. Usa el '
+    + cotSerieNum(p.anio, cotSerieProximo(p.anio)) + ' o corrige el número.';
+  return null;
+}
+function cotEmiAviso(){
+  const err = cotEmiRevisar();
+  const el = document.getElementById('emiNumAviso');
+  if(el){
+    el.textContent = err || '';
+    el.className = 'form-msg' + (err ? ' show err' : '');
+  }
+  const b = document.getElementById('emiPdf');
+  if(b) b.disabled = !!err;
+  return err;
+}
+
+/* Descargar = reservar. El número se anota antes de abrir la ventana de
+   impresión: si el navegador la bloquea, el número ya es de esta
+   cotización y volver a pulsar no consume otro.                        */
+function cotEmiDescargar(){
+  const err = cotEmiAviso();
+  if(err){
+    const el = document.getElementById('emiNum');
+    if(el){ el.focus(); el.select(); }
+    return;
+  }
+  const p = cotSeriePartes(COT_EMI.num);
+  COT_EMI.num = cotSerieNum(p.anio, p.n);        // 'cot-sb-2026-50' queda COT-SB-2026-0050
+  const el = document.getElementById('emiNum');
+  if(el) el.value = COT_EMI.num;
+  const anotado = cotSerieAnotar(COT_EMI.num, COT_EMI, COT_EMI.emiId);
+  cotSeriePintar();
+  const av = document.getElementById('emiNumAviso');
+  if(av && !anotado){
+    av.textContent = 'Ojo: este navegador no deja guardar el registro (¿ventana privada?). '
+      + 'El PDF sale igual, pero apunta el ' + COT_EMI.num + ' a mano.';
+    av.className = 'form-msg show err';
+  }
+  cotImprimir(COT_EMI, true);
 }
 
 /* Entrada desde las páginas de cada equipo: #/cotizar/<id>. Los datos del

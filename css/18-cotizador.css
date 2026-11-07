@@ -186,7 +186,22 @@
 .emi-tot{margin:-4px 0 4px;font-size:14px;color:var(--grafito)}
 .emi-tot b{font-family:var(--ff-d);font-size:17px;color:var(--onix)}
 .emi-pdf{width:100%;margin-top:8px}
+.emi-pdf[disabled]{opacity:.45;pointer-events:none}
 .emi-nota{margin:8px 0 0;font-size:12px;color:var(--gris);line-height:1.5}
+/* registro del correlativo anual, bajo el N° de cotización */
+.emi-serie-l{margin:-6px 0 8px;font-size:12.5px;color:var(--gris);line-height:1.5}
+.emi-serie-l b{font-family:var(--ff-d);color:var(--onix)}
+.emi-serie{margin:0 0 14px;font-size:12.5px;color:var(--gris)}
+.emi-serie summary{cursor:pointer;color:var(--cobre-d)}
+.emi-serie ul{list-style:none;margin:8px 0 0;padding:0;max-height:190px;overflow:auto}
+.emi-serie li{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px;padding:6px 0;
+  border-top:1px solid var(--linea)}
+.emi-serie li b{font-family:var(--ff-d);font-size:12.5px;color:var(--onix)}
+.emi-serie li span{font-size:11.5px;color:var(--gris)}
+.emi-serie li button{margin-left:auto;padding:0;border:0;background:none;font:inherit;
+  font-size:11.5px;color:var(--gris);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.emi-serie li button:hover{color:#9E3A2C}
+.emi-serie-n{margin:8px 0 0;font-size:11.5px;color:var(--gris);line-height:1.55}
 @media(max-width:980px){
   .emi{grid-template-columns:minmax(0,1fr)}
   .emi-form{position:static}
