@@ -697,6 +697,101 @@ def _nombre_corto(nom, hueco):
     return _recortar(nom, hueco)
 
 
+# Palabras que distinguen una variante de otra del MISMO equipo: dónde se
+# apoya o cómo se lleva. Son las primeras en caerse al recortar, porque van
+# al final del nombre, y al caerse dejaban dos fichas distintas con el mismo
+# título: las tres lámparas marLED E3 salían las tres como «Lámpara
+# quirúrgica LED KLS Martin marLED E3». «de mesa» y «de sobremesa» quedan
+# fuera a propósito: están en RELLENO, donde ya se decidió que para un
+# autoclave dicen menos que los litros.
+VARIANTE = ('de pared', 'de techo', 'de pedestal', 'rodable', 'portátil',
+            'de mano', 'de bolsillo', 'mural', 'con trípode', 'con mordaza')
+
+# Adjetivos que dicen de qué clase es el equipo, cosa que el resto del
+# nombre ya dice. Se sueltan solo cuando hacen falta esos caracteres para
+# salvar la palabra que sí distingue la ficha: «Tensiómetro aneroide de
+# pared» no entra con «Heine Gamma XXL LF-W», y vale más «Tensiómetro de
+# pared» que «Tensiómetro aneroide», que es lo que salía antes y era igual
+# que el del modelo LF-S.
+GENERICAS = ('aneroide', 'de fibra óptica')
+
+# Lo rellena _preparar_titulos() la primera vez que se pide un título.
+_TITULOS = {}
+
+
+def _mm(p):
+    return ' '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
+
+
+def _titulo_simple(p):
+    """El título de siempre: marca y modelo intactos, nombre recortado por
+    el final si no entra."""
+    mm = _mm(p)
+    hueco = LARGO_TITLE - len(COLA_TITLE) - (len(mm) + 1 if mm else 0)
+    nom = _nombre_corto(p['nom'], max(hueco, 12))
+    t = (nom + (' ' + mm if mm else '')) + COLA_TITLE
+    return t if len(t) <= LARGO_TITLE else _recortar(t, LARGO_TITLE)
+
+
+def _preparar_titulos(catalogo):
+    """Calcula el título de cada ficha mirando el catálogo entero.
+
+    El título de siempre se queda igual salvo que haya un defecto
+    demostrado: que salga idéntico al de otra ficha, que quede como gemelo
+    (mismo nombre recortado y misma marca, o sea dos páginas que solo se
+    diferencian en el sufijo del modelo), o que se esté perdiendo la palabra
+    que distingue la variante. Solo en esos casos se reconstruye.
+    """
+    import collections
+    pr = [p for p in catalogo if p.get('nom')]
+    simple = {id(p): _titulo_simple(p) for p in pr}
+    veces = collections.Counter(simple.values())
+    # Pares marca+modelo que comparten varias fichas: ahí el modelo no
+    # distingue nada y lo que tiene que sobrevivir es el nombre.
+    repetidos = {k for k, n in collections.Counter(
+        _mm(p).lower() for p in pr).items() if k and n > 1}
+    corto = {}
+    for p in pr:
+        mm = _mm(p)
+        hueco = LARGO_TITLE - len(COLA_TITLE) - (len(mm) + 1 if mm else 0)
+        corto[id(p)] = (_nombre_corto(p['nom'], max(hueco, 12)).lower(),
+                        (p.get('marca') or '').lower())
+    gemelas = collections.Counter(corto.values())
+
+    out = {}
+    for p in pr:
+        viejo = simple[id(p)]
+        nom = ' '.join(p['nom'].split())
+        defecto = (veces[viejo] > 1
+                   or gemelas[corto[id(p)]] > 1
+                   or any(v in nom.lower() and v not in viejo.lower()
+                          for v in VARIANTE))
+        if not defecto:
+            out[id(p)] = viejo
+            continue
+        mm, ma = _mm(p), p.get('marca') or ''
+        cabe = lambda s: len(s) <= LARGO_TITLE
+        puesto = None
+        if mm and mm.lower() in repetidos:
+            for cand in (nom + ' ' + ma + COLA_TITLE, nom + ' ' + ma,
+                         nom + COLA_TITLE, nom):
+                if cabe(cand):
+                    puesto = cand
+                    break
+        if puesto is None:
+            c = nom
+            for ge in GENERICAS:
+                if cabe(c + (' ' + mm if mm else '') + COLA_TITLE):
+                    break
+                c = ' '.join(c.replace(ge, ' ').split())
+            if cabe(c + (' ' + mm if mm else '') + COLA_TITLE):
+                puesto = c + (' ' + mm if mm else '') + COLA_TITLE
+            elif cabe(c + (' ' + mm if mm else '')):
+                puesto = c + (' ' + mm if mm else '')
+        out[id(p)] = puesto or viejo
+    return out
+
+
 def titulo_ficha(p):
     """«<equipo> <marca> <modelo> | Precio Perú», máximo 60 caracteres.
 
@@ -705,12 +800,24 @@ def titulo_ficha(p):
     búsquedas de venta que traen visitas hoy son «mindray a7» y
     «surtron 200», o sea marca y modelo. Si no entra todo, se acorta el
     nombre del equipo por el final, que es la parte genérica.
+
+    Con una excepción, y es la que mira _preparar_titulos(): cuando ese
+    recorte deja la ficha con el mismo título que otra, el modelo deja de
+    ser lo que hay que salvar. Tres lámparas marLED E3 con el mismo título
+    son una sola página para Google, y entonces vale más «de pared 60 000
+    lux» que repetir un modelo que las tres comparten.
     """
-    mm = ' '.join(x for x in (p.get('marca'), p.get('modelo')) if x)
-    hueco = LARGO_TITLE - len(COLA_TITLE) - (len(mm) + 1 if mm else 0)
-    nom = _nombre_corto(p['nom'], max(hueco, 12))
-    t = (nom + (' ' + mm if mm else '')) + COLA_TITLE
-    return t if len(t) <= LARGO_TITLE else _recortar(t, LARGO_TITLE)
+    if TODOS_PUBLICADOS:
+        # Se calcula una sola vez por catálogo. La marca «hecho» evita
+        # rehacerlo en cada ficha, que sería recorrer 191 equipos 191 veces.
+        if _TITULOS.get('hecho') is not TODOS_PUBLICADOS:
+            _TITULOS.clear()
+            _TITULOS.update(_preparar_titulos(TODOS_PUBLICADOS))
+            _TITULOS['hecho'] = TODOS_PUBLICADOS
+        puesto = _TITULOS.get(id(p))
+        if puesto:
+            return puesto
+    return _titulo_simple(p)
 
 
 def descripcion_ficha(p):
