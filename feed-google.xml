@@ -3,7 +3,22 @@
 <channel>
   <title>Sinergia Biomédica — equipos biomédicos</title>
   <link>https://sinergiabiomedica.pe</link>
-  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-11-25.</description>
+  <description>Equipamiento biomédico con precio, stock y código NTS. Actualizado el 2026-11-26.</description>
+  <item>
+    <g:id>boeco-010664</g:id>
+    <title>Microscopio estereoscópico binocular Boeco BTB-3C</title>
+    <description>Estereomicroscopio para observación en 3D de muestras y disección. Binocular estereoscópico</description>
+    <link>https://sinergiabiomedica.pe/venta/boeco-010664/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-010664.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>1735.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Boeco</g:brand>
+    <g:mpn>BTB-3C</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
   <item>
     <g:id>edan-h100b</g:id>
     <title>Pulsioxímetro de mano Edan H100B</title>
@@ -11,7 +26,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h100b/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h100b.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>971.00 PEN</g:price>
+    <g:price>772.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H100B</g:mpn>
@@ -26,12 +41,27 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h100b-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h100b-2.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>1277.00 PEN</g:price>
+    <g:price>1015.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H100B</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>ca-mi-new-askir-230-12v-br</g:id>
+    <title>Aspirador portátil con batería 16 L/min CA-MI New Askir 230 12V BR</title>
+    <description>Aspirador de secreciones con batería y corriente para atención domiciliaria y traslado. 16 L/min Frasco de 1 L Batería y corriente Cod. D-86.</description>
+    <link>https://sinergiabiomedica.pe/venta/ca-mi-new-askir-230-12v-br/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-new-askir-230-12v-br.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>1944.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>CA-MI</g:brand>
+    <g:mpn>New Askir 230 12V BR</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Quirófano y aspiración</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -41,10 +71,25 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-030070/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-030070.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1984.00 PEN</g:price>
+    <g:price>1576.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>PLC-03</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>gemmy-071351</g:id>
+    <title>Centrífuga de 12 tubos Gemmy PLC-05</title>
+    <description>Centrífuga clínica sencilla para separación de suero y plasma. 12 tubos de 15 ml Hasta 4000 rpm</description>
+    <link>https://sinergiabiomedica.pe/venta/gemmy-071351/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-071351.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>1639.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Gemmy</g:brand>
+    <g:mpn>PLC-05</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -56,10 +101,25 @@
     <link>https://sinergiabiomedica.pe/venta/riester-econom/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-econom.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>1347.00 PEN</g:price>
+    <g:price>1071.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Econom</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-mini-3000-led</g:id>
+    <title>Set de diagnóstico LED de bolsillo Heine mini 3000 LED</title>
+    <description>Set compacto de otoscopio y oftalmoscopio para consulta. Otoscopio y oftalmoscopio 2 mangos a pilas Estuche Cod. D-131.</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-mini-3000-led/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-mini-3000-led.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>1920.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>mini 3000 LED</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -71,7 +131,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-g5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-g5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>395.00 PEN</g:price>
+    <g:price>314.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Gamma G5</g:mpn>
@@ -86,7 +146,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben-3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben-3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>725.00 PEN</g:price>
+    <g:price>576.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Big Ben</g:mpn>
@@ -101,7 +161,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>971.00 PEN</g:price>
+    <g:price>772.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Big Ben</g:mpn>
@@ -116,7 +176,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-gamma-xxl-lf-w/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-xxl-lf-w.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1120.00 PEN</g:price>
+    <g:price>890.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Gamma XXL LF-W</g:mpn>
@@ -131,10 +191,25 @@
     <link>https://sinergiabiomedica.pe/venta/riester-big-ben/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-big-ben.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1412.00 PEN</g:price>
+    <g:price>1122.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Big Ben</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-gamma-xxl-lf-s</g:id>
+    <title>Tensiómetro aneroide rodable Heine Gamma XXL LF-S</title>
+    <description>Tensiómetro de pedestal con ruedas para consultorios y hospitalización. Brazalete adulto con velcro Base rodable Cod. D-135.</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-gamma-xxl-lf-s/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-xxl-lf-s.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>1775.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>Gamma XXL LF-S</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -146,7 +221,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-008008/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-008008.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>181.00 PEN</g:price>
+    <g:price>144.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Duplex Baby</g:mpn>
@@ -161,7 +236,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-sd3-plus/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd3-plus.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>920.00 PEN</g:price>
+    <g:price>731.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SD-3 Plus</g:mpn>
@@ -176,10 +251,25 @@
     <link>https://sinergiabiomedica.pe/venta/edan-sonotrax-ii-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sonotrax-ii-pro.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>920.00 PEN</g:price>
+    <g:price>731.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Sonotrax II Pro</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Neonatología y obstetricia</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-sd5</g:id>
+    <title>Detector de latidos fetales de sobremesa Edan SD-5</title>
+    <description>Doppler fetal de mesa para consultorios de obstetricia. Sonda de 2,0 MHz alámbrica Versión SD-6 con sonda inalámbrica Cod. D-96.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-sd5/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd5.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>1706.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>SD-5</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Neonatología y obstetricia</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -191,7 +281,7 @@
     <link>https://sinergiabiomedica.pe/venta/riester-ri-standard/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-ri-standard.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>1138.00 PEN</g:price>
+    <g:price>904.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Riester</g:brand>
     <g:mpn>Ri-standard</g:mpn>
@@ -206,7 +296,7 @@
     <link>https://sinergiabiomedica.pe/venta/cami-new-askir-30/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cami-new-askir-30.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>1238.00 PEN</g:price>
+    <g:price>1266.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CA-MI</g:brand>
     <g:mpn>New Askir 30</g:mpn>
@@ -221,25 +311,10 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-072210/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-072210.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>1728.00 PEN</g:price>
+    <g:price>1373.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>VM 300P</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>boeco-010664</g:id>
-    <title>Microscopio estereoscópico binocular Boeco BTB-3C</title>
-    <description>Estereomicroscopio para observación en 3D de muestras y disección. Binocular estereoscópico</description>
-    <link>https://sinergiabiomedica.pe/venta/boeco-010664/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-010664.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2183.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Boeco</g:brand>
-    <g:mpn>BTB-3C</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -251,7 +326,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-081262/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-081262.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>2572.00 PEN</g:price>
+    <g:price>2044.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BM-117</g:mpn>
@@ -265,8 +340,8 @@
     <description>Monitor multiparámetro compacto con impresora. Pantalla táctil de 8&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/edan-092796/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092796.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>5110.00 PEN</g:price>
+    <g:availability>backorder</g:availability>
+    <g:price>4061.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>X8</g:mpn>
@@ -281,7 +356,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-092797/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092797.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>5365.00 PEN</g:price>
+    <g:price>4264.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>X10</g:mpn>
@@ -296,7 +371,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-im3s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-im3s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5621.00 PEN</g:price>
+    <g:price>4467.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iM3s</g:mpn>
@@ -311,475 +386,10 @@
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>5621.00 PEN</g:price>
+    <g:price>4467.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Elite V5</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>led-spa-surtron-50d</g:id>
-    <title>Electrocauterio de 50 W LED SpA Surtron 50D</title>
-    <description>Electrocauterio compacto para dermatología, ginecología y consultorio. 50 W Monopolar y bipolar</description>
-    <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-50d/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-50d.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3716.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>LED SpA</g:brand>
-    <g:mpn>Surtron 50D</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>led-spa-surtron-80</g:id>
-    <title>Electrocauterio de 80 W LED SpA Surtron 80</title>
-    <description>Electrocauterio de baja potencia para procedimientos menores. 80 W Monopolar y bipolar</description>
-    <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-80/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-80.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>4102.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>LED SpA</g:brand>
-    <g:mpn>Surtron 80</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>cu-medical-cu-sp1-auto</g:id>
-    <title>Desfibrilador externo automático (DEA) básico CU Medical CU-SP1 Auto</title>
-    <description>DEA totalmente automático de acceso público, con parches y batería. Totalmente automático Guía por voz Parches y batería incluidos Cod. D-373.</description>
-    <link>https://sinergiabiomedica.pe/venta/cu-medical-cu-sp1-auto/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-cu-sp1-auto.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>5876.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>CU Medical</g:brand>
-    <g:mpn>CU-SP1 Auto</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Desfibriladores y reanimación</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-m3a</g:id>
-    <title>Pulsioxímetro de sobremesa con pantalla de 3.5&quot; Edan M3A</title>
-    <description>Pulsioxímetro de mesa con batería de litio. Pantalla a color de 3.5&quot; SpO2 y pulso Batería de litio Cod. D-17.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-m3a/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3a.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3098.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>M3A</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-m3</g:id>
-    <title>Pulsioxímetro de sobremesa Edan M3</title>
-    <description>Pulsioxímetro de mesa con batería para hospitalización, emergencia y consulta. Pantalla a color de 5,6 pulgadas SpO2 y frecuencia de pulso Batería de litio Cod. D-17.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-m3/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3679.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>M3</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>ca-mi-new-askir-230-12v-br</g:id>
-    <title>Aspirador portátil con batería 16 L/min CA-MI New Askir 230 12V BR</title>
-    <description>Aspirador de secreciones con batería y corriente para atención domiciliaria y traslado. 16 L/min Frasco de 1 L Batería y corriente Cod. D-86.</description>
-    <link>https://sinergiabiomedica.pe/venta/ca-mi-new-askir-230-12v-br/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-new-askir-230-12v-br.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2446.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>CA-MI</g:brand>
-    <g:mpn>New Askir 230 12V BR</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>ca-mi-askir-36-br</g:id>
-    <title>Aspirador portátil con batería 36 L/min CA-MI Askir 36 BR</title>
-    <description>Aspirador de secreciones de mayor caudal con batería recargable. 36 L/min Frasco de 1 L Batería y corriente Cod. D-86.</description>
-    <link>https://sinergiabiomedica.pe/venta/ca-mi-askir-36-br/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-askir-36-br.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3245.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>CA-MI</g:brand>
-    <g:mpn>Askir 36 BR</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>gemmy-071351</g:id>
-    <title>Centrífuga de 12 tubos Gemmy PLC-05</title>
-    <description>Centrífuga clínica sencilla para separación de suero y plasma. 12 tubos de 15 ml Hasta 4000 rpm</description>
-    <link>https://sinergiabiomedica.pe/venta/gemmy-071351/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-071351.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2063.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Gemmy</g:brand>
-    <g:mpn>PLC-05</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>gemmy-010542</g:id>
-    <title>Centrífuga de microhematocrito Gemmy KHT-410E</title>
-    <description>Centrífuga para microhematocrito con rotor de capilares. 24 capilares 12 000 rpm Cod. D-269.</description>
-    <link>https://sinergiabiomedica.pe/venta/gemmy-010542/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-010542.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3400.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Gemmy</g:brand>
-    <g:mpn>KHT-410E</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-mini-3000-led</g:id>
-    <title>Set de diagnóstico LED de bolsillo Heine mini 3000 LED</title>
-    <description>Set compacto de otoscopio y oftalmoscopio para consulta. Otoscopio y oftalmoscopio 2 mangos a pilas Estuche Cod. D-131.</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-mini-3000-led/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-mini-3000-led.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2416.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>mini 3000 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200</g:id>
-    <title>Otoscopio de fibra óptica con mango recargable Heine BETA 200</title>
-    <description>Otoscopio con 4 espéculos reutilizables y mango recargable. Fibra óptica Mango BETA R de 3.5 V 4 espéculos</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2653.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200-led-2</g:id>
-    <title>Oftalmoscopio LED con mango a pilas Heine BETA 200 LED</title>
-    <description>Oftalmoscopio directo de alta gama con estuche rígido. LED Mango a pilas de 2.5 V</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-2/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-2.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3870.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200-led</g:id>
-    <title>Otoscopio de fibra óptica LED recargable Heine BETA 200 LED</title>
-    <description>Otoscopio de alta gama con iluminación LED por fibra óptica. LED por fibra óptica Mango recargable de 3.5 V Estuche</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-led.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>4176.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200-beta-100</g:id>
-    <title>Set oftalmoscopio y otoscopio recargable Heine BETA 200 / BETA 100</title>
-    <description>Set de diagnóstico con oftalmoscopio y otoscopio de alta gama. Oftalmoscopio y otoscopio Mango BETA 4 USB recargable de 3.5 V Cod. D-131.</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-beta-100/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-beta-100.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>5544.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200 / BETA 100</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200s-led</g:id>
-    <title>Oftalmoscopio LED con mango recargable Heine BETA 200S LED</title>
-    <description>Oftalmoscopio premium con mango recargable por USB. LED Mango recargable BETA 4 USB Estuche</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200s-led/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200s-led.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>5704.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200S LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-beta-200-led-4</g:id>
-    <title>Set otoscopio y oftalmoscopio LED a pilas Heine BETA 200 LED</title>
-    <description>Set de diagnóstico LED con otoscopio de fibra óptica y oftalmoscopio. Otoscopio y oftalmoscopio LED Mango a pilas de 2.5 V Cod. D-131.</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-4/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-4.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>5954.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>BETA 200 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-se301</g:id>
-    <title>Electrocardiógrafo de 3 canales Edan SE-301</title>
-    <description>Electrocardiógrafo interpretativo para consulta, emergencia y hospitalización. 3 canales Pantalla táctil a color de 5 pulgadas Interpretación automática Papel de 80 mm, puerto USB Cod. D-1.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-se301/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-se301-real.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>4088.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SE-301</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-094577</g:id>
-    <title>Electrocardiógrafo de 6 canales Edan SE-601B</title>
-    <description>Electrocardiógrafo interpretativo para consulta y emergencia. 6 canales Pantalla de 5.7&quot; Papel de 110 mm, USB Cod. D-1.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-094577/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-094577.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>5621.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SE-601B</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-gamma-xxl-lf-s</g:id>
-    <title>Tensiómetro aneroide rodable Heine Gamma XXL LF-S</title>
-    <description>Tensiómetro de pedestal con ruedas para consultorios y hospitalización. Brazalete adulto con velcro Base rodable Cod. D-135.</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-gamma-xxl-lf-s/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-gamma-xxl-lf-s.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2234.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>Gamma XXL LF-S</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-sd5</g:id>
-    <title>Detector de latidos fetales de sobremesa Edan SD-5</title>
-    <description>Doppler fetal de mesa para consultorios de obstetricia. Sonda de 2,0 MHz alámbrica Versión SD-6 con sonda inalámbrica Cod. D-96.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-sd5/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd5.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2146.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SD-5</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Neonatología y obstetricia</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-sd-6</g:id>
-    <title>Detector de latidos fetales con sonda inalámbrica Edan SD-6</title>
-    <description>Doppler fetal de mesa con transductor inalámbrico Bluetooth. Sonda de 2.0 MHz inalámbrica Cod. D-96.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-sd-6/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd-6.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2657.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SD-6</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Neonatología y obstetricia</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>riester-ri-modul</g:id>
-    <title>Laringoscopio pediátrico Macintosh de fibra óptica Riester Ri-modul</title>
-    <description>Set de laringoscopio pediátrico con luz LED por fibra óptica. 3 hojas Macintosh (0, 1 y 2) Mango LED de 2.5 V</description>
-    <link>https://sinergiabiomedica.pe/venta/riester-ri-modul/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-ri-modul.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>2967.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Riester</g:brand>
-    <g:mpn>Ri-modul</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Desfibriladores y reanimación</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>medrena-sp50</g:id>
-    <title>Bomba de infusión de jeringa Medrena SP-50</title>
-    <description>Bomba de jeringa apilable para infusiones de precisión. Apilable en rack Versión SP-50 Pro con Wi-Fi</description>
-    <link>https://sinergiabiomedica.pe/venta/medrena-sp50/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/medrena-sp50.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3131.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Medrena</g:brand>
-    <g:mpn>SP-50</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Ventilación e infusión</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>boeco-076505</g:id>
-    <title>Balanza de precisión de 600 g Boeco BBL 64</title>
-    <description>Balanza de precisión para laboratorio, con capacidad de 600 gramos. Capacidad 600 g Precisión 0,1 g Pantalla digital</description>
-    <link>https://sinergiabiomedica.pe/venta/boeco-076505/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-076505.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3322.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Boeco</g:brand>
-    <g:mpn>BBL 64</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>medrena-vp50-pro</g:id>
-    <title>Bomba de infusión volumétrica Medrena VP50 Pro</title>
-    <description>Bomba volumétrica apilable para hospitalización, emergencia y UCI. 1 canal (también de 2 y 3 canales) Pantalla táctil a color Wi-Fi e infrarrojo Cod. D-105.</description>
-    <link>https://sinergiabiomedica.pe/venta/medrena-vp50-pro/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/medrena-vp50-pro.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>3484.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Medrena</g:brand>
-    <g:mpn>VP50 Pro</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Ventilación e infusión</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>boeco-077672</g:id>
-    <title>Balanza de precisión de 2 000 g Boeco BWL 51</title>
-    <description>Balanza de precisión para laboratorio, con capacidad de 2 000 gramos. Capacidad 2 000 g Precisión 0,01 g Pantalla digital</description>
-    <link>https://sinergiabiomedica.pe/venta/boeco-077672/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-077672.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>4167.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Boeco</g:brand>
-    <g:mpn>BWL 51</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-083007</g:id>
-    <title>Lámpara de exploración con mordaza para mesa Heine EL3 LED</title>
-    <description>Lámpara de exploración LED que se fija con mordaza al borde de la mesa o camilla. Luz LED Fijación por mordaza Brazo flexible</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-083007/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-083007.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>4841.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>EL3 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-084117</g:id>
-    <title>Lámpara de examen LED rodable Heine EL3 LED</title>
-    <description>Lámpara de exploración LED con trípode rodable para consultorio. Iluminación LED Trípode rodable Cod. D-28.</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-084117/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-084117.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>5717.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>EL3 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>optika-b-382pli-alc</g:id>
-    <title>Microscopio binocular plan con LED Optika B-382PLi-ALC</title>
-    <description>Microscopio de laboratorio con óptica corregida al infinito. 1000X Objetivos plan Iluminación LED Cod. D-60.</description>
-    <link>https://sinergiabiomedica.pe/venta/optika-b-382pli-alc/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-382pli-alc.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>9337.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Optika</g:brand>
-    <g:mpn>B-382PLi-ALC</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>optika-b-290tb</g:id>
-    <title>Microscopio digital con tablet Optika B-290TB</title>
-    <description>Microscopio binocular con cámara y tablet integrados para documentar imágenes. 1000X Cámara de 3.1 MP Tablet incluida Cod. D-60.</description>
-    <link>https://sinergiabiomedica.pe/venta/optika-b-290tb/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-290tb.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>12714.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Optika</g:brand>
-    <g:mpn>B-290TB</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-100807</g:id>
-    <title>Monitor de signos vitales de 13.6&quot; preconfigurado Edan iX12</title>
-    <description>Monitor multiparámetro táctil con impresora para UCI y emergencia. Pantalla táctil de 13.6&quot; 5 parámetros Impresora Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-100807/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100807.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>9198.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iX12</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Monitoreo de pacientes</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -791,7 +401,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-elite-v6/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v6.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>6643.00 PEN</g:price>
+    <g:price>5279.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Elite V6</g:mpn>
@@ -805,8 +415,8 @@
     <description>Monitor multiparámetro táctil compacto para hospitalización y emergencia. Pantalla táctil de 10&quot; 5 parámetros Impresora Cod. D-18.</description>
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx10/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx10.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>6847.00 PEN</g:price>
+    <g:availability>backorder</g:availability>
+    <g:price>5442.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>CX10</g:mpn>
@@ -821,7 +431,7 @@
     <link>https://sinergiabiomedica.pe/venta/monitoreo-cx12/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx12.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>7358.00 PEN</g:price>
+    <g:price>5848.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>CX12</g:mpn>
@@ -830,151 +440,46 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>edan-elite-v8</g:id>
-    <title>Monitor modular de 17&quot; Edan Elite V8</title>
-    <description>Monitor modular de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular 2 baterías Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-elite-v8/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v8.jpg</g:image_link>
+    <g:id>led-spa-surtron-50d</g:id>
+    <title>Electrocauterio de 50 W LED SpA Surtron 50D</title>
+    <description>Electrocauterio compacto para dermatología, ginecología y consultorio. 50 W Monopolar y bipolar</description>
+    <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-50d/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-50d.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7665.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>Elite V8</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>monitoreo-cx15</g:id>
-    <title>Monitor de signos vitales de 15&quot; con impresora Edan CX15</title>
-    <description>Monitor multiparámetro táctil de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/monitoreo-cx15/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx15.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>8380.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>CX15</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-100806</g:id>
-    <title>Monitor de signos vitales de 10&quot; preconfigurado Edan iX10</title>
-    <description>Monitor multiparámetro táctil con impresora para hospitalización. Pantalla táctil de 10&quot; 5 parámetros Impresora Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-100806/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100806.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>8687.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iX10</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-099004</g:id>
-    <title>Monitor de signos vitales de 12&quot; Slim Edan X12</title>
-    <description>Monitor multiparámetro delgado, sin impresora. Pantalla de 12&quot; 5 parámetros Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-099004/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099004.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>9988.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>X12</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-100808</g:id>
-    <title>Monitor de signos vitales de 15&quot; preconfigurado Edan iX15</title>
-    <description>Monitor multiparámetro táctil con impresora de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-100808/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100808.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>10220.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iX15</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-095443</g:id>
-    <title>Monitor multiparámetro de 12&quot; de 7 parámetros Edan X12</title>
-    <description>Monitor táctil de diseño delgado con 7 parámetros. Pantalla táctil de 12&quot; 7 parámetros Impresora Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-095443/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-095443.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>13286.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>X12</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-iv12</g:id>
-    <title>Monitor modular de 12&quot; (módulos aparte) Edan iV12</title>
-    <description>Monitor modular táctil que se configura con los módulos de parámetros que necesites. Pantalla táctil de 12&quot; Modular Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-iv12/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv12.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>13890.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iV12</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>led-spa-surtron-200</g:id>
-    <title>Electrocauterio de 200 W LED SpA Surtron 200</title>
-    <description>Electrocauterio mono y bipolar de potencia media para cirugía general. 200 W Monopolar y bipolar</description>
-    <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-200/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-200.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>9486.00 PEN</g:price>
+    <g:price>2953.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
-    <g:mpn>Surtron 200</g:mpn>
+    <g:mpn>Surtron 50D</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>meling-biomedi-100408</g:id>
-    <title>Refrigeradora de medicamentos de 130 L Meling YC-130L</title>
-    <description>Refrigeradora para farmacia y vacunas de +2 a +8 °C. 130 L +2 a +8 °C Cod. D-288.</description>
-    <link>https://sinergiabiomedica.pe/venta/meling-biomedi-100408/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-biomedi-100408.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>7851.00 PEN</g:price>
+    <g:id>led-spa-surtron-80</g:id>
+    <title>Electrocauterio de 80 W LED SpA Surtron 80</title>
+    <description>Electrocauterio de baja potencia para procedimientos menores. 80 W Monopolar y bipolar</description>
+    <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-80/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-80.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>3260.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Meling</g:brand>
-    <g:mpn>YC-130L</g:mpn>
+    <g:brand>LED SpA</g:brand>
+    <g:mpn>Surtron 80</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Cadena de frío</g:product_type>
+    <g:product_type>Quirófano y aspiración</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>cu-medical-dea</g:id>
-    <title>Desfibrilador externo automático (DEA) CU Medical Serie i-PAD</title>
-    <description>DEA de acceso público para centros de salud, empresas, colegios y ambulancias. Uso automático con guía por voz Versión con pantalla y batería recargable Parches desechables adulto y pediátrico Cod. D-373.</description>
-    <link>https://sinergiabiomedica.pe/venta/cu-medical-dea/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-dea.jpg</g:image_link>
+    <g:id>cu-medical-cu-sp1-auto</g:id>
+    <title>Desfibrilador externo automático (DEA) básico CU Medical CU-SP1 Auto</title>
+    <description>DEA totalmente automático de acceso público, con parches y batería. Totalmente automático Guía por voz Parches y batería incluidos Cod. D-373.</description>
+    <link>https://sinergiabiomedica.pe/venta/cu-medical-cu-sp1-auto/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-cu-sp1-auto.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>11149.00 PEN</g:price>
+    <g:price>4670.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CU Medical</g:brand>
-    <g:mpn>Serie i-PAD</g:mpn>
+    <g:mpn>CU-SP1 Auto</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Desfibriladores y reanimación</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -986,7 +491,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-f3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7358.00 PEN</g:price>
+    <g:price>5848.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>F3</g:mpn>
@@ -995,18 +500,33 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>edan-f9</g:id>
-    <title>Monitor fetal-materno de 12 pulgadas Edan F9</title>
-    <description>Monitor fetal gemelar con parámetros maternos para centros obstétricos. Pantalla a color de 12 pulgadas Monitoreo de gemelos Opción con ECG, PNI, SpO2 y temperatura materna Cod. D-15.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-f9/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f9.jpg</g:image_link>
+    <g:id>edan-m3a</g:id>
+    <title>Pulsioxímetro de sobremesa con pantalla de 3.5&quot; Edan M3A</title>
+    <description>Pulsioxímetro de mesa con batería de litio. Pantalla a color de 3.5&quot; SpO2 y pulso Batería de litio Cod. D-17.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-m3a/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>13797.00 PEN</g:price>
+    <g:price>2462.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
-    <g:mpn>F9</g:mpn>
+    <g:mpn>M3A</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Neonatología y obstetricia</g:product_type>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-m3</g:id>
+    <title>Pulsioxímetro de sobremesa Edan M3</title>
+    <description>Pulsioxímetro de mesa con batería para hospitalización, emergencia y consulta. Pantalla a color de 5,6 pulgadas SpO2 y frecuencia de pulso Batería de litio Cod. D-17.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-m3/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-m3.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>2924.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>M3</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1016,10 +536,25 @@
     <link>https://sinergiabiomedica.pe/venta/cami-new-hospivac-350/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cami-new-hospivac-350.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>6961.00 PEN</g:price>
+    <g:price>5532.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CA-MI</g:brand>
     <g:mpn>New Hospivac 350 Full5</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Quirófano y aspiración</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>ca-mi-askir-36-br</g:id>
+    <title>Aspirador portátil con batería 36 L/min CA-MI Askir 36 BR</title>
+    <description>Aspirador de secreciones de mayor caudal con batería recargable. 36 L/min Frasco de 1 L Batería y corriente Cod. D-86.</description>
+    <link>https://sinergiabiomedica.pe/venta/ca-mi-askir-36-br/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/ca-mi-askir-36-br.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>2579.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>CA-MI</g:brand>
+    <g:mpn>Askir 36 BR</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -1031,12 +566,27 @@
     <link>https://sinergiabiomedica.pe/venta/cami-094407/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cami-094407.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>7070.00 PEN</g:price>
+    <g:price>5618.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CA-MI</g:brand>
     <g:mpn>New Hospivac 400 Full2</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>gemmy-010542</g:id>
+    <title>Centrífuga de microhematocrito Gemmy KHT-410E</title>
+    <description>Centrífuga para microhematocrito con rotor de capilares. 24 capilares 12 000 rpm Cod. D-269.</description>
+    <link>https://sinergiabiomedica.pe/venta/gemmy-010542/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-010542.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>2702.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Gemmy</g:brand>
+    <g:mpn>KHT-410E</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1046,7 +596,7 @@
     <link>https://sinergiabiomedica.pe/venta/gemmy-076299/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-076299.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7024.00 PEN</g:price>
+    <g:price>5582.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Gemmy</g:brand>
     <g:mpn>PLC-024</g:mpn>
@@ -1055,63 +605,93 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>gemmy-010762</g:id>
-    <title>Centrífuga universal automática de 12 tubos Gemmy PLC-012H</title>
-    <description>Centrífuga automática para separación de muestras en laboratorio clínico. 12 tubos de 15 ml Programable</description>
-    <link>https://sinergiabiomedica.pe/venta/gemmy-010762/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-010762.jpg</g:image_link>
+    <g:id>heine-beta-200</g:id>
+    <title>Otoscopio de fibra óptica con mango recargable Heine BETA 200</title>
+    <description>Otoscopio con 4 espéculos reutilizables y mango recargable. Fibra óptica Mango BETA R de 3.5 V 4 espéculos</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-beta-200/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9198.00 PEN</g:price>
+    <g:price>2109.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Gemmy</g:brand>
-    <g:mpn>PLC-012H</g:mpn>
+    <g:brand>Heine</g:brand>
+    <g:mpn>BETA 200</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
+    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>gemmy-087719</g:id>
-    <title>Centrífuga universal automática de 16 tubos Gemmy PLC-025</title>
-    <description>Centrífuga automática de mayor capacidad para laboratorio clínico. 16 tubos de 15 ml 5000 rpm</description>
-    <link>https://sinergiabiomedica.pe/venta/gemmy-087719/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-087719.jpg</g:image_link>
+    <g:id>heine-beta-200-led-2</g:id>
+    <title>Oftalmoscopio LED con mango a pilas Heine BETA 200 LED</title>
+    <description>Oftalmoscopio directo de alta gama con estuche rígido. LED Mango a pilas de 2.5 V</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-2/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>9477.00 PEN</g:price>
+    <g:price>3076.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Gemmy</g:brand>
-    <g:mpn>PLC-025</g:mpn>
+    <g:brand>Heine</g:brand>
+    <g:mpn>BETA 200 LED</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
+    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>boeco-082095</g:id>
-    <title>Centrífuga de 8 tubos Boeco SC-8</title>
-    <description>Centrífuga electrónica compacta con rotor angular. 8 tubos de 15 ml Hasta 6000 rpm</description>
-    <link>https://sinergiabiomedica.pe/venta/boeco-082095/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-082095.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>11894.00 PEN</g:price>
+    <g:id>heine-beta-200-led</g:id>
+    <title>Otoscopio de fibra óptica LED recargable Heine BETA 200 LED</title>
+    <description>Otoscopio de alta gama con iluminación LED por fibra óptica. LED por fibra óptica Mango recargable de 3.5 V Estuche</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-led.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>3318.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Boeco</g:brand>
-    <g:mpn>SC-8</g:mpn>
+    <g:brand>Heine</g:brand>
+    <g:mpn>BETA 200 LED</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
+    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>mindray-ba88a</g:id>
-    <title>Analizador bioquímico semiautomático Mindray BA-88A</title>
-    <description>Analizador de química clínica semiautomático para laboratorios pequeños y medianos. Semiautomático Cod. D-245.</description>
-    <link>https://sinergiabiomedica.pe/venta/mindray-ba88a/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-ba88a.jpg</g:image_link>
+    <g:id>heine-beta-200-beta-100</g:id>
+    <title>Set oftalmoscopio y otoscopio recargable Heine BETA 200 / BETA 100</title>
+    <description>Set de diagnóstico con oftalmoscopio y otoscopio de alta gama. Oftalmoscopio y otoscopio Mango BETA 4 USB recargable de 3.5 V Cod. D-131.</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-beta-100/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-beta-100.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>12502.00 PEN</g:price>
+    <g:price>4405.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Mindray</g:brand>
-    <g:mpn>BA-88A</g:mpn>
+    <g:brand>Heine</g:brand>
+    <g:mpn>BETA 200 / BETA 100</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-beta-200s-led</g:id>
+    <title>Oftalmoscopio LED con mango recargable Heine BETA 200S LED</title>
+    <description>Oftalmoscopio premium con mango recargable por USB. LED Mango recargable BETA 4 USB Estuche</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-beta-200s-led/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200s-led.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>4533.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>BETA 200S LED</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-beta-200-led-4</g:id>
+    <title>Set otoscopio y oftalmoscopio LED a pilas Heine BETA 200 LED</title>
+    <description>Set de diagnóstico LED con otoscopio de fibra óptica y oftalmoscopio. Otoscopio y oftalmoscopio LED Mango a pilas de 2.5 V Cod. D-131.</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-beta-200-led-4/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200-led-4.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>4732.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>BETA 200 LED</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1121,7 +701,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200s-led-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-heine-beta-200s-led-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7075.00 PEN</g:price>
+    <g:price>5622.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200S LED</g:mpn>
@@ -1136,10 +716,40 @@
     <link>https://sinergiabiomedica.pe/venta/heine-beta-200-2/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-beta-200-2.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7170.00 PEN</g:price>
+    <g:price>5698.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>BETA 200</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-se301</g:id>
+    <title>Electrocardiógrafo de 3 canales Edan SE-301</title>
+    <description>Electrocardiógrafo interpretativo para consulta, emergencia y hospitalización. 3 canales Pantalla táctil a color de 5 pulgadas Interpretación automática Papel de 80 mm, puerto USB Cod. D-1.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-se301/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-se301-real.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>3249.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>SE-301</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-094577</g:id>
+    <title>Electrocardiógrafo de 6 canales Edan SE-601B</title>
+    <description>Electrocardiógrafo interpretativo para consulta y emergencia. 6 canales Pantalla de 5.7&quot; Papel de 110 mm, USB Cod. D-1.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-094577/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-094577.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>4467.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>SE-601B</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -1151,7 +761,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-096982/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-096982.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>6643.00 PEN</g:price>
+    <g:price>5279.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>SE-601C</g:mpn>
@@ -1160,48 +770,138 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>edan-099606</g:id>
-    <title>Electrocardiógrafo de 12 canales Edan SE-1201</title>
-    <description>Electrocardiógrafo interpretativo con algoritmo Glasgow. 12 canales Pantalla táctil de 7&quot; Interpretación Glasgow Cod. D-1.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-099606/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099606.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>7665.00 PEN</g:price>
+    <g:id>edan-sd-6</g:id>
+    <title>Detector de latidos fetales con sonda inalámbrica Edan SD-6</title>
+    <description>Doppler fetal de mesa con transductor inalámbrico Bluetooth. Sonda de 2.0 MHz inalámbrica Cod. D-96.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-sd-6/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sd-6.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>2112.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
-    <g:mpn>SE-1201</g:mpn>
+    <g:mpn>SD-6</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Neonatología y obstetricia</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>riester-ri-modul</g:id>
+    <title>Laringoscopio pediátrico Macintosh de fibra óptica Riester Ri-modul</title>
+    <description>Set de laringoscopio pediátrico con luz LED por fibra óptica. 3 hojas Macintosh (0, 1 y 2) Mango LED de 2.5 V</description>
+    <link>https://sinergiabiomedica.pe/venta/riester-ri-modul/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/riester-ri-modul.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>2358.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Riester</g:brand>
+    <g:mpn>Ri-modul</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Desfibriladores y reanimación</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>medrena-sp50</g:id>
+    <title>Bomba de infusión de jeringa Medrena SP-50</title>
+    <description>Bomba de jeringa apilable para infusiones de precisión. Apilable en rack Versión SP-50 Pro con Wi-Fi</description>
+    <link>https://sinergiabiomedica.pe/venta/medrena-sp50/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/medrena-sp50.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>2488.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Medrena</g:brand>
+    <g:mpn>SP-50</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Ventilación e infusión</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>boeco-076505</g:id>
+    <title>Balanza de precisión de 600 g Boeco BBL 64</title>
+    <description>Balanza de precisión para laboratorio, con capacidad de 600 gramos. Capacidad 600 g Precisión 0,1 g Pantalla digital</description>
+    <link>https://sinergiabiomedica.pe/venta/boeco-076505/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-076505.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>2640.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Boeco</g:brand>
+    <g:mpn>BBL 64</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>medrena-vp50-pro</g:id>
+    <title>Bomba de infusión volumétrica Medrena VP50 Pro</title>
+    <description>Bomba volumétrica apilable para hospitalización, emergencia y UCI. 1 canal (también de 2 y 3 canales) Pantalla táctil a color Wi-Fi e infrarrojo Cod. D-105.</description>
+    <link>https://sinergiabiomedica.pe/venta/medrena-vp50-pro/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/medrena-vp50-pro.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>2769.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Medrena</g:brand>
+    <g:mpn>VP50 Pro</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Ventilación e infusión</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>boeco-bm-120</g:id>
+    <title>Microscopio binocular Boeco BM-120</title>
+    <description>Microscopio de rutina para laboratorio clínico. Cabezal binocular Cod. D-60.</description>
+    <link>https://sinergiabiomedica.pe/venta/boeco-bm-120/</link>
+    <g:image_link>https://drive.google.com/thumbnail?id=1z-6Ac21IeTE7EBkfzkWsqcR6yBDrxpK6&amp;sz=w1600</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>2957.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Boeco</g:brand>
+    <g:mpn>BM-120</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>boeco-077672</g:id>
+    <title>Balanza de precisión de 2 000 g Boeco BWL 51</title>
+    <description>Balanza de precisión para laboratorio, con capacidad de 2 000 gramos. Capacidad 2 000 g Precisión 0,01 g Pantalla digital</description>
+    <link>https://sinergiabiomedica.pe/venta/boeco-077672/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-077672.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>3311.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Boeco</g:brand>
+    <g:mpn>BWL 51</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-083007</g:id>
+    <title>Lámpara de exploración con mordaza para mesa Heine EL3 LED</title>
+    <description>Lámpara de exploración LED que se fija con mordaza al borde de la mesa o camilla. Luz LED Fijación por mordaza Brazo flexible</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-083007/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-083007.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>3847.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>EL3 LED</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Quirófano y aspiración</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-084117</g:id>
+    <title>Lámpara de examen LED rodable Heine EL3 LED</title>
+    <description>Lámpara de exploración LED con trípode rodable para consultorio. Iluminación LED Trípode rodable Cod. D-28.</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-084117/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-084117.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>4543.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>EL3 LED</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>ugaiya-099169</g:id>
-    <title>Incubadora de indicadores biológicos Ugaiya UG-AR200</title>
-    <description>Incubadora de lectura para controlar la esterilización con indicadores biológicos. 3 viales Impresora integrada</description>
-    <link>https://sinergiabiomedica.pe/venta/ugaiya-099169/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-ugaiya-099169.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>13662.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ugaiya</g:brand>
-    <g:mpn>UG-AR200</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Esterilización</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>memmert-sn-75</g:id>
-    <title>Esterilizador de calor seco de 74 L Memmert SN-75</title>
-    <description>Esterilizador por calor seco con control táctil. 74 L Hasta 250 °C Pantalla táctil</description>
-    <link>https://sinergiabiomedica.pe/venta/memmert-sn-75/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-sn-75.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>14819.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Memmert</g:brand>
-    <g:mpn>SN-75</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Esterilización</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1211,7 +911,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-im70/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-im70.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>7154.00 PEN</g:price>
+    <g:price>5685.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iM70</g:mpn>
@@ -1226,7 +926,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-im50/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-im50.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>7214.00 PEN</g:price>
+    <g:price>5733.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iM50</g:mpn>
@@ -1241,12 +941,387 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-087895/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-087895.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>7358.00 PEN</g:price>
+    <g:price>5848.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BPS 40 Plus</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>optika-b-382pli-alc</g:id>
+    <title>Microscopio binocular plan con LED Optika B-382PLi-ALC</title>
+    <description>Microscopio de laboratorio con óptica corregida al infinito. 1000X Objetivos plan Iluminación LED Cod. D-60.</description>
+    <link>https://sinergiabiomedica.pe/venta/optika-b-382pli-alc/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-382pli-alc.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>7421.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Optika</g:brand>
+    <g:mpn>B-382PLi-ALC</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>optika-b-290tb</g:id>
+    <title>Microscopio digital con tablet Optika B-290TB</title>
+    <description>Microscopio binocular con cámara y tablet integrados para documentar imágenes. 1000X Cámara de 3.1 MP Tablet incluida Cod. D-60.</description>
+    <link>https://sinergiabiomedica.pe/venta/optika-b-290tb/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-optika-b-290tb.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>10104.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Optika</g:brand>
+    <g:mpn>B-290TB</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-100807</g:id>
+    <title>Monitor de signos vitales de 13.6&quot; preconfigurado Edan iX12</title>
+    <description>Monitor multiparámetro táctil con impresora para UCI y emergencia. Pantalla táctil de 13.6&quot; 5 parámetros Impresora Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-100807/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100807.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>7310.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iX12</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-elite-v8</g:id>
+    <title>Monitor modular de 17&quot; Edan Elite V8</title>
+    <description>Monitor modular de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular 2 baterías Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-elite-v8/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-elite-v8.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>6091.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>Elite V8</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>monitoreo-cx15</g:id>
+    <title>Monitor de signos vitales de 15&quot; con impresora Edan CX15</title>
+    <description>Monitor multiparámetro táctil de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/monitoreo-cx15/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/monitoreo-cx15.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>6660.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>CX15</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-100806</g:id>
+    <title>Monitor de signos vitales de 10&quot; preconfigurado Edan iX10</title>
+    <description>Monitor multiparámetro táctil con impresora para hospitalización. Pantalla táctil de 10&quot; 5 parámetros Impresora Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-100806/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100806.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>6903.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iX10</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-099004</g:id>
+    <title>Monitor de signos vitales de 12&quot; Slim Edan X12</title>
+    <description>Monitor multiparámetro delgado, sin impresora. Pantalla de 12&quot; 5 parámetros Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-099004/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099004.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>7937.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>X12</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-100808</g:id>
+    <title>Monitor de signos vitales de 15&quot; preconfigurado Edan iX15</title>
+    <description>Monitor multiparámetro táctil con impresora de pantalla grande. Pantalla táctil de 15&quot; 5 parámetros Impresora Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-100808/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-100808.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>8122.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iX15</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-095443</g:id>
+    <title>Monitor multiparámetro de 12&quot; de 7 parámetros Edan X12</title>
+    <description>Monitor táctil de diseño delgado con 7 parámetros. Pantalla táctil de 12&quot; 7 parámetros Impresora Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-095443/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-095443.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>10558.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>X12</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-iv12</g:id>
+    <title>Monitor modular de 12&quot; (módulos aparte) Edan iV12</title>
+    <description>Monitor modular táctil que se configura con los módulos de parámetros que necesites. Pantalla táctil de 12&quot; Modular Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-iv12/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv12.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>11038.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iV12</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-iv15</g:id>
+    <title>Monitor modular de 15&quot; (módulos aparte) Edan iV15</title>
+    <description>Monitor modular táctil de pantalla grande para cuidados críticos. Pantalla táctil de 15&quot; Modular Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-iv15/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv15.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>12736.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iV15</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-086825</g:id>
+    <title>Monitor multiparámetro de 12&quot; con presión invasiva Edan iM70</title>
+    <description>Monitor de cabecera con 6 parámetros incluida presión invasiva. Pantalla táctil de 12&quot; 6 parámetros con PI Impresora Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-086825/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-086825.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>14028.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iM70</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-iv17</g:id>
+    <title>Monitor modular de 17&quot; (módulos aparte) Edan iV17</title>
+    <description>Monitor modular táctil de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-iv17/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv17.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>14435.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iV17</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>led-spa-surtron-200</g:id>
+    <title>Electrocauterio de 200 W LED SpA Surtron 200</title>
+    <description>Electrocauterio mono y bipolar de potencia media para cirugía general. 200 W Monopolar y bipolar</description>
+    <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-200/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-200.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>7538.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>LED SpA</g:brand>
+    <g:mpn>Surtron 200</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Quirófano y aspiración</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>meling-biomedi-100408</g:id>
+    <title>Refrigeradora de medicamentos de 130 L Meling YC-130L</title>
+    <description>Refrigeradora para farmacia y vacunas de +2 a +8 °C. 130 L +2 a +8 °C Cod. D-288.</description>
+    <link>https://sinergiabiomedica.pe/venta/meling-biomedi-100408/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-biomedi-100408.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>6239.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Meling</g:brand>
+    <g:mpn>YC-130L</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Cadena de frío</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>cu-medical-dea</g:id>
+    <title>Desfibrilador externo automático (DEA) CU Medical Serie i-PAD</title>
+    <description>DEA de acceso público para centros de salud, empresas, colegios y ambulancias. Uso automático con guía por voz Versión con pantalla y batería recargable Parches desechables adulto y pediátrico Cod. D-373.</description>
+    <link>https://sinergiabiomedica.pe/venta/cu-medical-dea/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-dea.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>8860.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>CU Medical</g:brand>
+    <g:mpn>Serie i-PAD</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Desfibriladores y reanimación</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-f9</g:id>
+    <title>Monitor fetal-materno de 12 pulgadas Edan F9</title>
+    <description>Monitor fetal gemelar con parámetros maternos para centros obstétricos. Pantalla a color de 12 pulgadas Monitoreo de gemelos Opción con ECG, PNI, SpO2 y temperatura materna Cod. D-15.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-f9/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f9.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>10964.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>F9</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Neonatología y obstetricia</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>gemmy-010762</g:id>
+    <title>Centrífuga universal automática de 12 tubos Gemmy PLC-012H</title>
+    <description>Centrífuga automática para separación de muestras en laboratorio clínico. 12 tubos de 15 ml Programable</description>
+    <link>https://sinergiabiomedica.pe/venta/gemmy-010762/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-010762.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>7310.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Gemmy</g:brand>
+    <g:mpn>PLC-012H</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>gemmy-087719</g:id>
+    <title>Centrífuga universal automática de 16 tubos Gemmy PLC-025</title>
+    <description>Centrífuga automática de mayor capacidad para laboratorio clínico. 16 tubos de 15 ml 5000 rpm</description>
+    <link>https://sinergiabiomedica.pe/venta/gemmy-087719/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/gemmy-087719.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>7531.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Gemmy</g:brand>
+    <g:mpn>PLC-025</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>boeco-082095</g:id>
+    <title>Centrífuga de 8 tubos Boeco SC-8</title>
+    <description>Centrífuga electrónica compacta con rotor angular. 8 tubos de 15 ml Hasta 6000 rpm</description>
+    <link>https://sinergiabiomedica.pe/venta/boeco-082095/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-082095.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>9453.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Boeco</g:brand>
+    <g:mpn>SC-8</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>mindray-ba88a</g:id>
+    <title>Analizador bioquímico semiautomático Mindray BA-88A</title>
+    <description>Analizador de química clínica semiautomático para laboratorios pequeños y medianos. Semiautomático Cod. D-245.</description>
+    <link>https://sinergiabiomedica.pe/venta/mindray-ba88a/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-ba88a.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>9936.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Mindray</g:brand>
+    <g:mpn>BA-88A</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-099606</g:id>
+    <title>Electrocardiógrafo de 12 canales Edan SE-1201</title>
+    <description>Electrocardiógrafo interpretativo con algoritmo Glasgow. 12 canales Pantalla táctil de 7&quot; Interpretación Glasgow Cod. D-1.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-099606/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099606.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>6091.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>SE-1201</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>cardioline-touchecg-tab7</g:id>
+    <title>Electrocardiógrafo con tablet Cardioline TouchECG Tab7</title>
+    <description>ECG de 12 derivaciones en tablet Android para consulta y atención móvil. Tablet Android Unidad de adquisición HD+ Cod. D-1.</description>
+    <link>https://sinergiabiomedica.pe/venta/cardioline-touchecg-tab7/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-cardioline-touchecg-tab7.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>12358.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Cardioline</g:brand>
+    <g:mpn>TouchECG Tab7</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>ugaiya-099169</g:id>
+    <title>Incubadora de indicadores biológicos Ugaiya UG-AR200</title>
+    <description>Incubadora de lectura para controlar la esterilización con indicadores biológicos. 3 viales Impresora integrada</description>
+    <link>https://sinergiabiomedica.pe/venta/ugaiya-099169/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-ugaiya-099169.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>10857.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ugaiya</g:brand>
+    <g:mpn>UG-AR200</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Esterilización</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>memmert-sn-75</g:id>
+    <title>Esterilizador de calor seco de 74 L Memmert SN-75</title>
+    <description>Esterilizador por calor seco con control táctil. 74 L Hasta 250 °C Pantalla táctil</description>
+    <link>https://sinergiabiomedica.pe/venta/memmert-sn-75/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-sn-75.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>11777.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Memmert</g:brand>
+    <g:mpn>SN-75</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Esterilización</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1256,12 +1331,102 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-030203/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-030203.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>7693.00 PEN</g:price>
+    <g:price>6113.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>OS-20</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-sa-10</g:id>
+    <title>Monitor ambulatorio de presión arterial (MAPA) Edan SA-10</title>
+    <description>Presurómetro portátil para registro de presión arterial de 24 horas. Registro ambulatorio Incluye software</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-sa-10/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sa-10.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>6793.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>SA-10</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>meling-yc-315l</g:id>
+    <title>Refrigeradora de medicamentos y vacunas de 315 litros Meling YC-315L</title>
+    <description>Refrigeradora de +2 a +8 °C para farmacia, inmunizaciones y almacén de medicamentos. Rango de +2 a +8 °C 315 litros (11 pies cúbicos) También en 130 L (YC-130L) y 525 L (YC-525L)</description>
+    <link>https://sinergiabiomedica.pe/venta/meling-yc-315l/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-yc-315l.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>6830.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Meling</g:brand>
+    <g:mpn>YC-315L</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Cadena de frío</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-se1200-express</g:id>
+    <title>Electrocardiógrafo de 12 canales Edan SE-1200 Express</title>
+    <description>Electrocardiógrafo de 12 canales para cardiología y hospitales. 12 canales Pantalla táctil a color de 8 pulgadas Interpretación automática Papel de 210 mm Cod. D-1.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-se1200-express/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-se1200-express.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>6903.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>SE-1200 Express</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-084116</g:id>
+    <title>Lámpara de exploración con trípode rodable Heine EL 10 LED</title>
+    <description>Lámpara de exploración LED sobre trípode con ruedas, para consultorio y sala de procedimientos. Luz LED Trípode rodable Brazo orientable</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-084116/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-084116.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>6903.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>EL 10 LED</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Quirófano y aspiración</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-091592</g:id>
+    <title>Analizador de inmunoensayos Edan CT3</title>
+    <description>Analizador compacto de inmunoensayo para marcadores cardiacos, inflamatorios y hormonales. Formato compacto de mesa Resultados rápidos</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-091592/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-091592.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>7383.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>CT3</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-im20</g:id>
+    <title>Monitor de signos vitales de 5 parámetros Edan iM20</title>
+    <description>Monitor portátil y compacto para tópico, consulta, hospitalización y traslado. Pantalla de 5 pulgadas 5 parámetros ECG de 3, 5 o 10 derivaciones Sin impresora Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-im20/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-im20.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>7383.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>iM20</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1280,108 +1445,78 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>edan-sa-10</g:id>
-    <title>Monitor ambulatorio de presión arterial (MAPA) Edan SA-10</title>
-    <description>Presurómetro portátil para registro de presión arterial de 24 horas. Registro ambulatorio Incluye software</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-sa-10/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-sa-10.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>8547.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SA-10</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>meling-yc-315l</g:id>
-    <title>Refrigeradora de medicamentos y vacunas de 315 litros Meling YC-315L</title>
-    <description>Refrigeradora de +2 a +8 °C para farmacia, inmunizaciones y almacén de medicamentos. Rango de +2 a +8 °C 315 litros (11 pies cúbicos) También en 130 L (YC-130L) y 525 L (YC-525L)</description>
-    <link>https://sinergiabiomedica.pe/venta/meling-yc-315l/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-yc-315l.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>8594.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Meling</g:brand>
-    <g:mpn>YC-315L</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Cadena de frío</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-se1200-express</g:id>
-    <title>Electrocardiógrafo de 12 canales Edan SE-1200 Express</title>
-    <description>Electrocardiógrafo de 12 canales para cardiología y hospitales. 12 canales Pantalla táctil a color de 8 pulgadas Interpretación automática Papel de 210 mm Cod. D-1.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-se1200-express/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-se1200-express.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>8687.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>SE-1200 Express</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>heine-084116</g:id>
-    <title>Lámpara de exploración con trípode rodable Heine EL 10 LED</title>
-    <description>Lámpara de exploración LED sobre trípode con ruedas, para consultorio y sala de procedimientos. Luz LED Trípode rodable Brazo orientable</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-084116/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-084116.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>8687.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>EL 10 LED</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-091592</g:id>
-    <title>Analizador de inmunoensayos Edan CT3</title>
-    <description>Analizador compacto de inmunoensayo para marcadores cardiacos, inflamatorios y hormonales. Formato compacto de mesa Resultados rápidos</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-091592/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-091592.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>9291.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>CT3</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-im20</g:id>
-    <title>Monitor de signos vitales de 5 parámetros Edan iM20</title>
-    <description>Monitor portátil y compacto para tópico, consulta, hospitalización y traslado. Pantalla de 5 pulgadas 5 parámetros ECG de 3, 5 o 10 derivaciones Sin impresora Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-im20/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-im20.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>9291.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iM20</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
     <g:id>boeco-076898</g:id>
     <title>Balanza analítica 220 g Boeco BAS 31 Plus</title>
     <description>Balanza analítica de alta precisión para laboratorio. Capacidad 220 g Precisión 0.0001 g Cod. D-280.</description>
     <link>https://sinergiabiomedica.pe/venta/boeco-076898/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-076898.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>10129.00 PEN</g:price>
+    <g:price>8049.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BAS 31 Plus</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>heine-097596</g:id>
+    <title>Dermatoscopio LED con estuche y cargador Heine Delta 30</title>
+    <description>Dermatoscopio de mano con luz LED para el examen de lesiones de piel en consulta. Luz LED Cable USB con fuente de alimentación Examen con y sin inmersión Estuche de transporte</description>
+    <link>https://sinergiabiomedica.pe/venta/heine-097596/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-097596.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>8671.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Heine</g:brand>
+    <g:mpn>Delta 30</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>hugemed-097345</g:id>
+    <title>Videolaringoscopio Hugemed VL3R</title>
+    <description>Videolaringoscopio con pantalla para intubación difícil. Pantalla LCD de 3.4&quot; 3 hojas curvas reutilizables</description>
+    <link>https://sinergiabiomedica.pe/venta/hugemed-097345/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hugemed-097345.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>9211.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Hugemed</g:brand>
+    <g:mpn>VL3R</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Desfibriladores y reanimación</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>keewell-ft2800</g:id>
+    <title>Calentador de sangre y fluidos Keewell FT2800</title>
+    <description>Calentador de sangre e infusiones para prevenir la hipotermia del paciente. Para sangre y soluciones Control de temperatura Cod. D-91.</description>
+    <link>https://sinergiabiomedica.pe/venta/keewell-ft2800/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-keewell-ft2800.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>9229.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Keewell</g:brand>
+    <g:mpn>FT2800</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Ventilación e infusión</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>memmert-sn55</g:id>
+    <title>Esterilizador por calor seco de 53 litros Memmert SN-55</title>
+    <description>Esterilizador de aire caliente para centros de salud y laboratorios. 53 litros Hasta 250 °C Pantalla táctil a color Convección natural (versión SF con ventilación forzada)</description>
+    <link>https://sinergiabiomedica.pe/venta/memmert-sn55/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-sn55.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>9665.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Memmert</g:brand>
+    <g:mpn>SN-55</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Esterilización</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1400,73 +1535,13 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>heine-097596</g:id>
-    <title>Dermatoscopio LED con estuche y cargador Heine Delta 30</title>
-    <description>Dermatoscopio de mano con luz LED para el examen de lesiones de piel en consulta. Luz LED Cable USB con fuente de alimentación Examen con y sin inmersión Estuche de transporte</description>
-    <link>https://sinergiabiomedica.pe/venta/heine-097596/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-097596.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>10911.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Heine</g:brand>
-    <g:mpn>Delta 30</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>hugemed-097345</g:id>
-    <title>Videolaringoscopio Hugemed VL3R</title>
-    <description>Videolaringoscopio con pantalla para intubación difícil. Pantalla LCD de 3.4&quot; 3 hojas curvas reutilizables</description>
-    <link>https://sinergiabiomedica.pe/venta/hugemed-097345/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hugemed-097345.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>11590.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Hugemed</g:brand>
-    <g:mpn>VL3R</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Desfibriladores y reanimación</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>keewell-ft2800</g:id>
-    <title>Calentador de sangre y fluidos Keewell FT2800</title>
-    <description>Calentador de sangre e infusiones para prevenir la hipotermia del paciente. Para sangre y soluciones Control de temperatura Cod. D-91.</description>
-    <link>https://sinergiabiomedica.pe/venta/keewell-ft2800/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-keewell-ft2800.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>11613.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Keewell</g:brand>
-    <g:mpn>FT2800</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Ventilación e infusión</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>memmert-sn55</g:id>
-    <title>Esterilizador por calor seco de 53 litros Memmert SN-55</title>
-    <description>Esterilizador de aire caliente para centros de salud y laboratorios. 53 litros Hasta 250 °C Pantalla táctil a color Convección natural (versión SF con ventilación forzada)</description>
-    <link>https://sinergiabiomedica.pe/venta/memmert-sn55/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-sn55.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>12162.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Memmert</g:brand>
-    <g:mpn>SN-55</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Esterilización</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
     <g:id>memmert-in55</g:id>
     <title>Incubadora de cultivo de 53 litros Memmert IN-55</title>
     <description>Incubadora para microbiología y cultivos. 53 litros Hasta 80 °C Pantalla táctil a color Cod. D-369.</description>
     <link>https://sinergiabiomedica.pe/venta/memmert-in55/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-in55.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>14020.00 PEN</g:price>
+    <g:price>11142.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Memmert</g:brand>
     <g:mpn>IN-55</g:mpn>
@@ -1481,10 +1556,55 @@
     <link>https://sinergiabiomedica.pe/venta/cardioline-walk400h/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cardioline-walk400h.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>14879.00 PEN</g:price>
+    <g:price>11825.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Cardioline</g:brand>
     <g:mpn>Walk400h</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>sibelmed-sibelsound-duo</g:id>
+    <title>Audiómetro clínico de 2 canales Sibelmed Sibelsound DUO</title>
+    <description>Audiómetro clínico con pantalla táctil para evaluación auditiva completa. 2 canales Pantalla LCD táctil a color</description>
+    <link>https://sinergiabiomedica.pe/venta/sibelmed-sibelsound-duo/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/sibelmed-sibelsound-duo.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>13933.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Sibelmed</g:brand>
+    <g:mpn>Sibelsound DUO</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Diagnóstico</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>boeco-s200</g:id>
+    <title>Espectrofotómetro visible Boeco S-200 Vis</title>
+    <description>Espectrofotómetro para química clínica y docencia. Rango de 320 a 1100 nm</description>
+    <link>https://sinergiabiomedica.pe/venta/boeco-s200/</link>
+    <g:image_link>https://drive.google.com/thumbnail?id=1hoogfLaUEQfYKF7rYKj3BjerHl2QnzxX&amp;sz=w1600</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>14087.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Boeco</g:brand>
+    <g:mpn>S-200 Vis</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>diagnostico-c6a</g:id>
+    <title>Videocolposcopio LED rodable Edan C6A</title>
+    <description>Videocolposcopio con brazo articulado para ginecología. 50X LED Brazo articulado</description>
+    <link>https://sinergiabiomedica.pe/venta/diagnostico-c6a/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-diagnostico-c6a.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>14176.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>C6A</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -1495,8 +1615,8 @@
     <description>Autoclave de vapor clase B para consultorios, odontología y centros de salud. 25 litros Clase B Impresora incorporada Cod. D-212.</description>
     <link>https://sinergiabiomedica.pe/venta/tuttnauer-t-top-11/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-t-top-11.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>33911.00 PEN</g:price>
+    <g:availability>in_stock</g:availability>
+    <g:price>26949.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Tuttnauer</g:brand>
     <g:mpn>T-Top 11 P</g:mpn>
@@ -1511,7 +1631,7 @@
     <link>https://sinergiabiomedica.pe/venta/baix-100921/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/baix-100921.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>25549.00 PEN</g:price>
+    <g:price>20304.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Baix</g:brand>
     <g:mpn>DS-25</g:mpn>
@@ -1526,57 +1646,12 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-077612/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-077612.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>20087.00 PEN</g:price>
+    <g:price>15964.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>BIB-100</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-iv15</g:id>
-    <title>Monitor modular de 15&quot; (módulos aparte) Edan iV15</title>
-    <description>Monitor modular táctil de pantalla grande para cuidados críticos. Pantalla táctil de 15&quot; Modular Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-iv15/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv15.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>16026.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iV15</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-086825</g:id>
-    <title>Monitor multiparámetro de 12&quot; con presión invasiva Edan iM70</title>
-    <description>Monitor de cabecera con 6 parámetros incluida presión invasiva. Pantalla táctil de 12&quot; 6 parámetros con PI Impresora Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-086825/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-086825.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>17652.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iM70</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-iv17</g:id>
-    <title>Monitor modular de 17&quot; (módulos aparte) Edan iV17</title>
-    <description>Monitor modular táctil de alta gama para UCI y quirófano. Pantalla táctil de 17&quot; Modular Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-iv17/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-iv17.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>18163.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>iV17</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1586,12 +1661,27 @@
     <link>https://sinergiabiomedica.pe/venta/edan-092463/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-092463.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>27408.00 PEN</g:price>
+    <g:price>21781.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iM80</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>david-yp-2000</g:id>
+    <title>Incubadora neonatal Ningbo David YP-2000</title>
+    <description>Incubadora cerrada para el cuidado del recién nacido en neonatología e intermedios. Pantalla LCD a color de 7 pulgadas Balanza incorporada Lámpara de observación Opción de sensor de oxígeno</description>
+    <link>https://sinergiabiomedica.pe/venta/david-yp-2000/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/david-yp-2000.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>35352.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ningbo David</g:brand>
+    <g:mpn>YP-2000</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Neonatología y obstetricia</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1601,7 +1691,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-095440/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-095440.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22706.00 PEN</g:price>
+    <g:price>18045.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED E3</g:mpn>
@@ -1616,7 +1706,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-hyled-200m/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-hyled-200m.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19510.00 PEN</g:price>
+    <g:price>15505.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>HyLED 200M</g:mpn>
@@ -1631,7 +1721,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-087352/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-087352.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22204.00 PEN</g:price>
+    <g:price>17646.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED E3</g:mpn>
@@ -1646,7 +1736,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-084199/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-084199.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22581.00 PEN</g:price>
+    <g:price>17945.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED E3</g:mpn>
@@ -1661,7 +1751,7 @@
     <link>https://sinergiabiomedica.pe/venta/ledspa-surtron-300/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/ledspa-surtron-300.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>29489.00 PEN</g:price>
+    <g:price>23435.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron 300 HP</g:mpn>
@@ -1676,10 +1766,25 @@
     <link>https://sinergiabiomedica.pe/venta/led-spa-surtron-touch-200/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-surtron-touch-200.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19232.00 PEN</g:price>
+    <g:price>15284.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>LED SpA</g:brand>
     <g:mpn>Surtron Touch 200</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Quirófano y aspiración</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>led-spa-075336</g:id>
+    <title>Electrobisturí de alta potencia 400 W LED SpA Surtron 400 HP</title>
+    <description>Unidad electroquirúrgica de máxima potencia para cirugía general y especialidades. 400 W Monopolar y bipolar</description>
+    <link>https://sinergiabiomedica.pe/venta/led-spa-075336/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-075336.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>39737.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>LED SpA</g:brand>
+    <g:mpn>Surtron 400 HP</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -1691,7 +1796,7 @@
     <link>https://sinergiabiomedica.pe/venta/meling-dw-fl528/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-dw-fl528.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>32471.00 PEN</g:price>
+    <g:price>25805.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Meling</g:brand>
     <g:mpn>DW-FL528</g:mpn>
@@ -1706,7 +1811,7 @@
     <link>https://sinergiabiomedica.pe/venta/cu-medical-hd1/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-hd1.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19510.00 PEN</g:price>
+    <g:price>15505.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CU Medical</g:brand>
     <g:mpn>CU-HD1</g:mpn>
@@ -1721,7 +1826,7 @@
     <link>https://sinergiabiomedica.pe/venta/cu-medical-096614/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/cu-medical-096614.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>36466.00 PEN</g:price>
+    <g:price>28980.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>CU Medical</g:brand>
     <g:mpn>Life Gain CU-HD1</g:mpn>
@@ -1736,7 +1841,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-f9-express/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f9-express.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>21973.00 PEN</g:price>
+    <g:price>17462.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>F9 Express</g:mpn>
@@ -1751,7 +1856,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-f15/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-f15.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>28615.00 PEN</g:price>
+    <g:price>22741.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>F15</g:mpn>
@@ -1766,7 +1871,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-075437/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-075437.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>21324.00 PEN</g:price>
+    <g:price>16946.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>C-28A</g:mpn>
@@ -1781,7 +1886,7 @@
     <link>https://sinergiabiomedica.pe/venta/hettich-rotofix-32a/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hettich-rotofix-32a.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19260.00 PEN</g:price>
+    <g:price>15306.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Hettich</g:brand>
     <g:mpn>Rotofix 32A</g:mpn>
@@ -1796,27 +1901,12 @@
     <link>https://sinergiabiomedica.pe/venta/hettich-haematokrit-200/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-hettich-haematokrit-200.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>19325.00 PEN</g:price>
+    <g:price>15357.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Hettich</g:brand>
     <g:mpn>Haematokrit 200</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>cardioline-touchecg-tab7</g:id>
-    <title>Electrocardiógrafo con tablet Cardioline TouchECG Tab7</title>
-    <description>ECG de 12 derivaciones en tablet Android para consulta y atención móvil. Tablet Android Unidad de adquisición HD+ Cod. D-1.</description>
-    <link>https://sinergiabiomedica.pe/venta/cardioline-touchecg-tab7/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-cardioline-touchecg-tab7.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>15551.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Cardioline</g:brand>
-    <g:mpn>TouchECG Tab7</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1826,7 +1916,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h30-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h30-pro.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22437.00 PEN</g:price>
+    <g:price>17831.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H30 Pro</g:mpn>
@@ -1841,7 +1931,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-bc-30s/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-bc-30s.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>33112.00 PEN</g:price>
+    <g:price>26314.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>BC-30S</g:mpn>
@@ -1856,7 +1946,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-093683/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-093683.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>38882.00 PEN</g:price>
+    <g:price>30900.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H30</g:mpn>
@@ -1871,42 +1961,12 @@
     <link>https://sinergiabiomedica.pe/venta/memmert-un-110/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-un-110.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19111.00 PEN</g:price>
+    <g:price>15188.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Memmert</g:brand>
     <g:mpn>UN-110</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>sibelmed-sibelsound-duo</g:id>
-    <title>Audiómetro clínico de 2 canales Sibelmed Sibelsound DUO</title>
-    <description>Audiómetro clínico con pantalla táctil para evaluación auditiva completa. 2 canales Pantalla LCD táctil a color</description>
-    <link>https://sinergiabiomedica.pe/venta/sibelmed-sibelsound-duo/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/sibelmed-sibelsound-duo.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>17532.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Sibelmed</g:brand>
-    <g:mpn>Sibelsound DUO</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>diagnostico-c6a</g:id>
-    <title>Videocolposcopio LED rodable Edan C6A</title>
-    <description>Videocolposcopio con brazo articulado para ginecología. 50X LED Brazo articulado</description>
-    <link>https://sinergiabiomedica.pe/venta/diagnostico-c6a/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-diagnostico-c6a.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>17838.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>C6A</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Diagnóstico</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1916,7 +1976,7 @@
     <link>https://sinergiabiomedica.pe/venta/sibelmed-datospir-touch-diagnostic/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/sibelmed-datospir-touch-diagnostic.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>19678.00 PEN</g:price>
+    <g:price>15638.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Sibelmed</g:brand>
     <g:mpn>Datospir Touch Diagnostic</g:mpn>
@@ -1931,7 +1991,7 @@
     <link>https://sinergiabiomedica.pe/venta/heine-073492/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/heine-073492.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22566.00 PEN</g:price>
+    <g:price>17933.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Heine</g:brand>
     <g:mpn>Omega 500</g:mpn>
@@ -1946,12 +2006,42 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-097070/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-097070.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>22953.00 PEN</g:price>
+    <g:price>18241.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>MW-12A</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>boeco-c-28a</g:id>
+    <title>Centrífuga de laboratorio de 12 y 16 tubos Boeco C-28A</title>
+    <description>Centrífuga electrónica de mesa para tubos de 15 ml. Rotor angular de 12 tubos y oscilante de 16 tubos Tubos de 15 ml</description>
+    <link>https://sinergiabiomedica.pe/venta/boeco-c-28a/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-c-28a.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>19512.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Boeco</g:brand>
+    <g:mpn>C-28A</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>meling-xc-630l</g:id>
+    <title>Refrigeradora para banco de sangre Meling XC-630L</title>
+    <description>Refrigeradora a +4 °C para conservación de hemocomponentes. Temperatura de +4 °C 630 litros (22 pies cúbicos)</description>
+    <link>https://sinergiabiomedica.pe/venta/meling-xc-630l/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-xc-630l.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>22113.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Meling</g:brand>
+    <g:mpn>XC-630L</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Cadena de frío</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -1970,33 +2060,33 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>boeco-c-28a</g:id>
-    <title>Centrífuga de laboratorio de 12 y 16 tubos Boeco C-28A</title>
-    <description>Centrífuga electrónica de mesa para tubos de 15 ml. Rotor angular de 12 tubos y oscilante de 16 tubos Tubos de 15 ml</description>
-    <link>https://sinergiabiomedica.pe/venta/boeco-c-28a/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-c-28a.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>24552.00 PEN</g:price>
+    <g:id>mindray-mr-96a</g:id>
+    <title>Lector de microplacas Mindray MR-96A</title>
+    <description>Lector de microplacas para pruebas ELISA. Lectura de 96 pocillos</description>
+    <link>https://sinergiabiomedica.pe/venta/mindray-mr-96a/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-mr-96a.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>27392.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Boeco</g:brand>
-    <g:mpn>C-28A</g:mpn>
+    <g:brand>Mindray</g:brand>
+    <g:mpn>MR-96A</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>meling-xc-630l</g:id>
-    <title>Refrigeradora para banco de sangre Meling XC-630L</title>
-    <description>Refrigeradora a +4 °C para conservación de hemocomponentes. Temperatura de +4 °C 630 litros (22 pies cúbicos)</description>
-    <link>https://sinergiabiomedica.pe/venta/meling-xc-630l/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/meling-xc-630l.jpg</g:image_link>
+    <g:id>tuttnauer-087186</g:id>
+    <title>Autoclave de mesa de 28 litros clase B Tuttnauer Elara 11D</title>
+    <description>Autoclave de mesa clase B con bomba de vacío e impresora, para esterilización de instrumental. 28 litros Clase B Bomba de vacío Generador de vapor Impresora incorporada</description>
+    <link>https://sinergiabiomedica.pe/venta/tuttnauer-087186/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-087186.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>27826.00 PEN</g:price>
+    <g:price>28343.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Meling</g:brand>
-    <g:mpn>XC-630L</g:mpn>
+    <g:brand>Tuttnauer</g:brand>
+    <g:mpn>Elara 11D</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Cadena de frío</g:product_type>
+    <g:product_type>Esterilización</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -2015,33 +2105,63 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>mindray-mr-96a</g:id>
-    <title>Lector de microplacas Mindray MR-96A</title>
-    <description>Lector de microplacas para pruebas ELISA. Lectura de 96 pocillos</description>
-    <link>https://sinergiabiomedica.pe/venta/mindray-mr-96a/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/mindray-mr-96a.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>34468.00 PEN</g:price>
+    <g:id>memmert-089258</g:id>
+    <title>Incubadora de CO₂ de 56 litros Memmert ICO 50</title>
+    <description>Incubadora de CO₂ para cultivo celular en laboratorio e investigación. 56 litros Hasta 50 °C Control de CO₂ Cámara de 40 × 42,5 × 33 cm</description>
+    <link>https://sinergiabiomedica.pe/venta/memmert-089258/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-089258.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>33690.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Mindray</g:brand>
-    <g:mpn>MR-96A</g:mpn>
+    <g:brand>Memmert</g:brand>
+    <g:mpn>ICO 50</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>tuttnauer-087186</g:id>
-    <title>Autoclave de mesa de 28 litros clase B Tuttnauer Elara 11D</title>
-    <description>Autoclave de mesa clase B con bomba de vacío e impresora, para esterilización de instrumental. 28 litros Clase B Bomba de vacío Generador de vapor Impresora incorporada</description>
-    <link>https://sinergiabiomedica.pe/venta/tuttnauer-087186/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-087186.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>35665.00 PEN</g:price>
+    <g:id>david-ti-2000</g:id>
+    <title>Incubadora de transporte neonatal Ningbo David TI-2000</title>
+    <description>Incubadora para el traslado seguro de neonatos entre servicios y en ambulancia. Pantalla LED Batería para traslado Opción de rango de temperatura hasta 38 °C Cod. D-112.</description>
+    <link>https://sinergiabiomedica.pe/venta/david-ti-2000/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/david-ti-2000.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>36769.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Tuttnauer</g:brand>
-    <g:mpn>Elara 11D</g:mpn>
+    <g:brand>Ningbo David</g:brand>
+    <g:mpn>TI-2000</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Esterilización</g:product_type>
+    <g:product_type>Neonatología y obstetricia</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>david-hkn-93a</g:id>
+    <title>Cuna de calor radiante Ningbo David HKN-93A</title>
+    <description>Servocuna térmica para recepción del recién nacido en sala de partos y neonatología. Altura variable Accesorios estándar incluidos Opciones: lámpara UV, elevador eléctrico, balanza Cod. D-350.</description>
+    <link>https://sinergiabiomedica.pe/venta/david-hkn-93a/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/david-hkn-93a.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>37445.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ningbo David</g:brand>
+    <g:mpn>HKN-93A</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Neonatología y obstetricia</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>biobase-bsc-4fa2</g:id>
+    <title>Cabina de flujo laminar vertical de 4 pies Biobase BSC-4FA2</title>
+    <description>Cabina de seguridad biológica para laboratorio y microbiología. Flujo laminar vertical Ancho de 4 pies</description>
+    <link>https://sinergiabiomedica.pe/venta/biobase-bsc-4fa2/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bsc-4fa2.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>39355.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Biobase</g:brand>
+    <g:mpn>BSC-4FA2</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -2051,7 +2171,7 @@
     <link>https://sinergiabiomedica.pe/venta/baix-48l/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/baix-48l.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>51099.00 PEN</g:price>
+    <g:price>40609.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Baix</g:brand>
     <g:mpn>48 L clase B</g:mpn>
@@ -2066,7 +2186,7 @@
     <link>https://sinergiabiomedica.pe/venta/tuttnauer-3870-ea/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/tuttnauer-3870-ea.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>90584.00 PEN</g:price>
+    <g:price>71988.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Tuttnauer</g:brand>
     <g:mpn>3870 EA</g:mpn>
@@ -2081,7 +2201,7 @@
     <link>https://sinergiabiomedica.pe/venta/edan-acclarix-lx3/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-acclarix-lx3.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>94301.00 PEN</g:price>
+    <g:price>74941.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>Acclarix LX3</g:mpn>
@@ -2111,7 +2231,7 @@
     <link>https://sinergiabiomedica.pe/venta/siare-aria-104/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/siare-aria-104.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>92907.00 PEN</g:price>
+    <g:price>73834.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Siare</g:brand>
     <g:mpn>Aria 104</g:mpn>
@@ -2126,7 +2246,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-tv50/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-tv50.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>85099.00 PEN</g:price>
+    <g:price>67629.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>TV50</g:mpn>
@@ -2135,18 +2255,18 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>david-yp-2000</g:id>
-    <title>Incubadora neonatal Ningbo David YP-2000</title>
-    <description>Incubadora cerrada para el cuidado del recién nacido en neonatología e intermedios. Pantalla LCD a color de 7 pulgadas Balanza incorporada Lámpara de observación Opción de sensor de oxígeno</description>
-    <link>https://sinergiabiomedica.pe/venta/david-yp-2000/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/david-yp-2000.jpg</g:image_link>
+    <g:id>siare-094409</g:id>
+    <title>Ventilador mecánico de 15&quot; para UCI Siare Aria 150</title>
+    <description>Ventilador rodable con turbina y pantalla grande para cuidados intensivos. Turbina incorporada Pantalla táctil de 15&quot; Adulto y pediátrico</description>
+    <link>https://sinergiabiomedica.pe/venta/siare-094409/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/siare-094409.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>44484.00 PEN</g:price>
+    <g:price>92292.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>Ningbo David</g:brand>
-    <g:mpn>YP-2000</g:mpn>
+    <g:brand>Siare</g:brand>
+    <g:mpn>Aria 150</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Neonatología y obstetricia</g:product_type>
+    <g:product_type>Ventilación e infusión</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -2156,7 +2276,7 @@
     <link>https://sinergiabiomedica.pe/venta/ningbo-david-ti-3000b/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/ningbo-david-ti-3000b.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>71585.00 PEN</g:price>
+    <g:price>56889.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ningbo David</g:brand>
     <g:mpn>TI-3000B</g:mpn>
@@ -2165,16 +2285,16 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>led-spa-075336</g:id>
-    <title>Electrobisturí de alta potencia 400 W LED SpA Surtron 400 HP</title>
-    <description>Unidad electroquirúrgica de máxima potencia para cirugía general y especialidades. 400 W Monopolar y bipolar</description>
-    <link>https://sinergiabiomedica.pe/venta/led-spa-075336/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/led-spa-075336.jpg</g:image_link>
+    <g:id>kls-martin-074705</g:id>
+    <title>Lámpara quirúrgica LED de techo doble KLS Martin marLED V16/V10</title>
+    <description>Lámpara de techo de 2 cabezales para sala de operaciones. 160 000 + 130 000 lux 2 cabezales</description>
+    <link>https://sinergiabiomedica.pe/venta/kls-martin-074705/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-074705.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>50003.00 PEN</g:price>
+    <g:price>80189.00 PEN</g:price>
     <g:condition>new</g:condition>
-    <g:brand>LED SpA</g:brand>
-    <g:mpn>Surtron 400 HP</g:mpn>
+    <g:brand>KLS Martin</g:brand>
+    <g:mpn>marLED V16/V10</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -2186,7 +2306,7 @@
     <link>https://sinergiabiomedica.pe/venta/meling-dw-hl530/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-meling-dw-hl530.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>66893.00 PEN</g:price>
+    <g:price>53160.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Meling</g:brand>
     <g:mpn>DW-HL530</g:mpn>
@@ -2201,7 +2321,7 @@
     <link>https://sinergiabiomedica.pe/venta/boeco-091295/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/boeco-091295.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>56085.00 PEN</g:price>
+    <g:price>44572.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Boeco</g:brand>
     <g:mpn>U-320</g:mpn>
@@ -2216,7 +2336,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-bs-240-pro/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-bs-240-pro.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>96995.00 PEN</g:price>
+    <g:price>77083.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>BS-240 Pro</g:mpn>
@@ -2231,10 +2351,25 @@
     <link>https://sinergiabiomedica.pe/venta/edan-h60/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h60.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>54629.00 PEN</g:price>
+    <g:price>43414.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>H60</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>edan-h80s</g:id>
+    <title>Analizador hematológico de 5 diferenciales con automuestreador Edan H80S</title>
+    <description>Hematología de 5 diferenciales con carga automática para alto volumen. 5 diferenciales Pantalla táctil de 12.1&quot; Automuestreador Cod. D-448.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-h80s/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h80s.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>62021.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>H80S</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
@@ -2255,88 +2390,13 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
-    <g:id>edan-h80s</g:id>
-    <title>Analizador hematológico de 5 diferenciales con automuestreador Edan H80S</title>
-    <description>Hematología de 5 diferenciales con carga automática para alto volumen. 5 diferenciales Pantalla táctil de 12.1&quot; Automuestreador Cod. D-448.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-h80s/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-h80s.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>78042.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>H80S</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>memmert-089258</g:id>
-    <title>Incubadora de CO₂ de 56 litros Memmert ICO 50</title>
-    <description>Incubadora de CO₂ para cultivo celular en laboratorio e investigación. 56 litros Hasta 50 °C Control de CO₂ Cámara de 40 × 42,5 × 33 cm</description>
-    <link>https://sinergiabiomedica.pe/venta/memmert-089258/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/memmert-089258.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>42393.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Memmert</g:brand>
-    <g:mpn>ICO 50</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>david-ti-2000</g:id>
-    <title>Incubadora de transporte neonatal Ningbo David TI-2000</title>
-    <description>Incubadora para el traslado seguro de neonatos entre servicios y en ambulancia. Pantalla LED Batería para traslado Opción de rango de temperatura hasta 38 °C Cod. D-112.</description>
-    <link>https://sinergiabiomedica.pe/venta/david-ti-2000/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/david-ti-2000.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>46268.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ningbo David</g:brand>
-    <g:mpn>TI-2000</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Neonatología y obstetricia</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>david-hkn-93a</g:id>
-    <title>Cuna de calor radiante Ningbo David HKN-93A</title>
-    <description>Servocuna térmica para recepción del recién nacido en sala de partos y neonatología. Altura variable Accesorios estándar incluidos Opciones: lámpara UV, elevador eléctrico, balanza Cod. D-350.</description>
-    <link>https://sinergiabiomedica.pe/venta/david-hkn-93a/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/david-hkn-93a.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>47118.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ningbo David</g:brand>
-    <g:mpn>HKN-93A</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Neonatología y obstetricia</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>biobase-bsc-4fa2</g:id>
-    <title>Cabina de flujo laminar vertical de 4 pies Biobase BSC-4FA2</title>
-    <description>Cabina de seguridad biológica para laboratorio y microbiología. Flujo laminar vertical Ancho de 4 pies</description>
-    <link>https://sinergiabiomedica.pe/venta/biobase-bsc-4fa2/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/biobase-bsc-4fa2.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>49521.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Biobase</g:brand>
-    <g:mpn>BSC-4FA2</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
     <g:id>esterilizacion-tiva2-h</g:id>
     <title>Lavador desinfector de 65 L Tuttnauer TIVA2-H</title>
     <description>Lavadora desinfectadora de instrumental para centrales de esterilización. 65 L 1 puerta Alta velocidad Cod. E-208.</description>
     <link>https://sinergiabiomedica.pe/venta/esterilizacion-tiva2-h/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-esterilizacion-tiva2-h.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>58067.00 PEN</g:price>
+    <g:price>46146.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Tuttnauer</g:brand>
     <g:mpn>TIVA2-H</g:mpn>
@@ -2351,7 +2411,7 @@
     <link>https://sinergiabiomedica.pe/venta/laboratorio-bc-60/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-bc-60.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>64106.00 PEN</g:price>
+    <g:price>50945.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Autobio</g:brand>
     <g:mpn>BC 60</g:mpn>
@@ -2366,12 +2426,27 @@
     <link>https://sinergiabiomedica.pe/venta/kls-marled-e9i/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-marled-e9i.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>73216.00 PEN</g:price>
+    <g:price>58186.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED E9i</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
+    <g:id>laboratorio-h100-plus</g:id>
+    <title>Analizador de hemoglobina glicosilada (HPLC) Lifotronic H100 Plus</title>
+    <description>Analizador de HbA1c por cromatografía líquida (HPLC) para control de diabetes. Método HPLC Medición de HbA1c</description>
+    <link>https://sinergiabiomedica.pe/venta/laboratorio-h100-plus/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-h100-plus.jpg</g:image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>95371.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Lifotronic</g:brand>
+    <g:mpn>H100 Plus</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -2381,7 +2456,7 @@
     <link>https://sinergiabiomedica.pe/venta/tuttnauer-101144/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-tuttnauer-101144.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>557442.00 PEN</g:price>
+    <g:price>443004.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Tuttnauer</g:brand>
     <g:mpn>T-MAX6 EP 2V</g:mpn>
@@ -2396,7 +2471,7 @@
     <link>https://sinergiabiomedica.pe/venta/imagenes-v5/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-imagenes-v5.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>143077.00 PEN</g:price>
+    <g:price>113704.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Samsung</g:brand>
     <g:mpn>V5</g:mpn>
@@ -2411,7 +2486,7 @@
     <link>https://sinergiabiomedica.pe/venta/sonoscape-096501/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-sonoscape-096501.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>192875.00 PEN</g:price>
+    <g:price>153279.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>SonoScape</g:brand>
     <g:mpn>P20</g:mpn>
@@ -2426,27 +2501,12 @@
     <link>https://sinergiabiomedica.pe/venta/imagenes-v8/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-imagenes-v8.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>268882.00 PEN</g:price>
+    <g:price>213683.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Samsung</g:brand>
     <g:mpn>V8</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Imagenología</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>siare-094409</g:id>
-    <title>Ventilador mecánico de 15&quot; para UCI Siare Aria 150</title>
-    <description>Ventilador rodable con turbina y pantalla grande para cuidados intensivos. Turbina incorporada Pantalla táctil de 15&quot; Adulto y pediátrico</description>
-    <link>https://sinergiabiomedica.pe/venta/siare-094409/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/siare-094409.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>116134.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Siare</g:brand>
-    <g:mpn>Aria 150</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Ventilación e infusión</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -2456,27 +2516,12 @@
     <link>https://sinergiabiomedica.pe/venta/perlove-099414/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/perlove-rx-digital.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>429230.00 PEN</g:price>
+    <g:price>341113.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Perlove</g:brand>
     <g:mpn>PLD6500E</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Imagenología</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>kls-martin-074705</g:id>
-    <title>Lámpara quirúrgica LED de techo doble KLS Martin marLED V16/V10</title>
-    <description>Lámpara de techo de 2 cabezales para sala de operaciones. 160 000 + 130 000 lux 2 cabezales</description>
-    <link>https://sinergiabiomedica.pe/venta/kls-martin-074705/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-074705.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>100904.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>KLS Martin</g:brand>
-    <g:mpn>marLED V16/V10</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Quirófano y aspiración</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -2486,7 +2531,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-martin-096941/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-martin-096941.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>217402.00 PEN</g:price>
+    <g:price>172772.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED X/X</g:mpn>
@@ -2501,7 +2546,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-a7/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-a7.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>330964.00 PEN</g:price>
+    <g:price>263020.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>A7</g:mpn>
@@ -2516,7 +2561,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-hybase-6100-plus/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-hybase-6100-plus.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>207183.00 PEN</g:price>
+    <g:price>164650.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>HyBase 6100 Plus</g:mpn>
@@ -2531,27 +2576,12 @@
     <link>https://sinergiabiomedica.pe/venta/medifa-089727/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/medifa-089727.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>281787.00 PEN</g:price>
+    <g:price>223938.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Medifa</g:brand>
     <g:mpn>601120</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Quirófano y aspiración</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>laboratorio-h100-plus</g:id>
-    <title>Analizador de hemoglobina glicosilada (HPLC) Lifotronic H100 Plus</title>
-    <description>Analizador de HbA1c por cromatografía líquida (HPLC) para control de diabetes. Método HPLC Medición de HbA1c</description>
-    <link>https://sinergiabiomedica.pe/venta/laboratorio-h100-plus/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/web-laboratorio-h100-plus.jpg</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>120008.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Lifotronic</g:brand>
-    <g:mpn>H100 Plus</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Laboratorio</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
@@ -2561,7 +2591,7 @@
     <link>https://sinergiabiomedica.pe/venta/kls-marled-x/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/kls-marled-x.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>126805.00 PEN</g:price>
+    <g:price>100773.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>KLS Martin</g:brand>
     <g:mpn>marLED X</g:mpn>
@@ -2576,7 +2606,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-c3510/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-c3510.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>150732.00 PEN</g:price>
+    <g:price>119788.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>C3510</g:mpn>
@@ -2591,7 +2621,7 @@
     <link>https://sinergiabiomedica.pe/venta/mindray-cl-900i/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/web-mindray-cl-900i.jpg</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>156864.00 PEN</g:price>
+    <g:price>124661.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Mindray</g:brand>
     <g:mpn>CL-900i</g:mpn>
@@ -2606,7 +2636,7 @@
     <link>https://sinergiabiomedica.pe/venta/medifa-6000/</link>
     <g:image_link>https://sinergiabiomedica.pe/img/venta/medifa-6000.jpg</g:image_link>
     <g:availability>backorder</g:availability>
-    <g:price>234544.00 PEN</g:price>
+    <g:price>186394.00 PEN</g:price>
     <g:condition>new</g:condition>
     <g:brand>Medifa</g:brand>
     <g:mpn>6000</g:mpn>
