@@ -335,6 +335,21 @@
     <g:google_product_category>2496</g:google_product_category>
   </item>
   <item>
+    <g:id>edan-099004</g:id>
+    <title>Monitor de signos vitales de 12&quot; Slim Edan X12</title>
+    <description>Monitor multiparámetro delgado, sin impresora. Pantalla de 12&quot; 5 parámetros Cod. D-18.</description>
+    <link>https://sinergiabiomedica.pe/venta/edan-099004/</link>
+    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099004.jpg</g:image_link>
+    <g:availability>backorder</g:availability>
+    <g:price>3637.00 PEN</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Edan</g:brand>
+    <g:mpn>X12</g:mpn>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Monitoreo de pacientes</g:product_type>
+    <g:google_product_category>2496</g:google_product_category>
+  </item>
+  <item>
     <g:id>edan-092796</g:id>
     <title>Monitor de signos vitales de 8&quot; Slim Edan X8</title>
     <description>Monitor multiparámetro compacto con impresora. Pantalla táctil de 8&quot; 5 parámetros Impresora Cod. D-18.</description>
@@ -1065,21 +1080,6 @@
     <g:condition>new</g:condition>
     <g:brand>Edan</g:brand>
     <g:mpn>iX10</g:mpn>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Monitoreo de pacientes</g:product_type>
-    <g:google_product_category>2496</g:google_product_category>
-  </item>
-  <item>
-    <g:id>edan-099004</g:id>
-    <title>Monitor de signos vitales de 12&quot; Slim Edan X12</title>
-    <description>Monitor multiparámetro delgado, sin impresora. Pantalla de 12&quot; 5 parámetros Cod. D-18.</description>
-    <link>https://sinergiabiomedica.pe/venta/edan-099004/</link>
-    <g:image_link>https://sinergiabiomedica.pe/img/venta/edan-099004.jpg</g:image_link>
-    <g:availability>backorder</g:availability>
-    <g:price>7643.00 PEN</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Edan</g:brand>
-    <g:mpn>X12</g:mpn>
     <g:identifier_exists>no</g:identifier_exists>
     <g:product_type>Monitoreo de pacientes</g:product_type>
     <g:google_product_category>2496</g:google_product_category>
